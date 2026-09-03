@@ -14,69 +14,69 @@ import java.util.Map;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<ApiResponse<Void>> handleResourceNotFound(
-            ResourceNotFoundException ex) {
+        @ExceptionHandler(ResourceNotFoundException.class)
+        public ResponseEntity<ApiResponse<Void>> handleResourceNotFound(
+                        ResourceNotFoundException ex) {
 
-        return ResponseEntity
-                .status(HttpStatus.NOT_FOUND)
-                .body(ApiResponse.error(ex.getMessage()));
-    }
+                return ResponseEntity
+                                .status(HttpStatus.NOT_FOUND)
+                                .body(ApiResponse.error(ex.getMessage()));
+        }
 
-    @ExceptionHandler(BadRequestException.class)
-    public ResponseEntity<ApiResponse<Void>> handleBadRequest(
-            BadRequestException ex) {
+        @ExceptionHandler(BadRequestException.class)
+        public ResponseEntity<ApiResponse<Void>> handleBadRequest(
+                        BadRequestException ex) {
 
-        return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
-                .body(ApiResponse.error(ex.getMessage()));
-    }
+                return ResponseEntity
+                                .status(HttpStatus.BAD_REQUEST)
+                                .body(ApiResponse.error(ex.getMessage()));
+        }
 
-    @ExceptionHandler(DuplicateResourceException.class)
-    public ResponseEntity<ApiResponse<Void>> handleDuplicateResource(
-            DuplicateResourceException ex) {
+        @ExceptionHandler(DuplicateResourceException.class)
+        public ResponseEntity<ApiResponse<Void>> handleDuplicateResource(
+                        DuplicateResourceException ex) {
 
-        return ResponseEntity
-                .status(HttpStatus.CONFLICT)
-                .body(ApiResponse.error(ex.getMessage()));
-    }
+                return ResponseEntity
+                                .status(HttpStatus.CONFLICT)
+                                .body(ApiResponse.error(ex.getMessage()));
+        }
 
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ApiResponse<Map<String, String>>> handleValidationErrors(
-            MethodArgumentNotValidException ex) {
+        @ExceptionHandler(MethodArgumentNotValidException.class)
+        public ResponseEntity<ApiResponse<Map<String, String>>> handleValidationErrors(
+                        MethodArgumentNotValidException ex) {
 
-        Map<String, String> errores = new HashMap<>();
+                Map<String, String> errores = new HashMap<>();
 
-        ex.getBindingResult().getFieldErrors().forEach(error ->
-                errores.put(error.getField(), error.getDefaultMessage()));
+                ex.getBindingResult().getFieldErrors()
+                                .forEach(error -> errores.put(error.getField(), error.getDefaultMessage()));
 
-        ApiResponse<Map<String, String>> response = ApiResponse.error(
-                "Error de validación");
-        response.setData(errores);
+                ApiResponse<Map<String, String>> response = ApiResponse.error(
+                                "Error de validación");
+                response.setData(errores);
 
-        return ResponseEntity
-                .status(HttpStatus.UNPROCESSABLE_ENTITY)
-                .body(response);
-    }
+                return ResponseEntity
+                                .status(422)
+                                .body(response);
+        }
 
-    @ExceptionHandler(DataIntegrityViolationException.class)
-    public ResponseEntity<ApiResponse<Void>> handleDataIntegrity(
-            DataIntegrityViolationException ex) {
+        @ExceptionHandler(DataIntegrityViolationException.class)
+        public ResponseEntity<ApiResponse<Void>> handleDataIntegrity(
+                        DataIntegrityViolationException ex) {
 
-        return ResponseEntity
-                .status(HttpStatus.CONFLICT)
-                .body(ApiResponse.error(
-                        "Error de integridad de datos: " +
-                                ex.getMostSpecificCause().getMessage()));
-    }
+                return ResponseEntity
+                                .status(HttpStatus.CONFLICT)
+                                .body(ApiResponse.error(
+                                                "Error de integridad de datos: " +
+                                                                ex.getMostSpecificCause().getMessage()));
+        }
 
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<ApiResponse<Void>> handleGenericException(
-            Exception ex) {
+        @ExceptionHandler(Exception.class)
+        public ResponseEntity<ApiResponse<Void>> handleGenericException(
+                        Exception ex) {
 
-        return ResponseEntity
-                .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(ApiResponse.error(
-                        "Error interno del servidor: " + ex.getMessage()));
-    }
+                return ResponseEntity
+                                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                                .body(ApiResponse.error(
+                                                "Error interno del servidor: " + ex.getMessage()));
+        }
 }
