@@ -19,6 +19,8 @@ public class SecurityConfig {
                                 "/swagger-ui.html",
                                 "/v3/api-docs/**")
                         .permitAll()
+                        // Fase de desarrollo: todos los endpoints abiertos
+                        .requestMatchers("/api/**").permitAll()
                         .anyRequest().authenticated())
                 .httpBasic(httpBasic -> {
                 });
