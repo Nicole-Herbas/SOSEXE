@@ -4,6 +4,7 @@ import bo.edu.sos.backend.dto.CentroDTO;
 import bo.edu.sos.backend.entity.Centro;
 import bo.edu.sos.backend.entity.Departamento;
 import bo.edu.sos.backend.entity.Usuario;
+import bo.edu.sos.backend.exception.ResourceNotFoundException;
 import bo.edu.sos.backend.repository.CentroRepository;
 import bo.edu.sos.backend.repository.DepartamentoRepository;
 import bo.edu.sos.backend.repository.UsuarioRepository;
@@ -40,7 +41,7 @@ public class CentroService {
     @Transactional(readOnly = true)
     public CentroDTO buscarPorId(Long id) {
         Centro centro = centroRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Centro no encontrado con ID: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Centro", id));
 
         return convertirADTO(centro);
     }
@@ -64,7 +65,7 @@ public class CentroService {
     public CentroDTO actualizar(Long id, CentroDTO dto) {
 
         Centro centro = centroRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Centro no encontrado con ID: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Centro", id));
 
         copiarDTOaEntidad(dto, centro);
 
@@ -77,8 +78,7 @@ public class CentroService {
     public void eliminar(Long id) {
 
         if (!centroRepository.existsById(id)) {
-            throw new RuntimeException(
-                    "No existe un centro con ID: " + id);
+            throw new ResourceNotFoundException("Centro", id);
         }
 
         centroRepository.deleteById(id);
@@ -98,9 +98,8 @@ public class CentroService {
 
         Departamento departamento = departamentoRepository
                 .findById(dto.getDepartamentoId())
-                .orElseThrow(() -> new RuntimeException(
-                        "No existe el departamento con ID: "
-                                + dto.getDepartamentoId()));
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Departamento", dto.getDepartamentoId()));
 
         centro.setDepartamento(departamento);
 
@@ -108,9 +107,8 @@ public class CentroService {
 
             Usuario responsable = usuarioRepository
                     .findById(dto.getResponsableId())
-                    .orElseThrow(() -> new RuntimeException(
-                            "No existe el usuario con ID: "
-                                    + dto.getResponsableId()));
+                    .orElseThrow(() -> new ResourceNotFoundException(
+                            "Usuario", dto.getResponsableId()));
 
             centro.setResponsable(responsable);
 

@@ -1,8 +1,10 @@
 package bo.edu.sos.backend.controller;
 
+import bo.edu.sos.backend.dto.ApiResponse;
 import bo.edu.sos.backend.dto.CentroDTO;
 import bo.edu.sos.backend.service.CentroService;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,42 +21,46 @@ public class CentroController {
     }
 
     @GetMapping
-    public ResponseEntity<List<CentroDTO>> listarTodos() {
+    public ResponseEntity<ApiResponse<List<CentroDTO>>> listarTodos() {
         return ResponseEntity.ok(
-                centroService.listarTodos());
+                ApiResponse.ok(centroService.listarTodos()));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<CentroDTO> buscarPorId(
+    public ResponseEntity<ApiResponse<CentroDTO>> buscarPorId(
             @PathVariable Long id) {
 
         return ResponseEntity.ok(
-                centroService.buscarPorId(id));
+                ApiResponse.ok(centroService.buscarPorId(id)));
     }
 
     @PostMapping
-    public ResponseEntity<CentroDTO> crear(
+    public ResponseEntity<ApiResponse<CentroDTO>> crear(
             @Valid @RequestBody CentroDTO centroDTO) {
 
-        return ResponseEntity.ok(
-                centroService.guardar(centroDTO));
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(ApiResponse.created(
+                        centroService.guardar(centroDTO)));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<CentroDTO> actualizar(
+    public ResponseEntity<ApiResponse<CentroDTO>> actualizar(
             @PathVariable Long id,
             @Valid @RequestBody CentroDTO centroDTO) {
 
         return ResponseEntity.ok(
-                centroService.actualizar(id, centroDTO));
+                ApiResponse.ok("Centro actualizado",
+                        centroService.actualizar(id, centroDTO)));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> eliminar(
+    public ResponseEntity<ApiResponse<Void>> eliminar(
             @PathVariable Long id) {
 
         centroService.eliminar(id);
 
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(
+                ApiResponse.ok("Centro eliminado", null));
     }
 }

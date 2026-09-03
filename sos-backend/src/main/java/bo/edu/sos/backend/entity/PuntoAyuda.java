@@ -11,11 +11,11 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Table(name = "centro")
+@Table(name = "punto_ayuda")
 @Getter
 @Setter
 @NoArgsConstructor
-public class Centro {
+public class PuntoAyuda {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,21 +30,15 @@ public class Centro {
     @Column(length = 500)
     private String descripcion;
 
-    @Column(nullable = false, length = 250)
+    @Column(length = 250)
     private String direccion;
 
-    @Column(nullable = false, length = 100)
+    @Column(length = 100)
     private String ciudad;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "departamento_id", nullable = false)
     private Departamento departamento;
-
-    @Column(length = 20)
-    private String telefono;
-
-    @Column(length = 150)
-    private String email;
 
     @Column(nullable = false, precision = 10, scale = 7)
     private BigDecimal latitud;
@@ -55,14 +49,14 @@ public class Centro {
     @Column(name = "estado_verificacion", nullable = false, length = 30)
     private String estadoVerificacion = "PENDIENTE";
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "responsable_id")
-    private Usuario responsable;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "creador_id", nullable = false)
+    private Usuario creador;
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
-            name = "centro_necesidad",
-            joinColumns = @JoinColumn(name = "centro_id"),
+            name = "punto_necesidad",
+            joinColumns = @JoinColumn(name = "punto_id"),
             inverseJoinColumns = @JoinColumn(name = "necesidad_id")
     )
     private Set<Necesidad> necesidades = new HashSet<>();
