@@ -1,0 +1,16 @@
+<nav class="navbar">
+  <div class="navbar-logo">SOS.exe</div>
+
+  <button class="navbar-toggle" (click)="menuAbierto = !menuAbierto">
+    ☰
+  </button>
+
+  <ul class="navbar-links" [class.abierto]="menuAbierto">
+    <li><a routerLink="/inicio" routerLinkActive="active">Inicio</a></li>
+    <li><a routerLink="/mapa" routerLinkActive="active">Mapa</a></li>
+    <li><a routerLink="/donar" routerLinkActive="active">Donar</a></li>
+    <li><a routerLink="/voluntariado" routerLinkActive="active">Voluntariado</a></li>
+    <li><a routerLink="/noticias" routerLinkActive="active">Noticias</a></li>
+    <li><a routerLink="/acerca-de" routerLinkActive="active">Acerca de</a></li>
+  </ul>
+</nav>
