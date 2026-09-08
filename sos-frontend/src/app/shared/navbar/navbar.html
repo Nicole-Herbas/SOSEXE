@@ -1,5 +1,11 @@
 <nav class="navbar">
-  <div class="navbar-logo">SOS.exe</div>
+  <div class="navbar-brand">
+    <div class="navbar-icon">✛</div>
+    <div class="navbar-titles">
+      <span class="navbar-logo">SOS.exe</span>
+      <span class="navbar-tagline">Juntos ante desastres naturales</span>
+    </div>
+  </div>
 
   <button class="navbar-toggle" (click)="menuAbierto = !menuAbierto">
     ☰
@@ -9,8 +15,17 @@
     <li><a routerLink="/inicio" routerLinkActive="active">Inicio</a></li>
     <li><a routerLink="/mapa" routerLinkActive="active">Mapa</a></li>
     <li><a routerLink="/donar" routerLinkActive="active">Donar</a></li>
-    <li><a routerLink="/voluntariado" routerLinkActive="active">Voluntariado</a></li>
+    <li><a routerLink="/voluntariado" routerLinkActive="active">Voluntariados</a></li>
     <li><a routerLink="/noticias" routerLinkActive="active">Noticias</a></li>
     <li><a routerLink="/acerca-de" routerLinkActive="active">Acerca de</a></li>
   </ul>
+
+  <div class="navbar-actions">
+    <button class="navbar-bell" aria-label="Notificaciones">
+      🔔
+      <span class="navbar-badge">1</span>
+    </button>
+    <a class="navbar-login" href="#">Iniciar sesión</a>
+    <button class="navbar-cta">♥ Quiero ayudar</button>
+  </div>
 </nav>
