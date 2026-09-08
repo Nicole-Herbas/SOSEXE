@@ -1,0 +1,148 @@
+/* Centrar todo en la pantalla con un fondo gris claro */
+:host {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: #eef2f5;
+  font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  padding: 20px;
+}
+
+/* La tarjeta principal que contiene ambas mitades */
+.login-container {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  max-width: 1000px;
+  background-color: #ffffff;
+  border-radius: 24px;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
+  overflow: hidden; /* Clave para que el fondo verde no se salga de las curvas */
+}
+
+/* --- PANEL IZQUIERDO (VERDE) --- */
+.info-panel {
+  flex: 1;
+  background-color: #12826a; /* Color verde corporativo SOS.exe */
+  color: white;
+  padding: 60px 50px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.info-panel .logo {
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 20px;
+  padding: 6px 16px;
+  font-size: 0.85em;
+  width: max-content;
+  margin-bottom: 30px;
+}
+
+.info-panel h1 {
+  font-size: 2.8em;
+  margin-bottom: 20px;
+  line-height: 1.1;
+  font-weight: bold;
+}
+
+.info-panel p {
+  font-size: 1.05em;
+  line-height: 1.5;
+  opacity: 0.9;
+}
+
+/* --- PANEL DERECHO (FORMULARIO) --- */
+.form-panel {
+  flex: 1;
+  padding: 60px 50px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.form-panel h2 {
+  color: #1a1a1a;
+  font-size: 2em;
+  margin-bottom: 8px;
+}
+
+.form-panel p {
+  color: #666;
+  margin-bottom: 35px;
+  font-size: 0.95em;
+}
+
+.form-group {
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  font-weight: 600;
+  margin-bottom: 8px;
+  font-size: 0.9em;
+  color: #333;
+}
+
+.form-group input {
+  padding: 14px 16px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 1em;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.form-group input:focus {
+  border-color: #12826a;
+  box-shadow: 0 0 0 3px rgba(18, 130, 106, 0.1);
+}
+
+.error {
+  color: #dc2626;
+  font-size: 0.8em;
+  margin-top: 6px;
+  font-weight: 500;
+}
+
+/* Botones y Enlaces */
+.btn-primary {
+  width: 100%;
+  padding: 16px;
+  background-color: #12826a;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.05em;
+  cursor: pointer;
+  margin-top: 15px;
+  font-weight: 600;
+  transition: background-color 0.2s;
+}
+
+.btn-primary:hover {
+  background-color: #0f6b57;
+}
+
+.links {
+  margin-top: 25px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+}
+
+.links a {
+  color: #12826a;
+  text-decoration: none;
+  font-size: 0.9em;
+  font-weight: 500;
+}
+
+.links a:hover {
+  text-decoration: underline;
+}
