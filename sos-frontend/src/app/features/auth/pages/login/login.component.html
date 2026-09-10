@@ -1,0 +1,38 @@
+<div class="login-container">
+  <div class="info-panel">
+    <div class="logo">Tu cuenta SOS.exe</div>
+    <h1>Tu ayuda y participación, en un solo lugar</h1>
+    <p>Ingresa para continuar apoyando a centros, refugios y comunidades de forma segura.</p>
+  </div>
+
+  <div class="form-panel">
+    <h2>Iniciar sesión</h2>
+    <p>Ingresa con el correo y la contraseña de tu cuenta.</p>
+
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+      
+      <div class="form-group">
+        <label>Correo electrónico</label>
+        <input type="email" formControlName="email" placeholder="correo@ejemplo.com">
+        <small class="error" *ngIf="loginForm.get('email')?.invalid && loginForm.get('email')?.touched">
+          Ingresa un correo válido.
+        </small>
+      </div>
+
+      <div class="form-group">
+        <label>Contraseña</label>
+        <input type="password" formControlName="password" placeholder="Ingresa tu contraseña">
+        <small class="error" *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.touched">
+          La contraseña es obligatoria.
+        </small>
+      </div>
+
+      <button type="submit" class="btn-primary">Iniciar sesión &rarr;</button>
+    </form>
+    
+    <div class="links">
+      <a href="/registro">¿Aún no tienes una cuenta? Crear una cuenta</a>
+      <a href="/">Cancelar y volver al sitio</a>
+    </div>
+  </div>
+</div>
