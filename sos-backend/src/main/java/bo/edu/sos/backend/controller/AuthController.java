@@ -17,7 +17,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/auth")
-@CrossOrigin(origins = "http://localhost:4200") // ¡Derribamos el muro de Angular!
+@CrossOrigin(origins = "http://localhost:4200") 
 public class AuthController {
 
     @Autowired
@@ -26,22 +26,18 @@ public class AuthController {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    // TAREA SOS-104: REGISTRO DE USUARIO
     @PostMapping("/registro")
     public ResponseEntity<?> registrar(@Valid @RequestBody RegistroRequestDTO request) {
-        // 1. Validación de correo duplicado
         if (usuarioRepository.existsByEmail(request.getEmail())) {
             return ResponseEntity.badRequest().body("Error: El correo ya está registrado");
         }
 
-        // 2. Mapear DTO a la Entidad
         Usuario usuario = new Usuario();
         usuario.setNombre(request.getNombre());
         usuario.setEmail(request.getEmail());
-        usuario.setPassword(passwordEncoder.encode(request.getPassword())); // Encriptación lista
+        usuario.setPassword(passwordEncoder.encode(request.getPassword())); 
         usuario.setTelefono(request.getTelefono());
         
-        // Asignar las relaciones (Solo con el ID basta para guardar)
         if (request.getRolId() != null) {
             Rol rol = new Rol();
             rol.setId(request.getRolId());
@@ -55,33 +51,29 @@ public class AuthController {
         }
 
         usuario.setActivo(true);
-        usuarioRepository.save(usuario); // ¡Registro persistido en la BD!
+        usuarioRepository.save(usuario); 
         
         return ResponseEntity.ok("¡Usuario registrado con éxito!");
     }
 
-    // TAREA SOS-99: INICIO DE SESIÓN
     @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody LoginRequestDTO request) {
         Optional<Usuario> usuarioOpt = usuarioRepository.findByEmail(request.getEmail());
         
-        // 1. Validar que el usuario exista
         if (usuarioOpt.isEmpty()) {
             return ResponseEntity.status(401).body("Credenciales incorrectas");
         }
         
         Usuario usuario = usuarioOpt.get();
 
-        // 2. Validar contraseña encriptada
         if (passwordEncoder.matches(request.getPassword(), usuario.getPassword())) {
-            // Token de rescate para que puedas presentar tu avance a las 5:30
             String tokenSimulado = "jwt-generado-exitosamente-para-" + usuario.getId();
-            
+            String rolReal = usuario.getRol().getNombre();
             AuthResponseDTO respuesta = new AuthResponseDTO(
                     tokenSimulado, 
                     usuario.getNombre(), 
                     usuario.getEmail(), 
-                    "CIUDADANO" // Rol por defecto temporal
+                    rolReal 
             );
             return ResponseEntity.ok(respuesta);
         } else {

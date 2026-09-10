@@ -27,6 +27,7 @@ public class SecurityConfig {
                     "/swagger-ui.html",
                     "/v3/api-docs/**"
                 ).permitAll()
+                .requestMatchers("/api/admin/**").hasAuthority("ADMINISTRADOR")
                 .anyRequest().authenticated()
             )
             .httpBasic(httpBasic -> {});
