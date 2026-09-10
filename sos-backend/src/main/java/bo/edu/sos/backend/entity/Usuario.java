@@ -1,6 +1,8 @@
 package bo.edu.sos.backend.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -18,12 +20,16 @@ public class Usuario {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank(message = "El nombre no puede estar vacío")
     @Column(nullable = false, length = 120)
     private String nombre;
 
+    @Email(message = "Debe ser un formato de correo electrónico válido")
+    @NotBlank(message = "El correo es obligatorio")
     @Column(nullable = false, unique = true, length = 150)
     private String email;
 
+    @NotBlank(message = "La contraseña es obligatoria")
     @Column(nullable = false, length = 255)
     private String password;
 

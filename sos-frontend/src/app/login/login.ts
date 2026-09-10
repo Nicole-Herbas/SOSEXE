@@ -1,21 +1,22 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { CommonModule } from '@angular/common'; // Necesario para usar *ngIf en tu HTML
+import { CommonModule } from '@angular/common';
+import { AuthService } from './auth.service'; 
 
 @Component({
   selector: 'app-login',
-  standalone: true, // Confirma que es arquitectura moderna
-  imports: [ReactiveFormsModule, CommonModule], // ¡Aquí inyectamos las herramientas!
+  standalone: true,
+  imports: [ReactiveFormsModule, CommonModule],
   templateUrl: './login.component.html',
   styleUrl: './login.component.css'
 })
 export class LoginComponent implements OnInit {
   loginForm!: FormGroup;
 
-  constructor(private fb: FormBuilder) {}
+  // Inyectamos el AuthService en el constructor
+  constructor(private fb: FormBuilder, private authService: AuthService) {}
 
   ngOnInit(): void {
-    // Validaciones estrictas requeridas por Jira
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]]
@@ -24,9 +25,18 @@ export class LoginComponent implements OnInit {
 
   onSubmit(): void {
     if (this.loginForm.valid) {
-      console.log('Datos listos para enviar a Spring Boot:', this.loginForm.value);
+      this.authService.login(this.loginForm.value).subscribe({
+        next: (respuesta) => {
+          console.log('¡Éxito total!', respuesta);
+          alert('¡Bienvenido ' + respuesta.nombre + '! Tu token es: ' + respuesta.token);
+        },
+        error: (err) => {
+          console.error('Error al iniciar sesión', err);
+          alert('¡Credenciales incorrectas o usuario no registrado!');
+        }
+      });
     } else {
-      this.loginForm.markAllAsTouched(); // Muestra los errores rojos
+      this.loginForm.markAllAsTouched();
     }
   }
 }
