@@ -1,0 +1,191 @@
+<!-- ===================== HERO SECTION ===================== -->
+<main class="inicio-page">
+  <section class="hero">
+    <!-- Left column: text content -->
+    <div class="hero__content">
+      <div class="hero__badge">
+        <span class="hero__badge-dot"></span>
+        Respuesta solo en Bolivia
+      </div>
+
+      <h1 class="hero__title">
+        Ayuda que llega,
+        <span class="hero__title--accent">esperanza que permanece.</span>
+      </h1>
+
+      <p class="hero__description">
+        Conectamos a personas, comunidades y recursos para responder juntos ante desastres en Bolivia.
+      </p>
+
+      <div class="hero__actions">
+        <a routerLink="/donar" class="btn btn--primary">♥ Quiero ayudar</a>
+        <a routerLink="/mapa" class="btn btn--outline">Explorar el mapa</a>
+      </div>
+
+      <div class="hero__features">
+        <span class="hero__feature">✓ Centros verificados</span>
+        <span class="hero__feature">✓ Donaciones seguras</span>
+        <span class="hero__feature">✓ Información actualizada</span>
+      </div>
+    </div>
+
+    <!-- Right column: image mosaic -->
+    <div class="hero__mosaic">
+      <figure class="mosaic__item mosaic__item--1">
+        <img
+          src="https://images.unsplash.com/photo-1780607956296-8ce5efde9330?auto=format&fit=crop&w=1200&q=85"
+          alt="Bomberos trabajando durante un incendio forestal"
+          loading="lazy"
+        />
+        <figcaption class="mosaic__caption">Imagen referencial</figcaption>
+      </figure>
+
+      <figure class="mosaic__item mosaic__item--2">
+        <img
+          src="https://images.pexels.com/photos/6647119/pexels-photo-6647119.jpeg?auto=compress&cs=tinysrgb&w=1200"
+          alt="Voluntarios organizando donaciones"
+          loading="lazy"
+        />
+        <figcaption class="mosaic__caption">Imagen referencial</figcaption>
+      </figure>
+
+      <figure class="mosaic__item mosaic__item--3">
+        <img
+          src="https://images.pexels.com/photos/35231854/pexels-photo-35231854/free-photo-of-volunteer-feeding-stray-dogs-at-animal-shelter.jpeg?auto=compress&cs=tinysrgb&w=1200"
+          alt="Voluntaria ayudando en un refugio"
+          loading="lazy"
+        />
+        <figcaption class="mosaic__caption">Imagen referencial</figcaption>
+      </figure>
+
+      <figure class="mosaic__item mosaic__item--4">
+        <img
+          src="https://images.pexels.com/photos/36829317/pexels-photo-36829317.jpeg?auto=compress&cs=tinysrgb&w=1200"
+          alt="Respuesta comunitaria ante una inundación"
+          loading="lazy"
+        />
+        <figcaption class="mosaic__caption">Imagen referencial</figcaption>
+      </figure>
+
+      <figure class="mosaic__item mosaic__item--5">
+        <img
+          src="https://images.pexels.com/photos/6591165/pexels-photo-6591165.jpeg?auto=compress&cs=tinysrgb&w=1200"
+          alt="Personas preparando cajas de ayuda"
+          loading="lazy"
+        />
+        <figcaption class="mosaic__caption">Imagen referencial</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- ===================== ACTION CARDS ===================== -->
+  <section class="actions">
+    <a routerLink="/donar" class="action-card">
+      <span class="action-card__icon action-card__icon--teal">♥</span>
+      <h2 class="action-card__title">Donar</h2>
+      <p class="action-card__desc">Apoya a comunidades afectadas</p>
+      <span class="action-card__arrow action-card__arrow--teal">→</span>
+    </a>
+
+    <a routerLink="/mapa" class="action-card">
+      <span class="action-card__icon action-card__icon--blue">⌂</span>
+      <h2 class="action-card__title">Centros y refugios</h2>
+      <p class="action-card__desc">Encuentra lugares seguros y verificados</p>
+      <span class="action-card__arrow action-card__arrow--blue">→</span>
+    </a>
+
+    <a routerLink="/voluntariado" class="action-card">
+      <span class="action-card__icon action-card__icon--teal">●</span>
+      <h2 class="action-card__title">Voluntariado</h2>
+      <p class="action-card__desc">Ofrece tu tiempo y habilidades para ayudar</p>
+      <span class="action-card__arrow action-card__arrow--teal">→</span>
+    </a>
+
+    <a routerLink="/mapa" class="action-card">
+      <span class="action-card__icon action-card__icon--red">!</span>
+      <h2 class="action-card__title">Emergencias</h2>
+      <p class="action-card__desc">Consulta alertas y avisos activos</p>
+      <span class="action-card__arrow action-card__arrow--red">→</span>
+    </a>
+  </section>
+
+  <!-- ===================== NEWS SECTION ===================== -->
+  <section class="news-section">
+    <div class="news-section__header">
+      <div>
+        <h2 class="news-section__title">Noticias y alertas recientes</h2>
+        <p class="news-section__subtitle">Información verificada sobre emergencias y respuesta comunitaria en Bolivia.</p>
+      </div>
+      <a routerLink="/noticias" class="news-section__view-all">Ver todas las noticias →</a>
+    </div>
+
+    <!-- Filters -->
+    <div class="news-section__filters">
+      @for (filter of newsFilters; track filter) {
+        <button
+          type="button"
+          class="filter-btn"
+          [class.filter-btn--active]="activeFilter === filter"
+          (click)="setFilter(filter)"
+        >
+          {{ filter }}
+        </button>
+      }
+    </div>
+
+    <!-- News grid -->
+    @if (filteredNews.length > 0) {
+      <div class="news-grid">
+        <!-- Featured (first) article -->
+        <article class="news-card news-card--featured">
+          <div class="news-card__image-wrapper news-card__image-wrapper--large">
+            <img [src]="filteredNews[0].image" [alt]="filteredNews[0].title" loading="lazy" />
+            <span class="news-card__category-badge"
+              [class.news-card__category-badge--red]="filteredNews[0].category === 'Incendios'"
+              [class.news-card__category-badge--teal]="filteredNews[0].category !== 'Incendios'"
+            >
+              {{ filteredNews[0].category }}
+            </span>
+            <span class="news-card__verified-badge">✓ Fuente verificada</span>
+            <span class="news-card__ref-badge">Imagen referencial</span>
+          </div>
+          <div class="news-card__body">
+            <div class="news-card__meta">
+              <span class="news-card__location">⌖ {{ filteredNews[0].location }}</span>
+              <span class="news-card__date">{{ filteredNews[0].date }}</span>
+            </div>
+            <h3 class="news-card__title news-card__title--large">{{ filteredNews[0].title }}</h3>
+            <p class="news-card__summary">{{ filteredNews[0].summary }}</p>
+          </div>
+        </article>
+
+        <!-- Secondary articles column -->
+        <div class="news-grid__secondary">
+          @for (news of filteredNews.slice(1); track news.title) {
+            <article class="news-card">
+              <div class="news-card__image-wrapper news-card__image-wrapper--small">
+                <img [src]="news.image" [alt]="news.title" loading="lazy" />
+                <span class="news-card__category-badge news-card__category-badge--teal">
+                  {{ news.category }}
+                </span>
+                <span class="news-card__ref-badge">Imagen referencial</span>
+              </div>
+              <div class="news-card__body news-card__body--compact">
+                <div class="news-card__meta">
+                  <span class="news-card__location">⌖ {{ news.location }}</span>
+                  <span class="news-card__date">{{ news.date }}</span>
+                </div>
+                <h3 class="news-card__title">{{ news.title }}</h3>
+                <p class="news-card__summary news-card__summary--small">{{ news.summary }}</p>
+              </div>
+            </article>
+          }
+        </div>
+      </div>
+    } @else {
+      <div class="news-section__empty">
+        No hay noticias disponibles para esta categoría.
+      </div>
+    }
+  </section>
+</main>
