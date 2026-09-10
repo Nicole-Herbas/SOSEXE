@@ -29,6 +29,7 @@ public class SecurityConfig {
                     "/api/auth/**",
                     "/error"
                 ).permitAll()
+                .requestMatchers("/api/admin/**").hasAuthority("ADMINISTRADOR")
                 // Fase de desarrollo: todos los endpoints abiertos
                 .requestMatchers("/api/**").permitAll()
                 .anyRequest().authenticated()

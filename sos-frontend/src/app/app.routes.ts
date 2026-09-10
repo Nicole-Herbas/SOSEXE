@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { ListaCentros } from './features/centros/pages/lista-centros/lista-centros';
 import { LoginComponent } from './features/auth/pages/login/login';
+import { adminGuard } from './admin-guard';
 import { Inicio } from './pages/inicio/inicio';
 import { Mapa } from './pages/mapa/mapa';
 import { Donar } from './pages/donar/donar';
@@ -45,5 +46,10 @@ export const routes: Routes = [
   {
     path: 'login',
     component: LoginComponent
+  },
+  {
+    path: 'admin',
+    component: ListaCentros,
+    canActivate: [adminGuard]
   }
 ];

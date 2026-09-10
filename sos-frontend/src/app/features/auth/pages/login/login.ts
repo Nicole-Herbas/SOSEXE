@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { AuthService } from '../../services/auth.service'; 
+import { Router } from '@angular/router';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-login',
@@ -13,8 +14,11 @@ import { AuthService } from '../../services/auth.service';
 export class LoginComponent implements OnInit {
   loginForm!: FormGroup;
 
-  // Inyectamos el AuthService en el constructor
-  constructor(private fb: FormBuilder, private authService: AuthService) {}
+  constructor(
+    private fb: FormBuilder, 
+    private authService: AuthService,
+    private router: Router 
+  ) {}
 
   ngOnInit(): void {
     this.loginForm = this.fb.group({
@@ -28,7 +32,17 @@ export class LoginComponent implements OnInit {
       this.authService.login(this.loginForm.value).subscribe({
         next: (respuesta) => {
           console.log('¡Éxito total!', respuesta);
-          alert('¡Bienvenido ' + respuesta.nombre + '! Tu token es: ' + respuesta.token);
+          
+          localStorage.setItem('token', respuesta.token);
+          localStorage.setItem('rol', respuesta.rol);
+          
+          if (respuesta.rol === 'ADMINISTRADOR') {
+            alert('¡Bienvenido Administrador ' + respuesta.nombre + '!');
+            this.router.navigate(['/admin']); 
+          } else {
+            alert('¡Bienvenido Ciudadano ' + respuesta.nombre + '!');
+            this.router.navigate(['/centros']); 
+          }
         },
         error: (err) => {
           console.error('Error al iniciar sesión', err);
