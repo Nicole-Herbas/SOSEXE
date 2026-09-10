@@ -1,13 +1,13 @@
 import { Routes } from '@angular/router';
 import { ListaCentros } from './features/centros/pages/lista-centros/lista-centros';
+import { Mapa } from './features/mapa/pages/mapa/mapa';
+import { Inicio } from './features/inicio/pages/inicio/inicio';
+import { Donar } from './features/donar/pages/donar/donar';
+import { Voluntariado } from './features/voluntariado/pages/voluntariado/voluntariado';
+import { Noticias } from './features/noticias/pages/noticias/noticias';
+import { AcercaDe } from './features/acerca-de/pages/acerca-de/acerca-de';
 import { LoginComponent } from './features/auth/pages/login/login';
 import { adminGuard } from './admin-guard';
-import { Inicio } from './pages/inicio/inicio';
-import { Mapa } from './pages/mapa/mapa';
-import { Donar } from './pages/donar/donar';
-import { Voluntariado } from './pages/voluntariado/voluntariado';
-import { Noticias } from './pages/noticias/noticias';
-import { AcercaDe } from './pages/acerca-de/acerca-de';
 
 export const routes: Routes = [
   {
