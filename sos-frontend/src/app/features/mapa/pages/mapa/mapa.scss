@@ -1,0 +1,487 @@
+.pagina-mapa {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 32px;
+  font-family: Arial, sans-serif;
+  color: #263238;
+}
+
+.encabezado-mapa {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 30px;
+  margin-bottom: 24px;
+}
+
+.subtitulo {
+  color: #159b96;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.encabezado-mapa h1 {
+  margin: 6px 0 8px;
+  font-size: 32px;
+}
+
+.encabezado-mapa p {
+  margin: 0;
+  max-width: 650px;
+  color: #68767d;
+  line-height: 1.5;
+}
+
+.contador-verificados {
+  border: 1px solid #159b96;
+  background: #dff4f1;
+  color: #127d79;
+
+  padding: 12px 22px;
+  border-radius: 14px;
+
+  white-space: nowrap;
+}
+
+.filtros-tipo {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.filtro {
+  border: 1px solid #d7dddd;
+  background: white;
+
+  padding: 10px 16px;
+  border-radius: 22px;
+
+  color: #526168;
+  cursor: pointer;
+}
+
+.filtro.activo {
+  background: #139b95;
+  border-color: #139b95;
+  color: white;
+}
+
+.punto {
+  display: inline-block;
+
+  width: 7px;
+  height: 7px;
+
+  border-radius: 50%;
+
+  margin-right: 6px;
+}
+
+.azul {
+  background: #218aa0;
+}
+
+.verde {
+  background: #149b8c;
+}
+
+.amarillo {
+  background: #dda638;
+}
+
+.rojo {
+  background: #ed5142;
+}
+
+.contenedor-mapa {
+  display: grid;
+
+  grid-template-columns:
+    300px
+    minmax(400px, 1fr)
+    330px;
+
+  height: 610px;
+
+  overflow: hidden;
+
+  border: 1px solid #d8dddd;
+  border-radius: 20px;
+
+  background: #ffffff;
+}
+
+.columna-izquierda {
+  padding: 22px 18px;
+
+  overflow: hidden;
+
+  border-right: 1px solid #e1e5e5;
+
+  background: #fafafa;
+}
+
+.bloque-busqueda,
+.bloque-filtros {
+  margin-bottom: 20px;
+}
+
+.bloque-busqueda label,
+.bloque-filtros label {
+  display: block;
+
+  margin-bottom: 9px;
+
+  font-size: 11px;
+  font-weight: bold;
+  text-transform: uppercase;
+
+  color: #65757d;
+}
+
+.bloque-busqueda input {
+  width: 100%;
+
+  padding: 13px 14px;
+
+  box-sizing: border-box;
+
+  border: 1px solid #d9dede;
+  border-radius: 10px;
+
+  outline: none;
+}
+
+.filtros-necesidades {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.necesidad {
+  border: 1px solid #d9dede;
+  background: white;
+
+  padding: 8px 11px;
+
+  border-radius: 18px;
+
+  color: #53636a;
+
+  cursor: pointer;
+}
+
+.necesidad.activa {
+  background: #149b95;
+  border-color: #149b95;
+  color: white;
+}
+
+.separador {
+  height: 1px;
+  background: #e5e8e8;
+
+  margin: 20px 0;
+}
+
+.resultados-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  margin-bottom: 12px;
+}
+
+.resultados-header h3 {
+  margin: 0;
+  font-size: 16px;
+}
+
+.cantidad-resultados {
+  background: #d9f1ef;
+  color: #138b86;
+
+  padding: 4px 9px;
+
+  border-radius: 15px;
+
+  font-size: 12px;
+}
+
+.lista-resultados {
+  display: flex;
+  flex-direction: column;
+
+  gap: 10px;
+
+  height: 330px;
+
+  overflow-y: auto;
+
+  padding-right: 5px;
+}
+
+.resultado-card {
+  padding: 14px;
+
+  border: 1px solid #e0e4e4;
+  border-radius: 14px;
+
+  background: white;
+}
+
+.resultado-card.seleccionado {
+  border-color: #159b96;
+  background: #dcf2f0;
+}
+
+.etiquetas-card {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  margin-bottom: 10px;
+
+  font-size: 10px;
+}
+
+.tag {
+  background: #dceef1;
+  color: #167c8c;
+
+  padding: 5px 8px;
+
+  border-radius: 12px;
+}
+
+.tag.refugio {
+  background: #d9f1e9;
+  color: #168775;
+}
+
+.verificado {
+  color: #149b8d;
+}
+
+.resultado-card h4 {
+  margin: 0 0 5px;
+
+  font-size: 14px;
+}
+
+.ubicacion {
+  margin: 0 0 10px;
+
+  font-size: 12px;
+
+  color: #7b898e;
+}
+
+.resultado-card small {
+  display: block;
+
+  margin-top: 12px;
+
+  color: #9aa4a8;
+
+  font-size: 10px;
+}
+
+.mini-tags {
+  display: flex;
+  flex-wrap: wrap;
+
+  gap: 6px;
+}
+
+.mini-tags span {
+  padding: 5px 8px;
+
+  border-radius: 12px;
+
+  background: #e2f2ef;
+
+  color: #4b6867;
+
+  font-size: 10px;
+}
+
+.columna-mapa {
+  position: relative;
+
+  min-width: 0;
+
+  overflow: hidden;
+}
+
+.mensaje-mapa {
+  position: absolute;
+
+  left: 15px;
+  bottom: 15px;
+
+  z-index: 500;
+
+  padding: 8px 12px;
+
+  border-radius: 9px;
+
+  background: rgba(255, 255, 255, 0.85);
+
+  color: #788689;
+
+  font-size: 11px;
+}
+
+.columna-derecha {
+  padding: 14px;
+
+  background: #f7f7f6;
+}
+
+.detalle-card {
+  height: 100%;
+
+  box-sizing: border-box;
+
+  padding: 20px;
+
+  border-radius: 18px;
+
+  background: white;
+
+  overflow-y: auto;
+}
+
+.detalle-etiquetas {
+  display: flex;
+  flex-wrap: wrap;
+
+  gap: 8px;
+
+  margin-bottom: 14px;
+}
+
+.tag-verificado {
+  padding: 5px 8px;
+
+  border-radius: 12px;
+
+  background: #c8f1e7;
+
+  color: #158b7d;
+
+  font-size: 11px;
+}
+
+.detalle-card h2 {
+  margin: 0;
+
+  font-size: 20px;
+}
+
+.detalle-ubicacion {
+  margin: 6px 0 16px;
+
+  color: #70838a;
+
+  font-size: 13px;
+}
+
+.descripcion {
+  color: #54666c;
+
+  font-size: 13px;
+
+  line-height: 1.5;
+}
+
+.informacion-verificada {
+  margin: 15px 0;
+
+  padding: 11px;
+
+  border-radius: 10px;
+
+  background: #ccefeb;
+
+  color: #147e79;
+
+  font-size: 11px;
+  font-weight: bold;
+}
+
+.detalle-dato {
+  margin-top: 15px;
+}
+
+.detalle-dato > span {
+  display: block;
+
+  margin-bottom: 5px;
+
+  color: #98a1a4;
+
+  font-size: 10px;
+  font-weight: bold;
+
+  text-transform: uppercase;
+}
+
+.detalle-dato p {
+  margin: 0;
+
+  color: #53656c;
+
+  font-size: 12px;
+}
+
+.acciones {
+  display: grid;
+
+  grid-template-columns: 1fr 1fr;
+
+  gap: 10px;
+
+  margin-top: 22px;
+}
+
+.boton-secundario,
+.boton-principal {
+  padding: 12px;
+
+  border-radius: 10px;
+
+  cursor: pointer;
+}
+
+.boton-secundario {
+  border: 1px solid #d6dddd;
+
+  background: white;
+
+  color: #46575d;
+}
+
+.boton-principal {
+  border: 1px solid #149b95;
+
+  background: #149b95;
+
+  color: white;
+}
+
+.reportar {
+  width: 100%;
+
+  margin-top: 18px;
+
+  border: none;
+
+  background: transparent;
+
+  color: #ea4f45;
+
+  cursor: pointer;
+}
