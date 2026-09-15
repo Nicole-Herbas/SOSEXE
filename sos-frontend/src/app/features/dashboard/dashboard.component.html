@@ -1,0 +1,102 @@
+<div class="dashboard-wrapper">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="logo-tag">SOS.exe</div>
+      <span class="admin-label">Panel Admin</span>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a routerLink="/dashboard" class="nav-item active">
+        <span class="nav-icon">📊</span> Dashboard
+      </a>
+      <a routerLink="/centros" class="nav-item">
+        <span class="nav-icon">🏠</span> Centros
+      </a>
+      <a routerLink="/noticias" class="nav-item">
+        <span class="nav-icon">📰</span> Noticias
+      </a>
+      <a routerLink="/voluntariado" class="nav-item">
+        <span class="nav-icon">🤝</span> Voluntariado
+      </a>
+      <a routerLink="/mapa" class="nav-item">
+        <span class="nav-icon">📍</span> Mapa
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <button class="btn-logout" (click)="logout()">
+        <span>⬅</span> Cerrar sesión
+      </button>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+
+    <!-- Header -->
+    <header class="dashboard-header">
+      <div>
+        <h1>Bienvenido, {{ nombreAdmin }} 👋</h1>
+        <p>Panel de administración de SOS.exe</p>
+      </div>
+    </header>
+
+    <!-- Stats Cards -->
+    <section class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon" style="background: rgba(18,130,106,0.1); color: #12826a;">🏠</div>
+        <div class="stat-info">
+          <span class="stat-label">Centros activos</span>
+          <span class="stat-value">—</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background: rgba(59,130,246,0.1); color: #3b82f6;">👥</div>
+        <div class="stat-info">
+          <span class="stat-label">Usuarios registrados</span>
+          <span class="stat-value">—</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background: rgba(245,158,11,0.1); color: #f59e0b;">🤝</div>
+        <div class="stat-info">
+          <span class="stat-label">Postulaciones</span>
+          <span class="stat-value">—</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background: rgba(239,68,68,0.1); color: #ef4444;">💚</div>
+        <div class="stat-info">
+          <span class="stat-label">Donaciones</span>
+          <span class="stat-value">—</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Quick Access -->
+    <section class="quick-access">
+      <h2>Acceso rápido</h2>
+      <div class="quick-grid">
+        <a routerLink="/centros" class="quick-card">
+          <span class="quick-icon">🏠</span>
+          <span>Gestionar Centros</span>
+        </a>
+        <a routerLink="/noticias" class="quick-card">
+          <span class="quick-icon">📰</span>
+          <span>Publicar Noticia</span>
+        </a>
+        <a routerLink="/voluntariado" class="quick-card">
+          <span class="quick-icon">🤝</span>
+          <span>Ver Postulaciones</span>
+        </a>
+        <a routerLink="/mapa" class="quick-card">
+          <span class="quick-icon">📍</span>
+          <span>Ver Mapa</span>
+        </a>
+      </div>
+    </section>
+
+  </main>
+</div>
