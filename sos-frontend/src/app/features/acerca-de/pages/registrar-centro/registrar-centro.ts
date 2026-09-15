@@ -25,6 +25,21 @@ export class RegistrarCentroComponent {
   paginaWeb = '';
   descripcion = '';
   poblacionAtendida = '';
+  
+    // ==========================================
+  // DATOS DEL RESPONSABLE - PASO 2
+  // ==========================================
+
+  nombreResponsable = '';
+  cargoResponsable = '';
+  documentoResponsable = '';
+  correoResponsable = '';
+  telefonoResponsable = '';
+
+  ciudad = '';
+  departamentoUbicacion = '';
+  direccionExacta = '';
+  referencia = '';
 
   // ==========================================
   // DEPARTAMENTOS DE BOLIVIA
@@ -71,16 +86,40 @@ export class RegistrarCentroComponent {
     );
   }
 
+    // ==========================================
+  // VALIDACIÓN DEL PASO 2
+  // ==========================================
+
+  get paso2Valido(): boolean {
+    return (
+      this.nombreResponsable.trim() !== '' &&
+      this.cargoResponsable.trim() !== '' &&
+      this.documentoResponsable.trim() !== '' &&
+      this.correoResponsable.trim() !== '' &&
+      this.telefonoResponsable.trim() !== '' &&
+      this.ciudad.trim() !== '' &&
+      this.departamentoUbicacion !== '' &&
+      this.direccionExacta.trim() !== ''
+    );
+  }
+
   // ==========================================
   // NAVEGACIÓN
   // ==========================================
 
-  continuar(): void {
-    if (!this.paso1Valido) {
+    continuar(): void {
+
+    if (this.currentStep === 1 && !this.paso1Valido) {
       return;
     }
 
-    this.currentStep++;
+    if (this.currentStep === 2 && !this.paso2Valido) {
+      return;
+    }
+
+    if (this.currentStep < 5) {
+      this.currentStep++;
+    }
   }
 
   volver(): void {

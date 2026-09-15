@@ -505,3 +505,37 @@
   }
 
 }
+
+/* ==========================================
+   SECCIONES DEL FORMULARIO
+   ========================================== */
+
+.section-title {
+  margin-top: 10px;
+  margin-bottom: 24px;
+}
+
+.section-title h3 {
+  margin: 0 0 6px;
+  color: #18354d;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.section-title p {
+  margin: 0;
+  color: #60788c;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+
+/* ==========================================
+   SEPARADOR ENTRE SECCIONES
+   ========================================== */
+
+.section-divider {
+  height: 1px;
+  margin: 28px 0;
+  background: #edf2f5;
+}
