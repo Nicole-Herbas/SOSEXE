@@ -1,385 +1,151 @@
 <section class="pagina-mapa">
-
   <div class="encabezado-mapa">
-
     <div>
-      <span class="subtitulo">
-        Ayuda cerca de ti
-      </span>
-
-      <h1>
-        Mapa de ayuda y emergencias
-      </h1>
-
-      <p>
-        Encuentra centros, refugios, puntos de donación y emergencias.
-        Filtra también por los artículos que necesitas entregar.
-      </p>
+      <span class="subtitulo">{{ textos.subtitulo }}</span>
+      <h1>{{ textos.titulo }}</h1>
+      <p>{{ textos.descripcion }}</p>
     </div>
 
     <div class="contador-verificados">
-      7 puntos verificados en el prototipo
+      {{ textos.contadorVerificados }}
     </div>
-
   </div>
-
 
   <div class="filtros-tipo">
-
-    <button class="filtro activo">
-      Todos
-    </button>
-
-    <button class="filtro">
-      <span class="punto azul"></span>
-      Centros de apoyo
-    </button>
-
-    <button class="filtro">
-      <span class="punto verde"></span>
-      Refugios
-    </button>
-
-    <button class="filtro">
-      <span class="punto amarillo"></span>
-      Puntos de donación
-    </button>
-
-    <button class="filtro">
-      <span class="punto rojo"></span>
-      Emergencias
-    </button>
-
+    @for (filtro of filtrosTipo; track filtro.id) {
+      <button
+        type="button"
+        class="filtro"
+        [class.activo]="filtroTipoActivo === filtro.id"
+        [attr.data-filtro-tipo]="filtro.id"
+        (click)="seleccionarFiltroTipo(filtro.id)"
+      >
+        @if (filtro.color) {
+          <span class="punto {{ filtro.color }}"></span>
+        }
+        {{ filtro.etiqueta }}
+      </button>
+    }
   </div>
 
-
   <section class="contenedor-mapa">
-
     <aside class="columna-izquierda">
-
       <div class="bloque-busqueda">
-
-        <label>
-          Buscar por ciudad o nombre
-        </label>
-
-        <input
-          type="text"
-          placeholder="Ej.: Cochabamba o San José"
-        >
-
+        <label>{{ textos.buscarEtiqueta }}</label>
+        <input type="text" [placeholder]="textos.buscarPlaceholder" />
       </div>
-
 
       <div class="bloque-filtros">
-
-        <label>
-          ¿Qué deseas donar o encontrar?
-        </label>
+        <label>{{ textos.necesidadesEtiqueta }}</label>
 
         <div class="filtros-necesidades">
-
-          <button class="necesidad activa">
-            Todas
-          </button>
-
-          <button class="necesidad">
-            💧 Agua
-          </button>
-
-          <button class="necesidad">
-            ◉ Alimentos
-          </button>
-
-          <button class="necesidad">
-            ✦ Higiene
-          </button>
-
-          <button class="necesidad">
-            ✚ Medicinas
-          </button>
-
+          @for (filtro of filtrosNecesidad; track filtro.id) {
+            <button
+              type="button"
+              class="necesidad"
+              [class.activo]="filtroNecesidadActivo === filtro.id"
+              [attr.data-filtro-necesidad]="filtro.id"
+              (click)="seleccionarFiltroNecesidad(filtro.id)"
+            >
+              {{ filtro.etiqueta }}
+            </button>
+          }
         </div>
-
       </div>
-
 
       <div class="separador"></div>
 
-
       <div class="resultados-header">
-
-        <h3>
-          Resultados
-        </h3>
-
-        <span class="cantidad-resultados">
-          8
-        </span>
-
+        <h3>{{ textos.resultadosTitulo }}</h3>
+        <span class="cantidad-resultados">{{ textos.resultadosCantidad }}</span>
       </div>
-
 
       <div class="lista-resultados">
+        @for (punto of puntos; track punto.nombre) {
+          <article
+            class="resultado-card"
+            [class.seleccionado]="punto.seleccionado"
+          >
+            <div class="etiquetas-card">
+              <span class="tag {{ punto.claseTipo }}">{{ punto.tipo }}</span>
+              <span class="verificado">{{ textos.verificado }}</span>
+            </div>
 
-        <article class="resultado-card seleccionado">
+            <h4>{{ punto.nombre }}</h4>
+            <p class="ubicacion">{{ punto.ubicacion }}</p>
 
-          <div class="etiquetas-card">
+            <div class="mini-tags">
+              @for (necesidad of punto.necesidades; track necesidad) {
+                <span>{{ necesidad }}</span>
+              }
+            </div>
 
-            <span class="tag">
-              Centro de apoyo
-            </span>
-
-            <span class="verificado">
-              ✓ Verificado
-            </span>
-
-          </div>
-
-          <h4>
-            Centro de Apoyo San José
-          </h4>
-
-          <p class="ubicacion">
-            Cochabamba · Cochabamba
-          </p>
-
-          <div class="mini-tags">
-
-            <span>💧 Agua</span>
-            <span>◉ Alimentos</span>
-            <span>✚ Medicinas</span>
-
-          </div>
-
-          <small>
-            Actualizado hace 3 días
-          </small>
-
-        </article>
-
-
-        <article class="resultado-card">
-
-          <div class="etiquetas-card">
-
-            <span class="tag">
-              Centro de apoyo
-            </span>
-
-            <span class="verificado">
-              ✓ Verificado
-            </span>
-
-          </div>
-
-          <h4>
-            Centro Comunitario La Paz
-          </h4>
-
-          <p class="ubicacion">
-            La Paz · La Paz
-          </p>
-
-          <div class="mini-tags">
-
-            <span>▭ Ropa</span>
-            <span>✦ Higiene</span>
-            <span>● Voluntarios</span>
-
-          </div>
-
-          <small>
-            Actualizado hace 5 días
-          </small>
-
-        </article>
-
-
-        <article class="resultado-card">
-
-          <div class="etiquetas-card">
-
-            <span class="tag refugio">
-              Refugio
-            </span>
-
-            <span class="verificado">
-              ✓ Verificado
-            </span>
-
-          </div>
-
-          <h4>
-            Refugio Temporal Santa Cruz
-          </h4>
-
-          <p class="ubicacion">
-            Santa Cruz · Santa Cruz
-          </p>
-
-          <div class="mini-tags">
-
-            <span>💧 Agua</span>
-            <span>▭ Ropa</span>
-
-          </div>
-
-          <small>
-            Actualizado recientemente
-          </small>
-
-        </article>
-
+            <small>{{ punto.actualizado }}</small>
+          </article>
+        }
       </div>
-
     </aside>
-
 
     <main class="columna-mapa">
-
       <app-mapa-leaflet></app-mapa-leaflet>
-
-      <div class="mensaje-mapa">
-        Mapa interactivo · Implementado con Leaflet
-      </div>
-
+      <div class="mensaje-mapa">{{ textos.mensajeMapa }}</div>
     </main>
 
-
     <aside class="columna-derecha">
-
       <div class="detalle-card">
-
         <div class="detalle-etiquetas">
-
-          <span class="tag">
-            Centro de apoyo
-          </span>
-
-          <span class="tag-verificado">
-            ✓ Punto verificado
-          </span>
-
+          <span class="tag">{{ textos.detalle.tipo }}</span>
+          <span class="tag-verificado">{{ textos.puntoVerificado }}</span>
         </div>
 
-
-        <h2>
-          Centro de Apoyo San José
-        </h2>
-
-        <p class="detalle-ubicacion">
-          Cochabamba, Cochabamba
-        </p>
-
-
-        <p class="descripcion">
-          Centro comunitario de recepción y distribución
-          de ayuda para familias afectadas.
-        </p>
-
+        <h2>{{ textos.detalle.nombre }}</h2>
+        <p class="detalle-ubicacion">{{ textos.detalle.ubicacion }}</p>
+        <p class="descripcion">{{ textos.detalle.descripcion }}</p>
 
         <div class="informacion-verificada">
-          Información comprobada hace 3 días
+          {{ textos.detalle.informacionVerificada }}
         </div>
 
-
         <div class="detalle-dato">
-
-          <span>
-            Dirección
-          </span>
-
-          <p>
-            Av. Blanco Galindo, zona oeste
-          </p>
-
+          <span>{{ textos.detalle.direccionEtiqueta }}</span>
+          <p>{{ textos.detalle.direccion }}</p>
         </div>
 
-
         <div class="detalle-dato">
-
-          <span>
-            Horario o estado
-          </span>
-
-          <p>
-            Lun–Sáb · 08:00–18:00
-          </p>
-
+          <span>{{ textos.detalle.horarioEtiqueta }}</span>
+          <p>{{ textos.detalle.horario }}</p>
         </div>
 
-
         <div class="detalle-dato">
-
-          <span>
-            Contacto
-          </span>
-
-          <p>
-            +591 70700001
-          </p>
-
+          <span>{{ textos.detalle.contactoEtiqueta }}</span>
+          <p>{{ textos.detalle.contacto }}</p>
         </div>
 
-
         <div class="detalle-dato">
-
-          <span>
-            Necesidades prioritarias
-          </span>
-
+          <span>{{ textos.detalle.prioridadesEtiqueta }}</span>
           <div class="mini-tags">
-
-            <span>💧 Agua</span>
-            <span>◉ Alimentos</span>
-            <span>✚ Medicinas</span>
-
+            @for (necesidad of necesidadesPrioritarias; track necesidad) {
+              <span>{{ necesidad }}</span>
+            }
           </div>
-
         </div>
-
 
         <div class="detalle-dato">
-
-          <span>
-            Donaciones que acepta
-          </span>
-
+          <span>{{ textos.detalle.donacionesEtiqueta }}</span>
           <div class="mini-tags">
-
-            <span>💧 Agua</span>
-            <span>◉ Alimentos</span>
-            <span>✦ Higiene</span>
-            <span>✚ Medicinas</span>
-            <span>▭ Ropa</span>
-
+            @for (donacion of donacionesAceptadas; track donacion) {
+              <span>{{ donacion }}</span>
+            }
           </div>
-
         </div>
-
 
         <div class="acciones">
-
-          <button class="boton-secundario">
-            Cómo llegar
-          </button>
-
-          <button class="boton-principal">
-            Ver centro
-          </button>
-
+          <button class="boton-secundario">{{ textos.detalle.comoLlegar }}</button>
+          <button class="boton-principal">{{ textos.detalle.verCentro }}</button>
         </div>
 
-
-        <button class="reportar">
-          Reportar información incorrecta
-        </button>
-
+        <button class="reportar">{{ textos.detalle.reportar }}</button>
       </div>
-
     </aside>
-
   </section>
-
 </section>
