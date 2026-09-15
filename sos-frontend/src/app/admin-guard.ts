@@ -6,11 +6,10 @@ export const adminGuard: CanActivateFn = (route, state) => {
   
   const rol = localStorage.getItem('rol'); 
 
-  if (rol === 'ADMINISTRADOR') {
+  if (rol === 'ADMIN') {
     return true; 
   } else {
-    alert('Acceso denegado. Solo administradores.');
-    router.navigate(['/mapa']); 
+    router.navigate(['/login']); 
     return false;
   }
 };

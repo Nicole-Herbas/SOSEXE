@@ -7,6 +7,8 @@ import { Voluntariado } from './features/voluntariado/pages/voluntariado/volunta
 import { Noticias } from './features/noticias/pages/noticias/noticias';
 import { AcercaDe } from './features/acerca-de/pages/acerca-de/acerca-de';
 import { LoginComponent } from './features/auth/pages/login/login';
+import { RegistroComponent } from './features/auth/pages/registro/registro.component';
+import { DashboardComponent } from './features/dashboard/dashboard.component';
 import { adminGuard } from './admin-guard';
 
 export const routes: Routes = [
@@ -48,8 +50,17 @@ export const routes: Routes = [
     component: LoginComponent
   },
   {
-    path: 'admin',
-    component: ListaCentros,
+    path: 'registro',
+    component: RegistroComponent
+  },
+  {
+    path: 'dashboard',
+    component: DashboardComponent,
     canActivate: [adminGuard]
+  },
+  {
+    path: 'admin',
+    redirectTo: 'dashboard',
+    pathMatch: 'full'
   }
 ];
