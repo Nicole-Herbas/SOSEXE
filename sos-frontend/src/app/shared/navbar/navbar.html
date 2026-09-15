@@ -25,7 +25,16 @@
       🔔
       <span class="navbar-badge">1</span>
     </button>
-    <a class="navbar-login" routerLink="/login" routerLinkActive="active">Iniciar sesión</a>
+
+    <!-- Si NO está logueado: mostrar botón de iniciar sesión -->
+    <a *ngIf="!isLoggedIn" class="navbar-login" routerLink="/login">Iniciar sesión</a>
+
+    <!-- Si está logueado: mostrar nombre + botón salir -->
+    <div *ngIf="isLoggedIn" class="navbar-user">
+      <span class="navbar-user-name">👤 {{ nombreUsuario }}</span>
+      <button class="navbar-logout-btn" (click)="logout()">Salir</button>
+    </div>
+
     <button class="navbar-cta">♥ Quiero ayudar</button>
   </div>
 </nav>

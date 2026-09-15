@@ -106,6 +106,34 @@
   font-size: 0.95rem;
 }
 
+.navbar-user {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+}
+
+.navbar-user-name {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #1a7a6e;
+}
+
+.navbar-logout-btn {
+  background: none;
+  border: 1px solid #1a7a6e;
+  color: #1a7a6e;
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.navbar-logout-btn:hover {
+  background: #1a7a6e;
+  color: white;
+}
+
 .navbar-cta {
   background-color: #1a7a6e;
   color: white;
