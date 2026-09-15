@@ -1,38 +1,53 @@
 <div class="login-container">
   <div class="info-panel">
-    <div class="logo">Tu cuenta SOS.exe</div>
-    <h1>Tu ayuda y participación, en un solo lugar</h1>
-    <p>Ingresa para continuar apoyando a centros, refugios y comunidades de forma segura.</p>
+    <div class="logo">{{ strings.logoTag }}</div>
+    <h1>{{ strings.panelTitulo }}</h1>
+    <p>{{ strings.panelDescripcion }}</p>
   </div>
 
   <div class="form-panel">
-    <h2>Iniciar sesión</h2>
-    <p>Ingresa con el correo y la contraseña de tu cuenta.</p>
+    <h2>{{ strings.tituloPagina }}</h2>
+    <p>{{ strings.subtitulo }}</p>
+
+    <div class="error-banner" *ngIf="errorMessage">
+      <span>⚠️ {{ errorMessage }}</span>
+    </div>
 
     <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
-      
+
       <div class="form-group">
-        <label>Correo electrónico</label>
-        <input type="email" formControlName="email" placeholder="correo@ejemplo.com">
+        <label for="login-email">{{ strings.labelEmail }}</label>
+        <input
+          id="login-email"
+          type="email"
+          formControlName="email"
+          [placeholder]="strings.placeholderEmail">
         <small class="error" *ngIf="loginForm.get('email')?.invalid && loginForm.get('email')?.touched">
-          Ingresa un correo válido.
+          {{ strings.errorEmail }}
         </small>
       </div>
 
       <div class="form-group">
-        <label>Contraseña</label>
-        <input type="password" formControlName="password" placeholder="Ingresa tu contraseña">
+        <label for="login-password">{{ strings.labelPassword }}</label>
+        <input
+          id="login-password"
+          type="password"
+          formControlName="password"
+          [placeholder]="strings.placeholderPassword">
         <small class="error" *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.touched">
-          La contraseña es obligatoria.
+          {{ strings.errorPassword }}
         </small>
       </div>
 
-      <button type="submit" class="btn-primary">Iniciar sesión &rarr;</button>
+      <button type="submit" class="btn-primary" [disabled]="isLoading">
+        <span *ngIf="!isLoading">{{ strings.botonSubmit }}</span>
+        <span *ngIf="isLoading">{{ strings.botonCargando }}</span>
+      </button>
     </form>
-    
+
     <div class="links">
-      <a routerLink="/registro">¿Aún no tienes una cuenta? Crear una cuenta</a>
-      <a routerLink="/">Cancelar y volver al sitio</a>
+      <a routerLink="/registro">{{ strings.linkRegistro }}</a>
+      <a routerLink="/">{{ strings.linkCancelar }}</a>
     </div>
   </div>
 </div>

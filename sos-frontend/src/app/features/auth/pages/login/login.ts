@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { LOGIN_STRINGS } from './login.strings';
 
 @Component({
   selector: 'app-login',
@@ -13,11 +14,16 @@ import { AuthService } from '../../services/auth.service';
 })
 export class LoginComponent implements OnInit {
   loginForm!: FormGroup;
+  isLoading = false;
+  errorMessage = '';
+
+  /** Objeto de strings para usar en el template */
+  readonly strings = LOGIN_STRINGS;
 
   constructor(
-    private fb: FormBuilder, 
+    private fb: FormBuilder,
     private authService: AuthService,
-    private router: Router 
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -29,23 +35,25 @@ export class LoginComponent implements OnInit {
 
   onSubmit(): void {
     if (this.loginForm.valid) {
+      this.isLoading = true;
+      this.errorMessage = '';
+
       this.authService.login(this.loginForm.value).subscribe({
         next: (respuesta) => {
-          console.log('¡Login exitoso!', respuesta);
-          
+          this.isLoading = false;
           localStorage.setItem('token', respuesta.token);
           localStorage.setItem('rol', respuesta.rol);
           localStorage.setItem('nombre', respuesta.nombre);
-          
+
           if (respuesta.rol === 'ADMIN') {
-            this.router.navigate(['/dashboard']); 
+            this.router.navigate(['/dashboard']);
           } else {
-            this.router.navigate(['/inicio']); 
+            this.router.navigate(['/inicio']);
           }
         },
-        error: (err) => {
-          console.error('Error al iniciar sesión', err);
-          alert('¡Credenciales incorrectas o usuario no registrado!');
+        error: () => {
+          this.isLoading = false;
+          this.errorMessage = this.strings.errorCredenciales;
         }
       });
     } else {

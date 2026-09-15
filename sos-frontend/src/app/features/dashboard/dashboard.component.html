@@ -3,31 +3,31 @@
   <!-- Sidebar -->
   <aside class="sidebar">
     <div class="sidebar-header">
-      <div class="logo-tag">SOS.exe</div>
-      <span class="admin-label">Panel Admin</span>
+      <div class="logo-tag">{{ strings.logoTag }}</div>
+      <span class="admin-label">{{ strings.sidebarTitulo }}</span>
     </div>
 
     <nav class="sidebar-nav">
       <a routerLink="/dashboard" class="nav-item active">
-        <span class="nav-icon">📊</span> Dashboard
+        <span class="nav-icon">📊</span> {{ strings.navDashboard }}
       </a>
       <a routerLink="/centros" class="nav-item">
-        <span class="nav-icon">🏠</span> Centros
+        <span class="nav-icon">🏠</span> {{ strings.navCentros }}
       </a>
       <a routerLink="/noticias" class="nav-item">
-        <span class="nav-icon">📰</span> Noticias
+        <span class="nav-icon">📰</span> {{ strings.navNoticias }}
       </a>
       <a routerLink="/voluntariado" class="nav-item">
-        <span class="nav-icon">🤝</span> Voluntariado
+        <span class="nav-icon">🤝</span> {{ strings.navVoluntariado }}
       </a>
       <a routerLink="/mapa" class="nav-item">
-        <span class="nav-icon">📍</span> Mapa
+        <span class="nav-icon">📍</span> {{ strings.navMapa }}
       </a>
     </nav>
 
     <div class="sidebar-footer">
       <button class="btn-logout" (click)="logout()">
-        <span>⬅</span> Cerrar sesión
+        <span>⬅</span> {{ strings.botonLogout }}
       </button>
     </div>
   </aside>
@@ -38,8 +38,8 @@
     <!-- Header -->
     <header class="dashboard-header">
       <div>
-        <h1>Bienvenido, {{ nombreAdmin }} 👋</h1>
-        <p>Panel de administración de SOS.exe</p>
+        <h1>{{ strings.bienvenida }} {{ nombreAdmin }} 👋</h1>
+        <p>{{ strings.subtituloHeader }}</p>
       </div>
     </header>
 
@@ -48,52 +48,52 @@
       <div class="stat-card">
         <div class="stat-icon" style="background: rgba(18,130,106,0.1); color: #12826a;">🏠</div>
         <div class="stat-info">
-          <span class="stat-label">Centros activos</span>
-          <span class="stat-value">—</span>
+          <span class="stat-label">{{ strings.statCentros }}</span>
+          <span class="stat-value">{{ strings.valorPendiente }}</span>
         </div>
       </div>
       <div class="stat-card">
         <div class="stat-icon" style="background: rgba(59,130,246,0.1); color: #3b82f6;">👥</div>
         <div class="stat-info">
-          <span class="stat-label">Usuarios registrados</span>
-          <span class="stat-value">—</span>
+          <span class="stat-label">{{ strings.statUsuarios }}</span>
+          <span class="stat-value">{{ strings.valorPendiente }}</span>
         </div>
       </div>
       <div class="stat-card">
         <div class="stat-icon" style="background: rgba(245,158,11,0.1); color: #f59e0b;">🤝</div>
         <div class="stat-info">
-          <span class="stat-label">Postulaciones</span>
-          <span class="stat-value">—</span>
+          <span class="stat-label">{{ strings.statPostulaciones }}</span>
+          <span class="stat-value">{{ strings.valorPendiente }}</span>
         </div>
       </div>
       <div class="stat-card">
         <div class="stat-icon" style="background: rgba(239,68,68,0.1); color: #ef4444;">💚</div>
         <div class="stat-info">
-          <span class="stat-label">Donaciones</span>
-          <span class="stat-value">—</span>
+          <span class="stat-label">{{ strings.statDonaciones }}</span>
+          <span class="stat-value">{{ strings.valorPendiente }}</span>
         </div>
       </div>
     </section>
 
     <!-- Quick Access -->
     <section class="quick-access">
-      <h2>Acceso rápido</h2>
+      <h2>{{ strings.tituloAccesoRapido }}</h2>
       <div class="quick-grid">
         <a routerLink="/centros" class="quick-card">
           <span class="quick-icon">🏠</span>
-          <span>Gestionar Centros</span>
+          <span>{{ strings.quickCentros }}</span>
         </a>
         <a routerLink="/noticias" class="quick-card">
           <span class="quick-icon">📰</span>
-          <span>Publicar Noticia</span>
+          <span>{{ strings.quickNoticias }}</span>
         </a>
         <a routerLink="/voluntariado" class="quick-card">
           <span class="quick-icon">🤝</span>
-          <span>Ver Postulaciones</span>
+          <span>{{ strings.quickVoluntariado }}</span>
         </a>
         <a routerLink="/mapa" class="quick-card">
           <span class="quick-icon">📍</span>
-          <span>Ver Mapa</span>
+          <span>{{ strings.quickMapa }}</span>
         </a>
       </div>
     </section>

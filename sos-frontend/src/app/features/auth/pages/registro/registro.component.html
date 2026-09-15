@@ -1,28 +1,28 @@
 <div class="registro-container">
   <div class="info-panel">
-    <div class="logo">Tu cuenta SOS.exe</div>
-    <h1>Únete a la comunidad de ayuda</h1>
-    <p>Crea tu cuenta para conectar con centros, refugios y comunidades que necesitan tu apoyo.</p>
+    <div class="logo">{{ strings.logoTag }}</div>
+    <h1>{{ strings.panelTitulo }}</h1>
+    <p>{{ strings.panelDescripcion }}</p>
 
     <div class="features">
       <div class="feature-item">
         <span class="feature-icon">🤝</span>
-        <span>Coordina voluntariados fácilmente</span>
+        <span>{{ strings.feature1 }}</span>
       </div>
       <div class="feature-item">
         <span class="feature-icon">💚</span>
-        <span>Realiza donaciones de forma segura</span>
+        <span>{{ strings.feature2 }}</span>
       </div>
       <div class="feature-item">
         <span class="feature-icon">📍</span>
-        <span>Encuentra centros de ayuda cercanos</span>
+        <span>{{ strings.feature3 }}</span>
       </div>
     </div>
   </div>
 
   <div class="form-panel">
-    <h2>Crear cuenta</h2>
-    <p>Completa los datos para registrarte en SOS.exe.</p>
+    <h2>{{ strings.tituloPagina }}</h2>
+    <p>{{ strings.subtitulo }}</p>
 
     <div class="error-banner" *ngIf="errorMessage">
       <span>⚠️ {{ errorMessage }}</span>
@@ -31,59 +31,62 @@
     <form [formGroup]="registroForm" (ngSubmit)="onSubmit()">
 
       <div class="form-group">
-        <label for="reg-nombre">Nombre completo</label>
+        <label for="reg-nombre">{{ strings.labelNombre }}</label>
         <input
           id="reg-nombre"
           type="text"
           formControlName="nombre"
-          placeholder="Tu nombre completo">
+          [placeholder]="strings.placeholderNombre">
         <small class="error" *ngIf="registroForm.get('nombre')?.invalid && registroForm.get('nombre')?.touched">
-          El nombre es obligatorio.
+          {{ strings.errorNombre }}
         </small>
       </div>
 
       <div class="form-group">
-        <label for="reg-email">Correo electrónico</label>
+        <label for="reg-email">{{ strings.labelEmail }}</label>
         <input
           id="reg-email"
           type="email"
           formControlName="email"
-          placeholder="correo@ejemplo.com">
+          [placeholder]="strings.placeholderEmail">
         <small class="error" *ngIf="registroForm.get('email')?.invalid && registroForm.get('email')?.touched">
-          Ingresa un correo válido.
+          {{ strings.errorEmail }}
         </small>
       </div>
 
       <div class="form-group">
-        <label for="reg-password">Contraseña</label>
+        <label for="reg-password">{{ strings.labelPassword }}</label>
         <input
           id="reg-password"
           type="password"
           formControlName="password"
-          placeholder="Mínimo 6 caracteres">
+          [placeholder]="strings.placeholderPassword">
         <small class="error" *ngIf="registroForm.get('password')?.invalid && registroForm.get('password')?.touched">
-          La contraseña debe tener al menos 6 caracteres.
+          {{ strings.errorPassword }}
         </small>
       </div>
 
       <div class="form-group">
-        <label for="reg-telefono">Teléfono <span class="optional">(opcional)</span></label>
+        <label for="reg-telefono">
+          {{ strings.labelTelefono }}
+          <span class="optional">{{ strings.labelOpcional }}</span>
+        </label>
         <input
           id="reg-telefono"
           type="tel"
           formControlName="telefono"
-          placeholder="Ej: 77712345">
+          [placeholder]="strings.placeholderTelefono">
       </div>
 
       <button type="submit" class="btn-primary" [disabled]="isLoading">
-        <span *ngIf="!isLoading">Crear cuenta &rarr;</span>
-        <span *ngIf="isLoading">Registrando...</span>
+        <span *ngIf="!isLoading">{{ strings.botonSubmit }}</span>
+        <span *ngIf="isLoading">{{ strings.botonCargando }}</span>
       </button>
     </form>
 
     <div class="links">
-      <a routerLink="/login">¿Ya tienes una cuenta? Iniciar sesión</a>
-      <a routerLink="/">Cancelar y volver al sitio</a>
+      <a routerLink="/login">{{ strings.linkLogin }}</a>
+      <a routerLink="/">{{ strings.linkCancelar }}</a>
     </div>
   </div>
 </div>
