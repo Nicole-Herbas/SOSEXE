@@ -1,0 +1,89 @@
+<div class="registro-container">
+  <div class="info-panel">
+    <div class="logo">Tu cuenta SOS.exe</div>
+    <h1>Únete a la comunidad de ayuda</h1>
+    <p>Crea tu cuenta para conectar con centros, refugios y comunidades que necesitan tu apoyo.</p>
+
+    <div class="features">
+      <div class="feature-item">
+        <span class="feature-icon">🤝</span>
+        <span>Coordina voluntariados fácilmente</span>
+      </div>
+      <div class="feature-item">
+        <span class="feature-icon">💚</span>
+        <span>Realiza donaciones de forma segura</span>
+      </div>
+      <div class="feature-item">
+        <span class="feature-icon">📍</span>
+        <span>Encuentra centros de ayuda cercanos</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-panel">
+    <h2>Crear cuenta</h2>
+    <p>Completa los datos para registrarte en SOS.exe.</p>
+
+    <div class="error-banner" *ngIf="errorMessage">
+      <span>⚠️ {{ errorMessage }}</span>
+    </div>
+
+    <form [formGroup]="registroForm" (ngSubmit)="onSubmit()">
+
+      <div class="form-group">
+        <label for="reg-nombre">Nombre completo</label>
+        <input
+          id="reg-nombre"
+          type="text"
+          formControlName="nombre"
+          placeholder="Tu nombre completo">
+        <small class="error" *ngIf="registroForm.get('nombre')?.invalid && registroForm.get('nombre')?.touched">
+          El nombre es obligatorio.
+        </small>
+      </div>
+
+      <div class="form-group">
+        <label for="reg-email">Correo electrónico</label>
+        <input
+          id="reg-email"
+          type="email"
+          formControlName="email"
+          placeholder="correo@ejemplo.com">
+        <small class="error" *ngIf="registroForm.get('email')?.invalid && registroForm.get('email')?.touched">
+          Ingresa un correo válido.
+        </small>
+      </div>
+
+      <div class="form-group">
+        <label for="reg-password">Contraseña</label>
+        <input
+          id="reg-password"
+          type="password"
+          formControlName="password"
+          placeholder="Mínimo 6 caracteres">
+        <small class="error" *ngIf="registroForm.get('password')?.invalid && registroForm.get('password')?.touched">
+          La contraseña debe tener al menos 6 caracteres.
+        </small>
+      </div>
+
+      <div class="form-group">
+        <label for="reg-telefono">Teléfono <span class="optional">(opcional)</span></label>
+        <input
+          id="reg-telefono"
+          type="tel"
+          formControlName="telefono"
+          placeholder="Ej: 77712345">
+      </div>
+
+      <button type="submit" class="btn-primary" [disabled]="isLoading">
+        <span *ngIf="!isLoading">Crear cuenta &rarr;</span>
+        <span *ngIf="isLoading">Registrando...</span>
+      </button>
+    </form>
+
+    <div class="links">
+      <a routerLink="/login">¿Ya tienes una cuenta? Iniciar sesión</a>
+      <a routerLink="/">Cancelar y volver al sitio</a>
+    </div>
+  </div>
+</div>

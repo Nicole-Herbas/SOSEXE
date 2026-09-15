@@ -1,13 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule],
+  imports: [ReactiveFormsModule, CommonModule, RouterLink],
   templateUrl: './login.component.html',
   styleUrl: './login.component.css'
 })
@@ -31,17 +31,16 @@ export class LoginComponent implements OnInit {
     if (this.loginForm.valid) {
       this.authService.login(this.loginForm.value).subscribe({
         next: (respuesta) => {
-          console.log('¡Éxito total!', respuesta);
+          console.log('¡Login exitoso!', respuesta);
           
           localStorage.setItem('token', respuesta.token);
           localStorage.setItem('rol', respuesta.rol);
+          localStorage.setItem('nombre', respuesta.nombre);
           
-          if (respuesta.rol === 'ADMINISTRADOR') {
-            alert('¡Bienvenido Administrador ' + respuesta.nombre + '!');
-            this.router.navigate(['/admin']); 
+          if (respuesta.rol === 'ADMIN') {
+            this.router.navigate(['/dashboard']); 
           } else {
-            alert('¡Bienvenido Ciudadano ' + respuesta.nombre + '!');
-            this.router.navigate(['/centros']); 
+            this.router.navigate(['/inicio']); 
           }
         },
         error: (err) => {
