@@ -1,0 +1,438 @@
+<div class="registro-page">
+
+  <!-- ==========================================
+       ENCABEZADO
+       ========================================== -->
+
+  <div class="registro-header">
+
+    <a class="volver-acerca" (click)="cancelar()">
+      ← Volver a Acerca de
+    </a>
+
+    <span class="badge">
+      Solicitud de verificación
+    </span>
+
+    <div class="header-content">
+
+      <div>
+        <h1>Registra tu centro o refugio</h1>
+
+        <p>
+          Completa la información para que el equipo administrador
+          pueda comprobar la organización antes de publicarla.
+        </p>
+      </div>
+
+      <div class="private-box">
+        <strong>🔒 Solicitud privada</strong>
+
+        <span>
+          Nada se publica automáticamente.
+        </span>
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- ==========================================
+       INDICADOR DE PASOS
+       ========================================== -->
+
+  <div class="steps">
+
+    <div class="step active">
+      <span class="step-number">1</span>
+      <span>Centro</span>
+    </div>
+
+    <div class="step">
+      <span class="step-number">2</span>
+      <span>Responsable y ubicación</span>
+    </div>
+
+    <div class="step">
+      <span class="step-number">3</span>
+      <span>Documentos</span>
+    </div>
+
+    <div class="step">
+      <span class="step-number">4</span>
+      <span>Necesidades y voluntariado</span>
+    </div>
+
+    <div class="step">
+      <span class="step-number">5</span>
+      <span>Revisión y envío</span>
+    </div>
+
+  </div>
+
+
+  <!-- ==========================================
+       CONTENIDO
+       ========================================== -->
+
+  <div class="content-layout">
+
+    <!-- ========================================
+         FORMULARIO
+         ======================================== -->
+
+    <section class="form-card">
+
+      <div class="form-title">
+
+        <span class="step-label">
+          Paso 1 de 5
+        </span>
+
+        <h2>Información del centro</h2>
+
+        <p>
+          Cuéntanos qué organización solicita ser verificada.
+        </p>
+
+      </div>
+
+
+      <!-- NOMBRE -->
+
+      <div class="field full">
+
+        <label>
+          Nombre oficial del centro o refugio
+          <span>*</span>
+        </label>
+
+        <input
+          type="text"
+          [(ngModel)]="nombreCentro"
+          placeholder="Ej.: Centro de Apoyo San José"
+        />
+
+      </div>
+
+
+      <!-- TIPO + DEPARTAMENTO -->
+
+      <div class="field-row">
+
+        <div class="field">
+
+          <label>
+            Tipo de organización
+            <span>*</span>
+          </label>
+
+          <select [(ngModel)]="tipoOrganizacion">
+
+            <option value="">
+              Selecciona una opción
+            </option>
+
+            @for (tipo of tiposOrganizacion; track tipo) {
+              <option [value]="tipo">
+                {{ tipo }}
+              </option>
+            }
+
+          </select>
+
+        </div>
+
+
+        <div class="field">
+
+          <label>
+            Departamento
+            <span>*</span>
+          </label>
+
+          <select [(ngModel)]="departamento">
+
+            <option value="">
+              Selecciona un departamento
+            </option>
+
+            @for (departamento of departamentos; track departamento) {
+              <option [value]="departamento">
+                {{ departamento }}
+              </option>
+            }
+
+          </select>
+
+        </div>
+
+      </div>
+
+
+      <!-- NIT + PERSONERÍA -->
+
+      <div class="field-row">
+
+        <div class="field">
+
+          <label>
+            NIT
+            <span>*</span>
+          </label>
+
+          <input
+            type="text"
+            [(ngModel)]="nit"
+            placeholder="Número de Identificación Tributaria"
+          />
+
+        </div>
+
+
+        <div class="field">
+
+          <label>
+            Personería jurídica
+            <span>*</span>
+          </label>
+
+          <input
+            type="text"
+            [(ngModel)]="personeriaJuridica"
+            placeholder="Número o resolución"
+          />
+
+        </div>
+
+      </div>
+
+
+      <!-- FECHA + WEB -->
+
+      <div class="field-row">
+
+        <div class="field">
+
+          <label>
+            Fecha de fundación
+          </label>
+
+          <input
+            type="date"
+            [(ngModel)]="fechaFundacion"
+          />
+
+        </div>
+
+
+        <div class="field">
+
+          <label>
+            Página web o red social oficial
+          </label>
+
+          <input
+            type="url"
+            [(ngModel)]="paginaWeb"
+            placeholder="https://..."
+          />
+
+        </div>
+
+      </div>
+
+
+      <!-- DESCRIPCIÓN -->
+
+      <div class="field full">
+
+        <label>
+          Descripción del centro
+          <span>*</span>
+        </label>
+
+        <textarea
+          [(ngModel)]="descripcion"
+          rows="4"
+          placeholder="Explica qué hace el centro, a quién ayuda y desde cuándo trabaja."
+        ></textarea>
+
+      </div>
+
+
+      <!-- POBLACIÓN -->
+
+      <div class="field full">
+
+        <label>
+          Población atendida
+        </label>
+
+        <input
+          type="text"
+          [(ngModel)]="poblacionAtendida"
+          placeholder="Ej.: familias afectadas, niños, adultos mayores o animales"
+        />
+
+      </div>
+
+
+      <!-- ======================================
+           BOTONES
+           ====================================== -->
+
+      <div class="form-actions">
+
+        <button
+          type="button"
+          class="btn secondary"
+          (click)="cancelar()"
+        >
+          ← Cancelar
+        </button>
+
+        <div class="right-actions">
+
+          <button
+            type="button"
+            class="btn secondary"
+            (click)="guardarBorrador()"
+          >
+            Guardar borrador
+          </button>
+
+          <button
+            type="button"
+            class="btn primary"
+            [disabled]="!paso1Valido"
+            (click)="continuar()"
+          >
+            Continuar →
+          </button>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- ========================================
+         RESUMEN LATERAL
+         ======================================== -->
+
+    <aside class="summary-card">
+
+      <div class="summary-header">
+
+        <div>
+
+          <span>
+            RESUMEN DE LA SOLICITUD
+          </span>
+
+          <h3>
+            {{ nombreCentro || 'Tu centro o refugio' }}
+          </h3>
+
+          <p>
+            {{ departamento || 'Ubicación pendiente' }}
+          </p>
+
+        </div>
+
+        <span class="summary-step">
+          Paso 1/5
+        </span>
+
+      </div>
+
+
+      <!-- VERIFICACIÓN -->
+
+      <div class="verification-box">
+
+        <strong>
+          ✓ Se mostrará tras la verificación
+        </strong>
+
+        <p>
+          La información no será pública hasta que un
+          administrador revise y apruebe la solicitud.
+        </p>
+
+      </div>
+
+
+      <!-- NECESIDADES -->
+
+      <div class="summary-section">
+
+        <span>
+          NECESIDADES PRIORITARIAS
+        </span>
+
+        <p>
+          Aún no seleccionadas
+        </p>
+
+      </div>
+
+
+      <!-- DONACIONES -->
+
+      <div class="summary-section">
+
+        <span>
+          DONACIONES QUE ACEPTA
+        </span>
+
+        <p>
+          Aún no seleccionadas
+        </p>
+
+      </div>
+
+
+      <!-- VOLUNTARIADO -->
+
+      <div class="summary-section">
+
+        <span>
+          VOLUNTARIADO
+        </span>
+
+        <p>
+          No solicita voluntarios
+        </p>
+
+      </div>
+
+
+      <!-- DOCUMENTOS -->
+
+      <div class="documents-counter">
+
+        <span>
+          Documentos añadidos
+        </span>
+
+        <strong>
+          0/4
+        </strong>
+
+      </div>
+
+
+      <p class="summary-footer">
+        Podrás actualizar necesidades, horarios y
+        vacantes cuando cambie la situación del centro.
+      </p>
+
+    </aside>
+
+  </div>
+
+</div>
