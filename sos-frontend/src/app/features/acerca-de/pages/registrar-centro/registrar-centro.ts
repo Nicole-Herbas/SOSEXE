@@ -41,6 +41,28 @@ export class RegistrarCentroComponent {
   direccionExacta = '';
   referencia = '';
 
+    // ==========================================
+  // DOCUMENTOS - PASO 3
+  // ==========================================
+
+  personeriaAdjunta = false;
+  nitAdjunto = false;
+  identidadAdjunta = false;
+  domicilioAdjunto = false;
+
+  get documentosAdjuntos(): number {
+    return [
+      this.personeriaAdjunta,
+      this.nitAdjunto,
+      this.identidadAdjunta,
+      this.domicilioAdjunto
+    ].filter(Boolean).length;
+  }
+
+  get paso3Valido(): boolean {
+    return this.documentosAdjuntos === 4;
+  }
+
   // ==========================================
   // DEPARTAMENTOS DE BOLIVIA
   // ==========================================
@@ -103,11 +125,32 @@ export class RegistrarCentroComponent {
     );
   }
 
+  
+
+  // ==========================================
+  // DOCUMENTOS
+  // ==========================================
+
+  alternarPersoneria(): void {
+    this.personeriaAdjunta = !this.personeriaAdjunta;
+  }
+
+  alternarNit(): void {
+    this.nitAdjunto = !this.nitAdjunto;
+  }
+
+  alternarIdentidad(): void {
+    this.identidadAdjunta = !this.identidadAdjunta;
+  }
+
+  alternarDomicilio(): void {
+    this.domicilioAdjunto = !this.domicilioAdjunto;
+  }
   // ==========================================
   // NAVEGACIÓN
   // ==========================================
 
-    continuar(): void {
+  continuar(): void {
 
     if (this.currentStep === 1 && !this.paso1Valido) {
       return;
@@ -117,9 +160,14 @@ export class RegistrarCentroComponent {
       return;
     }
 
+    if (this.currentStep === 3 && !this.paso3Valido) {
+      return;
+    }
+
     if (this.currentStep < 5) {
       this.currentStep++;
     }
+
   }
 
   volver(): void {
