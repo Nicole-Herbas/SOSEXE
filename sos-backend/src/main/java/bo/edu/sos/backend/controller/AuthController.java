@@ -12,16 +12,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import bo.edu.sos.backend.repository.RolRepository;
 
 import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/auth")
+
 @CrossOrigin(origins = "http://localhost:4200") 
 public class AuthController {
 
     @Autowired
     private UsuarioRepository usuarioRepository;
+
+    @Autowired
+    private RolRepository rolRepository;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -38,11 +43,13 @@ public class AuthController {
         usuario.setPassword(passwordEncoder.encode(request.getPassword())); 
         usuario.setTelefono(request.getTelefono());
         
-        if (request.getRolId() != null) {
-            Rol rol = new Rol();
-            rol.setId(request.getRolId());
-            usuario.setRol(rol);
-        }
+        Rol rolUsuario = rolRepository.findByNombre("USER")
+        .orElseThrow(() ->
+                new IllegalStateException(
+                        "El rol USER no existe en la base de datos"
+                )
+        );
+        usuario.setRol(rolUsuario);
         
         if (request.getDepartamentoId() != null) {
             Departamento depto = new Departamento();
