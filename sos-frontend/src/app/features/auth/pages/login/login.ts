@@ -36,7 +36,7 @@ export class LoginComponent implements OnInit {
           localStorage.setItem('token', respuesta.token);
           localStorage.setItem('rol', respuesta.rol);
           
-          if (respuesta.rol === 'ADMINISTRADOR') {
+          if (respuesta.rol === 'ADMIN') {
             alert('¡Bienvenido Administrador ' + respuesta.nombre + '!');
             this.router.navigate(['/admin']); 
           } else {
