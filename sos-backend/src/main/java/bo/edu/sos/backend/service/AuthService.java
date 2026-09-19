@@ -15,6 +15,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import bo.edu.sos.backend.security.JwtService;
 import java.util.Optional;
 
 @Service
@@ -24,18 +25,20 @@ public class AuthService {
     private final RolRepository rolRepository;
     private final DepartamentoRepository departamentoRepository;
     private final PasswordEncoder passwordEncoder;
-
+    private final JwtService jwtService;
 
     public AuthService(
             UsuarioRepository usuarioRepository,
             RolRepository rolRepository,
             DepartamentoRepository departamentoRepository,
-            PasswordEncoder passwordEncoder) {
+            PasswordEncoder passwordEncoder,
+            JwtService jwtService) {
 
         this.usuarioRepository = usuarioRepository;
         this.rolRepository = rolRepository;
         this.departamentoRepository = departamentoRepository;
         this.passwordEncoder = passwordEncoder;
+        this.jwtService = jwtService;
     }
 
 
@@ -123,14 +126,13 @@ public class AuthService {
         }
 
 
-        String tokenSimulado =
-                "jwt-generado-exitosamente-para-"
-                        + usuario.getId();
+        String token =
+                jwtService.generarToken(usuario);
 
 
         AuthResponseDTO respuesta =
                 new AuthResponseDTO(
-                        tokenSimulado,
+                        token,
                         usuario.getNombre(),
                         usuario.getEmail(),
                         usuario.getRol().getNombre()
