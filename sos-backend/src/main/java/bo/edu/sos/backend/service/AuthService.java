@@ -130,6 +130,13 @@ public class AuthService {
         Usuario usuario =
                 usuarioOpt.get();
 
+        if (!Boolean.TRUE.equals(
+                usuario.getActivo()
+        )) {
+
+            return Optional.empty();
+        }
+
 
         boolean passwordCorrecto =
                 passwordEncoder.matches(
