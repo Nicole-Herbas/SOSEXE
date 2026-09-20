@@ -12,6 +12,7 @@ import { AuthService } from '../../services/auth.service';
   styleUrl: './login.component.css'
 })
 export class LoginComponent implements OnInit {
+  mensajeError = '';
   loginForm!: FormGroup;
 
   constructor(
@@ -28,28 +29,57 @@ export class LoginComponent implements OnInit {
   }
 
   onSubmit(): void {
-    if (this.loginForm.valid) {
-      this.authService.login(this.loginForm.value).subscribe({
-        next: (respuesta) => {
-          console.log('¡Éxito total!', respuesta);
 
-          localStorage.setItem('token', respuesta.token);
+  this.mensajeError = '';
+
+
+  if (this.loginForm.valid) {
+
+    this.authService
+      .login(this.loginForm.value)
+      .subscribe({
+
+        next: (respuesta) => {
+
+          localStorage.setItem(
+            'token',
+            respuesta.token
+          );
 
           if (respuesta.rol === 'ADMIN') {
-            alert('¡Bienvenido Administrador ' + respuesta.nombre + '!');
-            this.router.navigate(['/admin']);
+
+            this.router.navigate([
+              '/admin'
+            ]);
+
           } else {
-            alert('¡Bienvenido Ciudadano ' + respuesta.nombre + '!');
-            this.router.navigate(['/centros']);
+
+            this.router.navigate([
+              '/centros'
+            ]);
+
           }
+
         },
+
         error: (err) => {
-          console.error('Error al iniciar sesión', err);
-          alert('¡Credenciales incorrectas o usuario no registrado!');
+
+          console.error(
+            'Error al iniciar sesión',
+            err
+          );
+
+          this.mensajeError =
+            'Correo o contraseña incorrectos.';
+
         }
+
       });
-    } else {
-      this.loginForm.markAllAsTouched();
-    }
+
+  } else {
+
+    this.loginForm.markAllAsTouched();
+
   }
+}
 }

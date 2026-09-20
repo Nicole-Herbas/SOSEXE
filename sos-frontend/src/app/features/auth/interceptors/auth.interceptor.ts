@@ -1,42 +1,144 @@
 import { isPlatformBrowser } from '@angular/common';
-import { HttpInterceptorFn } from '@angular/common/http';
-import { inject, PLATFORM_ID } from '@angular/core';
 
-export const authInterceptor: HttpInterceptorFn = (req, next) => {
+import {
+  HttpErrorResponse,
+  HttpInterceptorFn
+} from '@angular/common/http';
 
-  const platformId = inject(PLATFORM_ID);
+import {
+  inject,
+  PLATFORM_ID
+} from '@angular/core';
 
-  if (!isPlatformBrowser(platformId)) {
-    return next(req);
-  }
+import { Router } from '@angular/router';
 
+import {
+  catchError,
+  switchMap,
+  throwError
+} from 'rxjs';
 
-  const token = localStorage.getItem('token');
-
-
-  if (!token) {
-    return next(req);
-  }
-
-
-  if (
-    req.url.includes('/api/auth/login') ||
-    req.url.includes('/api/auth/registro')
-  ) {
-    return next(req);
-  }
+import { AuthService }
+  from '../services/auth.service';
 
 
-  const requestConToken = req.clone({
+export const authInterceptor: HttpInterceptorFn =
+  (req, next) => {
 
-    setHeaders: {
+    const platformId =
+      inject(PLATFORM_ID);
 
-      Authorization: `Bearer ${token}`
+    const authService =
+      inject(AuthService);
 
+    const router =
+      inject(Router);
+
+
+    if (!isPlatformBrowser(platformId)) {
+      return next(req);
     }
 
-  });
+
+    const esEndpointAuthPublico =
+      req.url.includes('/api/auth/login') ||
+      req.url.includes('/api/auth/registro') ||
+      req.url.includes('/api/auth/refresh');
+
+    if (esEndpointAuthPublico) {
+      return next(req);
+    }
 
 
-  return next(requestConToken);
-};
+    const token =
+      localStorage.getItem('token');
+
+
+   
+    const requestConToken =
+      token
+        ? req.clone({
+            setHeaders: {
+              Authorization:
+                `Bearer ${token}`
+            }
+          })
+        : req;
+
+
+    return next(requestConToken)
+      .pipe(
+
+        catchError(
+          (error: HttpErrorResponse) => {
+
+            
+            if (error.status !== 401) {
+
+              return throwError(
+                () => error
+              );
+            }
+
+
+           
+            return authService
+              .refrescarToken()
+              .pipe(
+
+                switchMap(
+                  respuesta => {
+
+                    
+                    localStorage.setItem(
+                      'token',
+                      respuesta.token
+                    );
+
+                    const reintento =
+                      req.clone({
+
+                        setHeaders: {
+
+                          Authorization:
+                            `Bearer ${respuesta.token}`
+
+                        }
+
+                      });
+
+
+            
+                    return next(
+                      reintento
+                    );
+                  }
+                ),
+
+
+                catchError(
+                  refreshError => {
+
+                    
+                    localStorage.removeItem(
+                      'token'
+                    );
+
+
+                    router.navigate([
+                      '/login'
+                    ]);
+
+
+                    return throwError(
+                      () => refreshError
+                    );
+                  }
+                )
+
+              );
+          }
+        )
+
+      );
+  };

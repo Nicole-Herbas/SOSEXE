@@ -34,4 +34,15 @@ export class AuthService {
 
   }
 
+  refrescarToken(): Observable<AuthResponse> {
+
+  return this.http.post<AuthResponse>(
+    `${this.apiUrl}/refresh`,
+    {},
+    {
+      withCredentials: true
+    }
+  );
+}
+
 }

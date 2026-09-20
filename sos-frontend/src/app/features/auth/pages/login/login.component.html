@@ -27,7 +27,19 @@
         </small>
       </div>
 
-      <button type="submit" class="btn-primary">Iniciar sesión &rarr;</button>
+      <button
+  type="submit"
+  class="btn-primary"
+>
+  Iniciar sesión &rarr;
+</button>
+
+<small
+  class="error login-error"
+  *ngIf="mensajeError"
+>
+  {{ mensajeError }}
+</small>
     </form>
     
     <div class="links">
