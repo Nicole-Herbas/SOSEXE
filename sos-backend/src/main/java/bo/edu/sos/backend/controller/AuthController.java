@@ -9,6 +9,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
+import bo.edu.sos.backend.dto.UsuarioAutenticadoDTO;
+import org.springframework.security.core.Authentication;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -47,6 +49,17 @@ public class AuthController {
 
         return ResponseEntity.ok(
                 respuesta.get()
+        );
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<UsuarioAutenticadoDTO> me(
+            Authentication authentication) {
+
+        return ResponseEntity.ok(
+                authService.obtenerUsuarioAutenticado(
+                        authentication.getName()
+                )
         );
     }
 }

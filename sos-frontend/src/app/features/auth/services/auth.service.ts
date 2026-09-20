@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 
 import { LoginRequest } from '../models/login-request';
 import { AuthResponse } from '../models/auth-response';
+import { AuthUser } from '../models/auth-user';
 
 @Injectable({
   providedIn: 'root'
@@ -21,6 +22,14 @@ export class AuthService {
     return this.http.post<AuthResponse>(
       `${this.apiUrl}/login`,
       credenciales
+    );
+
+  }
+
+  usuarioActual(): Observable<AuthUser> {
+
+    return this.http.get<AuthUser>(
+      `${this.apiUrl}/me`
     );
 
   }

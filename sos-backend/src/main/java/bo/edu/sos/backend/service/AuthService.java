@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import bo.edu.sos.backend.security.JwtService;
 import java.util.Optional;
+import bo.edu.sos.backend.dto.UsuarioAutenticadoDTO;
 
 @Service
 public class AuthService {
@@ -140,5 +141,26 @@ public class AuthService {
 
 
         return Optional.of(respuesta);
+    }
+
+    @Transactional(readOnly = true)
+    public UsuarioAutenticadoDTO obtenerUsuarioAutenticado(
+            String email) {
+
+        Usuario usuario =
+                usuarioRepository.findByEmail(email)
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "No existe un usuario con email: "
+                                                + email
+                                )
+                        );
+
+
+        return new UsuarioAutenticadoDTO(
+                usuario.getNombre(),
+                usuario.getEmail(),
+                usuario.getRol().getNombre()
+        );
     }
 }
