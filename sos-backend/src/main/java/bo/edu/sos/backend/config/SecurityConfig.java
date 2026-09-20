@@ -61,6 +61,7 @@ public class SecurityConfig {
                                 "/v3/api-docs/**",
                                 "/api/auth/login",
                                 "/api/auth/registro",
+                                "/api/auth/refresh",
                                 "/error"
                         ).permitAll()
 

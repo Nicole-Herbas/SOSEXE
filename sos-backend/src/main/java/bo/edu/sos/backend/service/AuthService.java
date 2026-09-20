@@ -112,7 +112,7 @@ public class AuthService {
     }
 
 
-    @Transactional(readOnly = true)
+    @Transactional
     public Optional<LoginResultDTO> login(
             LoginRequestDTO request) {
 
@@ -195,6 +195,70 @@ public class AuthService {
                 usuario.getNombre(),
                 usuario.getEmail(),
                 usuario.getRol().getNombre()
+        );
+    }
+
+    @Transactional
+    public Optional<LoginResultDTO> refrescar(
+            String refreshToken) {
+
+        Optional<Usuario> usuarioOpt =
+                refreshTokenService.validar(
+                        refreshToken
+                );
+
+
+        if (usuarioOpt.isEmpty()) {
+            return Optional.empty();
+        }
+
+
+        Usuario usuario =
+                usuarioOpt.get();
+
+
+        if (!Boolean.TRUE.equals(
+                usuario.getActivo()
+        )) {
+
+            refreshTokenService.revocar(
+                    refreshToken
+            );
+
+            return Optional.empty();
+        }
+
+
+        String nuevoAccessToken =
+                jwtService.generarToken(
+                        usuario
+                );
+
+
+        String nuevoRefreshToken =
+                refreshTokenService.crear(
+                        usuario
+                );
+
+
+        AuthResponseDTO respuesta =
+                new AuthResponseDTO(
+                        nuevoAccessToken,
+                        usuario.getNombre(),
+                        usuario.getEmail(),
+                        usuario.getRol().getNombre()
+                );
+
+
+        LoginResultDTO resultado =
+                new LoginResultDTO(
+                        respuesta,
+                        nuevoRefreshToken
+                );
+
+
+        return Optional.of(
+                resultado
         );
     }
 }

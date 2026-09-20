@@ -102,6 +102,91 @@ public class AuthController {
                 .body(respuesta);
     }
 
+    @PostMapping("/refresh")
+    public ResponseEntity<?> refresh(
+            @CookieValue(
+                    name = "refreshToken",
+                    required = false
+            )
+            String refreshToken) {
+
+
+        if (refreshToken == null ||
+                refreshToken.isBlank()) {
+
+            return ResponseEntity
+                    .status(401)
+                    .body(
+                            "Refresh token no disponible"
+                    );
+        }
+
+
+        Optional<LoginResultDTO> resultado =
+                authService.refrescar(
+                        refreshToken
+                );
+
+
+        if (resultado.isEmpty()) {
+
+            ResponseCookie cookieVacia =
+                    ResponseCookie
+                            .from(
+                                    "refreshToken",
+                                    ""
+                            )
+                            .httpOnly(true)
+                            .secure(false)
+                            .sameSite("Strict")
+                            .path("/api/auth")
+                            .maxAge(0)
+                            .build();
+
+
+            return ResponseEntity
+                    .status(401)
+                    .header(
+                            HttpHeaders.SET_COOKIE,
+                            cookieVacia.toString()
+                    )
+                    .body(
+                            "Refresh token inválido o expirado"
+                    );
+        }
+
+
+        LoginResultDTO loginResult =
+                resultado.get();
+
+
+        ResponseCookie nuevaCookie =
+                ResponseCookie
+                        .from(
+                                "refreshToken",
+                                loginResult.getRefreshToken()
+                        )
+                        .httpOnly(true)
+                        .secure(false)
+                        .sameSite("Strict")
+                        .path("/api/auth")
+                        .maxAge(
+                                Duration.ofDays(7)
+                        )
+                        .build();
+
+
+        return ResponseEntity
+                .ok()
+                .header(
+                        HttpHeaders.SET_COOKIE,
+                        nuevaCookie.toString()
+                )
+                .body(
+                        loginResult.getRespuesta()
+                );
+    }
+
 
     @GetMapping("/me")
     public ResponseEntity<UsuarioAutenticadoDTO> me(
