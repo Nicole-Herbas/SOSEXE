@@ -261,4 +261,16 @@ public class AuthService {
                 resultado
         );
     }
+    @Transactional
+    public void logout(
+            String refreshToken) {
+
+        if (refreshToken != null &&
+                !refreshToken.isBlank()) {
+
+            refreshTokenService.revocar(
+                    refreshToken
+            );
+        }
+    }
 }

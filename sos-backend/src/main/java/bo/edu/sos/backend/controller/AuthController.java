@@ -198,4 +198,40 @@ public class AuthController {
                 )
         );
     }
+
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout(
+            @CookieValue(
+                    name = "refreshToken",
+                    required = false
+            )
+            String refreshToken) {
+
+        authService.logout(
+                refreshToken
+        );
+
+
+        ResponseCookie cookieVacia =
+                ResponseCookie
+                        .from(
+                                "refreshToken",
+                                ""
+                        )
+                        .httpOnly(true)
+                        .secure(false)
+                        .sameSite("Strict")
+                        .path("/api/auth")
+                        .maxAge(0)
+                        .build();
+
+
+        return ResponseEntity
+                .noContent()
+                .header(
+                        HttpHeaders.SET_COOKIE,
+                        cookieVacia.toString()
+                )
+                .build();
+    }
 }
