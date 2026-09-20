@@ -43,7 +43,8 @@ export const authInterceptor: HttpInterceptorFn =
     const esEndpointAuthPublico =
       req.url.includes('/api/auth/login') ||
       req.url.includes('/api/auth/registro') ||
-      req.url.includes('/api/auth/refresh');
+      req.url.includes('/api/auth/refresh')||
+    req.url.includes('/api/auth/logout');
 
     if (esEndpointAuthPublico) {
       return next(req);
@@ -54,7 +55,7 @@ export const authInterceptor: HttpInterceptorFn =
       localStorage.getItem('token');
 
 
-   
+
     const requestConToken =
       token
         ? req.clone({
@@ -72,7 +73,7 @@ export const authInterceptor: HttpInterceptorFn =
         catchError(
           (error: HttpErrorResponse) => {
 
-            
+
             if (error.status !== 401) {
 
               return throwError(
@@ -81,7 +82,7 @@ export const authInterceptor: HttpInterceptorFn =
             }
 
 
-           
+
             return authService
               .refrescarToken()
               .pipe(
@@ -89,7 +90,7 @@ export const authInterceptor: HttpInterceptorFn =
                 switchMap(
                   respuesta => {
 
-                    
+
                     localStorage.setItem(
                       'token',
                       respuesta.token
@@ -108,7 +109,7 @@ export const authInterceptor: HttpInterceptorFn =
                       });
 
 
-            
+
                     return next(
                       reintento
                     );
@@ -119,7 +120,7 @@ export const authInterceptor: HttpInterceptorFn =
                 catchError(
                   refreshError => {
 
-                    
+
                     localStorage.removeItem(
                       'token'
                     );

@@ -36,13 +36,24 @@ export class AuthService {
 
   refrescarToken(): Observable<AuthResponse> {
 
-  return this.http.post<AuthResponse>(
-    `${this.apiUrl}/refresh`,
-    {},
-    {
-      withCredentials: true
-    }
-  );
-}
+    return this.http.post<AuthResponse>(
+      `${this.apiUrl}/refresh`,
+      {},
+      {
+        withCredentials: true
+      }
+    );
+  }
+  logout(): Observable<void> {
+
+    return this.http.post<void>(
+      `${this.apiUrl}/logout`,
+      {},
+      {
+        withCredentials: true
+      }
+    );
+
+  }
 
 }
