@@ -17,17 +17,17 @@ import java.util.Date;
 public class JwtService {
 
     private final SecretKey key;
-    private final long expirationMs;
+    private final long accessExpirationMs;
 
     public JwtService(
             @Value("${jwt.secret}") String secret,
-            @Value("${jwt.expiration-ms}") long expirationMs) {
+            @Value("${jwt.access-expiration-ms}") long accessExpirationMs) {
 
         this.key = Keys.hmacShaKeyFor(
                 secret.getBytes(StandardCharsets.UTF_8)
         );
 
-        this.expirationMs = expirationMs;
+        this.accessExpirationMs = accessExpirationMs;
     }
 
 
@@ -37,7 +37,7 @@ public class JwtService {
 
         Date expiracion =
                 new Date(
-                        ahora.getTime() + expirationMs
+                        ahora.getTime() + accessExpirationMs
                 );
 
 
