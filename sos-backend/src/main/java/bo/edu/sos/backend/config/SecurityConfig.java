@@ -106,9 +106,13 @@ public class SecurityConfig {
                                 "/api/centros/**",
                                 "/api/noticias/**",
                                 "/api/alertas/**",
-                                "/api/puntos-ayuda/**",
-                                "/api/voluntariados/**"
+                                "/api/puntos-ayuda/**"
                         ).hasAuthority("ADMIN")
+
+                        .requestMatchers(
+                                HttpMethod.POST,
+                                "/api/voluntariados/**"
+                        ).authenticated()
 
 
                         .requestMatchers(
@@ -116,9 +120,13 @@ public class SecurityConfig {
                                 "/api/centros/**",
                                 "/api/noticias/**",
                                 "/api/alertas/**",
-                                "/api/puntos-ayuda/**",
-                                "/api/voluntariados/**"
+                                "/api/puntos-ayuda/**"
                         ).hasAuthority("ADMIN")
+
+                        .requestMatchers(
+                                HttpMethod.PUT,
+                                "/api/voluntariados/**"
+                        ).authenticated()
 
 
                         .requestMatchers(
@@ -126,8 +134,7 @@ public class SecurityConfig {
                                 "/api/centros/**",
                                 "/api/noticias/**",
                                 "/api/alertas/**",
-                                "/api/puntos-ayuda/**",
-                                "/api/voluntariados/**"
+                                "/api/puntos-ayuda/**"
                         ).hasAuthority("ADMIN")
 
 
@@ -135,8 +142,23 @@ public class SecurityConfig {
                         .requestMatchers(
                                 HttpMethod.PATCH,
                                 "/api/postulaciones/**"
+                        ).authenticated()
+
+                        .requestMatchers(
+                                HttpMethod.DELETE,
+                                "/api/voluntariados/**"
+                        ).authenticated()
+
+                        // Consultas administrativas de postulaciones
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/api/postulaciones/usuario/**"
                         ).hasAuthority("ADMIN")
 
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/api/postulaciones/voluntariado/**"
+                        ).authenticated()
 
                         // Consultas de donaciones y postulaciones requieren login
                         .requestMatchers(

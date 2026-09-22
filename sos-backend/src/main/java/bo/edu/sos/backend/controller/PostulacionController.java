@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.Authentication;
 
 import java.util.List;
 
@@ -22,11 +23,17 @@ public class PostulacionController {
 
     @GetMapping("/voluntariado/{voluntariadoId}")
     public ResponseEntity<ApiResponse<List<PostulacionDTO>>> listarPorVoluntariado(
-            @PathVariable Long voluntariadoId) {
+            @PathVariable Long voluntariadoId,
+            Authentication authentication) {
 
         return ResponseEntity.ok(
-                ApiResponse.ok(postulacionService
-                        .listarPorVoluntariado(voluntariadoId)));
+                ApiResponse.ok(
+                        postulacionService.listarPorVoluntariado(
+                                voluntariadoId,
+                                authentication.getName()
+                        )
+                )
+        );
     }
 
     @GetMapping("/usuario/{usuarioId}")
@@ -40,12 +47,29 @@ public class PostulacionController {
 
     @PostMapping
     public ResponseEntity<ApiResponse<PostulacionDTO>> crear(
-            @Valid @RequestBody PostulacionDTO postulacionDTO) {
+            @Valid @RequestBody PostulacionDTO postulacionDTO,
+            Authentication authentication) {
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(ApiResponse.created(
-                        postulacionService.crear(postulacionDTO)));
+                        postulacionService.crear(
+                                postulacionDTO,
+                                authentication.getName()
+                        )));
+    }
+
+    @GetMapping("/mias")
+    public ResponseEntity<ApiResponse<List<PostulacionDTO>>> listarMias(
+            Authentication authentication) {
+
+        return ResponseEntity.ok(
+                ApiResponse.ok(
+                        postulacionService.listarPorEmail(
+                                authentication.getName()
+                        )
+                )
+        );
     }
 
     @PatchMapping("/{id}/estado")
