@@ -143,6 +143,8 @@ public class PuntoAyudaService {
 
         if (punto.getDepartamento() != null) {
             dto.setDepartamentoId(punto.getDepartamento().getId());
+            dto.setDepartamentoNombre(
+                    punto.getDepartamento().getNombre());
         }
 
         if (punto.getCreador() != null) {
@@ -153,6 +155,10 @@ public class PuntoAyudaService {
             dto.setNecesidadIds(
                     punto.getNecesidades().stream()
                             .map(Necesidad::getId)
+                            .toList());
+            dto.setNecesidadNombres(
+                    punto.getNecesidades().stream()
+                            .map(Necesidad::getNombre)
                             .toList());
         }
 

@@ -76,7 +76,8 @@ public class SecurityConfig {
                                 "/api/noticias/**",
                                 "/api/alertas/**",
                                 "/api/puntos-ayuda/**",
-                                "/api/voluntariados/**"
+                                "/api/voluntariados/**",
+                                "/api/mapa/**"
                         ).permitAll()
 
 
