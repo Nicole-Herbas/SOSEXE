@@ -75,10 +75,18 @@ public class PostulacionController {
     @PatchMapping("/{id}/estado")
     public ResponseEntity<ApiResponse<PostulacionDTO>> actualizarEstado(
             @PathVariable Long id,
-            @RequestParam String estado) {
+            @RequestParam String estado,
+            Authentication authentication) {
 
         return ResponseEntity.ok(
-                ApiResponse.ok("Estado de postulación actualizado",
-                        postulacionService.actualizarEstado(id, estado)));
+                ApiResponse.ok(
+                        "Estado de postulación actualizado",
+                        postulacionService.actualizarEstado(
+                                id,
+                                estado,
+                                authentication.getName()
+                        )
+                )
+        );
     }
 }

@@ -196,16 +196,75 @@ public class PostulacionService {
     }
 
     @Transactional
-    public PostulacionDTO actualizarEstado(Long id, String nuevoEstado) {
+    public PostulacionDTO actualizarEstado(
+            Long id,
+            String nuevoEstado,
+            String emailAutenticado) {
 
-        Postulacion postulacion = postulacionRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Postulación", id));
+        Postulacion postulacion =
+                postulacionRepository
+                        .findById(id)
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "Postulación",
+                                        id
+                                )
+                        );
 
-        postulacion.setEstado(nuevoEstado);
 
-        Postulacion actualizada = postulacionRepository.save(postulacion);
+        Usuario usuario =
+                usuarioRepository
+                        .findByEmail(emailAutenticado)
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "No existe un usuario con email: "
+                                                + emailAutenticado
+                                )
+                        );
 
-        return convertirADTO(actualizada);
+
+        boolean esAdmin =
+                "ADMIN".equals(
+                        usuario.getRol().getNombre()
+                );
+
+
+        boolean esResponsable =
+                postulacion
+                        .getVoluntariado()
+                        .getCentro()
+                        .getResponsable() != null
+
+                        && postulacion
+                        .getVoluntariado()
+                        .getCentro()
+                        .getResponsable()
+                        .getId()
+                        .equals(usuario.getId());
+
+
+        if (!esAdmin && !esResponsable) {
+
+            throw new ForbiddenException(
+                    "No tienes permiso para cambiar el estado de esta postulación"
+            );
+        }
+
+
+        postulacion.setEstado(
+                nuevoEstado
+        );
+
+
+        Postulacion actualizada =
+                postulacionRepository.save(
+                        postulacion
+                );
+
+
+        return convertirADTO(
+                actualizada
+        );
     }
 
     private PostulacionDTO convertirADTO(Postulacion postulacion) {
