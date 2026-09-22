@@ -11,6 +11,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.http.HttpMethod;
 
 
 @Configuration
@@ -55,6 +56,7 @@ public class SecurityConfig {
 
                 .authorizeHttpRequests(auth -> auth
 
+                        // Endpoints públicos de autenticación
                         .requestMatchers(
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",
@@ -67,21 +69,87 @@ public class SecurityConfig {
                         ).permitAll()
 
 
+                        // Datos públicos de lectura
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/api/centros/**",
+                                "/api/noticias/**",
+                                "/api/alertas/**",
+                                "/api/puntos-ayuda/**",
+                                "/api/voluntariados/**"
+                        ).permitAll()
+
+
+                        // Usuario autenticado
                         .requestMatchers(
                                 "/api/auth/me"
                         ).authenticated()
 
 
+                        // Acciones que puede realizar un usuario autenticado
                         .requestMatchers(
-                                "/api/admin/**",
+                                HttpMethod.POST,
+                                "/api/donaciones",
+                                "/api/postulaciones"
+                        ).authenticated()
+
+
+                        // Administración de usuarios
+                        .requestMatchers(
                                 "/api/usuarios/**"
                         ).hasAuthority("ADMIN")
 
 
-                        // Por ahora los demás endpoints siguen públicos
+                        // Escritura administrativa
+                        .requestMatchers(
+                                HttpMethod.POST,
+                                "/api/centros/**",
+                                "/api/noticias/**",
+                                "/api/alertas/**",
+                                "/api/puntos-ayuda/**",
+                                "/api/voluntariados/**"
+                        ).hasAuthority("ADMIN")
+
+
+                        .requestMatchers(
+                                HttpMethod.PUT,
+                                "/api/centros/**",
+                                "/api/noticias/**",
+                                "/api/alertas/**",
+                                "/api/puntos-ayuda/**",
+                                "/api/voluntariados/**"
+                        ).hasAuthority("ADMIN")
+
+
+                        .requestMatchers(
+                                HttpMethod.DELETE,
+                                "/api/centros/**",
+                                "/api/noticias/**",
+                                "/api/alertas/**",
+                                "/api/puntos-ayuda/**",
+                                "/api/voluntariados/**"
+                        ).hasAuthority("ADMIN")
+
+
+                        // Cambiar estado de postulaciones → ADMIN
+                        .requestMatchers(
+                                HttpMethod.PATCH,
+                                "/api/postulaciones/**"
+                        ).hasAuthority("ADMIN")
+
+
+                        // Consultas de donaciones y postulaciones requieren login
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/api/donaciones/**",
+                                "/api/postulaciones/**"
+                        ).authenticated()
+
+
+                        // Cualquier otro endpoint de API necesita autenticación
                         .requestMatchers(
                                 "/api/**"
-                        ).permitAll()
+                        ).authenticated()
 
 
                         .anyRequest()
