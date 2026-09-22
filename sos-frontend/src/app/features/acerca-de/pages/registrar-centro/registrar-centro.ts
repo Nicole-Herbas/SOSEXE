@@ -25,8 +25,9 @@ export class RegistrarCentroComponent {
   paginaWeb = '';
   descripcion = '';
   poblacionAtendida = '';
-  
-    // ==========================================
+
+
+  // ==========================================
   // DATOS DEL RESPONSABLE - PASO 2
   // ==========================================
 
@@ -41,7 +42,8 @@ export class RegistrarCentroComponent {
   direccionExacta = '';
   referencia = '';
 
-    // ==========================================
+
+  // ==========================================
   // DOCUMENTOS - PASO 3
   // ==========================================
 
@@ -50,18 +52,40 @@ export class RegistrarCentroComponent {
   identidadAdjunta = false;
   domicilioAdjunto = false;
 
+  // Archivos seleccionados
+  personeriaArchivo: File | null = null;
+  nitArchivo: File | null = null;
+  identidadArchivo: File | null = null;
+  domicilioArchivo: File | null = null;
+
+  // Mensaje de error para archivos
+  errorArchivo = '';
+
+  // Tamaño máximo permitido: 10 MB
+  readonly MAX_FILE_SIZE = 10 * 1024 * 1024;
+
+  // ==========================================
+  // CONTADOR DE DOCUMENTOS
+  // ==========================================
+
   get documentosAdjuntos(): number {
     return [
-      this.personeriaAdjunta,
-      this.nitAdjunto,
-      this.identidadAdjunta,
-      this.domicilioAdjunto
+      this.personeriaArchivo,
+      this.nitArchivo,
+      this.identidadArchivo,
+      this.domicilioArchivo
     ].filter(Boolean).length;
   }
+
+
+  // ==========================================
+  // VALIDACIÓN DEL PASO 3
+  // ==========================================
 
   get paso3Valido(): boolean {
     return this.documentosAdjuntos === 4;
   }
+
 
   // ==========================================
   // DEPARTAMENTOS DE BOLIVIA
@@ -79,6 +103,7 @@ export class RegistrarCentroComponent {
     'Tarija'
   ];
 
+
   // ==========================================
   // TIPOS DE ORGANIZACIÓN
   // ==========================================
@@ -92,6 +117,7 @@ export class RegistrarCentroComponent {
     'Organización comunitaria',
     'Otro'
   ];
+
 
   // ==========================================
   // VALIDACIÓN DEL PASO 1
@@ -108,7 +134,8 @@ export class RegistrarCentroComponent {
     );
   }
 
-    // ==========================================
+
+  // ==========================================
   // VALIDACIÓN DEL PASO 2
   // ==========================================
 
@@ -125,27 +152,138 @@ export class RegistrarCentroComponent {
     );
   }
 
-  
 
   // ==========================================
   // DOCUMENTOS
   // ==========================================
 
-  alternarPersoneria(): void {
-    this.personeriaAdjunta = !this.personeriaAdjunta;
+  seleccionarPersoneria(event: Event): void {
+    const archivo = this.obtenerArchivo(event);
+
+    if (!archivo) {
+      return;
+    }
+
+    this.personeriaArchivo = archivo;
+    this.personeriaAdjunta = true;
+    this.errorArchivo = '';
   }
 
-  alternarNit(): void {
-    this.nitAdjunto = !this.nitAdjunto;
+
+  seleccionarNit(event: Event): void {
+    const archivo = this.obtenerArchivo(event);
+
+    if (!archivo) {
+      return;
+    }
+
+    this.nitArchivo = archivo;
+    this.nitAdjunto = true;
+    this.errorArchivo = '';
   }
 
-  alternarIdentidad(): void {
-    this.identidadAdjunta = !this.identidadAdjunta;
+
+  seleccionarIdentidad(event: Event): void {
+    const archivo = this.obtenerArchivo(event);
+
+    if (!archivo) {
+      return;
+    }
+
+    this.identidadArchivo = archivo;
+    this.identidadAdjunta = true;
+    this.errorArchivo = '';
   }
 
-  alternarDomicilio(): void {
-    this.domicilioAdjunto = !this.domicilioAdjunto;
+
+  seleccionarDomicilio(event: Event): void {
+    const archivo = this.obtenerArchivo(event);
+
+    if (!archivo) {
+      return;
+    }
+
+    this.domicilioArchivo = archivo;
+    this.domicilioAdjunto = true;
+    this.errorArchivo = '';
   }
+
+
+  // ==========================================
+  // OBTENER Y VALIDAR ARCHIVO
+  // ==========================================
+
+  private obtenerArchivo(event: Event): File | null {
+
+    const input = event.target as HTMLInputElement;
+
+    if (!input.files || input.files.length === 0) {
+      return null;
+    }
+
+    const archivo = input.files[0];
+
+    // Validar tipo
+    const tiposPermitidos = [
+      'application/pdf',
+      'image/jpeg',
+      'image/png',
+      'image/webp'
+    ];
+
+    if (!tiposPermitidos.includes(archivo.type)) {
+
+      this.errorArchivo =
+        'Formato no válido. Solo se permiten archivos PDF, JPG, PNG o WEBP.';
+
+      input.value = '';
+
+      return null;
+    }
+
+    // Validar tamaño
+    if (archivo.size > this.MAX_FILE_SIZE) {
+
+      this.errorArchivo =
+        'El archivo es demasiado grande. El tamaño máximo permitido es de 10 MB.';
+
+      input.value = '';
+
+      return null;
+    }
+
+    return archivo;
+  }
+
+
+  // ==========================================
+  // QUITAR ARCHIVOS
+  // ==========================================
+
+  quitarPersoneria(): void {
+    this.personeriaArchivo = null;
+    this.personeriaAdjunta = false;
+  }
+
+
+  quitarNit(): void {
+    this.nitArchivo = null;
+    this.nitAdjunto = false;
+  }
+
+
+  quitarIdentidad(): void {
+    this.identidadArchivo = null;
+    this.identidadAdjunta = false;
+  }
+
+
+  quitarDomicilio(): void {
+    this.domicilioArchivo = null;
+    this.domicilioAdjunto = false;
+  }
+
+
   // ==========================================
   // NAVEGACIÓN
   // ==========================================
@@ -167,17 +305,25 @@ export class RegistrarCentroComponent {
     if (this.currentStep < 5) {
       this.currentStep++;
     }
-
   }
 
+
   volver(): void {
+
     if (this.currentStep > 1) {
       this.currentStep--;
     }
   }
 
+
+  // ==========================================
+  // GUARDAR BORRADOR
+  // ==========================================
+
   guardarBorrador(): void {
+
     console.log('Borrador guardado:', {
+
       nombreCentro: this.nombreCentro,
       tipoOrganizacion: this.tipoOrganizacion,
       departamento: this.departamento,
@@ -186,9 +332,30 @@ export class RegistrarCentroComponent {
       fechaFundacion: this.fechaFundacion,
       paginaWeb: this.paginaWeb,
       descripcion: this.descripcion,
-      poblacionAtendida: this.poblacionAtendida
+      poblacionAtendida: this.poblacionAtendida,
+
+      nombreResponsable: this.nombreResponsable,
+      cargoResponsable: this.cargoResponsable,
+      documentoResponsable: this.documentoResponsable,
+      correoResponsable: this.correoResponsable,
+      telefonoResponsable: this.telefonoResponsable,
+
+      ciudad: this.ciudad,
+      departamentoUbicacion: this.departamentoUbicacion,
+      direccionExacta: this.direccionExacta,
+      referencia: this.referencia,
+
+      personeriaArchivo: this.personeriaArchivo?.name,
+      nitArchivo: this.nitArchivo?.name,
+      identidadArchivo: this.identidadArchivo?.name,
+      domicilioArchivo: this.domicilioArchivo?.name
     });
   }
+
+
+  // ==========================================
+  // CANCELAR
+  // ==========================================
 
   cancelar(): void {
     window.history.back();

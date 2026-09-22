@@ -708,9 +708,9 @@
         </div>
 
       }
-            <!-- =================================================
-           PASO 3 - DOCUMENTOS
-           ================================================= -->
+      <!-- =================================================
+          PASO 3 - DOCUMENTOS
+          ================================================= -->
 
       @if (currentStep === 3) {
 
@@ -733,19 +733,19 @@
 
 
         <!-- ======================================
-             DOCUMENTO 1
-             ====================================== -->
+            DOCUMENTO 1 - PERSONERÍA
+            ====================================== -->
 
         <div
           class="document-item"
-          [class.document-complete]="personeriaAdjunta"
+          [class.document-complete]="personeriaArchivo"
         >
 
           <div class="document-info">
 
             <div class="document-icon">
 
-              @if (personeriaAdjunta) {
+              @if (personeriaArchivo) {
                 ✓
               } @else {
                 ▤
@@ -755,51 +755,75 @@
 
             <div>
 
-              <strong>
+              <h3>
                 Personería jurídica o documento de constitución
-              </strong>
+              </h3>
 
               <p>
                 Documento que demuestra la existencia legal de la organización.
               </p>
 
+              @if (personeriaArchivo) {
+
+                <span class="file-name">
+                  {{ personeriaArchivo.name }}
+                </span>
+
+              }
+
             </div>
 
           </div>
 
 
-          <button
-            type="button"
-            class="document-button"
-            [class.remove]="personeriaAdjunta"
-            (click)="alternarPersoneria()"
-          >
+          <input
+            #personeriaInput
+            type="file"
+            accept=".pdf,image/jpeg,image/png,image/webp"
+            hidden
+            (change)="seleccionarPersoneria($event)"
+          />
 
-            @if (personeriaAdjunta) {
+
+          @if (personeriaArchivo) {
+
+            <button
+              type="button"
+              class="document-btn remove"
+              (click)="quitarPersoneria(); personeriaInput.value = ''"
+            >
               Quitar archivo
-            } @else {
-              Adjuntar archivo
-            }
+            </button>
 
-          </button>
+          } @else {
+
+            <button
+              type="button"
+              class="document-btn"
+              (click)="personeriaInput.click()"
+            >
+              Adjuntar archivo
+            </button>
+
+          }
 
         </div>
 
 
         <!-- ======================================
-             DOCUMENTO 2
-             ====================================== -->
+            DOCUMENTO 2 - NIT
+            ====================================== -->
 
         <div
           class="document-item"
-          [class.document-complete]="nitAdjunto"
+          [class.document-complete]="nitArchivo"
         >
 
           <div class="document-info">
 
             <div class="document-icon">
 
-              @if (nitAdjunto) {
+              @if (nitArchivo) {
                 ✓
               } @else {
                 ▤
@@ -809,51 +833,75 @@
 
             <div>
 
-              <strong>
+              <h3>
                 Documento del NIT
-              </strong>
+              </h3>
 
               <p>
                 Constancia vigente del Número de Identificación Tributaria.
               </p>
 
+              @if (nitArchivo) {
+
+                <span class="file-name">
+                  {{ nitArchivo.name }}
+                </span>
+
+              }
+
             </div>
 
           </div>
 
 
-          <button
-            type="button"
-            class="document-button"
-            [class.remove]="nitAdjunto"
-            (click)="alternarNit()"
-          >
+          <input
+            #nitInput
+            type="file"
+            accept=".pdf,image/jpeg,image/png,image/webp"
+            hidden
+            (change)="seleccionarNit($event)"
+          />
 
-            @if (nitAdjunto) {
+
+          @if (nitArchivo) {
+
+            <button
+              type="button"
+              class="document-btn remove"
+              (click)="quitarNit(); nitInput.value = ''"
+            >
               Quitar archivo
-            } @else {
-              Adjuntar archivo
-            }
+            </button>
 
-          </button>
+          } @else {
+
+            <button
+              type="button"
+              class="document-btn"
+              (click)="nitInput.click()"
+            >
+              Adjuntar archivo
+            </button>
+
+          }
 
         </div>
 
 
         <!-- ======================================
-             DOCUMENTO 3
-             ====================================== -->
+            DOCUMENTO 3 - IDENTIDAD
+            ====================================== -->
 
         <div
           class="document-item"
-          [class.document-complete]="identidadAdjunta"
+          [class.document-complete]="identidadArchivo"
         >
 
           <div class="document-info">
 
             <div class="document-icon">
 
-              @if (identidadAdjunta) {
+              @if (identidadArchivo) {
                 ✓
               } @else {
                 ▤
@@ -863,51 +911,75 @@
 
             <div>
 
-              <strong>
+              <h3>
                 Identidad y poder del representante legal
-              </strong>
+              </h3>
 
               <p>
                 Cédula de identidad y documento que respalda su representación.
               </p>
 
+              @if (identidadArchivo) {
+
+                <span class="file-name">
+                  {{ identidadArchivo.name }}
+                </span>
+
+              }
+
             </div>
 
           </div>
 
 
-          <button
-            type="button"
-            class="document-button"
-            [class.remove]="identidadAdjunta"
-            (click)="alternarIdentidad()"
-          >
+          <input
+            #identidadInput
+            type="file"
+            accept=".pdf,image/jpeg,image/png,image/webp"
+            hidden
+            (change)="seleccionarIdentidad($event)"
+          />
 
-            @if (identidadAdjunta) {
+
+          @if (identidadArchivo) {
+
+            <button
+              type="button"
+              class="document-btn remove"
+              (click)="quitarIdentidad(); identidadInput.value = ''"
+            >
               Quitar archivo
-            } @else {
-              Adjuntar archivo
-            }
+            </button>
 
-          </button>
+          } @else {
+
+            <button
+              type="button"
+              class="document-btn"
+              (click)="identidadInput.click()"
+            >
+              Adjuntar archivo
+            </button>
+
+          }
 
         </div>
 
 
         <!-- ======================================
-             DOCUMENTO 4
-             ====================================== -->
+            DOCUMENTO 4 - DOMICILIO
+            ====================================== -->
 
         <div
           class="document-item"
-          [class.document-complete]="domicilioAdjunto"
+          [class.document-complete]="domicilioArchivo"
         >
 
           <div class="document-info">
 
             <div class="document-icon">
 
-              @if (domicilioAdjunto) {
+              @if (domicilioArchivo) {
                 ✓
               } @else {
                 ▤
@@ -917,56 +989,93 @@
 
             <div>
 
-              <strong>
+              <h3>
                 Respaldo del domicilio del centro
-              </strong>
+              </h3>
 
               <p>
                 Factura de servicio, contrato o documento con la dirección declarada.
               </p>
+
+              @if (domicilioArchivo) {
+
+                <span class="file-name">
+                  {{ domicilioArchivo.name }}
+                </span>
+
+              }
 
             </div>
 
           </div>
 
 
-          <button
-            type="button"
-            class="document-button"
-            [class.remove]="domicilioAdjunto"
-            (click)="alternarDomicilio()"
-          >
+          <input
+            #domicilioInput
+            type="file"
+            accept=".pdf,image/jpeg,image/png,image/webp"
+            hidden
+            (change)="seleccionarDomicilio($event)"
+          />
 
-            @if (domicilioAdjunto) {
+
+          @if (domicilioArchivo) {
+
+            <button
+              type="button"
+              class="document-btn remove"
+              (click)="quitarDomicilio(); domicilioInput.value = ''"
+            >
               Quitar archivo
-            } @else {
-              Adjuntar archivo
-            }
+            </button>
 
-          </button>
+          } @else {
+
+            <button
+              type="button"
+              class="document-btn"
+              (click)="domicilioInput.click()"
+            >
+              Adjuntar archivo
+            </button>
+
+          }
 
         </div>
 
 
         <!-- ======================================
-             INFORMACIÓN IMPORTANTE
-             ====================================== -->
+            ERROR DE ARCHIVO
+            ====================================== -->
 
-        <div class="documents-info">
+        @if (errorArchivo) {
+
+          <div class="file-error">
+            {{ errorArchivo }}
+          </div>
+
+        }
+
+
+        <!-- ======================================
+            INFORMACIÓN IMPORTANTE
+            ====================================== -->
+
+        <div class="document-notice">
 
           <strong>
             Información importante:
           </strong>
 
-          los documentos solo serán visibles para el equipo encargado
-          de revisar la solicitud.
+          Los documentos solo serán visibles para el equipo
+          encargado de revisar la solicitud.
 
         </div>
 
 
         <!-- ======================================
-             BOTONES PASO 3
-             ====================================== -->
+            BOTONES PASO 3
+            ====================================== -->
 
         <div class="form-actions">
 
