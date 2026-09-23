@@ -1114,6 +1114,310 @@
 
       }
 
+            <!-- =================================================
+           PASO 4 - NECESIDADES Y VOLUNTARIADO
+           ================================================= -->
+
+      @if (currentStep === 4) {
+
+        <div class="form-title">
+
+          <span class="step-label">
+            Paso 4 de 5
+          </span>
+
+          <h2>
+            Necesidades y voluntariado
+          </h2>
+
+          <p>
+            Indica qué necesita actualmente el centro y si requiere apoyo de voluntarios.
+          </p>
+
+        </div>
+
+
+        <!-- ======================================
+             NECESIDADES PRIORITARIAS
+             ====================================== -->
+
+        <div class="section-title">
+
+          <h3>
+            Necesidades prioritarias
+          </h3>
+
+          <p>
+            Selecciona los recursos que el centro necesita actualmente.
+          </p>
+
+        </div>
+
+
+        <div class="options-grid">
+
+          @for (necesidad of necesidadesDisponibles; track necesidad) {
+
+            <label
+              class="option-card"
+              [class.option-selected]="necesidadesSeleccionadas.includes(necesidad)"
+            >
+
+              <input
+                type="checkbox"
+                [checked]="necesidadesSeleccionadas.includes(necesidad)"
+                (change)="alternarNecesidad(necesidad)"
+              />
+
+              <span class="option-check">
+                @if (necesidadesSeleccionadas.includes(necesidad)) {
+                  ✓
+                }
+              </span>
+
+              <span class="option-text">
+                {{ necesidad }}
+              </span>
+
+            </label>
+
+          }
+
+        </div>
+
+
+        <!-- ======================================
+             DONACIONES
+             ====================================== -->
+
+        <div class="section-divider"></div>
+
+        <div class="section-title">
+
+          <h3>
+            Donaciones que acepta
+          </h3>
+
+          <p>
+            Selecciona los tipos de donaciones que el centro puede recibir.
+          </p>
+
+        </div>
+
+
+        <div class="options-grid">
+
+          @for (donacion of donacionesDisponibles; track donacion) {
+
+            <label
+              class="option-card"
+              [class.option-selected]="donacionesSeleccionadas.includes(donacion)"
+            >
+
+              <input
+                type="checkbox"
+                [checked]="donacionesSeleccionadas.includes(donacion)"
+                (change)="alternarDonacion(donacion)"
+              />
+
+              <span class="option-check">
+                @if (donacionesSeleccionadas.includes(donacion)) {
+                  ✓
+                }
+              </span>
+
+              <span class="option-text">
+                {{ donacion }}
+              </span>
+
+            </label>
+
+          }
+
+        </div>
+
+
+        <!-- ======================================
+             VOLUNTARIADO
+             ====================================== -->
+
+        <div class="section-divider"></div>
+
+        <div class="section-title">
+
+          <h3>
+            Voluntariado
+          </h3>
+
+          <p>
+            Indica si el centro necesita personas voluntarias.
+          </p>
+
+        </div>
+
+
+        <div class="volunteer-options">
+
+          <label
+            class="volunteer-card"
+            [class.option-selected]="solicitaVoluntarios === true"
+          >
+
+            <input
+              type="radio"
+              name="solicitaVoluntarios"
+              [value]="true"
+              [(ngModel)]="solicitaVoluntarios"
+            />
+
+            <div>
+
+              <strong>
+                Sí, necesitamos voluntarios
+              </strong>
+
+              <span>
+                El centro desea recibir apoyo de personas voluntarias.
+              </span>
+
+            </div>
+
+          </label>
+
+
+          <label
+            class="volunteer-card"
+            [class.option-selected]="solicitaVoluntarios === false"
+          >
+
+            <input
+              type="radio"
+              name="solicitaVoluntarios"
+              [value]="false"
+              [(ngModel)]="solicitaVoluntarios"
+            />
+
+            <div>
+
+              <strong>
+                No necesitamos voluntarios
+              </strong>
+
+              <span>
+                Actualmente el centro no requiere voluntariado.
+              </span>
+
+            </div>
+
+          </label>
+
+        </div>
+
+
+        <!-- ======================================
+             TIPOS DE VOLUNTARIADO
+             ====================================== -->
+
+        @if (solicitaVoluntarios === true) {
+
+          <div class="volunteer-detail">
+
+            <label>
+              ¿En qué actividades necesitas voluntarios?
+            </label>
+
+            <div class="options-grid">
+
+              @for (actividad of actividadesVoluntariado; track actividad) {
+
+                <label
+                  class="option-card"
+                  [class.option-selected]="actividadesSeleccionadas.includes(actividad)"
+                >
+
+                  <input
+                    type="checkbox"
+                    [checked]="actividadesSeleccionadas.includes(actividad)"
+                    (change)="alternarActividad(actividad)"
+                  />
+
+                  <span class="option-check">
+                    @if (actividadesSeleccionadas.includes(actividad)) {
+                      ✓
+                    }
+                  </span>
+
+                  <span class="option-text">
+                    {{ actividad }}
+                  </span>
+
+                </label>
+
+              }
+
+            </div>
+
+
+            <div class="field full">
+
+              <label>
+                Describe qué tipo de apoyo necesitas
+              </label>
+
+              <textarea
+                [(ngModel)]="descripcionVoluntariado"
+                rows="4"
+                placeholder="Ej.: Necesitamos personas para apoyar en actividades educativas durante las tardes."
+              ></textarea>
+
+            </div>
+
+          </div>
+
+        }
+
+
+        <!-- ======================================
+             BOTONES PASO 4
+             ====================================== -->
+
+        <div class="form-actions">
+
+          <button
+            type="button"
+            class="btn secondary"
+            (click)="volver()"
+          >
+            ← Atrás
+          </button>
+
+
+          <div class="right-actions">
+
+            <button
+              type="button"
+              class="btn secondary"
+              (click)="guardarBorrador()"
+            >
+              Guardar borrador
+            </button>
+
+
+            <button
+              type="button"
+              class="btn primary"
+              [disabled]="!paso4Valido"
+              (click)="continuar()"
+            >
+              Continuar →
+            </button>
+
+          </div>
+
+        </div>
+
+      }
+
     </section>
 
 

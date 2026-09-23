@@ -86,6 +86,155 @@ export class RegistrarCentroComponent {
     return this.documentosAdjuntos === 4;
   }
 
+    // ==========================================
+  // NECESIDADES Y VOLUNTARIADO - PASO 4
+  // ==========================================
+
+  necesidadesDisponibles = [
+    'Alimentos',
+    'Medicamentos',
+    'Ropa',
+    'Útiles escolares',
+    'Productos de higiene',
+    'Artículos para animales',
+    'Apoyo económico',
+    'Otro'
+  ];
+
+  donacionesDisponibles = [
+    'Alimentos',
+    'Ropa',
+    'Medicamentos',
+    'Útiles escolares',
+    'Productos de higiene',
+    'Dinero',
+    'Artículos para animales',
+    'Otro'
+  ];
+
+  actividadesVoluntariado = [
+    'Atención y acompañamiento',
+    'Apoyo educativo',
+    'Salud',
+    'Logística',
+    'Cocina',
+    'Limpieza',
+    'Cuidado de animales',
+    'Comunicación',
+    'Otro'
+  ];
+
+  necesidadesSeleccionadas: string[] = [];
+
+  donacionesSeleccionadas: string[] = [];
+
+  actividadesSeleccionadas: string[] = [];
+
+  solicitaVoluntarios: boolean | null = null;
+
+  descripcionVoluntariado = '';
+
+
+  // ==========================================
+  // VALIDACIÓN DEL PASO 4
+  // ==========================================
+
+  get paso4Valido(): boolean {
+
+    if (this.necesidadesSeleccionadas.length === 0) {
+      return false;
+    }
+
+    if (this.donacionesSeleccionadas.length === 0) {
+      return false;
+    }
+
+    if (this.solicitaVoluntarios === null) {
+      return false;
+    }
+
+    if (
+      this.solicitaVoluntarios &&
+      this.actividadesSeleccionadas.length === 0
+    ) {
+      return false;
+    }
+
+    return true;
+  }
+
+
+  // ==========================================
+  // SELECCIÓN DE NECESIDADES
+  // ==========================================
+
+  alternarNecesidad(necesidad: string): void {
+
+    if (this.necesidadesSeleccionadas.includes(necesidad)) {
+
+      this.necesidadesSeleccionadas =
+        this.necesidadesSeleccionadas.filter(
+          item => item !== necesidad
+        );
+
+    } else {
+
+      this.necesidadesSeleccionadas = [
+        ...this.necesidadesSeleccionadas,
+        necesidad
+      ];
+
+    }
+  }
+
+
+  // ==========================================
+  // SELECCIÓN DE DONACIONES
+  // ==========================================
+
+  alternarDonacion(donacion: string): void {
+
+    if (this.donacionesSeleccionadas.includes(donacion)) {
+
+      this.donacionesSeleccionadas =
+        this.donacionesSeleccionadas.filter(
+          item => item !== donacion
+        );
+
+    } else {
+
+      this.donacionesSeleccionadas = [
+        ...this.donacionesSeleccionadas,
+        donacion
+      ];
+
+    }
+  }
+
+
+  // ==========================================
+  // SELECCIÓN DE ACTIVIDADES
+  // ==========================================
+
+  alternarActividad(actividad: string): void {
+
+    if (this.actividadesSeleccionadas.includes(actividad)) {
+
+      this.actividadesSeleccionadas =
+        this.actividadesSeleccionadas.filter(
+          item => item !== actividad
+        );
+
+    } else {
+
+      this.actividadesSeleccionadas = [
+        ...this.actividadesSeleccionadas,
+        actividad
+      ];
+
+    }
+  }
+
 
   // ==========================================
   // DEPARTAMENTOS DE BOLIVIA
@@ -301,7 +450,9 @@ export class RegistrarCentroComponent {
     if (this.currentStep === 3 && !this.paso3Valido) {
       return;
     }
-
+    if (this.currentStep === 4 && !this.paso4Valido) {
+          return;
+    }
     if (this.currentStep < 5) {
       this.currentStep++;
     }

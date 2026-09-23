@@ -908,3 +908,152 @@
   }
 
 }
+/* ==========================================
+   PASO 4 - OPCIONES
+   ========================================== */
+
+.options-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.option-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 54px;
+  padding: 12px 14px;
+  box-sizing: border-box;
+
+  border: 1px solid #d7e3e9;
+  border-radius: 10px;
+
+  background: white;
+  cursor: pointer;
+
+  transition:
+    border-color 0.2s,
+    background 0.2s;
+}
+
+.option-card:hover {
+  border-color: #079696;
+  background: #f7fdfd;
+}
+
+.option-card input {
+  display: none;
+}
+
+.option-check {
+  width: 22px;
+  height: 22px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  border: 1px solid #cfdde4;
+  border-radius: 6px;
+
+  color: white;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.option-selected {
+  border-color: #079696;
+  background: #effafa;
+}
+
+.option-selected .option-check {
+  border-color: #079696;
+  background: #079696;
+}
+
+.option-text {
+  color: #18354d;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+
+/* ==========================================
+   VOLUNTARIADO
+   ========================================== */
+
+.volunteer-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.volunteer-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+
+  padding: 16px;
+
+  border: 1px solid #d7e3e9;
+  border-radius: 10px;
+
+  cursor: pointer;
+
+  transition:
+    border-color 0.2s,
+    background 0.2s;
+}
+
+.volunteer-card:hover {
+  border-color: #079696;
+  background: #f7fdfd;
+}
+
+.volunteer-card input {
+  margin-top: 3px;
+  accent-color: #079696;
+}
+
+.volunteer-card strong {
+  display: block;
+  color: #18354d;
+  font-size: 14px;
+}
+
+.volunteer-card span {
+  display: block;
+  margin-top: 5px;
+  color: #698093;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+
+/* ==========================================
+   DETALLE VOLUNTARIADO
+   ========================================== */
+
+.volunteer-detail {
+  margin-top: 20px;
+  padding: 18px;
+
+  border: 1px solid #dce8ee;
+  border-radius: 12px;
+
+  background: #fafcfd;
+}
+
+.volunteer-detail > label {
+  display: block;
+  margin-bottom: 5px;
+
+  color: #18354d;
+  font-size: 13px;
+  font-weight: 600;
+}
