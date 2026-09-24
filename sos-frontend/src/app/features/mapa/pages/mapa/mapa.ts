@@ -7,10 +7,12 @@ import {
   MAPA_TEXTOS,
   PUNTOS_MAPA_FALLBACK,
   TIPO_CLASE_MAPA,
+  TIPO_ETIQUETA_MAPA,
 } from '../../constants/mapa.constants';
 import { FEATURE_TOGGLES, FeatureToggles } from '../../../../shared/config/feature-toggles';
 import { MapaService } from '../../services/mapa.service';
 import { PuntoMapa } from '../../models/punto-mapa.model';
+
 
 @Component({
   selector: 'app-mapa',
@@ -21,6 +23,13 @@ import { PuntoMapa } from '../../models/punto-mapa.model';
   styleUrl: './mapa.scss'
 })
 export class Mapa implements OnInit {
+
+
+  readonly tipoEtiqueta = TIPO_ETIQUETA_MAPA;
+
+  obtenerEtiquetaTipo(tipo: string): string {
+    return this.tipoEtiqueta[tipo] ?? tipo.replaceAll('_', ' ');
+  }
 
   private mapaService = inject(MapaService);
 
