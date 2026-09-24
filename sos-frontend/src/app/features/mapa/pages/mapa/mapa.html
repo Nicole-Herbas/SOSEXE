@@ -84,7 +84,7 @@
               (click)="seleccionarPunto(punto)"
             >
               <div class="etiquetas-card">
-                <span class="tag {{ obtenerClaseTipo(punto.tipo) }}">{{ punto.tipo }}</span>
+                <span class="tag {{ obtenerClaseTipo(punto.tipo) }}">{{ obtenerEtiquetaTipo(punto.tipo) }}</span>
                 @if (estaVerificado(punto)) {
                   <span class="verificado">{{ textos.verificado }}</span>
                 }
@@ -122,7 +122,7 @@
           <button class="cerrar-detalle" (click)="cerrarDetalle()">✕</button>
 
           <div class="detalle-etiquetas">
-            <span class="tag {{ obtenerClaseTipo(puntoSeleccionado()!.tipo) }}">{{ puntoSeleccionado()!.tipo }}</span>
+            <span class="tag {{ obtenerClaseTipo(puntoSeleccionado()!.tipo) }}">{{ obtenerEtiquetaTipo(puntoSeleccionado()!.tipo) }}</span>
             @if (estaVerificado(puntoSeleccionado()!)) {
               <span class="tag-verificado">{{ textos.verificado }}</span>
             } @else {
