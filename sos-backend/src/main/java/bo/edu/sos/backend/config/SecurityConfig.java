@@ -132,8 +132,7 @@ public class SecurityConfig {
                                 HttpMethod.PUT,
                                 ApiRoutes.VOLUNTARIADOS + "/**"
                         ).authenticated()
-
-
+                                       
                         .requestMatchers(
                                 HttpMethod.DELETE,
                                 ApiRoutes.CENTROS + "/**",
@@ -145,26 +144,31 @@ public class SecurityConfig {
 
                         // Cambiar estado de postulaciones — autenticado (lógica de permisos en el servicio)
                         .requestMatchers(
-                                HttpMethod.PATCH,
-                                ApiRoutes.POSTULACIONES + "/**"
+                          HttpMethod.PATCH,
+                          ApiRoutes.POSTULACIONES + "/**"
                         ).authenticated()
 
-                        // DELETE voluntariados — autenticado (responsables)
                         .requestMatchers(
-                                HttpMethod.DELETE,
-                                ApiRoutes.VOLUNTARIADOS + "/**"
+                          HttpMethod.DELETE,
+                          ApiRoutes.VOLUNTARIADOS + "/**"
                         ).authenticated()
 
                         // Consultas administrativas de postulaciones
                         .requestMatchers(
-                                HttpMethod.GET,
-                                ApiRoutes.POSTULACIONES + "/usuario/**"
+                          HttpMethod.GET,
+                          ApiRoutes.POSTULACIONES + "/usuario/**"
                         ).hasAuthority(Roles.ADMIN)
 
                         .requestMatchers(
-                                HttpMethod.GET,
-                                ApiRoutes.POSTULACIONES + "/voluntariado/**"
+                          HttpMethod.GET,
+                          ApiRoutes.POSTULACIONES + "/voluntariado/**"
                         ).authenticated()
+                                       
+                        // Ver todas las donaciones → solo ADMIN
+                        .requestMatchers(
+                           HttpMethod.GET,
+                           ApiRoutes.DONACIONES
+                        ).hasAuthority(Roles.ADMIN)
 
                         // Consultas de donaciones y postulaciones requieren login
                         .requestMatchers(

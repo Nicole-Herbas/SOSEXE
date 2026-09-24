@@ -38,7 +38,6 @@ public class VoluntariadoDTO {
     @NotNull(message = "El centro es obligatorio")
     private Long centroId;
 
-    @NotNull(message = "El creador es obligatorio")
     private Long creadoPorId;
 
     private String centroNombre;
