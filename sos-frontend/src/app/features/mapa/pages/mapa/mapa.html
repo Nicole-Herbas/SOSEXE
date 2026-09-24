@@ -11,24 +11,27 @@
     </div>
   </div>
 
-  <div class="filtros-tipo">
-    @for (filtro of filtrosTipo; track filtro.id) {
-      <button
-        type="button"
-        class="filtro"
-        [class.activo]="filtroTipoActivo() === filtro.id"
-        [attr.data-filtro-tipo]="filtro.id"
-        (click)="seleccionarFiltroTipo(filtro.id)"
-      >
-        @if (filtro.color) {
-          <span class="punto {{ filtro.color }}"></span>
-        }
-        {{ filtro.etiqueta }}
-      </button>
-    }
-  </div>
+  @if (featureToggles.mapa.filtros) {
+    <div class="filtros-tipo">
+      @for (filtro of filtrosTipo; track filtro.id) {
+        <button
+          type="button"
+          class="filtro"
+          [class.activo]="filtroTipoActivo() === filtro.id"
+          [attr.data-filtro-tipo]="filtro.id"
+          (click)="seleccionarFiltroTipo(filtro.id)"
+        >
+          @if (filtro.color) {
+            <span class="punto {{ filtro.color }}"></span>
+          }
+          {{ filtro.etiqueta }}
+        </button>
+      }
+    </div>
+  }
 
   <section class="contenedor-mapa">
+  @if (featureToggles.mapa.mostrarLista) {
     <aside class="columna-izquierda">
       <div class="bloque-busqueda">
         <label>{{ textos.buscarEtiqueta }}</label>
@@ -39,25 +42,27 @@
         />
       </div>
 
-      <div class="bloque-filtros">
-        <label>{{ textos.necesidadesEtiqueta }}</label>
+      @if (featureToggles.mapa.filtros) {
+        <div class="bloque-filtros">
+          <label>{{ textos.necesidadesEtiqueta }}</label>
 
-        <div class="filtros-necesidades">
-          @for (filtro of filtrosNecesidad; track filtro.id) {
-            <button
-              type="button"
-              class="necesidad"
-              [class.activo]="filtroNecesidadActivo() === filtro.id"
-              [attr.data-filtro-necesidad]="filtro.id"
-              (click)="seleccionarFiltroNecesidad(filtro.id)"
-            >
-              {{ filtro.etiqueta }}
-            </button>
-          }
+          <div class="filtros-necesidades">
+            @for (filtro of filtrosNecesidad; track filtro.id) {
+              <button
+                type="button"
+                class="necesidad"
+                [class.activo]="filtroNecesidadActivo() === filtro.id"
+                [attr.data-filtro-necesidad]="filtro.id"
+                (click)="seleccionarFiltroNecesidad(filtro.id)"
+              >
+                {{ filtro.etiqueta }}
+              </button>
+            }
+          </div>
         </div>
-      </div>
 
-      <div class="separador"></div>
+        <div class="separador"></div>
+      }
 
       <div class="resultados-header">
         <h3>{{ textos.resultadosTitulo }}</h3>
@@ -98,17 +103,20 @@
         }
       </div>
     </aside>
+  }
 
-    <main class="columna-mapa">
-      <app-mapa-leaflet
-        [puntos]="puntosFiltrados()"
-        [puntoSeleccionado]="puntoSeleccionado()"
-        (puntoClick)="seleccionarPunto($event)"
-      ></app-mapa-leaflet>
-      <div class="mensaje-mapa">{{ textos.mensajeMapa }}</div>
-    </main>
+    @if (featureToggles.mapa.mostrarMapa) {
+      <main class="columna-mapa">
+        <app-mapa-leaflet
+          [puntos]="puntosFiltrados()"
+          [puntoSeleccionado]="puntoSeleccionado()"
+          (puntoClick)="seleccionarPunto($event)"
+        ></app-mapa-leaflet>
+        <div class="mensaje-mapa">{{ textos.mensajeMapa }}</div>
+      </main>
+    }
 
-    @if (featureToggles.mapaMostrarDetalle && puntoSeleccionado()) {
+    @if (featureToggles.mapa.mostrarDetalle && puntoSeleccionado()) {
       <aside class="columna-derecha">
         <div class="detalle-card">
           <button class="cerrar-detalle" (click)="cerrarDetalle()">✕</button>
