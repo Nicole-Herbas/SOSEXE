@@ -8,7 +8,7 @@ import {
   PUNTOS_MAPA_FALLBACK,
   TIPO_CLASE_MAPA,
 } from '../../constants/mapa.constants';
-import { FEATURE_TOGGLES } from '../../../../shared/config/feature-toggles';
+import { FEATURE_TOGGLES, FeatureToggles } from '../../../../shared/config/feature-toggles';
 import { MapaService } from '../../services/mapa.service';
 import { PuntoMapa } from '../../models/punto-mapa.model';
 
@@ -29,7 +29,7 @@ export class Mapa implements OnInit {
   readonly filtrosTipo = FILTROS_TIPO_MAPA;
   readonly filtrosNecesidad = FILTROS_NECESIDAD_MAPA;
   readonly tipoClase = TIPO_CLASE_MAPA;
-  readonly featureToggles = FEATURE_TOGGLES;
+  featureToggles: FeatureToggles = { mapa: { ...FEATURE_TOGGLES.mapa } };
 
   puntos = signal<PuntoMapa[]>([]);
   cargando = signal(true);
@@ -44,16 +44,18 @@ export class Mapa implements OnInit {
   puntosFiltrados = computed(() => {
     let resultado = this.puntos();
 
-    const tipo = this.filtroTipoActivo();
-    if (tipo !== 'todos') {
-      resultado = resultado.filter(p => p.tipo === tipo);
-    }
+    if (this.featureToggles.mapa.filtros) {
+      const tipo = this.filtroTipoActivo();
+      if (tipo !== 'todos') {
+        resultado = resultado.filter(p => p.tipo === tipo);
+      }
 
-    const necesidad = this.filtroNecesidadActivo();
-    if (necesidad !== 'todas') {
-      resultado = resultado.filter(p =>
-        p.necesidades?.includes(necesidad)
-      );
+      const necesidad = this.filtroNecesidadActivo();
+      if (necesidad !== 'todas') {
+        resultado = resultado.filter(p =>
+          p.necesidades?.includes(necesidad)
+        );
+      }
     }
 
     const busqueda = this.busqueda().toLowerCase().trim();
@@ -76,7 +78,7 @@ export class Mapa implements OnInit {
   });
 
   ngOnInit(): void {
-    if (FEATURE_TOGGLES.mapaUsarBackend) {
+    if (this.featureToggles.mapa.usarBackend) {
       this.cargarPuntosDelBackend();
     } else {
       this.puntos.set(PUNTOS_MAPA_FALLBACK as unknown as PuntoMapa[]);

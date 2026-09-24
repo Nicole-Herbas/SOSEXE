@@ -54,7 +54,7 @@ export const FEATURE_TOGGLES: FeatureToggles = {
   mapa: {
     usarBackend:    true,
     mostrarDetalle: true,
-    filtros:        false,
+    filtros:        true,
     mostrarLista:   true,
     mostrarMapa:    true,
   },
