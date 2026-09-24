@@ -232,5 +232,142 @@ inicio: {
   },
 
 },
+mapa: {
+  subtitulo: 'Ayuda cerca de ti',
+
+  titulo: 'Mapa de ayuda y emergencias',
+
+  descripcion:
+    'Encuentra centros, refugios, puntos de donación y emergencias. Filtra también por los artículos que necesitas entregar.',
+
+  buscarEtiqueta: 'Buscar por ciudad o nombre',
+
+  buscarPlaceholder: 'Ej.: Cochabamba o San José',
+
+  necesidadesEtiqueta: '¿Qué deseas donar o encontrar?',
+
+  resultadosTitulo: 'Resultados',
+
+  verificado: '✓ Verificado',
+
+  verificacionPendiente: 'Verificación pendiente',
+
+  sinResultados:
+    'No se encontraron puntos con los filtros seleccionados.',
+
+  cargando: 'Cargando puntos del mapa…',
+
+  errorCarga:
+    'No se pudieron cargar los puntos. Intenta de nuevo.',
+
+  mensajeMapa:
+    'Mapa interactivo · Implementado con Leaflet',
+
+  contadorVerificados:
+    'puntos verificados',
+
+  detalle: {
+    direccionEtiqueta:
+      'DIRECCIÓN',
+
+    horarioEtiqueta:
+      'HORARIO O ESTADO',
+
+    contactoEtiqueta:
+      'CONTACTO',
+
+    necesidadesEtiqueta:
+      'NECESIDADES PRIORITARIAS',
+
+    donacionesEtiqueta:
+      'DONACIONES QUE ACEPTA',
+
+    comoLlegar:
+      'Cómo llegar',
+
+    verCentro:
+      'Ver centro',
+
+    reportar:
+      'Reportar información incorrecta',
+
+    informacionVerificada:
+      'Información comprobada pendiente de revisión',
+  },
+
+  filtrosTipo: {
+    todos:
+      'Todos',
+
+    centroApoyo:
+      'Centros de apoyo',
+
+    refugio:
+      'Refugios',
+
+    puntoDonacion:
+      'Puntos de donación',
+
+    emergencia:
+      'Emergencias',
+  },
+
+  filtrosNecesidad: {
+    todas:
+      'Todas',
+
+    agua:
+      '💧 Agua',
+
+    alimentos:
+      '◉ Alimentos',
+
+    medicamentos:
+      '✦ Medicamentos',
+
+    ropa:
+      '▭ Ropa',
+
+    herramientas:
+      '✚ Herramientas',
+
+    voluntarios:
+      '● Voluntarios',
+  },
+
+  tipos: {
+    centroApoyo:
+      'Centro de apoyo',
+
+    refugio:
+      'Refugio',
+
+    puntoDonacion:
+      'Punto de donación',
+
+    emergencia:
+      'Emergencia',
+  },
+},
+
+donar: {
+  mensaje:
+    'donar works!',
+},
+
+noticias: {
+  mensaje:
+    'noticias works!',
+},
+
+voluntariado: {
+  mensaje:
+    'voluntariado works!',
+},
+
+acercaDe: {
+  mensaje:
+    'acerca-de works!',
+},
 
 } as const;
