@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { APP_TEXTOS } from '../../../../shared/constants/app-textos.constants';
 
 @Component({
   selector: 'app-login',
@@ -12,6 +13,8 @@ import { AuthService } from '../../services/auth.service';
   styleUrl: './login.component.css'
 })
 export class LoginComponent implements OnInit {
+  readonly textos = APP_TEXTOS.login;
+
   mensajeError = '';
   loginForm!: FormGroup;
 
@@ -69,8 +72,8 @@ export class LoginComponent implements OnInit {
             err
           );
 
-          this.mensajeError =
-            'Correo o contraseña incorrectos.';
+          this.mensajeError = this.textos.credencialesIncorrectas;
+            
 
         }
 
