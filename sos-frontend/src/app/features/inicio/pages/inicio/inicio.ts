@@ -1,10 +1,11 @@
-import { Component } from '@angular/core';
+import { Component, ElementRef, HostListener } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { APP_TEXTOS } from '../../../../shared/constants/app-textos.constants';
 
 interface NewsItem {
   category: string;
   location: string;
+  department: string;
   date: string;
   title: string;
   summary: string;
@@ -19,14 +20,32 @@ interface NewsItem {
 })
 export class Inicio {
   readonly textos = APP_TEXTOS.inicio;
-  
+
   newsFilters = ['Todas', 'Incendios', 'Inundaciones', 'Sequías', 'Comunidad'];
   activeFilter = 'Todas';
+
+  departments: string[] = [
+    'Todos',
+    'Beni',
+    'Chuquisaca',
+    'Cochabamba',
+    'La Paz',
+    'Oruro',
+    'Pando',
+    'Potosí',
+    'Santa Cruz',
+    'Tarija',
+  ];
+  selectedDepartment = 'Todos';
+  isDepartmentDropdownOpen = false;
+
+  constructor(private readonly elementRef: ElementRef) {}
 
   allNews: NewsItem[] = [
     {
       category: 'Incendios',
       location: 'Tarija, Bolivia',
+      department: 'Tarija',
       date: '16 may, 2024',
       title: 'Incendios forestales movilizan ayuda en Tarija',
       summary:
@@ -37,6 +56,7 @@ export class Inicio {
     {
       category: 'Inundaciones',
       location: 'La Paz, Bolivia',
+      department: 'La Paz',
       date: '15 may, 2024',
       title: 'Lluvias intensas afectan comunidades de La Paz',
       summary:
@@ -47,6 +67,7 @@ export class Inicio {
     {
       category: 'Comunidad',
       location: 'Cochabamba, Bolivia',
+      department: 'Cochabamba',
       date: '14 may, 2024',
       title: 'Centros habilitan nuevos puntos de acopio',
       summary:
@@ -57,13 +78,38 @@ export class Inicio {
   ];
 
   get filteredNews(): NewsItem[] {
-    if (this.activeFilter === 'Todas') {
-      return this.allNews;
-    }
-    return this.allNews.filter((n) => n.category === this.activeFilter);
+    return this.allNews.filter((n) => {
+      const matchesCategory =
+        this.activeFilter === 'Todas' || n.category === this.activeFilter;
+      const matchesDept =
+        this.selectedDepartment === 'Todos' ||
+        n.department === this.selectedDepartment;
+      return matchesCategory && matchesDept;
+    });
   }
 
   setFilter(filter: string): void {
     this.activeFilter = filter;
+  }
+
+  toggleDepartmentDropdown(): void {
+    this.isDepartmentDropdownOpen = !this.isDepartmentDropdownOpen;
+  }
+
+  closeDepartmentDropdown(): void {
+    this.isDepartmentDropdownOpen = false;
+  }
+
+  selectDepartment(department: string): void {
+    this.selectedDepartment = department;
+    this.isDepartmentDropdownOpen = false;
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    const dropdownEl = this.elementRef.nativeElement.querySelector('.dept-dropdown');
+    if (dropdownEl && !dropdownEl.contains(event.target as Node)) {
+      this.isDepartmentDropdownOpen = false;
+    }
   }
 }

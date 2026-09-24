@@ -301,6 +301,101 @@
     </div>
 
 
+    <div class="news-section__subfilters">
+
+      <span class="news-section__subfilters-label">
+        <!--
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/>
+          <circle cx="12" cy="10" r="3"/>
+        </svg>
+      -->
+        Departamento:
+      </span>
+
+      <div
+        class="dept-dropdown"
+        [class.dept-dropdown--open]="isDepartmentDropdownOpen"
+      >
+        <button
+          type="button"
+          class="dept-dropdown__trigger"
+          (click)="toggleDepartmentDropdown()"
+          [attr.aria-expanded]="isDepartmentDropdownOpen"
+          aria-haspopup="listbox"
+          id="dept-filter-trigger"
+        >
+          <span class="dept-dropdown__label">
+            {{ selectedDepartment }}
+          </span>
+
+          <svg
+            class="dept-dropdown__arrow"
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </button>
+
+        @if (isDepartmentDropdownOpen) {
+          <ul
+            class="dept-dropdown__menu"
+            role="listbox"
+            tabindex="-1"
+            aria-label="Lista de departamentos"
+          >
+            @for (dept of departments; track dept) {
+              <li
+                class="dept-dropdown__item"
+                [class.dept-dropdown__item--active]="dept === selectedDepartment"
+                (click)="selectDepartment(dept)"
+                role="option"
+                [attr.aria-selected]="dept === selectedDepartment"
+              >
+                <span>{{ dept }}</span>
+                @if (dept === selectedDepartment) {
+                  <span class="dept-dropdown__check" aria-hidden="true">✓</span>
+                }
+              </li>
+            }
+          </ul>
+        }
+      </div>
+<!--
+      @if (selectedDepartment !== 'Todos') {
+        <button
+          type="button"
+          class="dept-dropdown__clear-btn"
+          (click)="selectDepartment('Todos')"
+          title="Restablecer a todos los departamentos"
+        >
+          ✕ Quitar filtro
+        </button>
+      }
+      -->
+    </div>
+
+
     @if (filteredNews.length > 0) {
 
       <div class="news-grid">
