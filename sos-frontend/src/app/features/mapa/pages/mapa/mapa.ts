@@ -11,6 +11,7 @@ import {
 } from '../../components/mapa-leaflet/mapa-leaflet';
 
 import {
+  DEPARTAMENTOS_BOLIVIA,
   FILTROS_NECESIDAD_MAPA,
   FILTROS_TIPO_MAPA,
   PUNTOS_MAPA_FALLBACK,
@@ -66,6 +67,9 @@ export class Mapa implements OnInit {
   readonly filtrosNecesidad =
     FILTROS_NECESIDAD_MAPA;
 
+  readonly departamentos =
+    DEPARTAMENTOS_BOLIVIA;
+
   readonly tipoClase =
     TIPO_CLASE_MAPA;
 
@@ -98,6 +102,11 @@ export class Mapa implements OnInit {
   filtroNecesidadActivo =
     signal<string>(
       FILTROS_NECESIDAD_MAPA[0].id
+    );
+
+  filtroDepartamentoActivo =
+    signal<string>(
+      DEPARTAMENTOS_BOLIVIA[0].id
     );
 
 
@@ -145,6 +154,20 @@ export class Mapa implements OnInit {
               p.necesidades?.includes(
                 necesidad
               )
+          );
+
+      }
+
+
+      const departamento =
+        this.filtroDepartamentoActivo();
+
+
+      if (departamento !== 'todos') {
+
+        resultado =
+          resultado.filter(
+            p => p.departamentoNombre === departamento
           );
 
       }
@@ -243,6 +266,16 @@ export class Mapa implements OnInit {
   ): void {
 
     this.filtroNecesidadActivo.set(
+      id
+    );
+  }
+
+
+  seleccionarFiltroDepartamento(
+    id: string
+  ): void {
+
+    this.filtroDepartamentoActivo.set(
       id
     );
   }

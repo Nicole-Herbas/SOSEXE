@@ -42,6 +42,17 @@
         />
       </div>
 
+      <div class="bloque-departamento">
+        <label>Departamento</label>
+        <select
+          (change)="seleccionarFiltroDepartamento($any($event.target).value)"
+        >
+          @for (dep of departamentos; track dep.id) {
+            <option [value]="dep.id">{{ dep.etiqueta }}</option>
+          }
+        </select>
+      </div>
+
       @if (featureToggles.mapa.filtros) {
         <div class="bloque-filtros">
           <label>{{ textos.necesidadesEtiqueta }}</label>

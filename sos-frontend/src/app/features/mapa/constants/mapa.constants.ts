@@ -219,3 +219,16 @@ export const PUNTOS_MAPA_FALLBACK = [
     ],
   },
 ];
+
+export const DEPARTAMENTOS_BOLIVIA = [
+  { id: 'todos', etiqueta: 'Todos los departamentos' },
+  { id: 'La Paz', etiqueta: 'La Paz' },
+  { id: 'Cochabamba', etiqueta: 'Cochabamba' },
+  { id: 'Santa Cruz', etiqueta: 'Santa Cruz' },
+  { id: 'Oruro', etiqueta: 'Oruro' },
+  { id: 'Potosí', etiqueta: 'Potosí' },
+  { id: 'Chuquisaca', etiqueta: 'Chuquisaca' },
+  { id: 'Tarija', etiqueta: 'Tarija' },
+  { id: 'Beni', etiqueta: 'Beni' },
+  { id: 'Pando', etiqueta: 'Pando' },
+] as const;
