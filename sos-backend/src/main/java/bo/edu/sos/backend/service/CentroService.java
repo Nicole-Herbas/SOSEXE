@@ -1,5 +1,6 @@
 package bo.edu.sos.backend.service;
 
+import bo.edu.sos.backend.constants.EstadoVerificacion;
 import bo.edu.sos.backend.dto.CentroDTO;
 import bo.edu.sos.backend.entity.Centro;
 import bo.edu.sos.backend.entity.Departamento;
@@ -55,7 +56,7 @@ public class CentroService {
         copiarDTOaEntidad(dto, centro);
 
         // Al crear un centro, queda pendiente de verificación.
-        centro.setEstadoVerificacion("PENDIENTE");
+        centro.setEstadoVerificacion(EstadoVerificacion.PENDIENTE);
 
         Centro guardado = centroRepository.save(centro);
 

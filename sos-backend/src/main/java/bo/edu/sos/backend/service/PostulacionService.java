@@ -1,5 +1,6 @@
 package bo.edu.sos.backend.service;
 
+import bo.edu.sos.backend.constants.EstadoPostulacion;
 import bo.edu.sos.backend.dto.PostulacionDTO;
 import bo.edu.sos.backend.entity.Postulacion;
 import bo.edu.sos.backend.entity.Usuario;
@@ -70,7 +71,7 @@ public class PostulacionService {
                         "Usuario", dto.getUsuarioId()));
         postulacion.setUsuario(usuario);
 
-        postulacion.setEstado("PENDIENTE");
+        postulacion.setEstado(EstadoPostulacion.PENDIENTE);
         postulacion.setDisponibilidad(dto.getDisponibilidad());
         postulacion.setComentario(dto.getComentario());
 

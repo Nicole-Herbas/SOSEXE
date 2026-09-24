@@ -1,5 +1,6 @@
 package bo.edu.sos.backend.service;
 
+import bo.edu.sos.backend.constants.EstadoVerificacion;
 import bo.edu.sos.backend.dto.PuntoAyudaDTO;
 import bo.edu.sos.backend.entity.Departamento;
 import bo.edu.sos.backend.entity.Necesidad;
@@ -66,7 +67,7 @@ public class PuntoAyudaService {
 
         PuntoAyuda punto = new PuntoAyuda();
         copiarDTOaEntidad(dto, punto);
-        punto.setEstadoVerificacion("PENDIENTE");
+        punto.setEstadoVerificacion(EstadoVerificacion.PENDIENTE);
 
         PuntoAyuda guardado = puntoAyudaRepository.save(punto);
 
