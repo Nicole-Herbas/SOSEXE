@@ -241,7 +241,7 @@ $font-display: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, s
    ================================================================ */
 .actions {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 16px;
   margin-top: 24px;
 }
@@ -291,6 +291,11 @@ $font-display: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, s
   background: rgba($color-red, 0.08);
 }
 
+.action-card__icon--gold {
+  color: #b07717;
+  background: rgba($color-gold, 0.12);
+}
+
 .action-card__title {
   margin: 20px 0 0;
   font-family: $font-display;
@@ -327,6 +332,10 @@ $font-display: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, s
 
 .action-card__arrow--red {
   color: $color-red;
+}
+
+.action-card__arrow--gold {
+  color: #b07717;
 }
 
 /* ================================================================
