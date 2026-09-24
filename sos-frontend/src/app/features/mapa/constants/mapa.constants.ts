@@ -55,6 +55,13 @@ export const TIPO_CLASE_MAPA: Record<string, string> = {
   EMERGENCIA: 'emergencia',
 };
 
+export const TIPO_ETIQUETA_MAPA: Record<string, string> = {
+  CENTRO_APOYO: 'Centro de apoyo',
+  REFUGIO: 'Refugio',
+  PUNTO_DONACION: 'Punto de donación',
+  EMERGENCIA: 'Emergencia',
+};
+
 /**
  * Datos estáticos de fallback (usados cuando feature toggle mapaUsarBackend = false).
  */
