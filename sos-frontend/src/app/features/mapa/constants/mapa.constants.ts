@@ -3,92 +3,104 @@ export const MAPA_TEXTOS = {
   titulo: 'Mapa de ayuda y emergencias',
   descripcion:
     'Encuentra centros, refugios, puntos de donación y emergencias. Filtra también por los artículos que necesitas entregar.',
-  contadorVerificados: '7 puntos verificados en el prototipo',
   buscarEtiqueta: 'Buscar por ciudad o nombre',
   buscarPlaceholder: 'Ej.: Cochabamba o San José',
   necesidadesEtiqueta: '¿Qué deseas donar o encontrar?',
   resultadosTitulo: 'Resultados',
-  resultadosCantidad: 8,
   verificado: '✓ Verificado',
-  puntoVerificado: '✓ Punto verificado',
+  verificacionPendiente: 'Verificación pendiente',
+  sinResultados: 'No se encontraron puntos con los filtros seleccionados.',
+  cargando: 'Cargando puntos del mapa…',
+  errorCarga: 'No se pudieron cargar los puntos. Intenta de nuevo.',
   mensajeMapa: 'Mapa interactivo · Implementado con Leaflet',
-  detalle: {
-    tipo: 'Centro de apoyo',
-    nombre: 'Centro de Apoyo San José',
-    ubicacion: 'Cochabamba, Cochabamba',
-    descripcion:
-      'Centro comunitario de recepción y distribución de ayuda para familias afectadas.',
-    informacionVerificada: 'Información comprobada hace 3 días',
-    direccionEtiqueta: 'Dirección',
-    direccion: 'Av. Blanco Galindo, zona oeste',
-    horarioEtiqueta: 'Horario o estado',
-    horario: 'Lun–Sáb · 08:00–18:00',
-    contactoEtiqueta: 'Contacto',
-    contacto: '+591 70700001',
-    prioridadesEtiqueta: 'Necesidades prioritarias',
-    donacionesEtiqueta: 'Donaciones que acepta',
-    comoLlegar: 'Cómo llegar',
-    verCentro: 'Ver centro',
-    reportar: 'Reportar información incorrecta',
-  },
+} as const;
+
+export const MAPA_DETALLE_ETIQUETAS = {
+  direccionEtiqueta: 'DIRECCIÓN',
+  horarioEtiqueta: 'HORARIO O ESTADO',
+  contactoEtiqueta: 'CONTACTO',
+  necesidadesEtiqueta: 'NECESIDADES PRIORITARIAS',
+  donacionesEtiqueta: 'DONACIONES QUE ACEPTA',
+  comoLlegar: 'Cómo llegar',
+  verCentro: 'Ver centro',
+  reportar: 'Reportar información incorrecta',
+  informacionVerificada: 'Información comprobada pendiente de revisión',
 } as const;
 
 export const FILTROS_TIPO_MAPA = [
   { id: 'todos', etiqueta: 'Todos', color: '' },
-  { id: 'centros', etiqueta: 'Centros de apoyo', color: 'azul' },
-  { id: 'refugios', etiqueta: 'Refugios', color: 'verde' },
-  { id: 'donaciones', etiqueta: 'Puntos de donación', color: 'amarillo' },
-  { id: 'emergencias', etiqueta: 'Emergencias', color: 'rojo' },
+  { id: 'CENTRO_APOYO', etiqueta: 'Centros de apoyo', color: 'azul' },
+  { id: 'REFUGIO', etiqueta: 'Refugios', color: 'verde' },
+  { id: 'PUNTO_DONACION', etiqueta: 'Puntos de donación', color: 'amarillo' },
+  { id: 'EMERGENCIA', etiqueta: 'Emergencias', color: 'rojo' },
 ] as const;
 
 export const FILTROS_NECESIDAD_MAPA = [
   { id: 'todas', etiqueta: 'Todas' },
-  { id: 'agua', etiqueta: '💧 Agua' },
-  { id: 'alimentos', etiqueta: '◉ Alimentos' },
-  { id: 'higiene', etiqueta: '✦ Higiene' },
-  { id: 'medicinas', etiqueta: '✚ Medicinas' },
+  { id: 'Agua', etiqueta: '💧 Agua' },
+  { id: 'Alimentos', etiqueta: '◉ Alimentos' },
+  { id: 'Medicamentos', etiqueta: '✦ Medicamentos' },
+  { id: 'Ropa', etiqueta: '▭ Ropa' },
+  { id: 'Herramientas', etiqueta: '✚ Herramientas' },
+  { id: 'Voluntarios', etiqueta: '● Voluntarios' },
 ] as const;
 
-export const PUNTOS_MAPA = [
+/**
+ * Mapeo de tipo de backend a clase CSS para el color del tag.
+ */
+export const TIPO_CLASE_MAPA: Record<string, string> = {
+  CENTRO_APOYO: '',
+  REFUGIO: 'refugio',
+  PUNTO_DONACION: 'donacion',
+  EMERGENCIA: 'emergencia',
+};
+
+/**
+ * Datos estáticos de fallback (usados cuando feature toggle mapaUsarBackend = false).
+ */
+export const PUNTOS_MAPA_FALLBACK = [
   {
-    tipo: 'Centro de apoyo',
+    id: 0,
+    origen: 'CENTRO' as const,
+    tipo: 'CENTRO_APOYO',
     nombre: 'Centro de Apoyo San José',
-    ubicacion: 'Cochabamba · Cochabamba',
-    necesidades: ['💧 Agua', '◉ Alimentos', '✚ Medicinas'],
-    actualizado: 'Actualizado hace 3 días',
-    seleccionado: true,
-    claseTipo: '',
+    ciudad: 'Cochabamba',
+    departamentoNombre: 'Cochabamba',
+    descripcion: 'Centro comunitario de recepción y distribución de ayuda para familias afectadas.',
+    direccion: 'Av. Blanco Galindo, zona oeste',
+    telefono: '+591 70700001',
+    latitud: -17.3895,
+    longitud: -66.1568,
+    estadoVerificacion: 'VERIFICADO',
+    necesidades: ['Agua', 'Alimentos', 'Medicamentos'],
   },
   {
-    tipo: 'Centro de apoyo',
+    id: 1,
+    origen: 'CENTRO' as const,
+    tipo: 'CENTRO_APOYO',
     nombre: 'Centro Comunitario La Paz',
-    ubicacion: 'La Paz · La Paz',
-    necesidades: ['▭ Ropa', '✦ Higiene', '● Voluntarios'],
-    actualizado: 'Actualizado hace 5 días',
-    seleccionado: false,
-    claseTipo: '',
+    ciudad: 'La Paz',
+    departamentoNombre: 'La Paz',
+    descripcion: 'Centro de apoyo comunitario.',
+    direccion: 'Zona Central',
+    telefono: '+591 70700002',
+    latitud: -16.4897,
+    longitud: -68.1193,
+    estadoVerificacion: 'VERIFICADO',
+    necesidades: ['Ropa', 'Voluntarios'],
   },
   {
-    tipo: 'Refugio',
+    id: 2,
+    origen: 'PUNTO_AYUDA' as const,
+    tipo: 'REFUGIO',
     nombre: 'Refugio Temporal Santa Cruz',
-    ubicacion: 'Santa Cruz · Santa Cruz',
-    necesidades: ['💧 Agua', '▭ Ropa'],
-    actualizado: 'Actualizado recientemente',
-    seleccionado: false,
-    claseTipo: 'refugio',
+    ciudad: 'Santa Cruz',
+    departamentoNombre: 'Santa Cruz',
+    descripcion: 'Refugio temporal para familias desplazadas.',
+    direccion: 'Av. Cristo Redentor',
+    latitud: -17.7833,
+    longitud: -63.1821,
+    estadoVerificacion: 'PENDIENTE',
+    necesidades: ['Agua', 'Ropa'],
   },
-] as const;
-
-export const NECESIDADES_PRIORITARIAS = [
-  '💧 Agua',
-  '◉ Alimentos',
-  '✚ Medicinas',
-] as const;
-
-export const DONACIONES_ACEPTADAS = [
-  '💧 Agua',
-  '◉ Alimentos',
-  '✦ Higiene',
-  '✚ Medicinas',
-  '▭ Ropa',
-] as const;
+];
