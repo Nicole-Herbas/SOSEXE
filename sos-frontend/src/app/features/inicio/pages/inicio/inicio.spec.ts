@@ -28,4 +28,13 @@ describe('Inicio', () => {
     expect(component).toBeTruthy();
   });
 
+  it('should have a deadline for every news item', () => {
+    expect(component.allNews.length).toBeGreaterThan(0);
+
+    component.allNews.forEach((news) => {
+      expect(news.deadline).toBeTruthy();
+      expect(news.deadline.trim()).not.toBe('');
+    });
+  });
+
 });
