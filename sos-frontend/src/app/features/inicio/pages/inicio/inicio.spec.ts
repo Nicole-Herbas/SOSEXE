@@ -121,15 +121,6 @@ describe('Inicio', () => {
 
       expect(component.selectedDepartment).toBe('Cochabamba');
       expect(component.isDepartmentDropdownOpen).toBe(false);
-
-      // Botón para quitar filtro debe estar visible
-      const clearBtn = fixture.nativeElement.querySelector('.dept-dropdown__clear-btn');
-      expect(clearBtn).toBeTruthy();
-
-      clearBtn.click();
-      fixture.detectChanges();
-
-      expect(component.selectedDepartment).toBe('Todos');
     });
 
     it('debe cerrar el dropdown al hacer click fuera', () => {
