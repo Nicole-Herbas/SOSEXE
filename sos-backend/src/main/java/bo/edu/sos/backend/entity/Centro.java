@@ -1,5 +1,6 @@
 package bo.edu.sos.backend.entity;
 
+import bo.edu.sos.backend.constants.EstadoVerificacion;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -53,7 +54,7 @@ public class Centro {
     private BigDecimal longitud;
 
     @Column(name = "estado_verificacion", nullable = false, length = 30)
-    private String estadoVerificacion = "PENDIENTE";
+    private String estadoVerificacion = EstadoVerificacion.PENDIENTE;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "responsable_id")

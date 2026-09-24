@@ -1,5 +1,6 @@
 package bo.edu.sos.backend.security;
 
+import bo.edu.sos.backend.constants.JwtClaims;
 import bo.edu.sos.backend.entity.Usuario;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
@@ -43,9 +44,9 @@ public class JwtService {
 
         return Jwts.builder()
                 .setSubject(usuario.getEmail())
-                .claim("usuarioId", usuario.getId())
+                .claim(JwtClaims.USUARIO_ID, usuario.getId())
                 .claim(
-                        "rol",
+                        JwtClaims.ROL,
                         usuario.getRol().getNombre()
                 )
                 .setIssuedAt(ahora)
@@ -69,7 +70,7 @@ public class JwtService {
 
         return extraerClaims(token)
                 .get(
-                        "rol",
+                        JwtClaims.ROL,
                         String.class
                 );
     }

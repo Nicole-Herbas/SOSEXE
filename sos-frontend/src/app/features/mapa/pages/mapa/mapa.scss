@@ -485,3 +485,68 @@
 
   cursor: pointer;
 }
+
+.mensaje-estado {
+  padding: 20px;
+
+  text-align: center;
+
+  color: #7b898e;
+
+  font-size: 13px;
+}
+
+.mensaje-estado.error {
+  color: #ea4f45;
+}
+
+.resultado-card {
+  cursor: pointer;
+
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.resultado-card:hover {
+  border-color: #a0d8d4;
+
+  background: #f0faf9;
+}
+
+.tag.donacion {
+  background: #fef3d9;
+
+  color: #8a6b1d;
+}
+
+.tag.emergencia {
+  background: #fde2df;
+
+  color: #a8352a;
+}
+
+.cerrar-detalle {
+  position: absolute;
+
+  top: 14px;
+  right: 14px;
+
+  border: none;
+
+  background: transparent;
+
+  font-size: 18px;
+
+  color: #7b898e;
+
+  cursor: pointer;
+}
+
+.detalle-card {
+  position: relative;
+}
+
+.tag-verificado.pendiente {
+  background: #fef3d9;
+
+  color: #8a6b1d;
+}

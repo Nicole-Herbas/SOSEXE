@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Getter
 @Setter
@@ -61,4 +62,10 @@ public class CentroDTO {
     private String estadoVerificacion;
 
     private Long responsableId;
+
+    private String departamentoNombre;
+
+    private List<Long> necesidadIds;
+
+    private List<String> necesidadNombres;
 }

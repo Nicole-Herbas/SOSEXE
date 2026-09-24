@@ -1,5 +1,7 @@
 package bo.edu.sos.backend.config;
 
+import bo.edu.sos.backend.constants.ApiRoutes;
+import bo.edu.sos.backend.constants.Roles;
 import bo.edu.sos.backend.security.JwtAuthenticationFilter;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
@@ -58,13 +60,13 @@ public class SecurityConfig {
 
                         // Endpoints públicos de autenticación
                         .requestMatchers(
-                                "/swagger-ui/**",
-                                "/swagger-ui.html",
-                                "/v3/api-docs/**",
-                                "/api/auth/login",
-                                "/api/auth/registro",
-                                "/api/auth/refresh",
-                                "/api/auth/logout",
+                                ApiRoutes.SWAGGER_UI,
+                                ApiRoutes.SWAGGER_HTML,
+                                ApiRoutes.OPENAPI_DOCS,
+                                ApiRoutes.AUTH_LOGIN,
+                                ApiRoutes.AUTH_REGISTRO,
+                                ApiRoutes.AUTH_REFRESH,
+                                ApiRoutes.AUTH_LOGOUT,
                                 "/error"
                         ).permitAll()
 
@@ -72,99 +74,107 @@ public class SecurityConfig {
                         // Datos públicos de lectura
                         .requestMatchers(
                                 HttpMethod.GET,
-                                "/api/centros/**",
-                                "/api/noticias/**",
-                                "/api/alertas/**",
-                                "/api/puntos-ayuda/**",
-                                "/api/voluntariados/**"
+                                ApiRoutes.CENTROS + "/**",
+                                ApiRoutes.NOTICIAS + "/**",
+                                ApiRoutes.ALERTAS + "/**",
+                                ApiRoutes.PUNTOS_AYUDA + "/**",
+                                ApiRoutes.VOLUNTARIADOS + "/**",
+                                ApiRoutes.MAPA + "/**"
                         ).permitAll()
 
 
                         // Usuario autenticado
                         .requestMatchers(
-                                "/api/auth/me"
+                                ApiRoutes.AUTH_ME
                         ).authenticated()
 
 
                         // Acciones que puede realizar un usuario autenticado
                         .requestMatchers(
                                 HttpMethod.POST,
-                                "/api/donaciones",
-                                "/api/postulaciones"
+                                ApiRoutes.DONACIONES,
+                                ApiRoutes.POSTULACIONES
                         ).authenticated()
 
 
                         // Administración de usuarios
                         .requestMatchers(
-                                "/api/usuarios/**"
-                        ).hasAuthority("ADMIN")
+                                ApiRoutes.USUARIOS + "/**"
+                        ).hasAuthority(Roles.ADMIN)
 
 
-                        // Escritura administrativa
+                        // Escritura administrativa (centros, noticias, alertas, puntos)
                         .requestMatchers(
                                 HttpMethod.POST,
-                                "/api/centros/**",
-                                "/api/noticias/**",
-                                "/api/alertas/**",
-                                "/api/puntos-ayuda/**"
-                        ).hasAuthority("ADMIN")
+                                ApiRoutes.CENTROS + "/**",
+                                ApiRoutes.NOTICIAS + "/**",
+                                ApiRoutes.ALERTAS + "/**",
+                                ApiRoutes.PUNTOS_AYUDA + "/**"
+                        ).hasAuthority(Roles.ADMIN)
 
+                        // POST voluntariados — usuarios autenticados (responsables)
                         .requestMatchers(
                                 HttpMethod.POST,
-                                "/api/voluntariados/**"
+                                ApiRoutes.VOLUNTARIADOS + "/**"
                         ).authenticated()
 
 
                         .requestMatchers(
                                 HttpMethod.PUT,
-                                "/api/centros/**",
-                                "/api/noticias/**",
-                                "/api/alertas/**",
-                                "/api/puntos-ayuda/**"
-                        ).hasAuthority("ADMIN")
+                                ApiRoutes.CENTROS + "/**",
+                                ApiRoutes.NOTICIAS + "/**",
+                                ApiRoutes.ALERTAS + "/**",
+                                ApiRoutes.PUNTOS_AYUDA + "/**"
+                        ).hasAuthority(Roles.ADMIN)
 
+                        // PUT voluntariados — usuarios autenticados (responsables)
                         .requestMatchers(
                                 HttpMethod.PUT,
-                                "/api/voluntariados/**"
+                                ApiRoutes.VOLUNTARIADOS + "/**"
                         ).authenticated()
-
-
+                                       
                         .requestMatchers(
                                 HttpMethod.DELETE,
-                                "/api/centros/**",
-                                "/api/noticias/**",
-                                "/api/alertas/**",
-                                "/api/puntos-ayuda/**"
-                        ).hasAuthority("ADMIN")
+                                ApiRoutes.CENTROS + "/**",
+                                ApiRoutes.NOTICIAS + "/**",
+                                ApiRoutes.ALERTAS + "/**",
+                                ApiRoutes.PUNTOS_AYUDA + "/**"
+                        ).hasAuthority(Roles.ADMIN)
 
 
-                        // Cambiar estado de postulaciones → ADMIN
+                        // Cambiar estado de postulaciones — autenticado (lógica de permisos en el servicio)
                         .requestMatchers(
-                                HttpMethod.PATCH,
-                                "/api/postulaciones/**"
+                          HttpMethod.PATCH,
+                          ApiRoutes.POSTULACIONES + "/**"
                         ).authenticated()
 
                         .requestMatchers(
-                                HttpMethod.DELETE,
-                                "/api/voluntariados/**"
+                          HttpMethod.DELETE,
+                          ApiRoutes.VOLUNTARIADOS + "/**"
                         ).authenticated()
 
                         // Consultas administrativas de postulaciones
                         .requestMatchers(
-                                HttpMethod.GET,
-                                "/api/postulaciones/usuario/**"
-                        ).hasAuthority("ADMIN")
+                          HttpMethod.GET,
+                          ApiRoutes.POSTULACIONES + "/usuario/**"
+                        ).hasAuthority(Roles.ADMIN)
 
                         .requestMatchers(
-                                HttpMethod.GET,
-                                "/api/postulaciones/voluntariado/**"
+                          HttpMethod.GET,
+                          ApiRoutes.POSTULACIONES + "/voluntariado/**"
                         ).authenticated()
+                                       
+                        // Ver todas las donaciones → solo ADMIN
+                        .requestMatchers(
+                           HttpMethod.GET,
+                           ApiRoutes.DONACIONES
+                        ).hasAuthority(Roles.ADMIN)
 
                         // Consultas de donaciones y postulaciones requieren login
                         .requestMatchers(
                                 HttpMethod.GET,
-                                "/api/donaciones/**",
-                                "/api/postulaciones/**"
+                                ApiRoutes.DONACIONES + "/**",
+                                ApiRoutes.POSTULACIONES + "/**"
                         ).authenticated()
 
 

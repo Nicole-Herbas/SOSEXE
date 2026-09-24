@@ -1,17 +1,19 @@
 package bo.edu.sos.backend.service;
 
+import bo.edu.sos.backend.constants.EstadoPostulacion;
+import bo.edu.sos.backend.constants.Roles;
 import bo.edu.sos.backend.dto.PostulacionDTO;
 import bo.edu.sos.backend.entity.Postulacion;
 import bo.edu.sos.backend.entity.Usuario;
 import bo.edu.sos.backend.entity.Voluntariado;
 import bo.edu.sos.backend.exception.DuplicateResourceException;
+import bo.edu.sos.backend.exception.ForbiddenException;
 import bo.edu.sos.backend.exception.ResourceNotFoundException;
 import bo.edu.sos.backend.repository.PostulacionRepository;
 import bo.edu.sos.backend.repository.UsuarioRepository;
 import bo.edu.sos.backend.repository.VoluntariadoRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import bo.edu.sos.backend.exception.ForbiddenException;
 
 import java.util.List;
 
@@ -60,7 +62,7 @@ public class PostulacionService {
 
 
         boolean esAdmin =
-                "ADMIN".equals(
+                Roles.ADMIN.equals(
                         usuario.getRol().getNombre()
                 );
 
@@ -172,7 +174,7 @@ public class PostulacionService {
         );
 
         postulacion.setEstado(
-                "PENDIENTE"
+                EstadoPostulacion.PENDIENTE
         );
 
         postulacion.setDisponibilidad(
@@ -224,7 +226,7 @@ public class PostulacionService {
 
 
         boolean esAdmin =
-                "ADMIN".equals(
+                Roles.ADMIN.equals(
                         usuario.getRol().getNombre()
                 );
 

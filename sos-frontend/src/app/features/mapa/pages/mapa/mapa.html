@@ -7,145 +7,173 @@
     </div>
 
     <div class="contador-verificados">
-      {{ textos.contadorVerificados }}
+      {{ contadorVerificados() }}
     </div>
   </div>
 
-  <div class="filtros-tipo">
-    @for (filtro of filtrosTipo; track filtro.id) {
-      <button
-        type="button"
-        class="filtro"
-        [class.activo]="filtroTipoActivo === filtro.id"
-        [attr.data-filtro-tipo]="filtro.id"
-        (click)="seleccionarFiltroTipo(filtro.id)"
-      >
-        @if (filtro.color) {
-          <span class="punto {{ filtro.color }}"></span>
-        }
-        {{ filtro.etiqueta }}
-      </button>
-    }
-  </div>
+  @if (featureToggles.mapa.filtros) {
+    <div class="filtros-tipo">
+      @for (filtro of filtrosTipo; track filtro.id) {
+        <button
+          type="button"
+          class="filtro"
+          [class.activo]="filtroTipoActivo() === filtro.id"
+          [attr.data-filtro-tipo]="filtro.id"
+          (click)="seleccionarFiltroTipo(filtro.id)"
+        >
+          @if (filtro.color) {
+            <span class="punto {{ filtro.color }}"></span>
+          }
+          {{ filtro.etiqueta }}
+        </button>
+      }
+    </div>
+  }
 
   <section class="contenedor-mapa">
+  @if (featureToggles.mapa.mostrarLista) {
     <aside class="columna-izquierda">
       <div class="bloque-busqueda">
         <label>{{ textos.buscarEtiqueta }}</label>
-        <input type="text" [placeholder]="textos.buscarPlaceholder" />
+        <input
+          type="text"
+          [placeholder]="textos.buscarPlaceholder"
+          (input)="actualizarBusqueda($event)"
+        />
       </div>
 
-      <div class="bloque-filtros">
-        <label>{{ textos.necesidadesEtiqueta }}</label>
+      @if (featureToggles.mapa.filtros) {
+        <div class="bloque-filtros">
+          <label>{{ textos.necesidadesEtiqueta }}</label>
 
-        <div class="filtros-necesidades">
-          @for (filtro of filtrosNecesidad; track filtro.id) {
-            <button
-              type="button"
-              class="necesidad"
-              [class.activo]="filtroNecesidadActivo === filtro.id"
-              [attr.data-filtro-necesidad]="filtro.id"
-              (click)="seleccionarFiltroNecesidad(filtro.id)"
-            >
-              {{ filtro.etiqueta }}
-            </button>
-          }
+          <div class="filtros-necesidades">
+            @for (filtro of filtrosNecesidad; track filtro.id) {
+              <button
+                type="button"
+                class="necesidad"
+                [class.activo]="filtroNecesidadActivo() === filtro.id"
+                [attr.data-filtro-necesidad]="filtro.id"
+                (click)="seleccionarFiltroNecesidad(filtro.id)"
+              >
+                {{ filtro.etiqueta }}
+              </button>
+            }
+          </div>
         </div>
-      </div>
 
-      <div class="separador"></div>
+        <div class="separador"></div>
+      }
 
       <div class="resultados-header">
         <h3>{{ textos.resultadosTitulo }}</h3>
-        <span class="cantidad-resultados">{{ textos.resultadosCantidad }}</span>
+        <span class="cantidad-resultados">{{ puntosFiltrados().length }}</span>
       </div>
 
       <div class="lista-resultados">
-        @for (punto of puntos; track punto.nombre) {
-          <article
-            class="resultado-card"
-            [class.seleccionado]="punto.seleccionado"
-          >
-            <div class="etiquetas-card">
-              <span class="tag {{ punto.claseTipo }}">{{ punto.tipo }}</span>
-              <span class="verificado">{{ textos.verificado }}</span>
-            </div>
+        @if (cargando()) {
+          <p class="mensaje-estado">{{ textos.cargando }}</p>
+        } @else if (error()) {
+          <p class="mensaje-estado error">{{ error() }}</p>
+        } @else if (puntosFiltrados().length === 0) {
+          <p class="mensaje-estado">{{ textos.sinResultados }}</p>
+        } @else {
+          @for (punto of puntosFiltrados(); track punto.id) {
+            <article
+              class="resultado-card"
+              [class.seleccionado]="puntoSeleccionado()?.id === punto.id && puntoSeleccionado()?.origen === punto.origen"
+              (click)="seleccionarPunto(punto)"
+            >
+              <div class="etiquetas-card">
+                <span class="tag {{ obtenerClaseTipo(punto.tipo) }}">{{ punto.tipo }}</span>
+                @if (estaVerificado(punto)) {
+                  <span class="verificado">{{ textos.verificado }}</span>
+                }
+              </div>
 
-            <h4>{{ punto.nombre }}</h4>
-            <p class="ubicacion">{{ punto.ubicacion }}</p>
+              <h4>{{ punto.nombre }}</h4>
+              <p class="ubicacion">{{ punto.ciudad }} · {{ punto.departamentoNombre }}</p>
 
-            <div class="mini-tags">
-              @for (necesidad of punto.necesidades; track necesidad) {
-                <span>{{ necesidad }}</span>
-              }
-            </div>
-
-            <small>{{ punto.actualizado }}</small>
-          </article>
+              <div class="mini-tags">
+                @for (necesidad of punto.necesidades; track necesidad) {
+                  <span>{{ necesidad }}</span>
+                }
+              </div>
+            </article>
+          }
         }
       </div>
     </aside>
+  }
 
-    <main class="columna-mapa">
-      <app-mapa-leaflet></app-mapa-leaflet>
-      <div class="mensaje-mapa">{{ textos.mensajeMapa }}</div>
-    </main>
+    @if (featureToggles.mapa.mostrarMapa) {
+      <main class="columna-mapa">
+        <app-mapa-leaflet
+          [puntos]="puntosFiltrados()"
+          [puntoSeleccionado]="puntoSeleccionado()"
+          (puntoClick)="seleccionarPunto($event)"
+        ></app-mapa-leaflet>
+        <div class="mensaje-mapa">{{ textos.mensajeMapa }}</div>
+      </main>
+    }
 
-    <aside class="columna-derecha">
-      <div class="detalle-card">
-        <div class="detalle-etiquetas">
-          <span class="tag">{{ textos.detalle.tipo }}</span>
-          <span class="tag-verificado">{{ textos.puntoVerificado }}</span>
-        </div>
+    @if (featureToggles.mapa.mostrarDetalle && puntoSeleccionado()) {
+      <aside class="columna-derecha">
+        <div class="detalle-card">
+          <button class="cerrar-detalle" (click)="cerrarDetalle()">✕</button>
 
-        <h2>{{ textos.detalle.nombre }}</h2>
-        <p class="detalle-ubicacion">{{ textos.detalle.ubicacion }}</p>
-        <p class="descripcion">{{ textos.detalle.descripcion }}</p>
-
-        <div class="informacion-verificada">
-          {{ textos.detalle.informacionVerificada }}
-        </div>
-
-        <div class="detalle-dato">
-          <span>{{ textos.detalle.direccionEtiqueta }}</span>
-          <p>{{ textos.detalle.direccion }}</p>
-        </div>
-
-        <div class="detalle-dato">
-          <span>{{ textos.detalle.horarioEtiqueta }}</span>
-          <p>{{ textos.detalle.horario }}</p>
-        </div>
-
-        <div class="detalle-dato">
-          <span>{{ textos.detalle.contactoEtiqueta }}</span>
-          <p>{{ textos.detalle.contacto }}</p>
-        </div>
-
-        <div class="detalle-dato">
-          <span>{{ textos.detalle.prioridadesEtiqueta }}</span>
-          <div class="mini-tags">
-            @for (necesidad of necesidadesPrioritarias; track necesidad) {
-              <span>{{ necesidad }}</span>
+          <div class="detalle-etiquetas">
+            <span class="tag {{ obtenerClaseTipo(puntoSeleccionado()!.tipo) }}">{{ puntoSeleccionado()!.tipo }}</span>
+            @if (estaVerificado(puntoSeleccionado()!)) {
+              <span class="tag-verificado">{{ textos.verificado }}</span>
+            } @else {
+              <span class="tag-verificado pendiente">{{ textos.verificacionPendiente }}</span>
             }
           </div>
-        </div>
 
-        <div class="detalle-dato">
-          <span>{{ textos.detalle.donacionesEtiqueta }}</span>
-          <div class="mini-tags">
-            @for (donacion of donacionesAceptadas; track donacion) {
-              <span>{{ donacion }}</span>
-            }
+          <h2>{{ puntoSeleccionado()!.nombre }}</h2>
+          <p class="detalle-ubicacion">{{ puntoSeleccionado()!.ciudad }}, {{ puntoSeleccionado()!.departamentoNombre }}</p>
+
+          @if (puntoSeleccionado()!.descripcion) {
+            <p class="descripcion">{{ puntoSeleccionado()!.descripcion }}</p>
+          }
+
+          <div class="informacion-verificada">
+            {{ detalleEtiquetas.informacionVerificada }}
           </div>
-        </div>
 
-        <div class="acciones">
-          <button class="boton-secundario">{{ textos.detalle.comoLlegar }}</button>
-          <button class="boton-principal">{{ textos.detalle.verCentro }}</button>
-        </div>
+          @if (puntoSeleccionado()!.direccion) {
+            <div class="detalle-dato">
+              <span>{{ detalleEtiquetas.direccionEtiqueta }}</span>
+              <p>{{ puntoSeleccionado()!.direccion }}</p>
+            </div>
+          }
 
-        <button class="reportar">{{ textos.detalle.reportar }}</button>
-      </div>
-    </aside>
+          @if (puntoSeleccionado()!.telefono) {
+            <div class="detalle-dato">
+              <span>{{ detalleEtiquetas.contactoEtiqueta }}</span>
+              <p>{{ puntoSeleccionado()!.telefono }}</p>
+            </div>
+          }
+
+          @if (puntoSeleccionado()!.necesidades?.length) {
+            <div class="detalle-dato">
+              <span>{{ detalleEtiquetas.necesidadesEtiqueta }}</span>
+              <div class="mini-tags">
+                @for (necesidad of puntoSeleccionado()!.necesidades; track necesidad) {
+                  <span>{{ necesidad }}</span>
+                }
+              </div>
+            </div>
+          }
+
+          <div class="acciones">
+            <button class="boton-secundario">{{ detalleEtiquetas.comoLlegar }}</button>
+            <button class="boton-principal">{{ detalleEtiquetas.verCentro }}</button>
+          </div>
+
+          <button class="reportar">{{ detalleEtiquetas.reportar }}</button>
+        </div>
+      </aside>
+    }
   </section>
 </section>

@@ -1,5 +1,6 @@
 package bo.edu.sos.backend.service;
 
+import bo.edu.sos.backend.constants.Roles;
 import bo.edu.sos.backend.dto.AuthResponseDTO;
 import bo.edu.sos.backend.dto.LoginRequestDTO;
 import bo.edu.sos.backend.dto.LoginResultDTO;
@@ -74,7 +75,7 @@ public class AuthService {
 
 
         Rol rolUsuario =
-                rolRepository.findByNombre("USER")
+                rolRepository.findByNombre(Roles.USER)
                         .orElseThrow(() ->
                                 new IllegalStateException(
                                         "El rol USER no existe en la base de datos"

@@ -1,5 +1,6 @@
 package bo.edu.sos.backend.service;
 
+import bo.edu.sos.backend.constants.DonacionConstants;
 import bo.edu.sos.backend.dto.DonacionDTO;
 import bo.edu.sos.backend.entity.Centro;
 import bo.edu.sos.backend.entity.Donacion;
@@ -61,8 +62,8 @@ public class DonacionService {
         Donacion donacion = new Donacion();
 
         // Generar código único automáticamente
-        donacion.setCodigo("DON-" + UUID.randomUUID().toString()
-                .substring(0, 8).toUpperCase());
+        donacion.setCodigo(DonacionConstants.CODIGO_PREFIJO + UUID.randomUUID().toString()
+                .substring(0, DonacionConstants.CODIGO_SUFIJO_LONGITUD).toUpperCase());
 
         donacion.setMonto(dto.getMonto());
         donacion.setMetodo(dto.getMetodo());
