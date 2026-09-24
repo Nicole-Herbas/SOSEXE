@@ -103,15 +103,20 @@ public class SecurityConfig {
                         ).hasAuthority(Roles.ADMIN)
 
 
-                        // Escritura administrativa
+                        // Escritura administrativa (centros, noticias, alertas, puntos)
                         .requestMatchers(
                                 HttpMethod.POST,
                                 ApiRoutes.CENTROS + "/**",
                                 ApiRoutes.NOTICIAS + "/**",
                                 ApiRoutes.ALERTAS + "/**",
-                                ApiRoutes.PUNTOS_AYUDA + "/**",
-                                ApiRoutes.VOLUNTARIADOS + "/**"
+                                ApiRoutes.PUNTOS_AYUDA + "/**"
                         ).hasAuthority(Roles.ADMIN)
+
+                        // POST voluntariados — usuarios autenticados (responsables)
+                        .requestMatchers(
+                                HttpMethod.POST,
+                                ApiRoutes.VOLUNTARIADOS + "/**"
+                        ).authenticated()
 
 
                         .requestMatchers(
@@ -119,9 +124,14 @@ public class SecurityConfig {
                                 ApiRoutes.CENTROS + "/**",
                                 ApiRoutes.NOTICIAS + "/**",
                                 ApiRoutes.ALERTAS + "/**",
-                                ApiRoutes.PUNTOS_AYUDA + "/**",
-                                ApiRoutes.VOLUNTARIADOS + "/**"
+                                ApiRoutes.PUNTOS_AYUDA + "/**"
                         ).hasAuthority(Roles.ADMIN)
+
+                        // PUT voluntariados — usuarios autenticados (responsables)
+                        .requestMatchers(
+                                HttpMethod.PUT,
+                                ApiRoutes.VOLUNTARIADOS + "/**"
+                        ).authenticated()
 
 
                         .requestMatchers(
@@ -129,17 +139,32 @@ public class SecurityConfig {
                                 ApiRoutes.CENTROS + "/**",
                                 ApiRoutes.NOTICIAS + "/**",
                                 ApiRoutes.ALERTAS + "/**",
-                                ApiRoutes.PUNTOS_AYUDA + "/**",
-                                ApiRoutes.VOLUNTARIADOS + "/**"
+                                ApiRoutes.PUNTOS_AYUDA + "/**"
                         ).hasAuthority(Roles.ADMIN)
 
 
-                        // Cambiar estado de postulaciones → ADMIN
+                        // Cambiar estado de postulaciones — autenticado (lógica de permisos en el servicio)
                         .requestMatchers(
                                 HttpMethod.PATCH,
                                 ApiRoutes.POSTULACIONES + "/**"
+                        ).authenticated()
+
+                        // DELETE voluntariados — autenticado (responsables)
+                        .requestMatchers(
+                                HttpMethod.DELETE,
+                                ApiRoutes.VOLUNTARIADOS + "/**"
+                        ).authenticated()
+
+                        // Consultas administrativas de postulaciones
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                ApiRoutes.POSTULACIONES + "/usuario/**"
                         ).hasAuthority(Roles.ADMIN)
 
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                ApiRoutes.POSTULACIONES + "/voluntariado/**"
+                        ).authenticated()
 
                         // Consultas de donaciones y postulaciones requieren login
                         .requestMatchers(
