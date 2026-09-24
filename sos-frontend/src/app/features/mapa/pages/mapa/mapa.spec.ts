@@ -155,4 +155,64 @@ describe('Mapa', () => {
     expect(mapa).toBeNull();
   });
 
+  
+
+  it('debe mostrar el selector con todos los departamentos de Bolivia', () => {
+  fixture.detectChanges();
+
+  const req =
+    httpTesting.expectOne('/api/mapa/puntos');
+
+  req.flush({
+    success: true,
+    message: 'OK',
+    data: [],
+    timestamp: ''
+  });
+
+  fixture.detectChanges();
+
+  const select =
+    fixture.nativeElement.querySelector(
+      '.filtro-departamento select'
+    );
+
+  const opciones =
+    select.querySelectorAll('option');
+
+  expect(select).toBeTruthy();
+
+  expect(opciones.length).toBe(10);
+
+  expect(opciones[1].textContent.trim())
+    .toBe('Chuquisaca');
+
+  expect(opciones[9].textContent.trim())
+    .toBe('Pando');
+});
+
+
+it('debe mostrar todos los departamentos como opción seleccionada por defecto', () => {
+  fixture.detectChanges();
+
+  const req =
+    httpTesting.expectOne('/api/mapa/puntos');
+
+  req.flush({
+    success: true,
+    message: 'OK',
+    data: [],
+    timestamp: ''
+  });
+
+  fixture.detectChanges();
+
+  const select: HTMLSelectElement =
+    fixture.nativeElement.querySelector(
+      '.filtro-departamento select'
+    );
+
+  expect(select.value)
+    .toBe('Departamentos');
+});
 });

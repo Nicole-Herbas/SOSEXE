@@ -550,3 +550,29 @@
 
   color: #8a6b1d;
 }
+
+
+
+
+.filtro-departamento {
+  margin-left: 8px;
+
+  select {
+    height: 36px;
+    padding: 0px 20px;
+
+    border: 1px solid #d9e0e3;
+    border-radius: 18px;
+
+    background-color: #ffffff;
+
+    font-size: 13px;
+    color: #475569;
+
+    cursor: pointer;
+
+  }
+
+  
+
+}
