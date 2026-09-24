@@ -355,9 +355,21 @@
 
               </span>
 
-              <span class="news-card__date">
-                {{ filteredNews[0].date }}
-              </span>
+              <div class="news-card__dates">
+
+                <span class="news-card__date">
+                  Desde:{{ filteredNews[0].date }}
+                </span>
+
+                <br>
+
+                <span class="news-card__deadline">
+                  Hasta: {{ filteredNews[0].deadline }}
+                </span>
+
+            </div>
+
+              
 
             </div>
 
