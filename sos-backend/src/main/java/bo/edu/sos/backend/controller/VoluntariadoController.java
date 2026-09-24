@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.Authentication;
 
 import java.util.List;
 
@@ -44,31 +45,51 @@ public class VoluntariadoController {
 
     @PostMapping
     public ResponseEntity<ApiResponse<VoluntariadoDTO>> crear(
-            @Valid @RequestBody VoluntariadoDTO voluntariadoDTO) {
+            @Valid @RequestBody VoluntariadoDTO voluntariadoDTO,
+            Authentication authentication) {
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(ApiResponse.created(
-                        voluntariadoService.guardar(voluntariadoDTO)));
+                        voluntariadoService.guardar(
+                                voluntariadoDTO,
+                                authentication.getName()
+                        )));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<VoluntariadoDTO>> actualizar(
             @PathVariable Long id,
-            @Valid @RequestBody VoluntariadoDTO voluntariadoDTO) {
+            @Valid @RequestBody VoluntariadoDTO voluntariadoDTO,
+            Authentication authentication) {
 
         return ResponseEntity.ok(
-                ApiResponse.ok("Voluntariado actualizado",
-                        voluntariadoService.actualizar(id, voluntariadoDTO)));
+                ApiResponse.ok(
+                        "Voluntariado actualizado",
+                        voluntariadoService.actualizar(
+                                id,
+                                voluntariadoDTO,
+                                authentication.getName()
+                        )
+                )
+        );
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>> eliminar(
-            @PathVariable Long id) {
+            @PathVariable Long id,
+            Authentication authentication) {
 
-        voluntariadoService.eliminar(id);
+        voluntariadoService.eliminar(
+                id,
+                authentication.getName()
+        );
 
         return ResponseEntity.ok(
-                ApiResponse.ok("Voluntariado eliminado", null));
+                ApiResponse.ok(
+                        "Voluntariado eliminado",
+                        null
+                )
+        );
     }
 }

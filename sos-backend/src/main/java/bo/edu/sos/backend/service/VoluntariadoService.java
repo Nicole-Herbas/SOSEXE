@@ -11,6 +11,7 @@ import bo.edu.sos.backend.repository.UsuarioRepository;
 import bo.edu.sos.backend.repository.VoluntariadoRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import bo.edu.sos.backend.exception.ForbiddenException;
 
 import java.util.List;
 
@@ -56,27 +57,110 @@ public class VoluntariadoService {
     }
 
     @Transactional
-    public VoluntariadoDTO guardar(VoluntariadoDTO dto) {
+    public VoluntariadoDTO guardar(
+            VoluntariadoDTO dto,
+            String emailAutenticado) {
 
-        if (dto.getFechaFin().isBefore(dto.getFechaInicio())) {
+        if (dto.getFechaFin().isBefore(
+                dto.getFechaInicio())) {
+
             throw new BadRequestException(
-                    "La fecha de fin no puede ser anterior a la fecha de inicio");
+                    "La fecha de fin no puede ser anterior a la fecha de inicio"
+            );
         }
 
-        Voluntariado voluntariado = new Voluntariado();
-        copiarDTOaEntidad(dto, voluntariado);
-        voluntariado.setEstado("BORRADOR");
 
-        Voluntariado guardado = voluntariadoRepository.save(voluntariado);
+        Usuario usuario =
+                usuarioRepository
+                        .findByEmail(emailAutenticado)
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "No existe un usuario con email: "
+                                                + emailAutenticado
+                                )
+                        );
 
-        return convertirADTO(guardado);
+
+        Centro centro =
+                centroRepository
+                        .findById(dto.getCentroId())
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "Centro",
+                                        dto.getCentroId()
+                                )
+                        );
+
+
+        if (!puedeAdministrarCentro(
+                usuario,
+                centro)) {
+
+            throw new ForbiddenException(
+                    "No tienes permiso para crear voluntariados para este centro"
+            );
+        }
+
+
+        Voluntariado voluntariado =
+                new Voluntariado();
+
+
+        copiarDTOaEntidad(
+                dto,
+                voluntariado
+        );
+
+
+        voluntariado.setCreadoPor(
+                usuario
+        );
+
+
+        voluntariado.setEstado(
+                "BORRADOR"
+        );
+
+
+        Voluntariado guardado =
+                voluntariadoRepository.save(
+                        voluntariado
+                );
+
+
+        return convertirADTO(
+                guardado
+        );
     }
 
     @Transactional
-    public VoluntariadoDTO actualizar(Long id, VoluntariadoDTO dto) {
+    public VoluntariadoDTO actualizar(
+            Long id,
+            VoluntariadoDTO dto,
+            String emailAutenticado) {
 
         Voluntariado voluntariado = voluntariadoRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Voluntariado", id));
+
+        Usuario usuario =
+                usuarioRepository
+                        .findByEmail(emailAutenticado)
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "No existe un usuario con email: "
+                                                + emailAutenticado
+                                )
+                        );
+
+
+        if (!puedeAdministrarCentro(
+                usuario,
+                voluntariado.getCentro())) {
+
+            throw new ForbiddenException(
+                    "No tienes permiso para modificar este voluntariado"
+            );
+        }
 
         if (dto.getFechaFin().isBefore(dto.getFechaInicio())) {
             throw new BadRequestException(
@@ -91,13 +175,45 @@ public class VoluntariadoService {
     }
 
     @Transactional
-    public void eliminar(Long id) {
+    public void eliminar(
+            Long id,
+            String emailAutenticado) {
 
-        if (!voluntariadoRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Voluntariado", id);
+        Voluntariado voluntariado =
+                voluntariadoRepository
+                        .findById(id)
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "Voluntariado",
+                                        id
+                                )
+                        );
+
+
+        Usuario usuario =
+                usuarioRepository
+                        .findByEmail(emailAutenticado)
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "No existe un usuario con email: "
+                                                + emailAutenticado
+                                )
+                        );
+
+
+        if (!puedeAdministrarCentro(
+                usuario,
+                voluntariado.getCentro())) {
+
+            throw new ForbiddenException(
+                    "No tienes permiso para eliminar este voluntariado"
+            );
         }
 
-        voluntariadoRepository.deleteById(id);
+
+        voluntariadoRepository.delete(
+                voluntariado
+        );
     }
 
     private void copiarDTOaEntidad(VoluntariadoDTO dto, Voluntariado voluntariado) {
@@ -117,10 +233,7 @@ public class VoluntariadoService {
                         "Centro", dto.getCentroId()));
         voluntariado.setCentro(centro);
 
-        Usuario creador = usuarioRepository.findById(dto.getCreadoPorId())
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "Usuario", dto.getCreadoPorId()));
-        voluntariado.setCreadoPor(creador);
+
     }
 
     private VoluntariadoDTO convertirADTO(Voluntariado voluntariado) {
@@ -145,5 +258,24 @@ public class VoluntariadoService {
         }
 
         return dto;
+    }
+    private boolean puedeAdministrarCentro(
+            Usuario usuario,
+            Centro centro) {
+
+        boolean esAdmin =
+                "ADMIN".equals(
+                        usuario.getRol().getNombre()
+                );
+
+
+        boolean esResponsable =
+                centro.getResponsable() != null
+                        && centro.getResponsable()
+                        .getId()
+                        .equals(usuario.getId());
+
+
+        return esAdmin || esResponsable;
     }
 }
