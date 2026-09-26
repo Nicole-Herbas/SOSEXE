@@ -1417,6 +1417,406 @@
         </div>
 
       }
+      <!-- =================================================
+     PASO 5 - REVISIÓN Y ENVÍO
+     ================================================= -->
+
+@if (currentStep === 5) {
+
+  <div class="form-title">
+
+    <span class="step-label">
+      Paso 5 de 5
+    </span>
+
+    <h2>Revisión y envío</h2>
+
+    <p>
+      Revisa la información antes de enviar la solicitud
+      de verificación.
+    </p>
+
+  </div>
+
+
+  <!-- ======================================
+       INFORMACIÓN DEL CENTRO
+       ====================================== -->
+
+  <div class="review-section">
+
+    <div class="review-section-header">
+
+      <div>
+        <h3>Información del centro</h3>
+        <p>Datos principales de la organización.</p>
+      </div>
+
+      <span class="review-badge">
+        ✓ Completo
+      </span>
+
+    </div>
+
+
+    <div class="review-grid">
+
+      <div class="review-item">
+        <span>Nombre</span>
+        <strong>{{ nombreCentro }}</strong>
+      </div>
+
+      <div class="review-item">
+        <span>Tipo de organización</span>
+        <strong>{{ tipoOrganizacion }}</strong>
+      </div>
+
+      <div class="review-item">
+        <span>Departamento</span>
+        <strong>{{ departamento }}</strong>
+      </div>
+
+      <div class="review-item">
+        <span>NIT</span>
+        <strong>{{ nit }}</strong>
+      </div>
+
+        <div class="review-item">
+          <span>Personería jurídica</span>
+          <strong>{{ personeriaJuridica }}</strong>
+        </div>
+
+        <div class="review-item">
+          <span>Fecha de fundación</span>
+          <strong>{{ fechaFundacion || 'No especificada' }}</strong>
+        </div>
+
+        <div class="review-item full-review">
+          <span>Página web o red social</span>
+          <strong>{{ paginaWeb || 'No especificada' }}</strong>
+        </div>
+
+        <div class="review-item full-review">
+          <span>Descripción</span>
+          <strong>{{ descripcion }}</strong>
+        </div>
+
+        <div class="review-item full-review">
+          <span>Población atendida</span>
+          <strong>{{ poblacionAtendida || 'No especificada' }}</strong>
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- ======================================
+        RESPONSABLE
+        ====================================== -->
+
+    <div class="review-section">
+
+      <div class="review-section-header">
+
+        <div>
+          <h3>Responsable</h3>
+          <p>Persona encargada del centro.</p>
+        </div>
+
+        <span class="review-badge">
+          ✓ Completo
+        </span>
+
+      </div>
+
+
+      <div class="review-grid">
+
+        <div class="review-item">
+          <span>Nombre</span>
+          <strong>{{ nombreResponsable }}</strong>
+        </div>
+
+        <div class="review-item">
+          <span>Cargo</span>
+          <strong>{{ cargoResponsable }}</strong>
+        </div>
+
+        <div class="review-item">
+          <span>Documento</span>
+          <strong>{{ documentoResponsable }}</strong>
+        </div>
+
+        <div class="review-item">
+          <span>Correo</span>
+          <strong>{{ correoResponsable }}</strong>
+        </div>
+
+        <div class="review-item">
+          <span>Teléfono</span>
+          <strong>{{ telefonoResponsable }}</strong>
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- ======================================
+        UBICACIÓN
+        ====================================== -->
+
+    <div class="review-section">
+
+      <div class="review-section-header">
+
+        <div>
+          <h3>Ubicación</h3>
+          <p>Ubicación registrada del centro.</p>
+        </div>
+
+        <span class="review-badge">
+          ✓ Completo
+        </span>
+
+      </div>
+
+
+      <div class="review-grid">
+
+        <div class="review-item">
+          <span>Ciudad</span>
+          <strong>{{ ciudad }}</strong>
+        </div>
+
+        <div class="review-item">
+          <span>Departamento</span>
+          <strong>{{ departamentoUbicacion }}</strong>
+        </div>
+
+        <div class="review-item full-review">
+          <span>Dirección</span>
+          <strong>{{ direccionExacta }}</strong>
+        </div>
+
+        <div class="review-item full-review">
+          <span>Referencia</span>
+          <strong>{{ referencia || 'No especificada' }}</strong>
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- ======================================
+        DOCUMENTOS
+        ====================================== -->
+
+    <div class="review-section">
+
+      <div class="review-section-header">
+
+        <div>
+          <h3>Documentos</h3>
+          <p>Archivos adjuntados para la verificación.</p>
+        </div>
+
+        <span class="review-badge">
+          {{ documentosAdjuntos }}/4
+        </span>
+
+      </div>
+
+
+      <div class="review-documents">
+
+        <div class="review-document">
+          <span class="document-status">✓</span>
+          <span>{{ personeriaArchivo?.name }}</span>
+        </div>
+
+        <div class="review-document">
+          <span class="document-status">✓</span>
+          <span>{{ nitArchivo?.name }}</span>
+        </div>
+
+        <div class="review-document">
+          <span class="document-status">✓</span>
+          <span>{{ identidadArchivo?.name }}</span>
+        </div>
+
+        <div class="review-document">
+          <span class="document-status">✓</span>
+          <span>{{ domicilioArchivo?.name }}</span>
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- ======================================
+        NECESIDADES Y DONACIONES
+        ====================================== -->
+
+    <div class="review-section">
+
+      <div class="review-section-header">
+
+        <div>
+          <h3>Necesidades y donaciones</h3>
+          <p>Información de apoyo del centro.</p>
+        </div>
+
+      </div>
+
+
+      <div class="review-grid">
+
+        <div class="review-item full-review">
+
+          <span>Necesidades prioritarias</span>
+
+          <strong>
+            {{ necesidadesSeleccionadas.join(', ') }}
+          </strong>
+
+        </div>
+
+        <div class="review-item full-review">
+
+          <span>Donaciones que acepta</span>
+
+          <strong>
+            {{ donacionesSeleccionadas.join(', ') }}
+          </strong>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- ======================================
+        VOLUNTARIADO
+        ====================================== -->
+
+    <div class="review-section">
+
+      <div class="review-section-header">
+
+        <div>
+          <h3>Voluntariado</h3>
+          <p>Información sobre voluntarios.</p>
+        </div>
+
+      </div>
+
+
+      <div class="review-grid">
+
+        <div class="review-item">
+
+          <span>Solicita voluntarios</span>
+
+          <strong>
+            {{ solicitaVoluntarios ? 'Sí' : 'No' }}
+          </strong>
+
+        </div>
+
+
+        @if (solicitaVoluntarios) {
+
+          <div class="review-item full-review">
+
+            <span>Actividades</span>
+
+            <strong>
+              {{ actividadesSeleccionadas.join(', ') }}
+            </strong>
+
+          </div>
+
+
+          <div class="review-item full-review">
+
+            <span>Descripción</span>
+
+            <strong>
+              {{ descripcionVoluntariado || 'No especificada' }}
+            </strong>
+
+          </div>
+
+        }
+
+      </div>
+
+    </div>
+
+
+    <!-- ======================================
+        AVISO
+        ====================================== -->
+
+    <div class="submit-notice">
+
+      <strong>
+        🔒 Antes de enviar
+      </strong>
+
+      <p>
+        La solicitud será enviada al equipo administrador
+        para su revisión. El centro no será publicado
+        automáticamente.
+      </p>
+
+    </div>
+
+
+    <!-- ======================================
+        BOTONES
+        ====================================== -->
+
+    <div class="form-actions">
+
+      <button
+        type="button"
+        class="btn secondary"
+        (click)="volver()"
+      >
+        ← Atrás
+      </button>
+
+
+      <div class="right-actions">
+
+        <button
+          type="button"
+          class="btn secondary"
+          (click)="guardarBorrador()"
+        >
+          Guardar borrador
+        </button>
+
+
+        <button
+          type="button"
+          class="btn primary"
+          (click)="enviarSolicitud()"
+        >
+          Enviar solicitud →
+        </button>
+
+      </div>
+
+    </div>
+
+  }
 
     </section>
 

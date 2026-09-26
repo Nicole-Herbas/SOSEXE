@@ -234,7 +234,69 @@ export class RegistrarCentroComponent {
 
     }
   }
+// ==========================================
+// PASO 5 - REVISIÓN Y ENVÍO
+// ==========================================
 
+enviarSolicitud(): void {
+
+  if (!this.paso4Valido) {
+    return;
+  }
+
+  const solicitud = {
+    centro: {
+      nombre: this.nombreCentro,
+      tipo: this.tipoOrganizacion,
+      departamento: this.departamento,
+      nit: this.nit,
+      personeriaJuridica: this.personeriaJuridica,
+      fechaFundacion: this.fechaFundacion,
+      paginaWeb: this.paginaWeb,
+      descripcion: this.descripcion,
+      poblacionAtendida: this.poblacionAtendida
+    },
+
+    responsable: {
+      nombre: this.nombreResponsable,
+      cargo: this.cargoResponsable,
+      documento: this.documentoResponsable,
+      correo: this.correoResponsable,
+      telefono: this.telefonoResponsable
+    },
+
+    ubicacion: {
+      ciudad: this.ciudad,
+      departamento: this.departamentoUbicacion,
+      direccion: this.direccionExacta,
+      referencia: this.referencia
+    },
+
+    documentos: {
+      personeria: this.personeriaArchivo?.name ?? '',
+      nit: this.nitArchivo?.name ?? '',
+      identidad: this.identidadArchivo?.name ?? '',
+      domicilio: this.domicilioArchivo?.name ?? ''
+    },
+
+    necesidades: this.necesidadesSeleccionadas,
+
+    donaciones: this.donacionesSeleccionadas,
+
+    voluntariado: {
+      solicita: this.solicitaVoluntarios,
+      actividades: this.actividadesSeleccionadas,
+      descripcion: this.descripcionVoluntariado
+    }
+  };
+
+  console.log('Solicitud enviada:', solicitud);
+
+  alert(
+    'Solicitud enviada correctamente. ' +
+    'El equipo administrador revisará la información.'
+  );
+}
 
   // ==========================================
   // DEPARTAMENTOS DE BOLIVIA

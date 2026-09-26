@@ -1057,3 +1057,162 @@
   font-size: 13px;
   font-weight: 600;
 }
+/* ==========================================
+   PASO 5 - REVISIÓN
+   ========================================== */
+
+.review-section {
+  margin-bottom: 24px;
+  padding: 20px;
+  border: 1px solid #dce8ee;
+  border-radius: 14px;
+  background: #ffffff;
+}
+
+.review-section-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 15px;
+  margin-bottom: 18px;
+}
+
+.review-section-header h3 {
+  margin: 0 0 5px;
+  color: #18354d;
+  font-size: 17px;
+}
+
+.review-section-header p {
+  margin: 0;
+  color: #698093;
+  font-size: 12px;
+}
+
+.review-badge {
+  padding: 6px 10px;
+  border-radius: 20px;
+  background: #e8f7f6;
+  color: #078d8d;
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.review-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.review-item {
+  padding: 13px;
+  border-radius: 9px;
+  background: #f8fafb;
+}
+
+.review-item.full-review {
+  grid-column: 1 / -1;
+}
+
+.review-item span {
+  display: block;
+  margin-bottom: 5px;
+  color: #8a9daa;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.review-item strong {
+  display: block;
+  color: #18354d;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+
+/* ==========================================
+   DOCUMENTOS EN REVISIÓN
+   ========================================== */
+
+.review-documents {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.review-document {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 13px;
+  border: 1px solid #dce8ee;
+  border-radius: 9px;
+  background: #f8fafb;
+  color: #18354d;
+  font-size: 13px;
+}
+
+.document-status {
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: #079696;
+  color: white;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+
+/* ==========================================
+   AVISO DE ENVÍO
+   ========================================== */
+
+.submit-notice {
+  margin-top: 25px;
+  padding: 16px;
+  border: 1px solid #c9e8ef;
+  border-radius: 12px;
+  background: #f0fafc;
+}
+
+.submit-notice strong {
+  display: block;
+  margin-bottom: 5px;
+  color: #087c98;
+  font-size: 13px;
+}
+
+.submit-notice p {
+  margin: 0;
+  color: #607d8d;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+
+/* ==========================================
+   RESPONSIVE PASO 5
+   ========================================== */
+
+@media (max-width: 650px) {
+
+  .review-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .review-item.full-review {
+    grid-column: auto;
+  }
+
+  .review-section-header {
+    flex-direction: column;
+  }
+
+}
