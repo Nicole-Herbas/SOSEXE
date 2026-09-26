@@ -1939,3 +1939,62 @@
   </div>
 
 </div>
+
+<!-- ==========================================
+     MODAL - SOLICITUD ENVIADA
+     ========================================== -->
+
+@if (mostrarModalEnvio) {
+
+  <div
+    class="modal-overlay"
+    (click)="cerrarModalEnvio()"
+  >
+
+    <div
+      class="success-modal"
+      (click)="$event.stopPropagation()"
+    >
+
+      <!-- ICONO -->
+
+      <div class="success-icon">
+        ✓
+      </div>
+
+
+      <!-- CONTENIDO -->
+
+      <div class="success-content">
+
+        <h2>
+          ¡Solicitud enviada!
+        </h2>
+
+        <p>
+          Tu solicitud fue enviada correctamente.
+        </p>
+
+        <p class="success-description">
+          El equipo administrador revisará la información
+          proporcionada antes de publicar el centro.
+        </p>
+
+      </div>
+
+
+      <!-- ACCIÓN -->
+
+      <button
+        type="button"
+        class="success-button"
+        (click)="cerrarModalEnvio()"
+      >
+        Entendido
+      </button>
+
+    </div>
+
+  </div>
+
+}

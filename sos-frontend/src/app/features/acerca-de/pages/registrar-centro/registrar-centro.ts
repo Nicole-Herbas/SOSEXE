@@ -11,7 +11,7 @@ import { FormsModule } from '@angular/forms';
 export class RegistrarCentroComponent {
 
   currentStep = 1;
-
+  mostrarModalEnvio = false;
   // ==========================================
   // DATOS DEL CENTRO - PASO 1
   // ==========================================
@@ -280,7 +280,6 @@ enviarSolicitud(): void {
     },
 
     necesidades: this.necesidadesSeleccionadas,
-
     donaciones: this.donacionesSeleccionadas,
 
     voluntariado: {
@@ -292,12 +291,12 @@ enviarSolicitud(): void {
 
   console.log('Solicitud enviada:', solicitud);
 
-  alert(
-    'Solicitud enviada correctamente. ' +
-    'El equipo administrador revisará la información.'
-  );
+  this.mostrarModalEnvio = true;
 }
 
+cerrarModalEnvio(): void {
+  this.mostrarModalEnvio = false;
+}
   // ==========================================
   // DEPARTAMENTOS DE BOLIVIA
   // ==========================================
