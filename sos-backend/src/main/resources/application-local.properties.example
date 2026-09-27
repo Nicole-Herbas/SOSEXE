@@ -1,0 +1,22 @@
+# ==============================================================================
+# SOS.exe - Configuración Local del Desarrollador (PLANTILLA)
+# ==============================================================================
+# Instrucciones de uso:
+# 1. Copia este archivo en esta misma carpeta y renómbralo a:
+#    application-local.properties
+# 2. Modifica los valores con tus credenciales locales de MySQL y tu secreto JWT.
+# 3. NOTA DE SEGURIDAD:
+#    application-local.properties ya está excluido en .gitignore. NUNCA subas
+#    tus credenciales reales al repositorio remoto.
+# ==============================================================================
+
+# Credenciales de Base de Datos Local
+DB_URL=jdbc:mysql://localhost:3306/sos_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+DB_USERNAME=root
+DB_PASSWORD=tu_password_local_aqui
+
+# Secreto JWT para pruebas locales (debe tener al menos 256 bits para HMAC-SHA256)
+JWT_SECRET=sos-exe-desarrollo-local-secret-key-super-segura-2026-minimo-32-caracteres
+
+# Puerto del servidor (opcional, 8080 por defecto)
+# server.port=8080
