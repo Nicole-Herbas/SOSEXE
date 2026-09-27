@@ -7,6 +7,7 @@ import { Voluntariado } from './features/voluntariado/pages/voluntariado/volunta
 import { Noticias } from './features/noticias/pages/noticias/noticias';
 import { AcercaDe } from './features/acerca-de/pages/acerca-de/acerca-de';
 import { LoginComponent } from './features/auth/pages/login/login';
+import { RegistroComponent } from './features/auth/pages/registro/registro';
 import { adminGuard } from './admin-guard';
 
 export const routes: Routes = [
@@ -46,6 +47,10 @@ export const routes: Routes = [
   {
     path: 'login',
     component: LoginComponent
+  },
+  {
+    path: 'registro',
+    component: RegistroComponent
   },
   {
     path: 'admin',
