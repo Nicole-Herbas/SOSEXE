@@ -1,5 +1,6 @@
 package bo.edu.sos.backend.service;
 
+import bo.edu.sos.backend.constants.EstadoVerificacion;
 import bo.edu.sos.backend.dto.PuntoAyudaDTO;
 import bo.edu.sos.backend.entity.Departamento;
 import bo.edu.sos.backend.entity.Necesidad;
@@ -66,7 +67,7 @@ public class PuntoAyudaService {
 
         PuntoAyuda punto = new PuntoAyuda();
         copiarDTOaEntidad(dto, punto);
-        punto.setEstadoVerificacion("PENDIENTE");
+        punto.setEstadoVerificacion(EstadoVerificacion.PENDIENTE);
 
         PuntoAyuda guardado = puntoAyudaRepository.save(punto);
 
@@ -143,6 +144,8 @@ public class PuntoAyudaService {
 
         if (punto.getDepartamento() != null) {
             dto.setDepartamentoId(punto.getDepartamento().getId());
+            dto.setDepartamentoNombre(
+                    punto.getDepartamento().getNombre());
         }
 
         if (punto.getCreador() != null) {
@@ -153,6 +156,10 @@ public class PuntoAyudaService {
             dto.setNecesidadIds(
                     punto.getNecesidades().stream()
                             .map(Necesidad::getId)
+                            .toList());
+            dto.setNecesidadNombres(
+                    punto.getNecesidades().stream()
+                            .map(Necesidad::getNombre)
                             .toList());
         }
 

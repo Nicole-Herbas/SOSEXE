@@ -1,385 +1,179 @@
 <section class="pagina-mapa">
-
   <div class="encabezado-mapa">
-
     <div>
-      <span class="subtitulo">
-        Ayuda cerca de ti
-      </span>
-
-      <h1>
-        Mapa de ayuda y emergencias
-      </h1>
-
-      <p>
-        Encuentra centros, refugios, puntos de donación y emergencias.
-        Filtra también por los artículos que necesitas entregar.
-      </p>
+      <span class="subtitulo">{{ textos.subtitulo }}</span>
+      <h1>{{ textos.titulo }}</h1>
+      <p>{{ textos.descripcion }}</p>
     </div>
 
     <div class="contador-verificados">
-      7 puntos verificados en el prototipo
+      {{ contadorVerificados() }}
     </div>
-
   </div>
 
-
-  <div class="filtros-tipo">
-
-    <button class="filtro activo">
-      Todos
-    </button>
-
-    <button class="filtro">
-      <span class="punto azul"></span>
-      Centros de apoyo
-    </button>
-
-    <button class="filtro">
-      <span class="punto verde"></span>
-      Refugios
-    </button>
-
-    <button class="filtro">
-      <span class="punto amarillo"></span>
-      Puntos de donación
-    </button>
-
-    <button class="filtro">
-      <span class="punto rojo"></span>
-      Emergencias
-    </button>
-
-  </div>
-
+  @if (featureToggles.mapa.filtros) {
+    <div class="filtros-tipo">
+      @for (filtro of filtrosTipo; track filtro.id) {
+        <button
+          type="button"
+          class="filtro"
+          [class.activo]="filtroTipoActivo() === filtro.id"
+          [attr.data-filtro-tipo]="filtro.id"
+          (click)="seleccionarFiltroTipo(filtro.id)"
+        >
+          @if (filtro.color) {
+            <span class="punto {{ filtro.color }}"></span>
+          }
+          {{ filtro.etiqueta }}
+        </button>
+      }
+    </div>
+  }
 
   <section class="contenedor-mapa">
-
+  @if (featureToggles.mapa.mostrarLista) {
     <aside class="columna-izquierda">
-
       <div class="bloque-busqueda">
-
-        <label>
-          Buscar por ciudad o nombre
-        </label>
-
+        <label>{{ textos.buscarEtiqueta }}</label>
         <input
           type="text"
-          placeholder="Ej.: Cochabamba o San José"
-        >
-
+          [placeholder]="textos.buscarPlaceholder"
+          (input)="actualizarBusqueda($event)"
+        />
       </div>
 
+      @if (featureToggles.mapa.filtros) {
+        <div class="bloque-filtros">
+          <label>{{ textos.necesidadesEtiqueta }}</label>
 
-      <div class="bloque-filtros">
-
-        <label>
-          ¿Qué deseas donar o encontrar?
-        </label>
-
-        <div class="filtros-necesidades">
-
-          <button class="necesidad activa">
-            Todas
-          </button>
-
-          <button class="necesidad">
-            💧 Agua
-          </button>
-
-          <button class="necesidad">
-            ◉ Alimentos
-          </button>
-
-          <button class="necesidad">
-            ✦ Higiene
-          </button>
-
-          <button class="necesidad">
-            ✚ Medicinas
-          </button>
-
+          <div class="filtros-necesidades">
+            @for (filtro of filtrosNecesidad; track filtro.id) {
+              <button
+                type="button"
+                class="necesidad"
+                [class.activo]="filtroNecesidadActivo() === filtro.id"
+                [attr.data-filtro-necesidad]="filtro.id"
+                (click)="seleccionarFiltroNecesidad(filtro.id)"
+              >
+                {{ filtro.etiqueta }}
+              </button>
+            }
+          </div>
         </div>
 
-      </div>
-
-
-      <div class="separador"></div>
-
+        <div class="separador"></div>
+      }
 
       <div class="resultados-header">
-
-        <h3>
-          Resultados
-        </h3>
-
-        <span class="cantidad-resultados">
-          8
-        </span>
-
+        <h3>{{ textos.resultadosTitulo }}</h3>
+        <span class="cantidad-resultados">{{ puntosFiltrados().length }}</span>
       </div>
-
 
       <div class="lista-resultados">
+        @if (cargando()) {
+          <p class="mensaje-estado">{{ textos.cargando }}</p>
+        } @else if (error()) {
+          <p class="mensaje-estado error">{{ error() }}</p>
+        } @else if (puntosFiltrados().length === 0) {
+          <p class="mensaje-estado">{{ textos.sinResultados }}</p>
+        } @else {
+          @for (punto of puntosFiltrados(); track punto.id) {
+            <article
+              class="resultado-card"
+              [class.seleccionado]="puntoSeleccionado()?.id === punto.id && puntoSeleccionado()?.origen === punto.origen"
+              (click)="seleccionarPunto(punto)"
+            >
+              <div class="etiquetas-card">
+                <span class="tag {{ obtenerClaseTipo(punto.tipo) }}">{{ obtenerEtiquetaTipo(punto.tipo) }}</span>
+                @if (estaVerificado(punto)) {
+                  <span class="verificado">{{ textos.verificado }}</span>
+                }
+              </div>
 
-        <article class="resultado-card seleccionado">
+              <h4>{{ punto.nombre }}</h4>
+              <p class="ubicacion">{{ punto.ciudad }} · {{ punto.departamentoNombre }}</p>
 
-          <div class="etiquetas-card">
-
-            <span class="tag">
-              Centro de apoyo
-            </span>
-
-            <span class="verificado">
-              ✓ Verificado
-            </span>
-
-          </div>
-
-          <h4>
-            Centro de Apoyo San José
-          </h4>
-
-          <p class="ubicacion">
-            Cochabamba · Cochabamba
-          </p>
-
-          <div class="mini-tags">
-
-            <span>💧 Agua</span>
-            <span>◉ Alimentos</span>
-            <span>✚ Medicinas</span>
-
-          </div>
-
-          <small>
-            Actualizado hace 3 días
-          </small>
-
-        </article>
-
-
-        <article class="resultado-card">
-
-          <div class="etiquetas-card">
-
-            <span class="tag">
-              Centro de apoyo
-            </span>
-
-            <span class="verificado">
-              ✓ Verificado
-            </span>
-
-          </div>
-
-          <h4>
-            Centro Comunitario La Paz
-          </h4>
-
-          <p class="ubicacion">
-            La Paz · La Paz
-          </p>
-
-          <div class="mini-tags">
-
-            <span>▭ Ropa</span>
-            <span>✦ Higiene</span>
-            <span>● Voluntarios</span>
-
-          </div>
-
-          <small>
-            Actualizado hace 5 días
-          </small>
-
-        </article>
-
-
-        <article class="resultado-card">
-
-          <div class="etiquetas-card">
-
-            <span class="tag refugio">
-              Refugio
-            </span>
-
-            <span class="verificado">
-              ✓ Verificado
-            </span>
-
-          </div>
-
-          <h4>
-            Refugio Temporal Santa Cruz
-          </h4>
-
-          <p class="ubicacion">
-            Santa Cruz · Santa Cruz
-          </p>
-
-          <div class="mini-tags">
-
-            <span>💧 Agua</span>
-            <span>▭ Ropa</span>
-
-          </div>
-
-          <small>
-            Actualizado recientemente
-          </small>
-
-        </article>
-
+              <div class="mini-tags">
+                @for (necesidad of punto.necesidades; track necesidad) {
+                  <span>{{ necesidad }}</span>
+                }
+              </div>
+            </article>
+          }
+        }
       </div>
-
     </aside>
+  }
 
+    @if (featureToggles.mapa.mostrarMapa) {
+      <main class="columna-mapa">
+        <app-mapa-leaflet
+          [puntos]="puntosFiltrados()"
+          [puntoSeleccionado]="puntoSeleccionado()"
+          (puntoClick)="seleccionarPunto($event)"
+        ></app-mapa-leaflet>
+        <div class="mensaje-mapa">{{ textos.mensajeMapa }}</div>
+      </main>
+    }
 
-    <main class="columna-mapa">
+    @if (featureToggles.mapa.mostrarDetalle && puntoSeleccionado()) {
+      <aside class="columna-derecha">
+        <div class="detalle-card">
+          <button class="cerrar-detalle" (click)="cerrarDetalle()">✕</button>
 
-      <app-mapa-leaflet></app-mapa-leaflet>
-
-      <div class="mensaje-mapa">
-        Mapa interactivo · Implementado con Leaflet
-      </div>
-
-    </main>
-
-
-    <aside class="columna-derecha">
-
-      <div class="detalle-card">
-
-        <div class="detalle-etiquetas">
-
-          <span class="tag">
-            Centro de apoyo
-          </span>
-
-          <span class="tag-verificado">
-            ✓ Punto verificado
-          </span>
-
-        </div>
-
-
-        <h2>
-          Centro de Apoyo San José
-        </h2>
-
-        <p class="detalle-ubicacion">
-          Cochabamba, Cochabamba
-        </p>
-
-
-        <p class="descripcion">
-          Centro comunitario de recepción y distribución
-          de ayuda para familias afectadas.
-        </p>
-
-
-        <div class="informacion-verificada">
-          Información comprobada hace 3 días
-        </div>
-
-
-        <div class="detalle-dato">
-
-          <span>
-            Dirección
-          </span>
-
-          <p>
-            Av. Blanco Galindo, zona oeste
-          </p>
-
-        </div>
-
-
-        <div class="detalle-dato">
-
-          <span>
-            Horario o estado
-          </span>
-
-          <p>
-            Lun–Sáb · 08:00–18:00
-          </p>
-
-        </div>
-
-
-        <div class="detalle-dato">
-
-          <span>
-            Contacto
-          </span>
-
-          <p>
-            +591 70700001
-          </p>
-
-        </div>
-
-
-        <div class="detalle-dato">
-
-          <span>
-            Necesidades prioritarias
-          </span>
-
-          <div class="mini-tags">
-
-            <span>💧 Agua</span>
-            <span>◉ Alimentos</span>
-            <span>✚ Medicinas</span>
-
+          <div class="detalle-etiquetas">
+            <span class="tag {{ obtenerClaseTipo(puntoSeleccionado()!.tipo) }}">{{ obtenerEtiquetaTipo(puntoSeleccionado()!.tipo) }}</span>
+            @if (estaVerificado(puntoSeleccionado()!)) {
+              <span class="tag-verificado">{{ textos.verificado }}</span>
+            } @else {
+              <span class="tag-verificado pendiente">{{ textos.verificacionPendiente }}</span>
+            }
           </div>
 
-        </div>
+          <h2>{{ puntoSeleccionado()!.nombre }}</h2>
+          <p class="detalle-ubicacion">{{ puntoSeleccionado()!.ciudad }}, {{ puntoSeleccionado()!.departamentoNombre }}</p>
 
+          @if (puntoSeleccionado()!.descripcion) {
+            <p class="descripcion">{{ puntoSeleccionado()!.descripcion }}</p>
+          }
 
-        <div class="detalle-dato">
-
-          <span>
-            Donaciones que acepta
-          </span>
-
-          <div class="mini-tags">
-
-            <span>💧 Agua</span>
-            <span>◉ Alimentos</span>
-            <span>✦ Higiene</span>
-            <span>✚ Medicinas</span>
-            <span>▭ Ropa</span>
-
+          <div class="informacion-verificada">
+            {{ detalleEtiquetas.informacionVerificada }}
           </div>
 
+          @if (puntoSeleccionado()!.direccion) {
+            <div class="detalle-dato">
+              <span>{{ detalleEtiquetas.direccionEtiqueta }}</span>
+              <p>{{ puntoSeleccionado()!.direccion }}</p>
+            </div>
+          }
+
+          @if (puntoSeleccionado()!.telefono) {
+            <div class="detalle-dato">
+              <span>{{ detalleEtiquetas.contactoEtiqueta }}</span>
+              <p>{{ puntoSeleccionado()!.telefono }}</p>
+            </div>
+          }
+
+          @if (puntoSeleccionado()!.necesidades?.length) {
+            <div class="detalle-dato">
+              <span>{{ detalleEtiquetas.necesidadesEtiqueta }}</span>
+              <div class="mini-tags">
+                @for (necesidad of puntoSeleccionado()!.necesidades; track necesidad) {
+                  <span>{{ necesidad }}</span>
+                }
+              </div>
+            </div>
+          }
+
+          <div class="acciones">
+            <button class="boton-secundario">{{ detalleEtiquetas.comoLlegar }}</button>
+            <button class="boton-principal">{{ detalleEtiquetas.verCentro }}</button>
+          </div>
+
+          <button class="reportar">{{ detalleEtiquetas.reportar }}</button>
         </div>
-
-
-        <div class="acciones">
-
-          <button class="boton-secundario">
-            Cómo llegar
-          </button>
-
-          <button class="boton-principal">
-            Ver centro
-          </button>
-
-        </div>
-
-
-        <button class="reportar">
-          Reportar información incorrecta
-        </button>
-
-      </div>
-
-    </aside>
-
+      </aside>
+    }
   </section>
-
 </section>

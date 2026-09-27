@@ -1,38 +1,55 @@
-
-
 @if (cargando()) {
 
-  <p>Cargando centros...</p>
+  <p>
+    {{ textos.cargando }}
+  </p>
 
 } @else if (error()) {
 
-  <p>{{ error() }}</p>
+  <p>
+    {{ error() }}
+  </p>
 
 } @else if (centros().length === 0) {
 
-  <p>No hay centros registrados.</p>
+  <p>
+    {{ textos.vacio }}
+  </p>
 
 } @else {
 
   @for (centro of centros(); track centro.id) {
 
     <div>
-      <h2>{{ centro.nombre }}</h2>
+
+      <h2>
+        {{ centro.nombre }}
+      </h2>
 
       <p>
-        <strong>Tipo:</strong>
+        <strong>
+          {{ textos.tipo }}
+        </strong>
+
         {{ centro.tipo }}
       </p>
 
       <p>
-        <strong>Ciudad:</strong>
+        <strong>
+          {{ textos.ciudad }}
+        </strong>
+
         {{ centro.ciudad }}
       </p>
 
       <p>
-        <strong>Dirección:</strong>
+        <strong>
+          {{ textos.direccion }}
+        </strong>
+
         {{ centro.direccion }}
       </p>
+
     </div>
 
   }

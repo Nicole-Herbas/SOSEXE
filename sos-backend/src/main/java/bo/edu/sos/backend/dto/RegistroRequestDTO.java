@@ -21,7 +21,5 @@ public class RegistroRequestDTO {
 
     private String telefono;
     
-    // Solo pedimos el ID del departamento y rol, no todo el objeto
     private Long departamentoId; 
-    private Long rolId;
 }

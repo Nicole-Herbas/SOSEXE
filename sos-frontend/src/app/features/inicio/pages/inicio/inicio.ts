@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { APP_TEXTOS } from '../../../../shared/constants/app-textos.constants';
 
 interface NewsItem {
   category: string;
@@ -17,6 +18,8 @@ interface NewsItem {
   templateUrl: './inicio.html',
 })
 export class Inicio {
+  readonly textos = APP_TEXTOS.inicio;
+  
   newsFilters = ['Todas', 'Incendios', 'Inundaciones', 'Sequías', 'Comunidad'];
   activeFilter = 'Todas';
 

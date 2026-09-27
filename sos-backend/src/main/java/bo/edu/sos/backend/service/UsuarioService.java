@@ -11,6 +11,7 @@ import bo.edu.sos.backend.repository.RolRepository;
 import bo.edu.sos.backend.repository.UsuarioRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.List;
 
@@ -20,15 +21,18 @@ public class UsuarioService {
     private final UsuarioRepository usuarioRepository;
     private final RolRepository rolRepository;
     private final DepartamentoRepository departamentoRepository;
+    private final PasswordEncoder passwordEncoder;
 
     public UsuarioService(
             UsuarioRepository usuarioRepository,
             RolRepository rolRepository,
-            DepartamentoRepository departamentoRepository) {
+            DepartamentoRepository departamentoRepository,
+            PasswordEncoder passwordEncoder) {
 
         this.usuarioRepository = usuarioRepository;
         this.rolRepository = rolRepository;
         this.departamentoRepository = departamentoRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Transactional(readOnly = true)
@@ -109,7 +113,8 @@ public class UsuarioService {
         usuario.setTelefono(dto.getTelefono());
 
         if (dto.getPassword() != null && !dto.getPassword().isBlank()) {
-            usuario.setPassword(dto.getPassword());
+            usuario.setPassword(passwordEncoder.encode(dto.getPassword())
+);
         }
 
         if (dto.getActivo() != null) {

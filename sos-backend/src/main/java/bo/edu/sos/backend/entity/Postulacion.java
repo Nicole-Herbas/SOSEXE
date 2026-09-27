@@ -1,5 +1,6 @@
 package bo.edu.sos.backend.entity;
 
+import bo.edu.sos.backend.constants.EstadoPostulacion;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -33,7 +34,7 @@ public class Postulacion {
     private LocalDateTime fechaPostulacion;
 
     @Column(nullable = false, length = 30)
-    private String estado = "PENDIENTE";
+    private String estado = EstadoPostulacion.PENDIENTE;
 
     @Column(length = 255)
     private String disponibilidad;

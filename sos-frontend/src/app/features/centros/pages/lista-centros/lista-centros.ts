@@ -2,6 +2,7 @@ import { Component, inject, OnInit, signal } from '@angular/core';
 
 import { CentroService } from '../../services/centro';
 import { Centro } from '../../models/centro';
+import { APP_TEXTOS } from '../../../../shared/constants/app-textos.constants';
 
 @Component({
   selector: 'app-lista-centros',
@@ -10,6 +11,8 @@ import { Centro } from '../../models/centro';
   styleUrl: './lista-centros.scss'
 })
 export class ListaCentros implements OnInit {
+
+  readonly textos = APP_TEXTOS.centros;
 
   private centroService = inject(CentroService);
 
@@ -38,7 +41,9 @@ export class ListaCentros implements OnInit {
       error: (error) => {
         console.error('Error cargando centros:', error);
 
-        this.error.set('No se pudieron cargar los centros');
+        this.error.set(
+  this.textos.errorCarga
+);
         this.cargando.set(false);
       }
 

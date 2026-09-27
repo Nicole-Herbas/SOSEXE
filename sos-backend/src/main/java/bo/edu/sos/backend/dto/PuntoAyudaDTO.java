@@ -55,4 +55,8 @@ public class PuntoAyudaDTO {
     private Long creadorId;
 
     private List<Long> necesidadIds;
+
+    private String departamentoNombre;
+
+    private List<String> necesidadNombres;
 }

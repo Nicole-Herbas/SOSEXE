@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { APP_TEXTOS } from '../../../../shared/constants/app-textos.constants';
 
 @Component({
   imports: [],
@@ -7,4 +8,7 @@ import { Component } from '@angular/core';
   templateUrl: './noticias.html',
 })
 export class Noticias {
+
+  readonly textos =
+    APP_TEXTOS.noticias;
 }

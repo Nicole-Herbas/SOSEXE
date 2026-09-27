@@ -5,6 +5,7 @@ import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.security.core.Authentication;
 
 import java.time.LocalDateTime;
 
@@ -18,7 +19,6 @@ public class PostulacionDTO {
     @NotNull(message = "El voluntariado es obligatorio")
     private Long voluntariadoId;
 
-    @NotNull(message = "El usuario es obligatorio")
     private Long usuarioId;
 
     private LocalDateTime fechaPostulacion;

@@ -1,8 +1,10 @@
 package bo.edu.sos.backend.service;
 
+import bo.edu.sos.backend.constants.EstadoVerificacion;
 import bo.edu.sos.backend.dto.CentroDTO;
 import bo.edu.sos.backend.entity.Centro;
 import bo.edu.sos.backend.entity.Departamento;
+import bo.edu.sos.backend.entity.Necesidad;
 import bo.edu.sos.backend.entity.Usuario;
 import bo.edu.sos.backend.exception.ResourceNotFoundException;
 import bo.edu.sos.backend.repository.CentroRepository;
@@ -54,7 +56,7 @@ public class CentroService {
         copiarDTOaEntidad(dto, centro);
 
         // Al crear un centro, queda pendiente de verificación.
-        centro.setEstadoVerificacion("PENDIENTE");
+        centro.setEstadoVerificacion(EstadoVerificacion.PENDIENTE);
 
         Centro guardado = centroRepository.save(centro);
 
@@ -137,11 +139,24 @@ public class CentroService {
         if (centro.getDepartamento() != null) {
             dto.setDepartamentoId(
                     centro.getDepartamento().getId());
+            dto.setDepartamentoNombre(
+                    centro.getDepartamento().getNombre());
         }
 
         if (centro.getResponsable() != null) {
             dto.setResponsableId(
                     centro.getResponsable().getId());
+        }
+
+        if (centro.getNecesidades() != null) {
+            dto.setNecesidadIds(
+                    centro.getNecesidades().stream()
+                            .map(Necesidad::getId)
+                            .toList());
+            dto.setNecesidadNombres(
+                    centro.getNecesidades().stream()
+                            .map(Necesidad::getNombre)
+                            .toList());
         }
 
         return dto;

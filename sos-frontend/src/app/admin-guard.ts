@@ -1,16 +1,55 @@
-import { CanActivateFn, Router } from '@angular/router';
+import {
+  CanActivateFn,
+  Router
+} from '@angular/router';
+
 import { inject } from '@angular/core';
 
-export const adminGuard: CanActivateFn = (route, state) => {
-  const router = inject(Router);
-  
-  const rol = localStorage.getItem('rol'); 
+import {
+  catchError,
+  map,
+  of
+} from 'rxjs';
 
-  if (rol === 'ADMINISTRADOR') {
-    return true; 
-  } else {
-    alert('Acceso denegado. Solo administradores.');
-    router.navigate(['/mapa']); 
-    return false;
-  }
+import {
+  AuthService
+} from './features/auth/services/auth.service';
+
+
+export const adminGuard: CanActivateFn = () => {
+
+  const router = inject(Router);
+
+  const authService =
+    inject(AuthService);
+
+
+  return authService
+    .usuarioActual()
+    .pipe(
+
+      map(usuario => {
+
+        if (usuario.rol === 'ADMIN') {
+          return true;
+        }
+
+        return router.createUrlTree([
+          '/mapa'
+        ]);
+
+      }),
+
+
+      catchError(() => {
+
+        return of(
+          router.createUrlTree([
+            '/login'
+          ])
+        );
+
+      })
+
+    );
 };
