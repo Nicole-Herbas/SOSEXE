@@ -44,11 +44,6 @@ export class LoginComponent implements OnInit {
 
         next: (respuesta) => {
 
-          localStorage.setItem(
-            'token',
-            respuesta.token
-          );
-
           if (respuesta.rol === 'ADMIN') {
 
             this.router.navigate([
@@ -58,7 +53,7 @@ export class LoginComponent implements OnInit {
           } else {
 
             this.router.navigate([
-              '/centros'
+              '/inicio'
             ]);
 
           }

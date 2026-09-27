@@ -1,6 +1,6 @@
-import { Injectable } from '@angular/core';
+﻿import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { BehaviorSubject, Observable, tap } from 'rxjs';
 
 import { LoginRequest } from '../models/login-request';
 import { AuthResponse } from '../models/auth-response';
@@ -14,18 +14,53 @@ export class AuthService {
 
   private apiUrl = '/api/auth';
 
+  private readonly STORAGE_TOKEN  = 'token';
+  private readonly STORAGE_NOMBRE = 'usuario_nombre';
+  private readonly STORAGE_EMAIL  = 'usuario_email';
+
+  private sesionActiva$ = new BehaviorSubject<boolean>(
+    this.estaAutenticado()
+  );
+
+  readonly sesion$ = this.sesionActiva$.asObservable();
+
   constructor(private http: HttpClient) {}
+
 
   login(
     credenciales: LoginRequest
   ): Observable<AuthResponse> {
 
-    return this.http.post<AuthResponse>(
-      `${this.apiUrl}/login`,
-      credenciales
-    );
+    return this.http
+      .post<AuthResponse>(
+        `${this.apiUrl}/login`,
+        credenciales
+      )
+      .pipe(
+        tap(respuesta => {
+
+          localStorage.setItem(
+            this.STORAGE_TOKEN,
+            respuesta.token
+          );
+
+          localStorage.setItem(
+            this.STORAGE_NOMBRE,
+            respuesta.nombre
+          );
+
+          localStorage.setItem(
+            this.STORAGE_EMAIL,
+            respuesta.email
+          );
+
+          this.sesionActiva$.next(true);
+
+        })
+      );
 
   }
+
 
   registrar(
     datos: RegistroRequest
@@ -39,6 +74,7 @@ export class AuthService {
 
   }
 
+
   usuarioActual(): Observable<AuthUser> {
 
     return this.http.get<AuthUser>(
@@ -46,6 +82,7 @@ export class AuthService {
     );
 
   }
+
 
   refrescarToken(): Observable<AuthResponse> {
 
@@ -57,6 +94,8 @@ export class AuthService {
       }
     );
   }
+
+
   logout(): Observable<void> {
 
     return this.http.post<void>(
@@ -65,7 +104,31 @@ export class AuthService {
       {
         withCredentials: true
       }
+    ).pipe(
+      tap(() => {
+
+        localStorage.removeItem(this.STORAGE_TOKEN);
+        localStorage.removeItem(this.STORAGE_NOMBRE);
+        localStorage.removeItem(this.STORAGE_EMAIL);
+
+        this.sesionActiva$.next(false);
+
+      })
     );
+
+  }
+
+
+  estaAutenticado(): boolean {
+
+    return !!localStorage.getItem(this.STORAGE_TOKEN);
+
+  }
+
+
+  obtenerNombreUsuario(): string {
+
+    return localStorage.getItem(this.STORAGE_NOMBRE) ?? '';
 
   }
 
