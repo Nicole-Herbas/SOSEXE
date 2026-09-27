@@ -26,4 +26,30 @@ describe('RegistrarCentroComponent', () => {
   it('should not allow continuing with empty required fields', () => {
     expect(component.paso1Valido).toBeFalsy();
   });
+
+  it('should validate step 4 when required options are selected', () => {
+    component.necesidadesSeleccionadas = ['Alimentos'];
+    component.donacionesSeleccionadas = ['Ropa'];
+    component.solicitaVoluntarios = false;
+
+    expect(component.paso4Valido).toBeTruthy();
+  });
+
+  it('should not validate step 4 when volunteer activities are missing', () => {
+    component.necesidadesSeleccionadas = ['Alimentos'];
+    component.donacionesSeleccionadas = ['Ropa'];
+    component.solicitaVoluntarios = true;
+    component.actividadesSeleccionadas = [];
+
+    expect(component.paso4Valido).toBeFalsy();
+  });
+
+  it('should validate step 4 when volunteer activities are selected', () => {
+    component.necesidadesSeleccionadas = ['Alimentos'];
+    component.donacionesSeleccionadas = ['Ropa'];
+    component.solicitaVoluntarios = true;
+    component.actividadesSeleccionadas = ['Logística'];
+
+    expect(component.paso4Valido).toBeTruthy();
+  });
 });
