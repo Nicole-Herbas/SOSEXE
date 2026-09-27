@@ -5,6 +5,7 @@ import { Observable } from 'rxjs';
 import { LoginRequest } from '../models/login-request';
 import { AuthResponse } from '../models/auth-response';
 import { AuthUser } from '../models/auth-user';
+import { RegistroRequest } from '../models/registro-request';
 
 @Injectable({
   providedIn: 'root'
@@ -22,6 +23,18 @@ export class AuthService {
     return this.http.post<AuthResponse>(
       `${this.apiUrl}/login`,
       credenciales
+    );
+
+  }
+
+  registrar(
+    datos: RegistroRequest
+  ): Observable<string> {
+
+    return this.http.post(
+      `${this.apiUrl}/registro`,
+      datos,
+      { responseType: 'text' }
     );
 
   }
