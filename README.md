@@ -1,4 +1,4 @@
-# 🚨 SOS.exe — Plataforma de Coordinación de Emergencias y Ayuda Humanitaria
+# SOS.exe — Plataforma de Coordinación de Emergencias y Ayuda Humanitaria
 
 [![Spring Boot](https://img.shields.io/badge/Spring_Boot-4.1.1-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)](https://spring.io/projects/spring-boot)
 [![Angular](https://img.shields.io/badge/Angular-22.1.0-DD0031?style=for-the-badge&logo=angular&logoColor=white)](https://angular.dev/)
@@ -12,7 +12,7 @@ Proyecto desarrollado para la materia de **Taller de Sistemas de Información** 
 
 ---
 
-## 📋 Tabla de Contenidos
+## Tabla de Contenidos
 
 - [Módulos y Características](#-módulos-y-características)
 - [Arquitectura del Sistema](#-arquitectura-del-sistema)
@@ -30,14 +30,14 @@ Proyecto desarrollado para la materia de **Taller de Sistemas de Información** 
 
 ## 🌟 Módulos y Características
 
-| Módulo | Descripción |
-| :--- | :--- |
-| 🗺️ **Mapa Interactivo** | Visualización georreferenciada con **Leaflet** de centros de acopio, albergues, puntos de auxilio y zonas críticas en tiempo real. |
-| 🏢 **Centros de Ayuda** | Administración y verificación de centros de acopio y albergues con su respectiva capacidad, responsable y necesidades. |
-| 🤝 **Voluntariado y Postulaciones** | Publicación de convocatorias de voluntariado, postulación de ciudadanos y gestión del estado de solicitudes. |
-| 📦 **Donaciones** | Registro, categorización y trazabilidad de aportes materiales y monetarios para damnificados y centros. |
-| 📢 **Alertas y Noticias** | Emisión de avisos urgentes y comunicados oficiales para mantener a la población y brigadas informadas. |
-| 🔐 **Seguridad y Control de Acceso** | Autenticación basada en **JWT** (con *Access Token* de corta duración y *Refresh Token* rotativo) y control por roles (`ADMIN` y `USER`). |
+| Módulo                            | Descripción                                                                                                                               |
+| :-------------------------------- | :---------------------------------------------------------------------------------------------------------------------------------------- |
+| **Mapa Interactivo**              | Visualización georreferenciada con **Leaflet** de centros de acopio, albergues, puntos de auxilio y zonas críticas en tiempo real.        |
+| **Centros de Ayuda**              | Administración y verificación de centros de acopio y albergues con su respectiva capacidad, responsable y necesidades.                    |
+| **Voluntariado y Postulaciones**  | Publicación de convocatorias de voluntariado, postulación de ciudadanos y gestión del estado de solicitudes.                              |
+| **Donaciones**                    | Registro, categorización y trazabilidad de aportes materiales y monetarios para damnificados y centros.                                   |
+| **Alertas y Noticias**            | Emisión de avisos urgentes y comunicados oficiales para mantener a la población y brigadas informadas.                                    |
+| **Seguridad y Control de Acceso** | Autenticación basada en **JWT** (con _Access Token_ de corta duración y _Refresh Token_ rotativo) y control por roles (`ADMIN` y `USER`). |
 
 ---
 
@@ -104,11 +104,13 @@ CREATE DATABASE IF NOT EXISTS sos_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unico
 ### 2. Configuración y Ejecución del Backend (Spring Boot)
 
 #### A. Navegar al directorio del backend
+
 ```bash
 cd sos-backend
 ```
 
 #### B. Configurar las credenciales locales
+
 Copia el archivo de plantilla `application-local.properties.example` y renómbralo a `application-local.properties`:
 
 - **En Windows (PowerShell):**
@@ -121,6 +123,7 @@ Copia el archivo de plantilla `application-local.properties.example` y renómbra
   ```
 
 Abre `src/main/resources/application-local.properties` y coloca tu contraseña y usuario local de MySQL:
+
 ```properties
 DB_URL=jdbc:mysql://localhost:3306/sos_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
 DB_USERNAME=root
@@ -132,6 +135,7 @@ JWT_SECRET=sos-exe-desarrollo-local-secret-key-super-segura-2026-minimo-32-carac
 > El archivo `application-local.properties` está explícitamente excluido en el `.gitignore`. Tus contraseñas locales nunca se subirán a GitHub.
 
 #### C. Iniciar el servidor Spring Boot
+
 - **En Windows:**
   ```cmd
   mvnw.cmd spring-boot:run
@@ -142,6 +146,7 @@ JWT_SECRET=sos-exe-desarrollo-local-secret-key-super-segura-2026-minimo-32-carac
   ```
 
 El backend iniciará en el puerto **`8080`**. Puedes comprobar que está operativo visitando la documentación interactiva de Swagger:
+
 - **Swagger UI**: [http://localhost:8080/swagger-ui/index.html](http://localhost:8080/swagger-ui/index.html)
 - **OpenAPI JSON**: [http://localhost:8080/v3/api-docs](http://localhost:8080/v3/api-docs)
 
@@ -156,15 +161,18 @@ cd sos-frontend
 ```
 
 #### A. Instalar dependencias
+
 ```bash
 npm install
 ```
 
 #### B. Iniciar el servidor de desarrollo
+
 ```bash
 npm start
 ```
-*(Este comando ejecuta internamente `ng serve`, el cual ya incluye la configuración del proxy de desarrollo).*
+
+_(Este comando ejecuta internamente `ng serve`, el cual ya incluye la configuración del proxy de desarrollo)._
 
 Una vez compilado, abre tu navegador web en:
 👉 **[http://localhost:4200](http://localhost:4200)**
@@ -173,7 +181,7 @@ Una vez compilado, abre tu navegador web en:
 
 ## 🔄 Funcionamiento del Proxy de Desarrollo
 
-Para evitar problemas de **CORS** (*Cross-Origin Resource Sharing*) durante el desarrollo local, el frontend cuenta con el archivo `proxy.conf.json`:
+Para evitar problemas de **CORS** (_Cross-Origin Resource Sharing_) durante el desarrollo local, el frontend cuenta con el archivo `proxy.conf.json`:
 
 ```json
 {
@@ -227,7 +235,9 @@ ProyectoSos/
 ## 🧪 Pruebas Automatizadas
 
 ### Backend
+
 Para ejecutar la suite de pruebas unitarias y de integración del backend:
+
 ```bash
 cd sos-backend
 ./mvnw test        # En Linux / macOS
@@ -235,7 +245,9 @@ mvnw.cmd test      # En Windows
 ```
 
 ### Frontend
+
 Para ejecutar las pruebas unitarias del frontend con **Vitest**:
+
 ```bash
 cd sos-frontend
 npm test
