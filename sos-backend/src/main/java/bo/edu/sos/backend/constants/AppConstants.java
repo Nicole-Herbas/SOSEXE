@@ -18,7 +18,8 @@ package bo.edu.sos.backend.constants;
  * ├── EstadoPostulacion.java  ← estados de postulación (Postulacion)
  * ├── EstadoEnvioSms.java     ← estados de envío SMS (EnvioSms)
  * ├── MapaConstants.java      ← constantes del módulo Mapa (origen de puntos)
- * └── DonacionConstants.java  ← constantes del módulo Donación (prefijo código)
+ * ├── DonacionConstants.java  ← constantes del módulo Donación (prefijo código)
+ * └── NoticiaConstants.java   ← estados, categorías y URL de API externa de noticias
  * </pre>
  *
  * <h2>Cómo agregar nuevas constantes</h2>
