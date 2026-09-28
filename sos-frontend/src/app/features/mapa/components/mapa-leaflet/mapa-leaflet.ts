@@ -14,6 +14,7 @@ import {
 import * as L from 'leaflet';
 import { PuntoMapa } from '../../models/punto-mapa.model';
 
+
 const COLORES_MARCADOR: Record<string, string> = {
   CENTRO_APOYO: '#218aa0',
   REFUGIO: '#149b8c',
@@ -24,23 +25,33 @@ const COLORES_MARCADOR: Record<string, string> = {
 const COLOR_SELECCIONADO = '#0d6efd';
 const COLOR_DEFAULT = '#218aa0';
 
+
 @Component({
   selector: 'app-mapa-leaflet',
   imports: [],
   templateUrl: './mapa-leaflet.html',
   styleUrl: './mapa-leaflet.scss'
 })
-export class MapaLeaflet implements AfterViewInit, OnDestroy, OnChanges {
+export class MapaLeaflet
+  implements AfterViewInit, OnDestroy, OnChanges {
 
   @ViewChild('mapa')
   mapaElement!: ElementRef<HTMLDivElement>;
 
-  @Input() puntos: PuntoMapa[] = [];
-  @Input() puntoSeleccionado: PuntoMapa | null = null;
-  @Output() puntoClick = new EventEmitter<PuntoMapa>();
+  @Input()
+  puntos: PuntoMapa[] = [];
+
+  @Input()
+  puntoSeleccionado: PuntoMapa | null = null;
+
+  @Output()
+  puntoClick = new EventEmitter<PuntoMapa>();
+
 
   private mapa?: L.Map;
-  private marcadores: L.CircleMarker[] = [];
+
+  private marcadores: L.Marker[] = [];
+
 
   ngAfterViewInit(): void {
 
@@ -51,6 +62,7 @@ export class MapaLeaflet implements AfterViewInit, OnDestroy, OnChanges {
       6
     );
 
+
     L.tileLayer(
       'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
       {
@@ -59,68 +71,172 @@ export class MapaLeaflet implements AfterViewInit, OnDestroy, OnChanges {
       }
     ).addTo(this.mapa);
 
+
     this.renderizarMarcadores();
+
+
+    this.centrarEnPuntoSeleccionado();
   }
 
-  ngOnChanges(changes: SimpleChanges): void {
-    if (!this.mapa) return;
 
-    if (changes['puntos'] || changes['puntoSeleccionado']) {
+  ngOnChanges(changes: SimpleChanges): void {
+
+    if (!this.mapa) {
+      return;
+    }
+
+
+    if (
+      changes['puntos'] ||
+      changes['puntoSeleccionado']
+    ) {
+
       this.renderizarMarcadores();
+    }
+
+
+    if (changes['puntoSeleccionado']) {
+
+      this.centrarEnPuntoSeleccionado();
     }
   }
 
+
   ngOnDestroy(): void {
+
     this.mapa?.remove();
   }
 
-  private renderizarMarcadores(): void {
-    if (!this.mapa) return;
 
-    this.marcadores.forEach(m => m.remove());
+  private renderizarMarcadores(): void {
+
+    if (!this.mapa) {
+      return;
+    }
+
+
+    this.marcadores.forEach(
+      marcador => marcador.remove()
+    );
+
     this.marcadores = [];
 
+
     for (const punto of this.puntos) {
+
       const estaSeleccionado =
         this.puntoSeleccionado?.id === punto.id &&
         this.puntoSeleccionado?.origen === punto.origen;
 
+
       const color = estaSeleccionado
         ? COLOR_SELECCIONADO
-        : (COLORES_MARCADOR[punto.tipo] ?? COLOR_DEFAULT);
+        : (
+          COLORES_MARCADOR[punto.tipo]
+          ?? COLOR_DEFAULT
+        );
 
-      const marcador = L.circleMarker(
-        [punto.latitud, punto.longitud],
+
+      const tamanio =
+        estaSeleccionado
+          ? 34
+          : 28;
+
+
+      const icono = L.divIcon({
+
+        className: 'marcador-personalizado',
+
+        html: `
+          <div
+            class="pin-mapa ${estaSeleccionado ? 'seleccionado' : ''}"
+            style="--color-pin: ${color};"
+          >
+            <span></span>
+          </div>
+        `,
+
+        iconSize: [
+          tamanio,
+          tamanio
+        ],
+
+        iconAnchor: [
+          tamanio / 2,
+          tamanio
+        ],
+
+        tooltipAnchor: [
+          0,
+          -tamanio
+        ]
+      });
+
+
+      const marcador = L.marker(
+        [
+          punto.latitud,
+          punto.longitud
+        ],
         {
-          radius: estaSeleccionado ? 12 : 8,
-          fillColor: color,
-          color: '#fff',
-          weight: 2,
-          opacity: 1,
-          fillOpacity: 0.85,
+          icon: icono
         }
       );
 
-      marcador.bindTooltip(punto.nombre, {
-        direction: 'top',
-        offset: [0, -10],
-      });
 
-      marcador.on('click', () => {
-        this.puntoClick.emit(punto);
-      });
+      marcador.bindTooltip(
+        punto.nombre,
+        {
+          direction: 'top',
+          offset: [0, -10]
+        }
+      );
 
-      marcador.addTo(this.mapa!);
-      this.marcadores.push(marcador);
-    }
 
-    if (this.puntoSeleccionado && this.mapa) {
-      this.mapa.setView(
-        [this.puntoSeleccionado.latitud, this.puntoSeleccionado.longitud],
-        8,
-        { animate: true }
+      marcador.on(
+        'click',
+        () => {
+
+          this.puntoClick.emit(
+            punto
+          );
+        }
+      );
+
+
+      marcador.addTo(
+        this.mapa
+      );
+
+
+      this.marcadores.push(
+        marcador
       );
     }
+  }
+
+
+  private centrarEnPuntoSeleccionado(): void {
+
+    if (
+      !this.mapa ||
+      !this.puntoSeleccionado
+    ) {
+
+      return;
+    }
+
+
+    this.mapa.setView(
+      [
+        this.puntoSeleccionado.latitud,
+        this.puntoSeleccionado.longitud
+      ],
+      8,
+      {
+        animate: true
+      }
+    );
   }
 
 }
