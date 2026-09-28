@@ -1,5 +1,6 @@
 package bo.edu.sos.backend.service;
 
+import bo.edu.sos.backend.constants.NoticiaConstants;
 import bo.edu.sos.backend.dto.NoticiaDTO;
 import bo.edu.sos.backend.entity.Noticia;
 import bo.edu.sos.backend.entity.Usuario;
@@ -28,6 +29,35 @@ public class NoticiaService {
     @Transactional(readOnly = true)
     public List<NoticiaDTO> listarTodas() {
         return noticiaRepository.findAll()
+                .stream()
+                .map(this::convertirADTO)
+                .toList();
+    }
+
+    /**
+     * Retorna todas las noticias con estado {@code PUBLICADO},
+     * ordenadas por fecha de publicación descendente (más reciente primero).
+     * Este método es el consumido por el endpoint público del frontend.
+     */
+    @Transactional(readOnly = true)
+    public List<NoticiaDTO> listarPublicadas() {
+        return noticiaRepository
+                .findByEstadoOrderByFechaPublicacionDesc(
+                        NoticiaConstants.ESTADO_PUBLICADO)
+                .stream()
+                .map(this::convertirADTO)
+                .toList();
+    }
+
+    /**
+     * Retorna las noticias con estado {@code PUBLICADO} que pertenecen
+     * a la categoría indicada, ordenadas por fecha descendente.
+     */
+    @Transactional(readOnly = true)
+    public List<NoticiaDTO> listarPublicadasPorCategoria(String categoria) {
+        return noticiaRepository
+                .findByCategoriaAndEstadoOrderByFechaPublicacionDesc(
+                        categoria, NoticiaConstants.ESTADO_PUBLICADO)
                 .stream()
                 .map(this::convertirADTO)
                 .toList();
