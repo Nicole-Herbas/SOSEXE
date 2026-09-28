@@ -2,6 +2,8 @@ package bo.edu.sos.backend.controller;
 
 import bo.edu.sos.backend.dto.ApiResponse;
 import bo.edu.sos.backend.dto.NoticiaDTO;
+import bo.edu.sos.backend.dto.NoticiaExternaDTO;
+import bo.edu.sos.backend.service.NoticiaExternaService;
 import bo.edu.sos.backend.service.NoticiaService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -15,10 +17,17 @@ import java.util.List;
 public class NoticiaController {
 
     private final NoticiaService noticiaService;
+    private final NoticiaExternaService noticiaExternaService;
 
-    public NoticiaController(NoticiaService noticiaService) {
+    public NoticiaController(
+            NoticiaService noticiaService,
+            NoticiaExternaService noticiaExternaService) {
+
         this.noticiaService = noticiaService;
+        this.noticiaExternaService = noticiaExternaService;
     }
+
+    // ── Endpoints existentes ─────────────────────────────────────────────────
 
     @GetMapping
     public ResponseEntity<ApiResponse<List<NoticiaDTO>>> listarTodas() {
@@ -70,5 +79,29 @@ public class NoticiaController {
 
         return ResponseEntity.ok(
                 ApiResponse.ok("Noticia eliminada", null));
+    }
+
+    // ── Nuevos endpoints públicos (SOS-45) ───────────────────────────────────
+
+    /**
+     * Retorna las noticias propias con estado PUBLICADO,
+     * ordenadas por fecha de publicación descendente.
+     * No requiere autenticación JWT.
+     */
+    @GetMapping("/publicas")
+    public ResponseEntity<ApiResponse<List<NoticiaDTO>>> listarPublicadas() {
+        return ResponseEntity.ok(
+                ApiResponse.ok(noticiaService.listarPublicadas()));
+    }
+
+    /**
+     * Retorna noticias de Bolivia desde la API externa newsdata.io.
+     * Los resultados se cachean 15 minutos en memoria.
+     * No requiere autenticación JWT.
+     */
+    @GetMapping("/externas")
+    public ResponseEntity<ApiResponse<List<NoticiaExternaDTO>>> listarExternas() {
+        return ResponseEntity.ok(
+                ApiResponse.ok(noticiaExternaService.obtenerNoticias()));
     }
 }

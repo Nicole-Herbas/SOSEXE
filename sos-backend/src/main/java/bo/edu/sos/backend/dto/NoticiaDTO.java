@@ -39,4 +39,10 @@ public class NoticiaDTO {
     private Long autorId;
 
     private String autorNombre;
+
+    /**
+     * Siempre {@code false} para noticias propias.
+     * Permite que el frontend unifique noticias propias y externas en la misma lista.
+     */
+    private boolean esExterna = false;
 }
