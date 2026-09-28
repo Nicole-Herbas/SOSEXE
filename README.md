@@ -2,7 +2,7 @@
 
 [![Spring Boot](https://img.shields.io/badge/Spring_Boot-4.1.1-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)](https://spring.io/projects/spring-boot)
 [![Angular](https://img.shields.io/badge/Angular-22.1.0-DD0031?style=for-the-badge&logo=angular&logoColor=white)](https://angular.dev/)
-[![MySQL](https://img.shields.io/badge/MySQL-8.x-4479A1?style=for-the-badge&logo=mysql&logoColor=white)](https://www.mysql.com/)
+[![MySQL](https://img.shields.io/badge/MySQL-8.4-4479A1?style=for-the-badge&logo=mysql&logoColor=white)](https://www.mysql.com/)
 [![Java](https://img.shields.io/badge/Java-17-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)](https://www.oracle.com/java/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-6.0-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 
@@ -28,7 +28,7 @@ Proyecto desarrollado para la materia de **Taller de Sistemas de Información** 
 
 ---
 
-## 🌟 Módulos y Características
+## Módulos y Características
 
 | Módulo                            | Descripción                                                                                                                               |
 | :-------------------------------- | :---------------------------------------------------------------------------------------------------------------------------------------- |
@@ -41,39 +41,7 @@ Proyecto desarrollado para la materia de **Taller de Sistemas de Información** 
 
 ---
 
-## 🏛️ Arquitectura del Sistema
-
-```
-                      +-----------------------------+
-                      |       Navegador Web         |
-                      |   (http://localhost:4200)   |
-                      +--------------+--------------+
-                                     |
-                  [Peticiones HTTP: Interfaz de Usuario]
-                                     v
-                      +-----------------------------+
-                      |      Angular Dev Server     |
-                      |  (Proxy: proxy.conf.json)   |
-                      +--------------+--------------+
-                                     |
-                      [Reenvío de /api/* al puerto 8080]
-                                     v
-                      +-----------------------------+
-                      |     Spring Boot Backend     |
-                      |   (http://localhost:8080)   |
-                      +--------------+--------------+
-                                     |
-                         [JPA / Hibernate / Flyway]
-                                     v
-                      +-----------------------------+
-                      |       MySQL Database        |
-                      |      (Puerto 3306)          |
-                      +-----------------------------+
-```
-
----
-
-## 💻 Requisitos Previos
+## Requisitos Previos
 
 Asegúrate de contar con las siguientes herramientas instaladas en tu equipo:
 
@@ -84,24 +52,11 @@ Asegúrate de contar con las siguientes herramientas instaladas en tu equipo:
 
 ---
 
-## 🚀 Guía de Instalación y Ejecución Conjunta
+## Guía de Instalación y Ejecución Conjunta
 
 Sigue estos pasos en orden para poner en marcha tanto el backend como el frontend de manera integrada.
 
-### 1. Configuración de la Base de Datos
-
-Asegúrate de que tu servicio MySQL se encuentre en ejecución y crea la base de datos `sos_db`:
-
-```sql
-CREATE DATABASE IF NOT EXISTS sos_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-```
-
-> [!NOTE]
-> No es necesario ejecutar scripts SQL manualmente para crear las tablas. **Flyway** se encargará de ejecutar de forma automática todas las migraciones (`V1__...`, `V2__...`) apenas inicie el backend.
-
----
-
-### 2. Configuración y Ejecución del Backend (Spring Boot)
+### 1. Configuración y Ejecución del Backend (Spring Boot)
 
 #### A. Navegar al directorio del backend
 
@@ -136,11 +91,7 @@ JWT_SECRET=sos-exe-desarrollo-local-secret-key-super-segura-2026-minimo-32-carac
 
 #### C. Iniciar el servidor Spring Boot
 
-- **En Windows:**
-  ```cmd
-  mvnw.cmd spring-boot:run
-  ```
-- **En Linux / macOS:**
+- **En terminal:**
   ```bash
   ./mvnw spring-boot:run
   ```
@@ -152,7 +103,7 @@ El backend iniciará en el puerto **`8080`**. Puedes comprobar que está operati
 
 ---
 
-### 3. Configuración y Ejecución del Frontend (Angular)
+### 2. Configuración y Ejecución del Frontend (Angular)
 
 En una **nueva terminal**, navega a la carpeta del frontend:
 
@@ -175,11 +126,11 @@ npm start
 _(Este comando ejecuta internamente `ng serve`, el cual ya incluye la configuración del proxy de desarrollo)._
 
 Una vez compilado, abre tu navegador web en:
-👉 **[http://localhost:4200](http://localhost:4200)**
+**[http://localhost:4200](http://localhost:4200)**
 
 ---
 
-## 🔄 Funcionamiento del Proxy de Desarrollo
+## Funcionamiento del Proxy de Desarrollo
 
 Para evitar problemas de **CORS** (_Cross-Origin Resource Sharing_) durante el desarrollo local, el frontend cuenta con el archivo `proxy.conf.json`:
 
@@ -197,7 +148,7 @@ Cada vez que Angular realiza una petición a `/api/...` (por ejemplo, `/api/auth
 
 ---
 
-## 📂 Estructura del Proyecto
+## Estructura del Proyecto
 
 ```text
 ProyectoSos/
@@ -232,7 +183,7 @@ ProyectoSos/
 
 ---
 
-## 🧪 Pruebas Automatizadas
+## Pruebas Automatizadas
 
 ### Backend
 
@@ -240,8 +191,7 @@ Para ejecutar la suite de pruebas unitarias y de integración del backend:
 
 ```bash
 cd sos-backend
-./mvnw test        # En Linux / macOS
-mvnw.cmd test      # En Windows
+./mvnw test        # En terminal
 ```
 
 ### Frontend
@@ -255,7 +205,7 @@ npm test
 
 ---
 
-## 🔒 Políticas de Seguridad y Credenciales
+## Políticas de Seguridad y Credenciales
 
 - **No exponer contraseñas en Git**: Ningún desarrollador debe realizar commits de archivos `application.properties` con credenciales de producción o personales.
 - **Uso de `application-local.properties`**: Utiliza siempre el archivo local o variables de entorno del sistema (`DB_URL`, `DB_USERNAME`, `DB_PASSWORD`, `JWT_SECRET`) para tus pruebas locales.

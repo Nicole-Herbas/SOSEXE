@@ -1,4 +1,4 @@
-<nav class="navbar">
+﻿<nav class="navbar">
 
   <div class="navbar-brand">
 
@@ -87,13 +87,40 @@
     </button>
 
 
+    <!-- Sin sesión: botón Iniciar sesión -->
     <a
+      *ngIf="!sesionActiva"
       class="navbar-login"
       routerLink="/login"
       routerLinkActive="active"
     >
       {{ textos.iniciarSesion }}
     </a>
+
+
+    <!-- Con sesión: avatar + nombre + cerrar sesión -->
+    <div
+      *ngIf="sesionActiva"
+      class="navbar-user"
+    >
+
+      <div class="navbar-avatar">
+        <span class="navbar-avatar-icon">👤</span>
+      </div>
+
+      <span class="navbar-username">
+        {{ nombreUsuario }}
+      </span>
+
+      <button
+        class="navbar-logout"
+        (click)="cerrarSesion()"
+        title="Cerrar sesión"
+      >
+        Salir
+      </button>
+
+    </div>
 
 
     <button class="navbar-cta">

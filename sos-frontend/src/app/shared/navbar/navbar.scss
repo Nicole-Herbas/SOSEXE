@@ -1,4 +1,4 @@
-.navbar {
+﻿.navbar {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -118,6 +118,52 @@
 
 .navbar-cta:hover {
   background-color: #145f56;
+}
+
+/* Usuario autenticado */
+.navbar-user {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.navbar-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #1a7a6e, #e0a83c);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+.navbar-username {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #1e1e2f;
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.navbar-logout {
+  background: none;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  color: #666;
+  font-size: 0.8rem;
+  padding: 0.3rem 0.7rem;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s, border-color 0.2s;
+
+  &:hover {
+    background: #fee2e2;
+    color: #dc2626;
+    border-color: #dc2626;
+  }
 }
 
 .navbar-toggle {
