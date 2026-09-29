@@ -1,1 +1,8 @@
 .idea/
+.vscode/
+*.local
+.env
+.env.local
+.env.*.local
+!*.example
+*.local.properties

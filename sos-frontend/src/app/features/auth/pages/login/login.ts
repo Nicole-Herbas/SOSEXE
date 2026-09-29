@@ -1,14 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { APP_TEXTOS } from '../../../../shared/constants/app-textos.constants';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule],
+  imports: [ReactiveFormsModule, CommonModule, RouterLink],
   templateUrl: './login.component.html',
   styleUrl: './login.component.css'
 })
@@ -44,11 +44,6 @@ export class LoginComponent implements OnInit {
 
         next: (respuesta) => {
 
-          localStorage.setItem(
-            'token',
-            respuesta.token
-          );
-
           if (respuesta.rol === 'ADMIN') {
 
             this.router.navigate([
@@ -58,7 +53,7 @@ export class LoginComponent implements OnInit {
           } else {
 
             this.router.navigate([
-              '/centros'
+              '/inicio'
             ]);
 
           }

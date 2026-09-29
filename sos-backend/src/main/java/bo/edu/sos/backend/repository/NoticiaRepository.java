@@ -10,4 +10,11 @@ public interface NoticiaRepository extends JpaRepository<Noticia, Long> {
     List<Noticia> findByEstado(String estado);
 
     List<Noticia> findByCategoria(String categoria);
+
+    /** Noticias por estado ordenadas por fecha de publicación descendente. */
+    List<Noticia> findByEstadoOrderByFechaPublicacionDesc(String estado);
+
+    /** Noticias por categoría y estado, ordenadas por fecha de publicación desc. */
+    List<Noticia> findByCategoriaAndEstadoOrderByFechaPublicacionDesc(
+            String categoria, String estado);
 }

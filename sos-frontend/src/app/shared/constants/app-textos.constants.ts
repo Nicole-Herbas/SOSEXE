@@ -356,8 +356,78 @@ donar: {
 },
 
 noticias: {
-  mensaje:
-    'noticias works!',
+  // ── Encabezado de la página ──────────────────────────────────────────────
+  volverInicio:
+    '← Volver al inicio',
+
+  titulo:
+    'Noticias y alertas',
+
+  subtitulo:
+    'Información verificada sobre emergencias, desastres y acciones de ayuda en Bolivia.',
+
+  // ── Filtros de categoría ─────────────────────────────────────────────────
+  filtroTodas:
+    'Todas',
+
+  filtros: [
+    'Todas',
+    'Incendios',
+    'Inundaciones',
+    'Deslizamientos',
+    'Sequías',
+    'Comunidad',
+    'Alertas',
+  ] as const,
+
+  // ── Sección "Últimas actualizaciones" ────────────────────────────────────
+  ultimasTitulo:
+    'Últimas actualizaciones',
+
+  ultimasDesc:
+    'Las noticias más recientes sobre la situación en Bolivia.',
+
+  // ── Tarjeta de noticia ───────────────────────────────────────────────────
+  fuenteVerificada:
+    '✓ Fuente verificada',
+
+  imagenReferencial:
+    'Imagen referencial',
+
+  leerNoticia:
+    'Leer noticia →',
+
+  ubicacionIcono:
+    '⌖',
+
+  ubicacion:
+    'Bolivia',
+
+  // ── Sección "Alertas activas" (parte inferior de la página) ─────────────
+  alertasTitulo:
+    'Alertas activas',
+
+  alertasDesc:
+    'Situaciones que requieren atención inmediata en este momento.',
+
+  alertaActivaBadge:
+    'Alerta activa',
+
+  verEnMapa:
+    'Ver en el mapa →',
+
+  actualizado:
+    'Actualizado:',
+
+  // ── Estados de carga ─────────────────────────────────────────────────────
+  cargando:
+    'Cargando noticias...',
+
+  sinNoticias:
+    'No hay noticias disponibles para esta categoría.',
+
+  errorCarga:
+    'No se pudieron cargar las noticias. Intenta de nuevo.',
 },
 
 voluntariado: {
@@ -368,6 +438,79 @@ voluntariado: {
 acercaDe: {
   mensaje:
     'acerca-de works!',
+},
+
+registro: {
+  logo: 'Tu cuenta SOS.exe',
+
+  tituloPrincipal:
+    'Únete y marca la diferencia',
+
+  descripcionPrincipal:
+    'Regístrate para apoyar a comunidades afectadas por desastres en Bolivia.',
+
+  tituloFormulario:
+    'Crear una cuenta',
+
+  descripcionFormulario:
+    'Completa tus datos para unirte a SOS.exe.',
+
+  nombreLabel:
+    'Nombre completo',
+
+  nombrePlaceholder:
+    'Tu nombre completo',
+
+  nombreError:
+    'El nombre es obligatorio (mínimo 2 caracteres).',
+
+  correoLabel:
+    'Correo electrónico',
+
+  correoPlaceholder:
+    'correo@ejemplo.com',
+
+  correoError:
+    'Ingresa un correo válido.',
+
+  passwordLabel:
+    'Contraseña',
+
+  passwordPlaceholder:
+    'Mínimo 6 caracteres',
+
+  passwordError:
+    'La contraseña debe tener al menos 6 caracteres.',
+
+  telefonoLabel:
+    'Teléfono (opcional)',
+
+  telefonoPlaceholder:
+    '+591 7xxxxxxx',
+
+  departamentoLabel:
+    'Departamento (opcional)',
+
+  departamentoPlaceholder:
+    'Selecciona tu departamento',
+
+  botonRegistrar:
+    'Crear cuenta →',
+
+  yasTienesCuenta:
+    '¿Ya tienes una cuenta? Iniciar sesión',
+
+  cancelar:
+    'Cancelar y volver al sitio',
+
+  registroExitoso:
+    '¡Cuenta creada con éxito! Redirigiendo al inicio de sesión...',
+
+  correoExistente:
+    'Este correo ya está registrado. Prueba con otro.',
+
+  errorGeneral:
+    'Ocurrió un error al crear la cuenta. Intenta de nuevo.',
 },
 
 } as const;

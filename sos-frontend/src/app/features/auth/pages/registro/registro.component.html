@@ -1,0 +1,208 @@
+﻿<div class="registro-container">
+
+  <div class="info-panel">
+
+    <div class="logo">
+      {{ textos.logo }}
+    </div>
+
+    <h1>
+      {{ textos.tituloPrincipal }}
+    </h1>
+
+    <p>
+      {{ textos.descripcionPrincipal }}
+    </p>
+
+  </div>
+
+
+  <div class="form-panel">
+
+    <h2>
+      {{ textos.tituloFormulario }}
+    </h2>
+
+    <p>
+      {{ textos.descripcionFormulario }}
+    </p>
+
+
+    <div
+      class="alerta-exito"
+      *ngIf="mensajeExito"
+      id="registro-exito"
+    >
+      {{ mensajeExito }}
+    </div>
+
+
+    <form
+      [formGroup]="registroForm"
+      (ngSubmit)="onSubmit()"
+      id="form-registro"
+    >
+
+      <!-- Nombre -->
+      <div class="form-group">
+
+        <label for="reg-nombre">
+          {{ textos.nombreLabel }}
+        </label>
+
+        <input
+          id="reg-nombre"
+          type="text"
+          formControlName="nombre"
+          [placeholder]="textos.nombrePlaceholder"
+        >
+
+        <small
+          class="error"
+          *ngIf="
+            registroForm.get('nombre')?.invalid &&
+            registroForm.get('nombre')?.touched
+          "
+        >
+          {{ textos.nombreError }}
+        </small>
+
+      </div>
+
+
+      <!-- Email -->
+      <div class="form-group">
+
+        <label for="reg-email">
+          {{ textos.correoLabel }}
+        </label>
+
+        <input
+          id="reg-email"
+          type="email"
+          formControlName="email"
+          [placeholder]="textos.correoPlaceholder"
+        >
+
+        <small
+          class="error"
+          *ngIf="
+            registroForm.get('email')?.invalid &&
+            registroForm.get('email')?.touched
+          "
+        >
+          {{ textos.correoError }}
+        </small>
+
+      </div>
+
+
+      <!-- Contraseña -->
+      <div class="form-group">
+
+        <label for="reg-password">
+          {{ textos.passwordLabel }}
+        </label>
+
+        <input
+          id="reg-password"
+          type="password"
+          formControlName="password"
+          [placeholder]="textos.passwordPlaceholder"
+        >
+
+        <small
+          class="error"
+          *ngIf="
+            registroForm.get('password')?.invalid &&
+            registroForm.get('password')?.touched
+          "
+        >
+          {{ textos.passwordError }}
+        </small>
+
+      </div>
+
+
+      <!-- Teléfono -->
+      <div class="form-group">
+
+        <label for="reg-telefono">
+          {{ textos.telefonoLabel }}
+        </label>
+
+        <input
+          id="reg-telefono"
+          type="tel"
+          formControlName="telefono"
+          [placeholder]="textos.telefonoPlaceholder"
+        >
+
+      </div>
+
+
+      <!-- Departamento -->
+      <div class="form-group">
+
+        <label for="reg-departamento">
+          {{ textos.departamentoLabel }}
+        </label>
+
+        <select
+          id="reg-departamento"
+          formControlName="departamentoId"
+        >
+
+          <option [value]="null">
+            {{ textos.departamentoPlaceholder }}
+          </option>
+
+          <option
+            *ngFor="let dep of departamentos"
+            [value]="dep.id"
+          >
+            {{ dep.nombre }}
+          </option>
+
+        </select>
+
+      </div>
+
+
+      <button
+        type="submit"
+        class="btn-primary"
+        id="btn-crear-cuenta"
+        [disabled]="cargando"
+      >
+        <span *ngIf="!cargando">{{ textos.botonRegistrar }}</span>
+        <span *ngIf="cargando">Creando cuenta...</span>
+      </button>
+
+
+      <small
+        class="error login-error"
+        *ngIf="mensajeError"
+        id="registro-error"
+      >
+        {{ mensajeError }}
+      </small>
+
+    </form>
+
+
+    <div class="links">
+
+      <a routerLink="/login">
+        {{ textos.yasTienesCuenta }}
+      </a>
+
+      <a routerLink="/">
+        {{ textos.cancelar }}
+      </a>
+
+    </div>
+
+  </div>
+
+</div>
