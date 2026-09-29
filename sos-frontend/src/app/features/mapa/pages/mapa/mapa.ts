@@ -73,6 +73,9 @@ export class Mapa implements OnInit {
   featureToggles: FeatureToggles = {
     mapa: {
       ...FEATURE_TOGGLES.mapa
+    },
+    noticias: {
+      ...FEATURE_TOGGLES.noticias
     }
   };
 
