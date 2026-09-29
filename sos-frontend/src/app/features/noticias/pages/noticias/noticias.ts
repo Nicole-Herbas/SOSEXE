@@ -1,4 +1,5 @@
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import {
   FeatureToggles,
   FEATURE_TOGGLES,
@@ -8,7 +9,7 @@ import { Noticia } from '../../models/noticia.model';
 import { NoticiaService } from '../../services/noticia.service';
 
 @Component({
-  imports: [],
+  imports: [RouterLink],
   selector: 'app-noticias',
   styleUrl: './noticias.scss',
   templateUrl: './noticias.html',

@@ -394,6 +394,9 @@ noticias: {
   imagenReferencial:
     'Imagen referencial',
 
+  imagenNoDisponible:
+    'Imagen no disponible',
+
   leerNoticia:
     'Leer noticia →',
 
