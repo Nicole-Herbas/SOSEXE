@@ -71,4 +71,46 @@ describe('Noticias', () => {
     expect(component.noticias().length).toBe(1);
     expect(component.noticiasDestacadas()[0].titulo).toBe('Noticia de prueba');
   });
+
+  it('debe mostrar la alerta de referencia cuando el toggle está activo', () => {
+    fixture.detectChanges();
+    httpTesting.expectOne('/api/noticias/publicas').flush({
+      success: true,
+      message: 'OK',
+      data: [],
+      timestamp: '',
+    });
+    httpTesting.expectOne('/api/noticias/externas').flush({
+      success: true,
+      message: 'OK',
+      data: [],
+      timestamp: '',
+    });
+    fixture.detectChanges();
+
+    const alerta = fixture.nativeElement.querySelector('[data-alertas-referencia]');
+    expect(alerta.textContent).toContain(component.textos.alertaTituloReferencia);
+  });
+
+  it('debe ocultar la alerta de referencia cuando el toggle está desactivado', () => {
+    component.featureToggles.noticias.mostrarAlertas = false;
+    fixture.detectChanges();
+    httpTesting.expectOne('/api/noticias/publicas').flush({
+      success: true,
+      message: 'OK',
+      data: [],
+      timestamp: '',
+    });
+    httpTesting.expectOne('/api/noticias/externas').flush({
+      success: true,
+      message: 'OK',
+      data: [],
+      timestamp: '',
+    });
+    fixture.detectChanges();
+
+    expect(
+      fixture.nativeElement.querySelector('[data-alertas-referencia]'),
+    ).toBeNull();
+  });
 });

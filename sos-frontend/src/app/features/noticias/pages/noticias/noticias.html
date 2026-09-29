@@ -144,4 +144,31 @@
 			}
 		}
 	</section>
+
+	@if (featureToggles.noticias.mostrarAlertas) {
+		<section class="noticias-alertas" aria-labelledby="noticias-alertas-titulo" data-alertas-referencia>
+			<div class="noticias-seccion-encabezado">
+				<h2 id="noticias-alertas-titulo">{{ textos.alertasTitulo }}</h2>
+				<p>{{ textos.alertasDesc }}</p>
+			</div>
+
+			<article class="noticia-alerta">
+				<span class="noticia-alerta__icono" aria-hidden="true">!</span>
+				<div class="noticia-alerta__contenido">
+					<div class="noticia-alerta__meta">
+						<span class="noticia-alerta__badge">{{ textos.alertaActivaBadge }}</span>
+						<span>{{ textos.actualizado }} {{ textos.alertaActualizadoReferencia }}</span>
+					</div>
+					<h3>{{ textos.alertaTituloReferencia }}</h3>
+					<p>{{ textos.alertaMensajeReferencia }}</p>
+					<span class="noticia-alerta__ubicacion">
+						{{ textos.ubicacionIcono }} {{ textos.alertaUbicacionReferencia }}
+					</span>
+				</div>
+				<a class="noticia-alerta__mapa" routerLink="/mapa">
+					{{ textos.verEnMapa }}
+				</a>
+			</article>
+		</section>
+	}
 </main>
