@@ -113,4 +113,95 @@ describe('Noticias', () => {
       fixture.nativeElement.querySelector('[data-alertas-referencia]'),
     ).toBeNull();
   });
+
+  it('debe mostrar el estado vacío cuando las APIs no tienen noticias', () => {
+    fixture.detectChanges();
+    httpTesting.expectOne('/api/noticias/publicas').flush({
+      success: true,
+      message: 'OK',
+      data: [],
+      timestamp: '',
+    });
+    httpTesting.expectOne('/api/noticias/externas').flush({
+      success: true,
+      message: 'OK',
+      data: [],
+      timestamp: '',
+    });
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.textContent).toContain(component.textos.sinNoticias);
+  });
+
+  it('debe permitir reintentar cuando falla una API', () => {
+    fixture.detectChanges();
+    httpTesting.expectOne('/api/noticias/externas').flush({
+      success: true,
+      message: 'OK',
+      data: [],
+      timestamp: '',
+    });
+    httpTesting.expectOne('/api/noticias/publicas').flush('Error', {
+      status: 500,
+      statusText: 'Error del servidor',
+    });
+    fixture.detectChanges();
+
+    expect(component.error()).toBe(true);
+    expect(fixture.nativeElement.textContent).toContain(component.textos.errorCarga);
+
+    component.cargarNoticias();
+    httpTesting.expectOne('/api/noticias/publicas').flush({
+      success: true,
+      message: 'OK',
+      data: [],
+      timestamp: '',
+    });
+    httpTesting.expectOne('/api/noticias/externas').flush({
+      success: true,
+      message: 'OK',
+      data: [],
+      timestamp: '',
+    });
+
+    expect(component.error()).toBe(false);
+    expect(component.cargando()).toBe(false);
+  });
+
+  it('debe abrir el enlace externo de la noticia en una pestaña segura', () => {
+    fixture.detectChanges();
+    httpTesting.expectOne('/api/noticias/publicas').flush({
+      success: true,
+      message: 'OK',
+      data: [],
+      timestamp: '',
+    });
+    httpTesting.expectOne('/api/noticias/externas').flush({
+      success: true,
+      message: 'OK',
+      data: [
+        {
+          id: 'externa-1',
+          titulo: 'Noticia externa',
+          descripcion: 'Resumen',
+          url: 'https://example.com/noticia',
+          imagenUrl: null,
+          fuente: 'Medio',
+          categoria: 'general',
+          pais: 'Bolivia',
+          fechaPublicacion: '2026-09-21 09:00:00',
+          esExterna: true,
+        },
+      ],
+      timestamp: '',
+    });
+    fixture.detectChanges();
+
+    const enlace: HTMLAnchorElement = fixture.nativeElement.querySelector(
+      '.noticia-tarjeta__enlace',
+    );
+    expect(enlace.href).toBe('https://example.com/noticia');
+    expect(enlace.target).toBe('_blank');
+    expect(enlace.rel).toContain('noopener');
+  });
 });
