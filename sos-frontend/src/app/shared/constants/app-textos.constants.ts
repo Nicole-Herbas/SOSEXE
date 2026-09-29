@@ -397,6 +397,9 @@ noticias: {
   imagenNoDisponible:
     'Imagen no disponible',
 
+  categoriaGeneral:
+    'Noticias',
+
   leerNoticia:
     'Leer noticia →',
 

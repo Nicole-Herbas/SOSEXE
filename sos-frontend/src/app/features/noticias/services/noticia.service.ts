@@ -44,7 +44,7 @@ export class NoticiaService {
       imagenUrl: noticia.imagenUrl,
       fuente: noticia.fuente,
       categoria: noticia.categoria,
-      ubicacion: 'Bolivia',
+      ubicacion: '',
       fechaPublicacion: noticia.fechaPublicacion,
       esExterna: false,
     };
@@ -58,8 +58,8 @@ export class NoticiaService {
       url: noticia.url,
       imagenUrl: noticia.imagenUrl,
       fuente: noticia.fuente,
-      categoria: noticia.categoria ?? 'Noticias',
-      ubicacion: noticia.pais ?? 'Bolivia',
+      categoria: noticia.categoria ?? '',
+      ubicacion: noticia.pais ?? '',
       fechaPublicacion: noticia.fechaPublicacion,
       esExterna: true,
     };

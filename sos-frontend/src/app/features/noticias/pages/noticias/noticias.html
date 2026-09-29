@@ -7,7 +7,7 @@
 		<p>{{ textos.subtitulo }}</p>
 	</header>
 
-	<nav class="noticias-categorias" [attr.aria-label]="textos.categoriasEtiqueta">
+	<div class="noticias-categorias" role="group" [attr.aria-label]="textos.categoriasEtiqueta">
 		@for (categoria of textos.filtros; track categoria) {
 			<span
 				class="noticias-categoria"
@@ -16,7 +16,7 @@
 				{{ categoria }}
 			</span>
 		}
-	</nav>
+	</div>
 
 	<section class="noticias-actualizaciones" aria-labelledby="noticias-actualizaciones-titulo">
 		<div class="noticias-seccion-encabezado">
@@ -57,7 +57,7 @@
 									{{ textos.imagenNoDisponible }}
 								</div>
 							}
-							<span class="noticia-tarjeta__categoria">{{ noticia.categoria }}</span>
+							<span class="noticia-tarjeta__categoria">{{ noticia.categoria || textos.categoriaGeneral }}</span>
 							@if (noticia.fuente) {
 								<span class="noticia-tarjeta__fuente">{{ noticia.fuente }}</span>
 							}
@@ -65,7 +65,7 @@
 
 						<div class="noticia-tarjeta__contenido">
 							<div class="noticia-tarjeta__meta">
-								<span>{{ textos.ubicacionIcono }} {{ noticia.ubicacion }}</span>
+								<span>{{ textos.ubicacionIcono }} {{ noticia.ubicacion || textos.ubicacion }}</span>
 								@if (noticia.fechaPublicacion) {
 									<time [attr.datetime]="noticia.fechaPublicacion">
 										{{ formatearFecha(noticia.fechaPublicacion) }}
@@ -108,7 +108,7 @@
 										{{ textos.imagenNoDisponible }}
 									</div>
 								}
-								<span class="noticia-tarjeta__categoria">{{ noticia.categoria }}</span>
+								<span class="noticia-tarjeta__categoria">{{ noticia.categoria || textos.categoriaGeneral }}</span>
 								@if (noticia.fuente) {
 									<span class="noticia-tarjeta__fuente">{{ noticia.fuente }}</span>
 								}
@@ -116,7 +116,7 @@
 
 							<div class="noticia-tarjeta__contenido">
 								<div class="noticia-tarjeta__meta">
-									<span>{{ textos.ubicacionIcono }} {{ noticia.ubicacion }}</span>
+									  <span>{{ textos.ubicacionIcono }} {{ noticia.ubicacion || textos.ubicacion }}</span>
 									@if (noticia.fechaPublicacion) {
 										<time [attr.datetime]="noticia.fechaPublicacion">
 											{{ formatearFecha(noticia.fechaPublicacion) }}
