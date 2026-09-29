@@ -765,9 +765,13 @@
 
               @if (personeriaArchivo) {
 
-                <span class="file-name">
+                <button
+                  type="button"
+                  class="file-name file-preview-button"
+                  (click)="verArchivo(personeriaArchivo)"
+                >
                   {{ personeriaArchivo.name }}
-                </span>
+                </button>
 
               }
 
@@ -843,11 +847,15 @@
 
               @if (nitArchivo) {
 
-                <span class="file-name">
-                  {{ nitArchivo.name }}
-                </span>
+              <button
+                type="button"
+                class="file-name file-preview-button"
+                (click)="verArchivo(nitArchivo)"
+              >
+                {{ nitArchivo.name }}
+              </button>
 
-              }
+            }
 
             </div>
 
@@ -921,11 +929,15 @@
 
               @if (identidadArchivo) {
 
-                <span class="file-name">
-                  {{ identidadArchivo.name }}
-                </span>
+              <button
+                type="button"
+                class="file-name file-preview-button"
+                (click)="verArchivo(identidadArchivo)"
+              >
+                {{ identidadArchivo.name }}
+              </button>
 
-              }
+            }
 
             </div>
 
@@ -999,11 +1011,15 @@
 
               @if (domicilioArchivo) {
 
-                <span class="file-name">
-                  {{ domicilioArchivo.name }}
-                </span>
+              <button
+                type="button"
+                class="file-name file-preview-button"
+                (click)="verArchivo(domicilioArchivo)"
+              >
+                {{ domicilioArchivo.name }}
+              </button>
 
-              }
+            }
 
             </div>
 
@@ -1634,23 +1650,59 @@
 
         <div class="review-document">
           <span class="document-status">✓</span>
-          <span>{{ personeriaArchivo?.name }}</span>
+
+          @if (personeriaArchivo) {
+            <button
+              type="button"
+              class="file-preview-button"
+              (click)="verArchivo(personeriaArchivo)"
+            >
+              {{ personeriaArchivo.name }}
+            </button>
+          }
         </div>
 
         <div class="review-document">
-          <span class="document-status">✓</span>
-          <span>{{ nitArchivo?.name }}</span>
-        </div>
+        <span class="document-status">✓</span>
+
+        @if (nitArchivo) {
+          <button
+            type="button"
+            class="file-preview-button"
+            (click)="verArchivo(nitArchivo)"
+          >
+            {{ nitArchivo.name }}
+          </button>
+        }
+      </div>
 
         <div class="review-document">
           <span class="document-status">✓</span>
-          <span>{{ identidadArchivo?.name }}</span>
+
+          @if (identidadArchivo) {
+            <button
+              type="button"
+              class="file-preview-button"
+              (click)="verArchivo(identidadArchivo)"
+            >
+              {{ identidadArchivo.name }}
+            </button>
+          }
         </div>
 
         <div class="review-document">
-          <span class="document-status">✓</span>
-          <span>{{ domicilioArchivo?.name }}</span>
-        </div>
+        <span class="document-status">✓</span>
+
+        @if (domicilioArchivo) {
+          <button
+            type="button"
+            class="file-preview-button"
+            (click)="verArchivo(domicilioArchivo)"
+          >
+            {{ domicilioArchivo.name }}
+          </button>
+        }
+      </div>
 
       </div>
 
@@ -1939,6 +1991,77 @@
   </div>
 
 </div>
+
+<!-- ==========================================
+     MODAL - VISTA PREVIA DE ARCHIVO
+     ========================================== -->
+
+@if (mostrarModalArchivo) {
+
+  <div
+    class="modal-overlay"
+    (click)="cerrarVistaPrevia()"
+  >
+
+    <div
+      class="file-preview-modal"
+  (click)="$event.stopPropagation()"
+>
+
+  <button
+    type="button"
+    class="file-preview-close"
+    (click)="cerrarVistaPrevia()"
+    aria-label="Cerrar vista previa"
+  >
+    ×
+  </button>
+
+      <div class="file-preview-header">
+
+        <div>
+          <h2>Vista previa</h2>
+
+          @if (archivoVistaPrevia) {
+            <p>{{ archivoVistaPrevia.name }}</p>
+          }
+        </div>
+
+        <button
+          type="button"
+          class="file-preview-close"
+          (click)="cerrarVistaPrevia()"
+        >
+          ×
+        </button>
+
+      </div>
+
+      <div class="file-preview-content">
+
+        @if (esImagenArchivoVistaPrevia) {
+
+          <img
+            [src]="urlArchivoVistaPrevia"
+            [alt]="archivoVistaPrevia?.name || 'Documento'"
+          />
+
+        } @else {
+
+          <iframe
+            [src]="urlArchivoVistaPrevia"
+            title="Vista previa del documento"
+          ></iframe>
+
+        }
+
+      </div>
+
+    </div>
+
+  </div>
+
+}
 
 <!-- ==========================================
      MODAL - SOLICITUD ENVIADA

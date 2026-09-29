@@ -1,5 +1,7 @@
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { HttpClient } from '@angular/common/http';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-registrar-centro',
@@ -10,8 +12,21 @@ import { FormsModule } from '@angular/forms';
 })
 export class RegistrarCentroComponent {
 
+  constructor(
+    private http: HttpClient,
+    private router: Router
+  ) {}
+
   currentStep = 1;
   mostrarModalEnvio = false;
+
+  // ==========================================
+// VISTA PREVIA DE ARCHIVOS
+// ==========================================
+  mostrarModalArchivo = false;
+  archivoVistaPrevia: File | null = null;
+  urlArchivoVistaPrevia = '';
+  esImagenArchivoVistaPrevia = false;
   // ==========================================
   // DATOS DEL CENTRO - PASO 1
   // ==========================================
@@ -244,58 +259,89 @@ enviarSolicitud(): void {
     return;
   }
 
+  const departamentoIds: { [key: string]: number } = {
+    'Beni': 8,
+    'Chuquisaca': 1,
+    'Cochabamba': 3,
+    'La Paz': 2,
+    'Oruro': 4,
+    'Pando': 9,
+    'Potosí': 5,
+    'Santa Cruz': 7,
+    'Tarija': 6
+  };
+
+  const departamentoId = departamentoIds[this.departamento];
+
+  if (!departamentoId) {
+    console.error('Departamento no válido:', this.departamento);
+    return;
+  }
+
   const solicitud = {
-    centro: {
-      nombre: this.nombreCentro,
-      tipo: this.tipoOrganizacion,
-      departamento: this.departamento,
-      nit: this.nit,
-      personeriaJuridica: this.personeriaJuridica,
-      fechaFundacion: this.fechaFundacion,
-      paginaWeb: this.paginaWeb,
-      descripcion: this.descripcion,
-      poblacionAtendida: this.poblacionAtendida
-    },
 
-    responsable: {
-      nombre: this.nombreResponsable,
-      cargo: this.cargoResponsable,
-      documento: this.documentoResponsable,
-      correo: this.correoResponsable,
-      telefono: this.telefonoResponsable
-    },
+    nombreCentro: this.nombreCentro,
+    tipoOrganizacion: this.tipoOrganizacion,
+    departamentoId: departamentoId,
 
-    ubicacion: {
-      ciudad: this.ciudad,
-      departamento: this.departamentoUbicacion,
-      direccion: this.direccionExacta,
-      referencia: this.referencia
-    },
+    nit: this.nit,
+    personeriaJuridica: this.personeriaJuridica,
+    fechaFundacion: this.fechaFundacion,
+    paginaWeb: this.paginaWeb,
+    descripcion: this.descripcion,
+    poblacionAtendida: this.poblacionAtendida,
 
-    documentos: {
-      personeria: this.personeriaArchivo?.name ?? '',
-      nit: this.nitArchivo?.name ?? '',
-      identidad: this.identidadArchivo?.name ?? '',
-      domicilio: this.domicilioArchivo?.name ?? ''
-    },
+    nombreResponsable: this.nombreResponsable,
+    cargoResponsable: this.cargoResponsable,
+    documentoResponsable: this.documentoResponsable,
+    correoResponsable: this.correoResponsable,
+    telefonoResponsable: this.telefonoResponsable,
+
+    ciudad: this.ciudad,
+    departamentoUbicacion: this.departamentoUbicacion,
+    direccionExacta: this.direccionExacta,
+    referencia: this.referencia,
+
+    personeriaArchivo: this.personeriaArchivo?.name ?? '',
+    nitArchivo: this.nitArchivo?.name ?? '',
+    identidadArchivo: this.identidadArchivo?.name ?? '',
+    domicilioArchivo: this.domicilioArchivo?.name ?? '',
 
     necesidades: this.necesidadesSeleccionadas,
     donaciones: this.donacionesSeleccionadas,
 
-    voluntariado: {
-      solicita: this.solicitaVoluntarios,
-      actividades: this.actividadesSeleccionadas,
-      descripcion: this.descripcionVoluntariado
-    }
+    solicitaVoluntarios: this.solicitaVoluntarios,
+    actividadesVoluntariado: this.actividadesSeleccionadas,
+    descripcionVoluntariado: this.descripcionVoluntariado
   };
 
-  console.log('Solicitud enviada:', solicitud);
+  console.log('Enviando solicitud al backend:', solicitud);
 
-  this.mostrarModalEnvio = true;
-}
+  this.http.post(
+    'http://localhost:8080/api/solicitudes-centro',
+    solicitud
+  ).subscribe({
 
-cerrarModalEnvio(): void {
-  this.mostrarModalEnvio = false;
+    next: (respuesta) => {
+
+      console.log('Solicitud guardada correctamente:', respuesta);
+
+      this.mostrarModalEnvio = true;
+    },
+
+    error: (error) => {
+
+      console.error(
+        'Error al guardar la solicitud:',
+        error
+      );
+
+      alert(
+        'No se pudo registrar la solicitud. Revisa los datos e intenta nuevamente.'
+      );
+    }
+
+  });
 }
   // ==========================================
   // DEPARTAMENTOS DE BOLIVIA
@@ -493,12 +539,35 @@ cerrarModalEnvio(): void {
     this.domicilioAdjunto = false;
   }
 
+verArchivo(archivo: File | null): void {
+  if (!archivo) {
+    return;
+  }
 
-  // ==========================================
-  // NAVEGACIÓN
-  // ==========================================
+  this.cerrarVistaPrevia();
 
-  continuar(): void {
+  this.archivoVistaPrevia = archivo;
+  this.esImagenArchivoVistaPrevia = archivo.type.startsWith('image/');
+  this.urlArchivoVistaPrevia = URL.createObjectURL(archivo);
+  this.mostrarModalArchivo = true;
+}
+
+cerrarVistaPrevia(): void {
+  if (this.urlArchivoVistaPrevia) {
+    URL.revokeObjectURL(this.urlArchivoVistaPrevia);
+  }
+
+  this.urlArchivoVistaPrevia = '';
+  this.archivoVistaPrevia = null;
+  this.esImagenArchivoVistaPrevia = false;
+  this.mostrarModalArchivo = false;
+}
+
+// ==========================================
+// NAVEGACIÓN
+// ==========================================
+
+continuar(): void {
 
     if (this.currentStep === 1 && !this.paso1Valido) {
       return;
@@ -564,12 +633,22 @@ cerrarModalEnvio(): void {
     });
   }
 
+// ==========================================
+// MODAL DE SOLICITUD ENVIADA
+// ==========================================
+
+  cerrarModalEnvio(): void {
+    this.mostrarModalEnvio = false;
+    this.router.navigate(['/acerca-de']);
+  }
 
   // ==========================================
   // CANCELAR
   // ==========================================
 
   cancelar(): void {
+
     window.history.back();
+
   }
 }
