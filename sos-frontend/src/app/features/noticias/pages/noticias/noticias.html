@@ -1,1 +1,174 @@
-<p>{{ textos.titulo }}</p>
+<main class="pagina-noticias">
+	<header class="noticias-encabezado">
+		<a class="noticias-volver" routerLink="/inicio">
+			{{ textos.volverInicio }}
+		</a>
+		<h1>{{ textos.titulo }}</h1>
+		<p>{{ textos.subtitulo }}</p>
+	</header>
+
+	<div class="noticias-categorias" role="group" [attr.aria-label]="textos.categoriasEtiqueta">
+		@for (categoria of textos.filtros; track categoria) {
+			<span
+				class="noticias-categoria"
+				[class.noticias-categoria--activa]="categoria === textos.filtroTodas"
+			>
+				{{ categoria }}
+			</span>
+		}
+	</div>
+
+	<section class="noticias-actualizaciones" aria-labelledby="noticias-actualizaciones-titulo">
+		<div class="noticias-seccion-encabezado">
+			<div>
+				<h2 id="noticias-actualizaciones-titulo">{{ textos.ultimasTitulo }}</h2>
+				<p>{{ textos.ultimasDesc }}</p>
+			</div>
+		</div>
+
+		@if (cargando()) {
+			<p class="noticias-estado" role="status">{{ textos.cargando }}</p>
+		} @else if (error()) {
+			<div class="noticias-estado noticias-estado--error" role="alert">
+				<p>{{ textos.errorCarga }}</p>
+				<button type="button" (click)="cargarNoticias()">
+					{{ textos.reintentar }}
+				</button>
+			</div>
+		} @else if (noticias().length === 0) {
+			<p class="noticias-estado">{{ textos.sinNoticias }}</p>
+		} @else {
+			<div class="noticias-destacadas">
+				@for (noticia of noticiasDestacadas(); track noticia.id; let principal = $first) {
+					<article
+						class="noticia-tarjeta"
+						[class.noticia-tarjeta--principal]="principal"
+					>
+						<div class="noticia-tarjeta__imagen">
+							@if (noticia.imagenUrl) {
+								<img
+									[src]="noticia.imagenUrl"
+									[alt]="noticia.titulo"
+									loading="lazy"
+									(error)="ocultarImagen($event)"
+								/>
+							} @else {
+								<div class="noticia-tarjeta__imagen-fallback">
+									{{ textos.imagenNoDisponible }}
+								</div>
+							}
+							<span class="noticia-tarjeta__categoria">{{ noticia.categoria || textos.categoriaGeneral }}</span>
+							@if (noticia.fuente) {
+								<span class="noticia-tarjeta__fuente">{{ noticia.fuente }}</span>
+							}
+						</div>
+
+						<div class="noticia-tarjeta__contenido">
+							<div class="noticia-tarjeta__meta">
+								<span>{{ textos.ubicacionIcono }} {{ noticia.ubicacion || textos.ubicacion }}</span>
+								@if (noticia.fechaPublicacion) {
+									<time [attr.datetime]="noticia.fechaPublicacion">
+										{{ formatearFecha(noticia.fechaPublicacion) }}
+									</time>
+								}
+							</div>
+							<h3>{{ noticia.titulo }}</h3>
+							@if (noticia.resumen) {
+								<p>{{ noticia.resumen }}</p>
+							}
+							@if (noticia.url) {
+								<a
+									class="noticia-tarjeta__enlace"
+									[href]="noticia.url"
+									target="_blank"
+									rel="noopener noreferrer"
+								>
+									{{ textos.leerNoticia }}
+								</a>
+							}
+						</div>
+					</article>
+				}
+			</div>
+
+			@if (noticiasSecundarias().length > 0) {
+				<div class="noticias-secundarias">
+					@for (noticia of noticiasSecundarias(); track noticia.id) {
+						<article class="noticia-tarjeta">
+							<div class="noticia-tarjeta__imagen">
+								@if (noticia.imagenUrl) {
+									<img
+										[src]="noticia.imagenUrl"
+										[alt]="noticia.titulo"
+										loading="lazy"
+										(error)="ocultarImagen($event)"
+									/>
+								} @else {
+									<div class="noticia-tarjeta__imagen-fallback">
+										{{ textos.imagenNoDisponible }}
+									</div>
+								}
+								<span class="noticia-tarjeta__categoria">{{ noticia.categoria || textos.categoriaGeneral }}</span>
+								@if (noticia.fuente) {
+									<span class="noticia-tarjeta__fuente">{{ noticia.fuente }}</span>
+								}
+							</div>
+
+							<div class="noticia-tarjeta__contenido">
+								<div class="noticia-tarjeta__meta">
+									  <span>{{ textos.ubicacionIcono }} {{ noticia.ubicacion || textos.ubicacion }}</span>
+									@if (noticia.fechaPublicacion) {
+										<time [attr.datetime]="noticia.fechaPublicacion">
+											{{ formatearFecha(noticia.fechaPublicacion) }}
+										</time>
+									}
+								</div>
+								<h3>{{ noticia.titulo }}</h3>
+								@if (noticia.resumen) {
+									<p>{{ noticia.resumen }}</p>
+								}
+								@if (noticia.url) {
+									<a
+										class="noticia-tarjeta__enlace"
+										[href]="noticia.url"
+										target="_blank"
+										rel="noopener noreferrer"
+									>
+										{{ textos.leerNoticia }}
+									</a>
+								}
+							</div>
+						</article>
+					}
+				</div>
+			}
+		}
+	</section>
+
+	@if (featureToggles.noticias.mostrarAlertas) {
+		<section class="noticias-alertas" aria-labelledby="noticias-alertas-titulo" data-alertas-referencia>
+			<div class="noticias-seccion-encabezado">
+				<h2 id="noticias-alertas-titulo">{{ textos.alertasTitulo }}</h2>
+				<p>{{ textos.alertasDesc }}</p>
+			</div>
+
+			<article class="noticia-alerta">
+				<span class="noticia-alerta__icono" aria-hidden="true">!</span>
+				<div class="noticia-alerta__contenido">
+					<div class="noticia-alerta__meta">
+						<span class="noticia-alerta__badge">{{ textos.alertaActivaBadge }}</span>
+						<span>{{ textos.actualizado }} {{ textos.alertaActualizadoReferencia }}</span>
+					</div>
+					<h3>{{ textos.alertaTituloReferencia }}</h3>
+					<p>{{ textos.alertaMensajeReferencia }}</p>
+					<span class="noticia-alerta__ubicacion">
+						{{ textos.ubicacionIcono }} {{ textos.alertaUbicacionReferencia }}
+					</span>
+				</div>
+				<a class="noticia-alerta__mapa" routerLink="/mapa">
+					{{ textos.verEnMapa }}
+				</a>
+			</article>
+		</section>
+	}
+</main>

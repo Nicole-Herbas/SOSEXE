@@ -394,8 +394,20 @@ noticias: {
   imagenReferencial:
     'Imagen referencial',
 
+  imagenNoDisponible:
+    'Imagen no disponible',
+
+  categoriaGeneral:
+    'Noticias',
+
   leerNoticia:
     'Leer noticia →',
+
+  reintentar:
+    'Intentar de nuevo',
+
+  categoriasEtiqueta:
+    'Categorías de noticias',
 
   ubicacionIcono:
     '⌖',
@@ -412,6 +424,18 @@ noticias: {
 
   alertaActivaBadge:
     'Alerta activa',
+
+  alertaTituloReferencia:
+    'Inundaciones en zonas cercanas al río Piraí',
+
+  alertaMensajeReferencia:
+    'Niveles elevados del río Piraí afectan comunidades en Santa Cruz. Se recomienda alejarse de las riberas y seguir las indicaciones de Defensa Civil.',
+
+  alertaUbicacionReferencia:
+    'Santa Cruz, Bolivia',
+
+  alertaActualizadoReferencia:
+    'hoy, 15:35',
 
   verEnMapa:
     'Ver en el mapa →',
