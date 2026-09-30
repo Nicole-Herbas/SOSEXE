@@ -5,6 +5,7 @@ import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,7 +22,7 @@ public class CentroDTO {
     private Long id;
 
     @NotBlank(message = "El nombre es obligatorio")
-    @Size(max = 150, message = "El nombre no puede superar los 150 caracteres")
+    @Size(min = 5, max = 150, message = "El nombre debe tener entre 5 y 150 caracteres")
     private String nombre;
 
     @NotBlank(message = "El tipo es obligatorio")
@@ -42,6 +43,8 @@ public class CentroDTO {
     @NotNull(message = "El departamento es obligatorio")
     private Long departamentoId;
 
+    @NotBlank(message = "El teléfono es obligatorio")
+    @Pattern(regexp = "^[0-9]{8,15}$", message = "El teléfono debe tener entre 8 y 15 dígitos")
     @Size(max = 20, message = "El teléfono no puede superar los 20 caracteres")
     private String telefono;
 

@@ -55,6 +55,7 @@ export const routes: Routes = [
   {
     path: 'admin',
     component: ListaCentros,
-    canActivate: [adminGuard]
+    canActivate: [adminGuard],
+    data: { mostrarFormulario: true }
   }
 ];

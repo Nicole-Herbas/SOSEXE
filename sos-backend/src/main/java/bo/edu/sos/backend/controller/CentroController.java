@@ -54,6 +54,16 @@ public class CentroController {
                         centroService.actualizar(id, centroDTO)));
     }
 
+    @PutMapping("/{id}/estado")
+    public ResponseEntity<ApiResponse<CentroDTO>> actualizarEstado(
+            @PathVariable Long id,
+            @RequestBody String estado) {
+
+        return ResponseEntity.ok(
+                ApiResponse.ok("Estado de verificación actualizado",
+                        centroService.actualizarEstado(id, estado)));
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>> eliminar(
             @PathVariable Long id) {
