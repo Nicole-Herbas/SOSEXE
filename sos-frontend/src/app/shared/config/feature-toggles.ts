@@ -36,13 +36,19 @@ export interface MapaToggles {
 }
 
 // ---------------------------------------------------------------------------
+// 📰 Módulo: Noticias
+// ---------------------------------------------------------------------------
+export interface NoticiasToggles {
+  /** true → muestra la alerta estática de referencia; false → la oculta */
+  mostrarAlertas: boolean;
+}
+
+// ---------------------------------------------------------------------------
 // 📦 Interfaz raíz — agregar aquí nuevos módulos en el futuro
 // ---------------------------------------------------------------------------
 export interface FeatureToggles {
   mapa: MapaToggles;
-
-  // Ejemplo de cómo escalar en el futuro:
-  // noticias: NoticiasToggles;
+  noticias: NoticiasToggles;
   // donaciones: DonacionesToggles;
 }
 
@@ -57,6 +63,10 @@ export const FEATURE_TOGGLES: FeatureToggles = {
     filtros:        true,
     mostrarLista:   true,
     mostrarMapa:    true,
+  },
+
+  noticias: {
+    mostrarAlertas: true,
   },
 
 };
