@@ -17,6 +17,8 @@ public final class ApiRoutes {
     // ── Centros ──────────────────────────────────────────────────────────────
     public static final String CENTROS        = "/api/centros";
 
+    
+
     // ── Noticias ─────────────────────────────────────────────────────────────
     public static final String NOTICIAS           = "/api/noticias";
     public static final String NOTICIAS_PUBLICAS  = NOTICIAS + "/publicas";
