@@ -117,6 +117,19 @@ public class SecurityConfig {
                                 ApiRoutes.DEPARTAMENTOS + "/**"
                         ).permitAll()
 
+                        // ── SOS-41: solicitudes de registro de centro ──
+                        // Enviar una solicitud -> cualquier usuario con sesión
+                        .requestMatchers(
+                                HttpMethod.POST,
+                                ApiRoutes.SOLICITUDES_CENTRO
+                        ).authenticated()
+
+                        // Consultar solicitudes -> solo ADMIN
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                ApiRoutes.SOLICITUDES_CENTRO,
+                                ApiRoutes.SOLICITUDES_CENTRO + "/**"
+                        ).hasAuthority(Roles.ADMIN)
 
                         // Usuario autenticado
                         .requestMatchers(
