@@ -112,7 +112,9 @@ public class SecurityConfig {
                                 ApiRoutes.ALERTAS + "/**",
                                 ApiRoutes.PUNTOS_AYUDA + "/**",
                                 ApiRoutes.VOLUNTARIADOS + "/**",
-                                ApiRoutes.MAPA + "/**"
+                                ApiRoutes.MAPA + "/**",
+                                ApiRoutes.DEPARTAMENTOS,
+                                ApiRoutes.DEPARTAMENTOS + "/**"
                         ).permitAll()
 
 
