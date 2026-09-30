@@ -2,6 +2,7 @@ import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Router } from '@angular/router';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 
 import { ApiResponse } from '../../../../shared/models/api-response';
 
@@ -22,7 +23,9 @@ export class RegistrarCentroComponent implements OnInit {
 
   constructor(
     private http: HttpClient,
-    private router: Router
+    private router: Router,
+    private cdr: ChangeDetectorRef,
+    private sanitizer: DomSanitizer
   ) {}
 
   // Rutas relativas: proxy.conf.json las envía al backend
@@ -35,6 +38,7 @@ export class RegistrarCentroComponent implements OnInit {
 
   currentStep = 1;
   mostrarModalEnvio = false;
+  mostrarModalError = false;
   enviando = false;
   errorEnvio = '';
 
@@ -64,11 +68,13 @@ export class RegistrarCentroComponent implements OnInit {
       .subscribe({
         next: (respuesta) => {
           this.departamentos = respuesta.data ?? [];
+          this.cdr.markForCheck();
         },
         error: (error) => {
           console.error('Error al cargar departamentos:', error);
           this.errorDepartamentos =
             'No se pudieron cargar los departamentos. Recarga la página.';
+          this.cdr.markForCheck();
         }
       });
   }
@@ -86,6 +92,7 @@ export class RegistrarCentroComponent implements OnInit {
   mostrarModalArchivo = false;
   archivoVistaPrevia: File | null = null;
   urlArchivoVistaPrevia = '';
+  urlSeguraVistaPrevia: SafeResourceUrl | null = null; // para el <iframe> del PDF
   esImagenArchivoVistaPrevia = false;
 
   // ==========================================
@@ -378,15 +385,19 @@ export class RegistrarCentroComponent implements OnInit {
 
     this.http
       .post<ApiResponse<unknown>>(this.API_SOLICITUDES, this.construirFormData())
-      .subscribe({
+            .subscribe({
         next: () => {
+          console.log('✅ Solicitud guardada, mostrando modal');
           this.enviando = false;
           this.mostrarModalEnvio = true;
+          this.cdr.detectChanges();
         },
         error: (error: HttpErrorResponse) => {
-          this.enviando = false;
           console.error('Error al guardar la solicitud:', error);
+          this.enviando = false;
           this.errorEnvio = this.mensajeDeError(error);
+          this.mostrarModalError = true;
+          this.cdr.detectChanges();
         }
       });
   }
@@ -399,6 +410,10 @@ export class RegistrarCentroComponent implements OnInit {
 
     if (error.status === 413) {
       return 'Los archivos superan el tamaño máximo permitido (10 MB por archivo).';
+    }
+
+    if (error.status === 422) {
+      return 'Algunos datos no son válidos. Revisa la información y completa lo que falta.';
     }
 
     return error.error?.message
@@ -587,6 +602,11 @@ export class RegistrarCentroComponent implements OnInit {
     this.archivoVistaPrevia = archivo;
     this.esImagenArchivoVistaPrevia = archivo.type.startsWith('image/');
     this.urlArchivoVistaPrevia = URL.createObjectURL(archivo);
+
+    // Angular bloquea URLs en <iframe> por seguridad; esta es un blob local
+    this.urlSeguraVistaPrevia =
+      this.sanitizer.bypassSecurityTrustResourceUrl(this.urlArchivoVistaPrevia);
+
     this.mostrarModalArchivo = true;
   }
 
@@ -596,6 +616,7 @@ export class RegistrarCentroComponent implements OnInit {
     }
 
     this.urlArchivoVistaPrevia = '';
+    this.urlSeguraVistaPrevia = null;
     this.archivoVistaPrevia = null;
     this.esImagenArchivoVistaPrevia = false;
     this.mostrarModalArchivo = false;
@@ -678,6 +699,20 @@ export class RegistrarCentroComponent implements OnInit {
   cerrarModalEnvio(): void {
     this.mostrarModalEnvio = false;
     this.router.navigate(['/acerca-de']);
+  }
+
+  // ==========================================
+  // MODAL DE ERROR
+  // ==========================================
+
+  // Cierra el modal y deja al usuario en el formulario (no se pierde nada)
+  cerrarModalError(): void {
+    this.mostrarModalError = false;
+  }
+
+  irALoginDesdeError(): void {
+    this.mostrarModalError = false;
+    this.irALogin();
   }
 
   // ==========================================

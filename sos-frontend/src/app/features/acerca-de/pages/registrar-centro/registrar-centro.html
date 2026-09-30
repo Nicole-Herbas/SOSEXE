@@ -1873,19 +1873,6 @@
 
 
         <!-- ======================================
-             SOS-41: ERROR DEL BACKEND
-             ====================================== -->
-
-        @if (errorEnvio) {
-
-          <div class="file-error">
-            {{ errorEnvio }}
-          </div>
-
-        }
-
-
-        <!-- ======================================
              BOTONES
              ====================================== -->
 
@@ -2105,7 +2092,7 @@
         } @else {
 
           <iframe
-            [src]="urlArchivoVistaPrevia"
+            [src]="urlSeguraVistaPrevia"
             title="Vista previa del documento"
           ></iframe>
 
@@ -2125,52 +2112,103 @@
 
 @if (mostrarModalEnvio) {
 
-  <div
-    class="modal-overlay"
-    (click)="cerrarModalEnvio()"
-  >
+  <div class="modal-overlay" (click)="cerrarModalEnvio()">
 
-    <div
-      class="success-modal"
-      (click)="$event.stopPropagation()"
-    >
+    <div class="success-modal" (click)="$event.stopPropagation()">
 
-      <!-- ICONO -->
-
-      <div class="success-icon">
-        ✓
-      </div>
-
-
-      <!-- CONTENIDO -->
+      <div class="success-icon">✓</div>
 
       <div class="success-content">
 
-        <h2>
-          ¡Solicitud enviada!
-        </h2>
+        <span class="modal-badge">Estado: Pendiente de revisión</span>
+
+        <h2>¡Registro recibido!</h2>
 
         <p>
-          Tu solicitud fue enviada correctamente.
-        </p>
-
-        <p class="success-description">
-          El equipo administrador revisará la información
-          proporcionada antes de publicar el centro.
+          La solicitud de <strong>{{ nombreCentro }}</strong>
+          fue enviada correctamente.
         </p>
 
       </div>
 
+      <div class="modal-steps">
 
-      <!-- ACCIÓN -->
+        <span class="modal-steps-title">¿Qué sigue?</span>
 
-      <button
-        type="button"
-        class="success-button"
-        (click)="cerrarModalEnvio()"
-      >
+        <div class="modal-step">
+          <span class="modal-step-number">1</span>
+          <p>El equipo administrador revisará los datos y documentos.</p>
+        </div>
+
+        <div class="modal-step">
+          <span class="modal-step-number">2</span>
+          <p>Podrá contactarte al correo o teléfono del responsable.</p>
+        </div>
+
+        <div class="modal-step">
+          <span class="modal-step-number">3</span>
+          <p>Si todo está en orden, el centro se publicará en la plataforma.</p>
+        </div>
+
+      </div>
+
+      <button type="button" class="success-button" (click)="cerrarModalEnvio()">
         Entendido
       </button>
+
+    </div>
+
+  </div>
+
+}
+
+
+<!-- ==========================================
+     MODAL - ERROR AL ENVIAR
+     ========================================== -->
+
+@if (mostrarModalError) {
+
+  <div class="modal-overlay" (click)="cerrarModalError()">
+
+    <div class="success-modal error-modal" (click)="$event.stopPropagation()">
+
+      <div class="success-icon error-icon">!</div>
+
+      <div class="success-content">
+
+        <h2>No se pudo enviar la solicitud</h2>
+
+        <p>{{ errorEnvio }}</p>
+
+        <p class="success-description">
+          Tu información sigue aquí; no se perdió nada.
+          Corrige lo necesario y vuelve a intentarlo.
+        </p>
+
+      </div>
+
+      <div class="modal-actions">
+
+        @if (haySesion) {
+
+          <button type="button" class="success-button" (click)="cerrarModalError()">
+            Revisar y completar
+          </button>
+
+        } @else {
+
+          <button type="button" class="btn secondary" (click)="cerrarModalError()">
+            Cerrar
+          </button>
+
+          <button type="button" class="success-button" (click)="irALoginDesdeError()">
+            Iniciar sesión
+          </button>
+
+        }
+
+      </div>
 
     </div>
 
