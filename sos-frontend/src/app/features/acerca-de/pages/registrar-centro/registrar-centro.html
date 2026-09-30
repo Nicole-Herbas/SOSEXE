@@ -93,43 +93,45 @@
     <!-- PASO 3 -->
 
     <div
-    class="step"
-    [class.active]="currentStep === 3"
-    [class.completed]="currentStep > 3"
+      class="step"
+      [class.active]="currentStep === 3"
+      [class.completed]="currentStep > 3"
     >
-    <span class="step-number">
+
+      <span class="step-number">
 
         @if (currentStep > 3) {
-        ✓
+          ✓
         } @else {
-        3
+          3
         }
 
-    </span>
+      </span>
 
-    <span>Documentos</span>
+      <span>Documentos</span>
+
     </div>
 
 
     <!-- PASO 4 -->
 
     <div
-    class="step"
-    [class.active]="currentStep === 4"
-    [class.completed]="currentStep > 4"
+      class="step"
+      [class.active]="currentStep === 4"
+      [class.completed]="currentStep > 4"
     >
 
-    <span class="step-number">
+      <span class="step-number">
 
         @if (currentStep > 4) {
-        ✓
+          ✓
         } @else {
-        4
+          4
         }
 
-    </span>
+      </span>
 
-    <span>Necesidades y voluntariado</span>
+      <span>Necesidades y voluntariado</span>
 
     </div>
 
@@ -137,15 +139,15 @@
     <!-- PASO 5 -->
 
     <div
-    class="step"
-    [class.active]="currentStep === 5"
+      class="step"
+      [class.active]="currentStep === 5"
     >
 
-    <span class="step-number">
+      <span class="step-number">
         5
-    </span>
+      </span>
 
-    <span>Revisión y envío</span>
+      <span>Revisión y envío</span>
 
     </div>
 
@@ -248,26 +250,31 @@
               <span>*</span>
             </label>
 
-            <select
-              [(ngModel)]="departamento"
-            >
+            <!-- SOS-41: departamentos desde el backend.
+                 [ngValue] conserva el id como número -->
+            <select [(ngModel)]="departamentoId">
 
-              <option value="">
+              <option [ngValue]="null">
                 Selecciona un departamento
               </option>
 
-              @for (
-                departamento of departamentos;
-                track departamento
-              ) {
+              @for (dep of departamentos; track dep.id) {
 
-                <option [value]="departamento">
-                  {{ departamento }}
+                <option [ngValue]="dep.id">
+                  {{ dep.nombre }}
                 </option>
 
               }
 
             </select>
+
+            @if (errorDepartamentos) {
+
+              <div class="file-error">
+                {{ errorDepartamentos }}
+              </div>
+
+            }
 
           </div>
 
@@ -615,13 +622,11 @@
                 Selecciona un departamento
               </option>
 
-              @for (
-                departamento of departamentos;
-                track departamento
-              ) {
+              <!-- SOS-41: departamentos desde el backend -->
+              @for (dep of departamentos; track dep.id) {
 
-                <option [value]="departamento">
-                  {{ departamento }}
+                <option [value]="dep.nombre">
+                  {{ dep.nombre }}
                 </option>
 
               }
@@ -708,9 +713,11 @@
         </div>
 
       }
+
+
       <!-- =================================================
-          PASO 3 - DOCUMENTOS
-          ================================================= -->
+           PASO 3 - DOCUMENTOS
+           ================================================= -->
 
       @if (currentStep === 3) {
 
@@ -733,8 +740,8 @@
 
 
         <!-- ======================================
-            DOCUMENTO 1 - PERSONERÍA
-            ====================================== -->
+             DOCUMENTO 1 - PERSONERÍA
+             ====================================== -->
 
         <div
           class="document-item"
@@ -815,8 +822,8 @@
 
 
         <!-- ======================================
-            DOCUMENTO 2 - NIT
-            ====================================== -->
+             DOCUMENTO 2 - NIT
+             ====================================== -->
 
         <div
           class="document-item"
@@ -847,15 +854,15 @@
 
               @if (nitArchivo) {
 
-              <button
-                type="button"
-                class="file-name file-preview-button"
-                (click)="verArchivo(nitArchivo)"
-              >
-                {{ nitArchivo.name }}
-              </button>
+                <button
+                  type="button"
+                  class="file-name file-preview-button"
+                  (click)="verArchivo(nitArchivo)"
+                >
+                  {{ nitArchivo.name }}
+                </button>
 
-            }
+              }
 
             </div>
 
@@ -897,8 +904,8 @@
 
 
         <!-- ======================================
-            DOCUMENTO 3 - IDENTIDAD
-            ====================================== -->
+             DOCUMENTO 3 - IDENTIDAD
+             ====================================== -->
 
         <div
           class="document-item"
@@ -929,15 +936,15 @@
 
               @if (identidadArchivo) {
 
-              <button
-                type="button"
-                class="file-name file-preview-button"
-                (click)="verArchivo(identidadArchivo)"
-              >
-                {{ identidadArchivo.name }}
-              </button>
+                <button
+                  type="button"
+                  class="file-name file-preview-button"
+                  (click)="verArchivo(identidadArchivo)"
+                >
+                  {{ identidadArchivo.name }}
+                </button>
 
-            }
+              }
 
             </div>
 
@@ -979,8 +986,8 @@
 
 
         <!-- ======================================
-            DOCUMENTO 4 - DOMICILIO
-            ====================================== -->
+             DOCUMENTO 4 - DOMICILIO
+             ====================================== -->
 
         <div
           class="document-item"
@@ -1011,15 +1018,15 @@
 
               @if (domicilioArchivo) {
 
-              <button
-                type="button"
-                class="file-name file-preview-button"
-                (click)="verArchivo(domicilioArchivo)"
-              >
-                {{ domicilioArchivo.name }}
-              </button>
+                <button
+                  type="button"
+                  class="file-name file-preview-button"
+                  (click)="verArchivo(domicilioArchivo)"
+                >
+                  {{ domicilioArchivo.name }}
+                </button>
 
-            }
+              }
 
             </div>
 
@@ -1061,8 +1068,8 @@
 
 
         <!-- ======================================
-            ERROR DE ARCHIVO
-            ====================================== -->
+             ERROR DE ARCHIVO
+             ====================================== -->
 
         @if (errorArchivo) {
 
@@ -1074,8 +1081,8 @@
 
 
         <!-- ======================================
-            INFORMACIÓN IMPORTANTE
-            ====================================== -->
+             INFORMACIÓN IMPORTANTE
+             ====================================== -->
 
         <div class="document-notice">
 
@@ -1090,8 +1097,8 @@
 
 
         <!-- ======================================
-            BOTONES PASO 3
-            ====================================== -->
+             BOTONES PASO 3
+             ====================================== -->
 
         <div class="form-actions">
 
@@ -1130,7 +1137,8 @@
 
       }
 
-            <!-- =================================================
+
+      <!-- =================================================
            PASO 4 - NECESIDADES Y VOLUNTARIADO
            ================================================= -->
 
@@ -1433,442 +1441,490 @@
         </div>
 
       }
+
+
       <!-- =================================================
-     PASO 5 - REVISIÓN Y ENVÍO
-     ================================================= -->
+           PASO 5 - REVISIÓN Y ENVÍO
+           ================================================= -->
 
-@if (currentStep === 5) {
+      @if (currentStep === 5) {
 
-  <div class="form-title">
+        <div class="form-title">
 
-    <span class="step-label">
-      Paso 5 de 5
-    </span>
+          <span class="step-label">
+            Paso 5 de 5
+          </span>
 
-    <h2>Revisión y envío</h2>
+          <h2>Revisión y envío</h2>
 
-    <p>
-      Revisa la información antes de enviar la solicitud
-      de verificación.
-    </p>
-
-  </div>
-
-
-  <!-- ======================================
-       INFORMACIÓN DEL CENTRO
-       ====================================== -->
-
-  <div class="review-section">
-
-    <div class="review-section-header">
-
-      <div>
-        <h3>Información del centro</h3>
-        <p>Datos principales de la organización.</p>
-      </div>
-
-      <span class="review-badge">
-        ✓ Completo
-      </span>
-
-    </div>
-
-
-    <div class="review-grid">
-
-      <div class="review-item">
-        <span>Nombre</span>
-        <strong>{{ nombreCentro }}</strong>
-      </div>
-
-      <div class="review-item">
-        <span>Tipo de organización</span>
-        <strong>{{ tipoOrganizacion }}</strong>
-      </div>
-
-      <div class="review-item">
-        <span>Departamento</span>
-        <strong>{{ departamento }}</strong>
-      </div>
-
-      <div class="review-item">
-        <span>NIT</span>
-        <strong>{{ nit }}</strong>
-      </div>
-
-        <div class="review-item">
-          <span>Personería jurídica</span>
-          <strong>{{ personeriaJuridica }}</strong>
-        </div>
-
-        <div class="review-item">
-          <span>Fecha de fundación</span>
-          <strong>{{ fechaFundacion || 'No especificada' }}</strong>
-        </div>
-
-        <div class="review-item full-review">
-          <span>Página web o red social</span>
-          <strong>{{ paginaWeb || 'No especificada' }}</strong>
-        </div>
-
-        <div class="review-item full-review">
-          <span>Descripción</span>
-          <strong>{{ descripcion }}</strong>
-        </div>
-
-        <div class="review-item full-review">
-          <span>Población atendida</span>
-          <strong>{{ poblacionAtendida || 'No especificada' }}</strong>
-        </div>
-
-      </div>
-
-    </div>
-
-
-    <!-- ======================================
-        RESPONSABLE
-        ====================================== -->
-
-    <div class="review-section">
-
-      <div class="review-section-header">
-
-        <div>
-          <h3>Responsable</h3>
-          <p>Persona encargada del centro.</p>
-        </div>
-
-        <span class="review-badge">
-          ✓ Completo
-        </span>
-
-      </div>
-
-
-      <div class="review-grid">
-
-        <div class="review-item">
-          <span>Nombre</span>
-          <strong>{{ nombreResponsable }}</strong>
-        </div>
-
-        <div class="review-item">
-          <span>Cargo</span>
-          <strong>{{ cargoResponsable }}</strong>
-        </div>
-
-        <div class="review-item">
-          <span>Documento</span>
-          <strong>{{ documentoResponsable }}</strong>
-        </div>
-
-        <div class="review-item">
-          <span>Correo</span>
-          <strong>{{ correoResponsable }}</strong>
-        </div>
-
-        <div class="review-item">
-          <span>Teléfono</span>
-          <strong>{{ telefonoResponsable }}</strong>
-        </div>
-
-      </div>
-
-    </div>
-
-
-    <!-- ======================================
-        UBICACIÓN
-        ====================================== -->
-
-    <div class="review-section">
-
-      <div class="review-section-header">
-
-        <div>
-          <h3>Ubicación</h3>
-          <p>Ubicación registrada del centro.</p>
-        </div>
-
-        <span class="review-badge">
-          ✓ Completo
-        </span>
-
-      </div>
-
-
-      <div class="review-grid">
-
-        <div class="review-item">
-          <span>Ciudad</span>
-          <strong>{{ ciudad }}</strong>
-        </div>
-
-        <div class="review-item">
-          <span>Departamento</span>
-          <strong>{{ departamentoUbicacion }}</strong>
-        </div>
-
-        <div class="review-item full-review">
-          <span>Dirección</span>
-          <strong>{{ direccionExacta }}</strong>
-        </div>
-
-        <div class="review-item full-review">
-          <span>Referencia</span>
-          <strong>{{ referencia || 'No especificada' }}</strong>
-        </div>
-
-      </div>
-
-    </div>
-
-
-    <!-- ======================================
-        DOCUMENTOS
-        ====================================== -->
-
-    <div class="review-section">
-
-      <div class="review-section-header">
-
-        <div>
-          <h3>Documentos</h3>
-          <p>Archivos adjuntados para la verificación.</p>
-        </div>
-
-        <span class="review-badge">
-          {{ documentosAdjuntos }}/4
-        </span>
-
-      </div>
-
-
-      <div class="review-documents">
-
-        <div class="review-document">
-          <span class="document-status">✓</span>
-
-          @if (personeriaArchivo) {
-            <button
-              type="button"
-              class="file-preview-button"
-              (click)="verArchivo(personeriaArchivo)"
-            >
-              {{ personeriaArchivo.name }}
-            </button>
-          }
-        </div>
-
-        <div class="review-document">
-        <span class="document-status">✓</span>
-
-        @if (nitArchivo) {
-          <button
-            type="button"
-            class="file-preview-button"
-            (click)="verArchivo(nitArchivo)"
-          >
-            {{ nitArchivo.name }}
-          </button>
-        }
-      </div>
-
-        <div class="review-document">
-          <span class="document-status">✓</span>
-
-          @if (identidadArchivo) {
-            <button
-              type="button"
-              class="file-preview-button"
-              (click)="verArchivo(identidadArchivo)"
-            >
-              {{ identidadArchivo.name }}
-            </button>
-          }
-        </div>
-
-        <div class="review-document">
-        <span class="document-status">✓</span>
-
-        @if (domicilioArchivo) {
-          <button
-            type="button"
-            class="file-preview-button"
-            (click)="verArchivo(domicilioArchivo)"
-          >
-            {{ domicilioArchivo.name }}
-          </button>
-        }
-      </div>
-
-      </div>
-
-    </div>
-
-
-    <!-- ======================================
-        NECESIDADES Y DONACIONES
-        ====================================== -->
-
-    <div class="review-section">
-
-      <div class="review-section-header">
-
-        <div>
-          <h3>Necesidades y donaciones</h3>
-          <p>Información de apoyo del centro.</p>
-        </div>
-
-      </div>
-
-
-      <div class="review-grid">
-
-        <div class="review-item full-review">
-
-          <span>Necesidades prioritarias</span>
-
-          <strong>
-            {{ necesidadesSeleccionadas.join(', ') }}
-          </strong>
-
-        </div>
-
-        <div class="review-item full-review">
-
-          <span>Donaciones que acepta</span>
-
-          <strong>
-            {{ donacionesSeleccionadas.join(', ') }}
-          </strong>
-
-        </div>
-
-      </div>
-
-    </div>
-
-
-    <!-- ======================================
-        VOLUNTARIADO
-        ====================================== -->
-
-    <div class="review-section">
-
-      <div class="review-section-header">
-
-        <div>
-          <h3>Voluntariado</h3>
-          <p>Información sobre voluntarios.</p>
-        </div>
-
-      </div>
-
-
-      <div class="review-grid">
-
-        <div class="review-item">
-
-          <span>Solicita voluntarios</span>
-
-          <strong>
-            {{ solicitaVoluntarios ? 'Sí' : 'No' }}
-          </strong>
+          <p>
+            Revisa la información antes de enviar la solicitud
+            de verificación.
+          </p>
 
         </div>
 
 
-        @if (solicitaVoluntarios) {
+        <!-- ======================================
+             INFORMACIÓN DEL CENTRO
+             ====================================== -->
 
-          <div class="review-item full-review">
+        <div class="review-section">
 
-            <span>Actividades</span>
+          <div class="review-section-header">
 
-            <strong>
-              {{ actividadesSeleccionadas.join(', ') }}
-            </strong>
+            <div>
+              <h3>Información del centro</h3>
+              <p>Datos principales de la organización.</p>
+            </div>
+
+            <span class="review-badge">
+              ✓ Completo
+            </span>
 
           </div>
 
 
-          <div class="review-item full-review">
+          <div class="review-grid">
 
-            <span>Descripción</span>
+            <div class="review-item">
+              <span>Nombre</span>
+              <strong>{{ nombreCentro }}</strong>
+            </div>
+
+            <div class="review-item">
+              <span>Tipo de organización</span>
+              <strong>{{ tipoOrganizacion }}</strong>
+            </div>
+
+            <div class="review-item">
+              <span>Departamento</span>
+              <strong>{{ nombreDepartamento }}</strong>
+            </div>
+
+            <div class="review-item">
+              <span>NIT</span>
+              <strong>{{ nit }}</strong>
+            </div>
+
+            <div class="review-item">
+              <span>Personería jurídica</span>
+              <strong>{{ personeriaJuridica }}</strong>
+            </div>
+
+            <div class="review-item">
+              <span>Fecha de fundación</span>
+              <strong>{{ fechaFundacion || 'No especificada' }}</strong>
+            </div>
+
+            <div class="review-item full-review">
+              <span>Página web o red social</span>
+              <strong>{{ paginaWeb || 'No especificada' }}</strong>
+            </div>
+
+            <div class="review-item full-review">
+              <span>Descripción</span>
+              <strong>{{ descripcion }}</strong>
+            </div>
+
+            <div class="review-item full-review">
+              <span>Población atendida</span>
+              <strong>{{ poblacionAtendida || 'No especificada' }}</strong>
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <!-- ======================================
+             RESPONSABLE
+             ====================================== -->
+
+        <div class="review-section">
+
+          <div class="review-section-header">
+
+            <div>
+              <h3>Responsable</h3>
+              <p>Persona encargada del centro.</p>
+            </div>
+
+            <span class="review-badge">
+              ✓ Completo
+            </span>
+
+          </div>
+
+
+          <div class="review-grid">
+
+            <div class="review-item">
+              <span>Nombre</span>
+              <strong>{{ nombreResponsable }}</strong>
+            </div>
+
+            <div class="review-item">
+              <span>Cargo</span>
+              <strong>{{ cargoResponsable }}</strong>
+            </div>
+
+            <div class="review-item">
+              <span>Documento</span>
+              <strong>{{ documentoResponsable }}</strong>
+            </div>
+
+            <div class="review-item">
+              <span>Correo</span>
+              <strong>{{ correoResponsable }}</strong>
+            </div>
+
+            <div class="review-item">
+              <span>Teléfono</span>
+              <strong>{{ telefonoResponsable }}</strong>
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <!-- ======================================
+             UBICACIÓN
+             ====================================== -->
+
+        <div class="review-section">
+
+          <div class="review-section-header">
+
+            <div>
+              <h3>Ubicación</h3>
+              <p>Ubicación registrada del centro.</p>
+            </div>
+
+            <span class="review-badge">
+              ✓ Completo
+            </span>
+
+          </div>
+
+
+          <div class="review-grid">
+
+            <div class="review-item">
+              <span>Ciudad</span>
+              <strong>{{ ciudad }}</strong>
+            </div>
+
+            <div class="review-item">
+              <span>Departamento</span>
+              <strong>{{ departamentoUbicacion }}</strong>
+            </div>
+
+            <div class="review-item full-review">
+              <span>Dirección</span>
+              <strong>{{ direccionExacta }}</strong>
+            </div>
+
+            <div class="review-item full-review">
+              <span>Referencia</span>
+              <strong>{{ referencia || 'No especificada' }}</strong>
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <!-- ======================================
+             DOCUMENTOS
+             ====================================== -->
+
+        <div class="review-section">
+
+          <div class="review-section-header">
+
+            <div>
+              <h3>Documentos</h3>
+              <p>Archivos adjuntados para la verificación.</p>
+            </div>
+
+            <span class="review-badge">
+              {{ documentosAdjuntos }}/4
+            </span>
+
+          </div>
+
+
+          <div class="review-documents">
+
+            <div class="review-document">
+
+              <span class="document-status">✓</span>
+
+              @if (personeriaArchivo) {
+                <button
+                  type="button"
+                  class="file-preview-button"
+                  (click)="verArchivo(personeriaArchivo)"
+                >
+                  {{ personeriaArchivo.name }}
+                </button>
+              }
+
+            </div>
+
+            <div class="review-document">
+
+              <span class="document-status">✓</span>
+
+              @if (nitArchivo) {
+                <button
+                  type="button"
+                  class="file-preview-button"
+                  (click)="verArchivo(nitArchivo)"
+                >
+                  {{ nitArchivo.name }}
+                </button>
+              }
+
+            </div>
+
+            <div class="review-document">
+
+              <span class="document-status">✓</span>
+
+              @if (identidadArchivo) {
+                <button
+                  type="button"
+                  class="file-preview-button"
+                  (click)="verArchivo(identidadArchivo)"
+                >
+                  {{ identidadArchivo.name }}
+                </button>
+              }
+
+            </div>
+
+            <div class="review-document">
+
+              <span class="document-status">✓</span>
+
+              @if (domicilioArchivo) {
+                <button
+                  type="button"
+                  class="file-preview-button"
+                  (click)="verArchivo(domicilioArchivo)"
+                >
+                  {{ domicilioArchivo.name }}
+                </button>
+              }
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <!-- ======================================
+             NECESIDADES Y DONACIONES
+             ====================================== -->
+
+        <div class="review-section">
+
+          <div class="review-section-header">
+
+            <div>
+              <h3>Necesidades y donaciones</h3>
+              <p>Información de apoyo del centro.</p>
+            </div>
+
+          </div>
+
+
+          <div class="review-grid">
+
+            <div class="review-item full-review">
+
+              <span>Necesidades prioritarias</span>
+
+              <strong>
+                {{ necesidadesSeleccionadas.join(', ') }}
+              </strong>
+
+            </div>
+
+            <div class="review-item full-review">
+
+              <span>Donaciones que acepta</span>
+
+              <strong>
+                {{ donacionesSeleccionadas.join(', ') }}
+              </strong>
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <!-- ======================================
+             VOLUNTARIADO
+             ====================================== -->
+
+        <div class="review-section">
+
+          <div class="review-section-header">
+
+            <div>
+              <h3>Voluntariado</h3>
+              <p>Información sobre voluntarios.</p>
+            </div>
+
+          </div>
+
+
+          <div class="review-grid">
+
+            <div class="review-item">
+
+              <span>Solicita voluntarios</span>
+
+              <strong>
+                {{ solicitaVoluntarios ? 'Sí' : 'No' }}
+              </strong>
+
+            </div>
+
+
+            @if (solicitaVoluntarios) {
+
+              <div class="review-item full-review">
+
+                <span>Actividades</span>
+
+                <strong>
+                  {{ actividadesSeleccionadas.join(', ') }}
+                </strong>
+
+              </div>
+
+
+              <div class="review-item full-review">
+
+                <span>Descripción</span>
+
+                <strong>
+                  {{ descripcionVoluntariado || 'No especificada' }}
+                </strong>
+
+              </div>
+
+            }
+
+          </div>
+
+        </div>
+
+
+        <!-- ======================================
+             AVISO
+             ====================================== -->
+
+        <div class="submit-notice">
+
+          <strong>
+            🔒 Antes de enviar
+          </strong>
+
+          <p>
+            La solicitud será enviada al equipo administrador
+            para su revisión. El centro no será publicado
+            automáticamente.
+          </p>
+
+        </div>
+
+
+        <!-- ======================================
+             SOS-41: SIN SESIÓN (el backend exige login)
+             ====================================== -->
+
+        @if (!haySesion) {
+
+          <div class="submit-notice">
 
             <strong>
-              {{ descripcionVoluntariado || 'No especificada' }}
+              Inicia sesión para enviar
             </strong>
+
+            <p>
+              Necesitas una cuenta para enviar la solicitud.
+              <a class="volver-acerca" (click)="irALogin()">
+                Ir a iniciar sesión
+              </a>
+            </p>
 
           </div>
 
         }
 
-      </div>
 
-    </div>
+        <!-- ======================================
+             SOS-41: ERROR DEL BACKEND
+             ====================================== -->
 
+        @if (errorEnvio) {
 
-    <!-- ======================================
-        AVISO
-        ====================================== -->
+          <div class="file-error">
+            {{ errorEnvio }}
+          </div>
 
-    <div class="submit-notice">
-
-      <strong>
-        🔒 Antes de enviar
-      </strong>
-
-      <p>
-        La solicitud será enviada al equipo administrador
-        para su revisión. El centro no será publicado
-        automáticamente.
-      </p>
-
-    </div>
+        }
 
 
-    <!-- ======================================
-        BOTONES
-        ====================================== -->
+        <!-- ======================================
+             BOTONES
+             ====================================== -->
 
-    <div class="form-actions">
+        <div class="form-actions">
 
-      <button
-        type="button"
-        class="btn secondary"
-        (click)="volver()"
-      >
-        ← Atrás
-      </button>
-
-
-      <div class="right-actions">
-
-        <button
-          type="button"
-          class="btn secondary"
-          (click)="guardarBorrador()"
-        >
-          Guardar borrador
-        </button>
+          <button
+            type="button"
+            class="btn secondary"
+            (click)="volver()"
+          >
+            ← Atrás
+          </button>
 
 
-        <button
-          type="button"
-          class="btn primary"
-          (click)="enviarSolicitud()"
-        >
-          Enviar solicitud →
-        </button>
+          <div class="right-actions">
 
-      </div>
+            <button
+              type="button"
+              class="btn secondary"
+              (click)="guardarBorrador()"
+            >
+              Guardar borrador
+            </button>
 
-    </div>
 
-  }
+            <button
+              type="button"
+              class="btn primary"
+              [disabled]="enviando || !haySesion || !formularioCompleto"
+              (click)="enviarSolicitud()"
+            >
+              {{ enviando ? 'Enviando...' : 'Enviar solicitud →' }}
+            </button>
+
+          </div>
+
+        </div>
+
+      }
 
     </section>
 
@@ -1893,7 +1949,7 @@
           </h3>
 
           <p>
-            {{ departamento || 'Ubicación pendiente' }}
+            {{ nombreDepartamento || 'Ubicación pendiente' }}
           </p>
 
         </div>
@@ -2005,17 +2061,17 @@
 
     <div
       class="file-preview-modal"
-  (click)="$event.stopPropagation()"
->
+      (click)="$event.stopPropagation()"
+    >
 
-  <button
-    type="button"
-    class="file-preview-close"
-    (click)="cerrarVistaPrevia()"
-    aria-label="Cerrar vista previa"
-  >
-    ×
-  </button>
+      <button
+        type="button"
+        class="file-preview-close"
+        (click)="cerrarVistaPrevia()"
+        aria-label="Cerrar vista previa"
+      >
+        ×
+      </button>
 
       <div class="file-preview-header">
 

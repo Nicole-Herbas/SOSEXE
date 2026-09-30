@@ -1,7 +1,15 @@
-import { Component } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Router } from '@angular/router';
+
+import { ApiResponse } from '../../../../shared/models/api-response';
+
+// Forma en que el backend devuelve cada departamento
+export interface Departamento {
+  id: number;
+  nombre: string;
+}
 
 @Component({
   selector: 'app-registrar-centro',
@@ -10,37 +18,89 @@ import { Router } from '@angular/router';
   templateUrl: './registrar-centro.html',
   styleUrl: './registrar-centro.scss'
 })
-export class RegistrarCentroComponent {
+export class RegistrarCentroComponent implements OnInit {
 
   constructor(
     private http: HttpClient,
     private router: Router
   ) {}
 
+  // Rutas relativas: proxy.conf.json las envía al backend
+  private readonly API_SOLICITUDES = '/api/solicitudes-centro';
+  private readonly API_DEPARTAMENTOS = '/api/departamentos';
+
+  ngOnInit(): void {
+    this.cargarDepartamentos();
+  }
+
   currentStep = 1;
   mostrarModalEnvio = false;
+  enviando = false;
+  errorEnvio = '';
 
   // ==========================================
-// VISTA PREVIA DE ARCHIVOS
-// ==========================================
+  // SESIÓN (el POST exige login; el token lo pone el authInterceptor)
+  // ==========================================
+
+  get haySesion(): boolean {
+    return typeof localStorage !== 'undefined'
+      && !!localStorage.getItem('token');
+  }
+
+  irALogin(): void {
+    this.router.navigate(['/login']);
+  }
+
+  // ==========================================
+  // DEPARTAMENTOS (vienen del backend)
+  // ==========================================
+
+  departamentos: Departamento[] = [];
+  errorDepartamentos = '';
+
+  cargarDepartamentos(): void {
+    this.http
+      .get<ApiResponse<Departamento[]>>(this.API_DEPARTAMENTOS)
+      .subscribe({
+        next: (respuesta) => {
+          this.departamentos = respuesta.data ?? [];
+        },
+        error: (error) => {
+          console.error('Error al cargar departamentos:', error);
+          this.errorDepartamentos =
+            'No se pudieron cargar los departamentos. Recarga la página.';
+        }
+      });
+  }
+
+  // Nombre del departamento elegido (para mostrarlo en pantalla)
+  get nombreDepartamento(): string {
+    return this.departamentos
+      .find(d => d.id === this.departamentoId)?.nombre ?? '';
+  }
+
+  // ==========================================
+  // VISTA PREVIA DE ARCHIVOS
+  // ==========================================
+
   mostrarModalArchivo = false;
   archivoVistaPrevia: File | null = null;
   urlArchivoVistaPrevia = '';
   esImagenArchivoVistaPrevia = false;
+
   // ==========================================
   // DATOS DEL CENTRO - PASO 1
   // ==========================================
 
   nombreCentro = '';
   tipoOrganizacion = '';
-  departamento = '';
+  departamentoId: number | null = null;
   nit = '';
   personeriaJuridica = '';
   fechaFundacion = '';
   paginaWeb = '';
   descripcion = '';
   poblacionAtendida = '';
-
 
   // ==========================================
   // DATOS DEL RESPONSABLE - PASO 2
@@ -56,7 +116,6 @@ export class RegistrarCentroComponent {
   departamentoUbicacion = '';
   direccionExacta = '';
   referencia = '';
-
 
   // ==========================================
   // DOCUMENTOS - PASO 3
@@ -92,7 +151,6 @@ export class RegistrarCentroComponent {
     ].filter(Boolean).length;
   }
 
-
   // ==========================================
   // VALIDACIÓN DEL PASO 3
   // ==========================================
@@ -101,7 +159,7 @@ export class RegistrarCentroComponent {
     return this.documentosAdjuntos === 4;
   }
 
-    // ==========================================
+  // ==========================================
   // NECESIDADES Y VOLUNTARIADO - PASO 4
   // ==========================================
 
@@ -149,7 +207,6 @@ export class RegistrarCentroComponent {
 
   descripcionVoluntariado = '';
 
-
   // ==========================================
   // VALIDACIÓN DEL PASO 4
   // ==========================================
@@ -178,7 +235,6 @@ export class RegistrarCentroComponent {
     return true;
   }
 
-
   // ==========================================
   // SELECCIÓN DE NECESIDADES
   // ==========================================
@@ -201,7 +257,6 @@ export class RegistrarCentroComponent {
 
     }
   }
-
 
   // ==========================================
   // SELECCIÓN DE DONACIONES
@@ -226,7 +281,6 @@ export class RegistrarCentroComponent {
     }
   }
 
-
   // ==========================================
   // SELECCIÓN DE ACTIVIDADES
   // ==========================================
@@ -249,116 +303,107 @@ export class RegistrarCentroComponent {
 
     }
   }
-// ==========================================
-// PASO 5 - REVISIÓN Y ENVÍO
-// ==========================================
 
-enviarSolicitud(): void {
+  // ==========================================
+  // PASO 5 - REVISIÓN Y ENVÍO
+  // ==========================================
 
-  if (!this.paso4Valido) {
-    return;
+  // Datos de texto que se envían (sin archivos)
+  construirSolicitud() {
+    return {
+      nombreCentro: this.nombreCentro.trim(),
+      tipoOrganizacion: this.tipoOrganizacion,
+      departamentoId: this.departamentoId,
+
+      nit: this.nit.trim(),
+      personeriaJuridica: this.personeriaJuridica.trim(),
+      fechaFundacion: this.fechaFundacion || null, // '' haría fallar el LocalDate
+      paginaWeb: this.paginaWeb.trim() || null,
+      descripcion: this.descripcion.trim(),
+      poblacionAtendida: this.poblacionAtendida.trim() || null,
+
+      nombreResponsable: this.nombreResponsable.trim(),
+      cargoResponsable: this.cargoResponsable.trim(),
+      documentoResponsable: this.documentoResponsable.trim(),
+      correoResponsable: this.correoResponsable.trim(),
+      telefonoResponsable: this.telefonoResponsable.trim(),
+
+      ciudad: this.ciudad.trim(),
+      departamentoUbicacion: this.departamentoUbicacion,
+      direccionExacta: this.direccionExacta.trim(),
+      referencia: this.referencia.trim() || null,
+
+      necesidades: this.necesidadesSeleccionadas,
+      donaciones: this.donacionesSeleccionadas,
+
+      solicitaVoluntarios: this.solicitaVoluntarios,
+      actividadesVoluntariado:
+        this.solicitaVoluntarios ? this.actividadesSeleccionadas : [],
+      descripcionVoluntariado:
+        this.solicitaVoluntarios ? (this.descripcionVoluntariado.trim() || null) : null
+    };
   }
 
-  const departamentoIds: { [key: string]: number } = {
-    'Beni': 8,
-    'Chuquisaca': 1,
-    'Cochabamba': 3,
-    'La Paz': 2,
-    'Oruro': 4,
-    'Pando': 9,
-    'Potosí': 5,
-    'Santa Cruz': 7,
-    'Tarija': 6
-  };
+  // Paquete multipart: JSON + 4 archivos
+  // Los nombres deben coincidir con @RequestPart del backend
+  construirFormData(): FormData {
 
-  const departamentoId = departamentoIds[this.departamento];
+    const formData = new FormData();
 
-  if (!departamentoId) {
-    console.error('Departamento no válido:', this.departamento);
-    return;
+    formData.append(
+      'solicitud',
+      new Blob([JSON.stringify(this.construirSolicitud())], { type: 'application/json' })
+    );
+
+    formData.append('personeria', this.personeriaArchivo as File);
+    formData.append('nit', this.nitArchivo as File);
+    formData.append('identidad', this.identidadArchivo as File);
+    formData.append('domicilio', this.domicilioArchivo as File);
+
+    return formData;
   }
 
-  const solicitud = {
+  get formularioCompleto(): boolean {
+    return this.paso1Valido && this.paso2Valido && this.paso3Valido && this.paso4Valido;
+  }
 
-    nombreCentro: this.nombreCentro,
-    tipoOrganizacion: this.tipoOrganizacion,
-    departamentoId: departamentoId,
+  enviarSolicitud(): void {
 
-    nit: this.nit,
-    personeriaJuridica: this.personeriaJuridica,
-    fechaFundacion: this.fechaFundacion,
-    paginaWeb: this.paginaWeb,
-    descripcion: this.descripcion,
-    poblacionAtendida: this.poblacionAtendida,
-
-    nombreResponsable: this.nombreResponsable,
-    cargoResponsable: this.cargoResponsable,
-    documentoResponsable: this.documentoResponsable,
-    correoResponsable: this.correoResponsable,
-    telefonoResponsable: this.telefonoResponsable,
-
-    ciudad: this.ciudad,
-    departamentoUbicacion: this.departamentoUbicacion,
-    direccionExacta: this.direccionExacta,
-    referencia: this.referencia,
-
-    personeriaArchivo: this.personeriaArchivo?.name ?? '',
-    nitArchivo: this.nitArchivo?.name ?? '',
-    identidadArchivo: this.identidadArchivo?.name ?? '',
-    domicilioArchivo: this.domicilioArchivo?.name ?? '',
-
-    necesidades: this.necesidadesSeleccionadas,
-    donaciones: this.donacionesSeleccionadas,
-
-    solicitaVoluntarios: this.solicitaVoluntarios,
-    actividadesVoluntariado: this.actividadesSeleccionadas,
-    descripcionVoluntariado: this.descripcionVoluntariado
-  };
-
-  console.log('Enviando solicitud al backend:', solicitud);
-
-  this.http.post(
-    'http://localhost:8080/api/solicitudes-centro',
-    solicitud
-  ).subscribe({
-
-    next: (respuesta) => {
-
-      console.log('Solicitud guardada correctamente:', respuesta);
-
-      this.mostrarModalEnvio = true;
-    },
-
-    error: (error) => {
-
-      console.error(
-        'Error al guardar la solicitud:',
-        error
-      );
-
-      alert(
-        'No se pudo registrar la solicitud. Revisa los datos e intenta nuevamente.'
-      );
+    if (this.enviando || !this.formularioCompleto || !this.haySesion) {
+      return;
     }
 
-  });
-}
-  // ==========================================
-  // DEPARTAMENTOS DE BOLIVIA
-  // ==========================================
+    this.enviando = true;
+    this.errorEnvio = '';
 
-  departamentos = [
-    'Beni',
-    'Chuquisaca',
-    'Cochabamba',
-    'La Paz',
-    'Oruro',
-    'Pando',
-    'Potosí',
-    'Santa Cruz',
-    'Tarija'
-  ];
+    this.http
+      .post<ApiResponse<unknown>>(this.API_SOLICITUDES, this.construirFormData())
+      .subscribe({
+        next: () => {
+          this.enviando = false;
+          this.mostrarModalEnvio = true;
+        },
+        error: (error: HttpErrorResponse) => {
+          this.enviando = false;
+          console.error('Error al guardar la solicitud:', error);
+          this.errorEnvio = this.mensajeDeError(error);
+        }
+      });
+  }
 
+  private mensajeDeError(error: HttpErrorResponse): string {
+
+    if (error.status === 401) {
+      return 'Tu sesión expiró. Inicia sesión nuevamente para enviar la solicitud.';
+    }
+
+    if (error.status === 413) {
+      return 'Los archivos superan el tamaño máximo permitido (10 MB por archivo).';
+    }
+
+    return error.error?.message
+      ?? 'No se pudo registrar la solicitud. Revisa los datos e intenta nuevamente.';
+  }
 
   // ==========================================
   // TIPOS DE ORGANIZACIÓN
@@ -374,7 +419,6 @@ enviarSolicitud(): void {
     'Otro'
   ];
 
-
   // ==========================================
   // VALIDACIÓN DEL PASO 1
   // ==========================================
@@ -383,13 +427,12 @@ enviarSolicitud(): void {
     return (
       this.nombreCentro.trim() !== '' &&
       this.tipoOrganizacion !== '' &&
-      this.departamento !== '' &&
+      this.departamentoId !== null &&
       this.nit.trim() !== '' &&
       this.personeriaJuridica.trim() !== '' &&
       this.descripcion.trim() !== ''
     );
   }
-
 
   // ==========================================
   // VALIDACIÓN DEL PASO 2
@@ -408,7 +451,6 @@ enviarSolicitud(): void {
     );
   }
 
-
   // ==========================================
   // DOCUMENTOS
   // ==========================================
@@ -425,7 +467,6 @@ enviarSolicitud(): void {
     this.errorArchivo = '';
   }
 
-
   seleccionarNit(event: Event): void {
     const archivo = this.obtenerArchivo(event);
 
@@ -437,7 +478,6 @@ enviarSolicitud(): void {
     this.nitAdjunto = true;
     this.errorArchivo = '';
   }
-
 
   seleccionarIdentidad(event: Event): void {
     const archivo = this.obtenerArchivo(event);
@@ -451,7 +491,6 @@ enviarSolicitud(): void {
     this.errorArchivo = '';
   }
 
-
   seleccionarDomicilio(event: Event): void {
     const archivo = this.obtenerArchivo(event);
 
@@ -463,7 +502,6 @@ enviarSolicitud(): void {
     this.domicilioAdjunto = true;
     this.errorArchivo = '';
   }
-
 
   // ==========================================
   // OBTENER Y VALIDAR ARCHIVO
@@ -511,7 +549,6 @@ enviarSolicitud(): void {
     return archivo;
   }
 
-
   // ==========================================
   // QUITAR ARCHIVOS
   // ==========================================
@@ -521,53 +558,54 @@ enviarSolicitud(): void {
     this.personeriaAdjunta = false;
   }
 
-
   quitarNit(): void {
     this.nitArchivo = null;
     this.nitAdjunto = false;
   }
-
 
   quitarIdentidad(): void {
     this.identidadArchivo = null;
     this.identidadAdjunta = false;
   }
 
-
   quitarDomicilio(): void {
     this.domicilioArchivo = null;
     this.domicilioAdjunto = false;
   }
 
-verArchivo(archivo: File | null): void {
-  if (!archivo) {
-    return;
+  // ==========================================
+  // VISTA PREVIA
+  // ==========================================
+
+  verArchivo(archivo: File | null): void {
+    if (!archivo) {
+      return;
+    }
+
+    this.cerrarVistaPrevia();
+
+    this.archivoVistaPrevia = archivo;
+    this.esImagenArchivoVistaPrevia = archivo.type.startsWith('image/');
+    this.urlArchivoVistaPrevia = URL.createObjectURL(archivo);
+    this.mostrarModalArchivo = true;
   }
 
-  this.cerrarVistaPrevia();
+  cerrarVistaPrevia(): void {
+    if (this.urlArchivoVistaPrevia) {
+      URL.revokeObjectURL(this.urlArchivoVistaPrevia);
+    }
 
-  this.archivoVistaPrevia = archivo;
-  this.esImagenArchivoVistaPrevia = archivo.type.startsWith('image/');
-  this.urlArchivoVistaPrevia = URL.createObjectURL(archivo);
-  this.mostrarModalArchivo = true;
-}
-
-cerrarVistaPrevia(): void {
-  if (this.urlArchivoVistaPrevia) {
-    URL.revokeObjectURL(this.urlArchivoVistaPrevia);
+    this.urlArchivoVistaPrevia = '';
+    this.archivoVistaPrevia = null;
+    this.esImagenArchivoVistaPrevia = false;
+    this.mostrarModalArchivo = false;
   }
 
-  this.urlArchivoVistaPrevia = '';
-  this.archivoVistaPrevia = null;
-  this.esImagenArchivoVistaPrevia = false;
-  this.mostrarModalArchivo = false;
-}
+  // ==========================================
+  // NAVEGACIÓN
+  // ==========================================
 
-// ==========================================
-// NAVEGACIÓN
-// ==========================================
-
-continuar(): void {
+  continuar(): void {
 
     if (this.currentStep === 1 && !this.paso1Valido) {
       return;
@@ -580,14 +618,15 @@ continuar(): void {
     if (this.currentStep === 3 && !this.paso3Valido) {
       return;
     }
+
     if (this.currentStep === 4 && !this.paso4Valido) {
-          return;
+      return;
     }
+
     if (this.currentStep < 5) {
       this.currentStep++;
     }
   }
-
 
   volver(): void {
 
@@ -596,9 +635,8 @@ continuar(): void {
     }
   }
 
-
   // ==========================================
-  // GUARDAR BORRADOR
+  // GUARDAR BORRADOR (se completa en SOS-42)
   // ==========================================
 
   guardarBorrador(): void {
@@ -607,7 +645,7 @@ continuar(): void {
 
       nombreCentro: this.nombreCentro,
       tipoOrganizacion: this.tipoOrganizacion,
-      departamento: this.departamento,
+      departamentoId: this.departamentoId,
       nit: this.nit,
       personeriaJuridica: this.personeriaJuridica,
       fechaFundacion: this.fechaFundacion,
@@ -633,9 +671,9 @@ continuar(): void {
     });
   }
 
-// ==========================================
-// MODAL DE SOLICITUD ENVIADA
-// ==========================================
+  // ==========================================
+  // MODAL DE SOLICITUD ENVIADA
+  // ==========================================
 
   cerrarModalEnvio(): void {
     this.mostrarModalEnvio = false;
@@ -647,8 +685,6 @@ continuar(): void {
   // ==========================================
 
   cancelar(): void {
-
     window.history.back();
-
   }
 }
