@@ -61,6 +61,19 @@ export const FILTROS_NECESIDAD_MAPA = [
     id: 'Voluntarios',
     etiqueta: APP_TEXTOS.mapa.filtrosNecesidad.voluntarios
   },
+
+  {
+    id: 'Higiene',
+    etiqueta: APP_TEXTOS.mapa.filtrosNecesidad.higiene
+  },
+  {
+    id: 'Primeros auxilios',
+    etiqueta: APP_TEXTOS.mapa.filtrosNecesidad.primerosAuxilios
+  },
+  {
+    id: 'Alojamiento',
+    etiqueta: APP_TEXTOS.mapa.filtrosNecesidad.alojamiento
+  },
 ] as const;
 
 
