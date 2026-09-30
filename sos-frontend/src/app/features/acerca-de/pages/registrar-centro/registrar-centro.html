@@ -166,6 +166,32 @@
 
     <section class="form-card">
 
+      <!-- SOS-42: AVISO DE BORRADOR RECUPERADO -->
+      @if (borradorRecuperado) {
+
+        <div class="draft-banner">
+
+          <div class="draft-banner-text">
+            <strong>📝 Continuando tu borrador</strong>
+            <span>
+              Recuperamos la información que guardaste
+              @if (fechaBorrador) {
+                el {{ fechaBorrador }}
+              }.
+            </span>
+          </div>
+
+          <button
+            type="button"
+            class="draft-banner-button"
+            (click)="descartarBorrador()"
+          >
+            Empezar de cero
+          </button>
+
+        </div>
+
+      }
 
       <!-- =================================================
            PASO 1 - INFORMACIÓN DEL CENTRO
