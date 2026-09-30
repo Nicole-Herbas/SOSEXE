@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
+import bo.edu.sos.backend.constants.EstadoVerificacion;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -102,7 +102,7 @@ public class SolicitudCentro {
     private String descripcionVoluntariado;
 
     @Column(nullable = false, length = 30)
-    private String estado = "PENDIENTE";
+    private String estado = EstadoVerificacion.PENDIENTE;
 
     @Column(name = "fecha_creacion", nullable = false,
             insertable = false, updatable = false)
