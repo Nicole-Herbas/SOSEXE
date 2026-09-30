@@ -2241,3 +2241,17 @@
   </div>
 
 }
+
+
+<!-- SOS-42: AVISO "BORRADOR GUARDADO" -->
+@if (mensajeBorrador) {
+
+  <div
+    class="draft-toast"
+    [class.draft-toast-error]="errorBorrador"
+    role="status"
+  >
+    {{ errorBorrador ? '⚠️' : '✓' }} {{ mensajeBorrador }}
+  </div>
+
+}
