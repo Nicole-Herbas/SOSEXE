@@ -357,12 +357,11 @@ export class Mapa implements OnInit {
 
         error: () => {
 
-          this.error.set(
-            this.textos.errorCarga
-          );
+          this.error.set(''); 
+          this.cargando.set(false);
 
-          this.cargando.set(
-            false
+          this.puntos.set(
+            PUNTOS_MAPA_FALLBACK as unknown as PuntoMapa[]
           );
 
 
