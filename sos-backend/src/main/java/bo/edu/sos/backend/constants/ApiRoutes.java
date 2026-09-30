@@ -18,6 +18,11 @@ public final class ApiRoutes {
     public static final String CENTROS        = "/api/centros";
 
     
+    // ── Solicitudes de registro de centro (SOS-41) ───────────────────────────
+    public static final String SOLICITUDES_CENTRO = "/api/solicitudes-centro";
+
+    // ── Departamentos (catálogo) ─────────────────────────────────────────────
+    public static final String DEPARTAMENTOS  = "/api/departamentos";
 
     // ── Noticias ─────────────────────────────────────────────────────────────
     public static final String NOTICIAS           = "/api/noticias";
