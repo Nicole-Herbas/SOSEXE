@@ -2243,15 +2243,86 @@
 }
 
 
-<!-- SOS-42: AVISO "BORRADOR GUARDADO" -->
-@if (mensajeBorrador) {
+<!-- ==========================================
+     SOS-42: MODAL DE BORRADOR
+     ========================================== -->
+
+@if (mostrarModalBorrador) {
 
   <div
-    class="draft-toast"
-    [class.draft-toast-error]="errorBorrador"
-    role="status"
+    class="modal-overlay"
+    (click)="!guardandoBorrador && seguirCompletando()"
   >
-    {{ errorBorrador ? '⚠️' : '✓' }} {{ mensajeBorrador }}
+
+    <div class="success-modal draft-modal" (click)="$event.stopPropagation()">
+
+      <!-- 1. GUARDANDO -->
+      @if (guardandoBorrador) {
+
+        <div class="draft-spinner"></div>
+
+        <div class="success-content">
+          <h2>Guardando borrador...</h2>
+          <p>Estamos guardando tu información y documentos.</p>
+        </div>
+
+      }
+
+      <!-- 2. ERROR -->
+      @else if (errorBorrador) {
+
+        <div class="success-icon error-icon">!</div>
+
+        <div class="success-content">
+          <h2>No se pudo guardar</h2>
+          <p>{{ mensajeBorrador }}</p>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn secondary" (click)="seguirCompletando()">
+            Cerrar
+          </button>
+          <button type="button" class="success-button" (click)="guardarBorrador()">
+            Reintentar
+          </button>
+        </div>
+
+      }
+
+      <!-- 3. GUARDADO -->
+      @else {
+
+        <div class="success-icon draft-icon">✓</div>
+
+        <div class="success-content">
+
+          <span class="modal-badge">Guardado en el paso {{ currentStep }} de 5</span>
+
+          <h2>¡Borrador guardado!</h2>
+
+          <p>{{ mensajeBorrador }}</p>
+
+          <p class="success-description">
+            Puedes salir tranquilo. Cuando vuelvas a esta página,
+            recuperaremos tu información y documentos, y continuarás
+            en el paso {{ currentStep }}.
+          </p>
+
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn secondary" (click)="salirYContinuarDespues()">
+            Salir y continuar después
+          </button>
+          <button type="button" class="success-button" (click)="seguirCompletando()">
+            Seguir completando
+          </button>
+        </div>
+
+      }
+
+    </div>
+
   </div>
 
 }
