@@ -50,27 +50,194 @@ class MapaControllerTest {
         punto.setEstadoVerificacion("VERIFICADO");
         punto.setNecesidades(List.of("Agua", "Alimentos"));
 
-        when(mapaService.listarPuntosMapa())
-                .thenReturn(List.of(punto));
-
+        when(mapaService.listarPuntosMapa(
+                null,
+                null,
+                null,
+                null
+        )).thenReturn(List.of(punto));
 
         ResponseEntity<ApiResponse<List<PuntoMapaDTO>>> respuesta =
-                mapaController.listarPuntos();
-
+                mapaController.listarPuntos(
+                        null,
+                        null,
+                        null,
+                        null
+                );
 
         assertEquals(200, respuesta.getStatusCode().value());
 
-        ApiResponse<List<PuntoMapaDTO>> body = respuesta.getBody();
+        ApiResponse<List<PuntoMapaDTO>> body =
+                respuesta.getBody();
+
         assertNotNull(body);
         assertTrue(body.isSuccess());
 
-        List<PuntoMapaDTO> data = body.getData();
-        assertEquals(1, data.size());
-        assertEquals("Centro San José", data.get(0).getNombre());
-        assertEquals("CENTRO", data.get(0).getOrigen());
-        assertEquals("Cochabamba", data.get(0).getDepartamentoNombre());
-        assertEquals(List.of("Agua", "Alimentos"), data.get(0).getNecesidades());
+        List<PuntoMapaDTO> data =
+                body.getData();
 
-        verify(mapaService).listarPuntosMapa();
+        assertEquals(1, data.size());
+        assertEquals(
+                "Centro San José",
+                data.get(0).getNombre()
+        );
+        assertEquals(
+                "CENTRO",
+                data.get(0).getOrigen()
+        );
+        assertEquals(
+                "Cochabamba",
+                data.get(0).getDepartamentoNombre()
+        );
+        assertEquals(
+                List.of("Agua", "Alimentos"),
+                data.get(0).getNecesidades()
+        );
+
+        verify(mapaService).listarPuntosMapa(
+                null,
+                null,
+                null,
+                null
+        );
+    }
+
+
+    @Test
+    void listarPuntosDebeEnviarFiltrosAlService() {
+
+        PuntoMapaDTO punto = new PuntoMapaDTO();
+        punto.setId(5L);
+        punto.setOrigen("PUNTO_AYUDA");
+        punto.setNombre("Refugio Esperanza");
+        punto.setTipo("REFUGIO");
+
+        when(mapaService.listarPuntosMapa(
+                "REFUGIO",
+                "Agua",
+                "Santa Cruz",
+                "Esperanza"
+        )).thenReturn(List.of(punto));
+
+        ResponseEntity<ApiResponse<List<PuntoMapaDTO>>> respuesta =
+                mapaController.listarPuntos(
+                        "REFUGIO",
+                        "Agua",
+                        "Santa Cruz",
+                        "Esperanza"
+                );
+
+        assertEquals(
+                200,
+                respuesta.getStatusCode().value()
+        );
+
+        assertNotNull(respuesta.getBody());
+        assertTrue(
+                respuesta.getBody().isSuccess()
+        );
+
+        List<PuntoMapaDTO> data =
+                respuesta.getBody().getData();
+
+        assertEquals(1, data.size());
+        assertEquals(
+                "Refugio Esperanza",
+                data.get(0).getNombre()
+        );
+
+        verify(mapaService).listarPuntosMapa(
+                "REFUGIO",
+                "Agua",
+                "Santa Cruz",
+                "Esperanza"
+        );
+    }
+
+
+    @Test
+    void buscarDetalleDebeRetornarPuntoDelMapa() {
+
+        PuntoMapaDTO punto = new PuntoMapaDTO();
+        punto.setId(1L);
+        punto.setOrigen("CENTRO");
+        punto.setNombre("Centro San José");
+        punto.setTipo("CENTRO_APOYO");
+
+        when(mapaService.buscarDetalle(
+                "CENTRO",
+                1L
+        )).thenReturn(punto);
+
+        ResponseEntity<ApiResponse<PuntoMapaDTO>> respuesta =
+                mapaController.buscarDetalle(
+                        "CENTRO",
+                        1L
+                );
+
+        assertEquals(
+                200,
+                respuesta.getStatusCode().value()
+        );
+
+        assertNotNull(respuesta.getBody());
+        assertTrue(
+                respuesta.getBody().isSuccess()
+        );
+
+        PuntoMapaDTO data =
+                respuesta.getBody().getData();
+
+        assertEquals(1L, data.getId());
+        assertEquals(
+                "Centro San José",
+                data.getNombre()
+        );
+        assertEquals(
+                "CENTRO",
+                data.getOrigen()
+        );
+
+        verify(mapaService).buscarDetalle(
+                "CENTRO",
+                1L
+        );
+    }
+
+
+    @Test
+    void listarPuntosSinFiltrosDebeEnviarParametrosNulos() {
+
+        when(mapaService.listarPuntosMapa(
+                null,
+                null,
+                null,
+                null
+        )).thenReturn(List.of());
+
+        ResponseEntity<ApiResponse<List<PuntoMapaDTO>>> respuesta =
+                mapaController.listarPuntos(
+                        null,
+                        null,
+                        null,
+                        null
+                );
+
+        assertEquals(
+                200,
+                respuesta.getStatusCode().value()
+        );
+
+        assertNotNull(respuesta.getBody());
+        assertTrue(
+                respuesta.getBody().isSuccess()
+        );
+
+        verify(mapaService).listarPuntosMapa(
+                null,
+                null,
+                null,
+                null
+        );
     }
 }
