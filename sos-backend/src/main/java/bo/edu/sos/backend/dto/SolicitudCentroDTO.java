@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
@@ -28,6 +29,9 @@ public class SolicitudCentroDTO {
 
     @NotNull
     private Long departamentoId;
+
+    // SOS-43: solo de salida (para mostrar en el panel admin)
+    private String departamentoNombre;
 
     @NotBlank
     @Size(max = 50)
@@ -102,4 +106,10 @@ public class SolicitudCentroDTO {
     private String descripcionVoluntariado;
 
     private String estado;
+
+    // ===== SOS-43: solo de salida =====
+    private String observacionAdmin;
+    private LocalDateTime fechaRevision;
+    private String revisadoPor;
+    private LocalDateTime fechaCreacion;
 }
