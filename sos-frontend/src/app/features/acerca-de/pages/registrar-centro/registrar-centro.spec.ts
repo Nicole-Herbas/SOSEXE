@@ -5,6 +5,7 @@ import {
   provideHttpClientTesting
 } from '@angular/common/http/testing';
 import { provideRouter } from '@angular/router';
+import { vi } from 'vitest';
 
 import { RegistrarCentroComponent } from './registrar-centro';
 
@@ -184,5 +185,72 @@ describe('RegistrarCentroComponent', () => {
     component.enviarSolicitud();
 
     httpMock.expectNone(URL_SOLICITUDES);
+  });
+
+  
+  // ── Borrador (SOS-42) ───────────────────────────────────────────────
+
+  it('should save the draft text in localStorage', async () => {
+    // IndexedDB no existe en el entorno de pruebas: simulamos esa parte
+    vi.spyOn(component as any, 'guardarArchivosBorrador').mockResolvedValue(undefined);
+
+    component.currentStep = 2;
+    component.nombreCentro = 'Centro San José';
+    component.departamentoId = 3;
+    component.necesidadesSeleccionadas = ['Alimentos'];
+
+    await component.guardarBorrador();
+
+    const guardado = JSON.parse(localStorage.getItem('registroCentroBorrador')!);
+
+    expect(guardado.currentStep).toBe(2);
+    expect(guardado.nombreCentro).toBe('Centro San José');
+    expect(guardado.departamentoId).toBe(3);
+    expect(component.mensajeBorrador).toContain('Borrador guardado');
+  });
+
+  it('should recover the draft with the same information', async () => {
+    vi.spyOn(component as any, 'cargarArchivosBorrador').mockResolvedValue(undefined);
+
+    localStorage.setItem('registroCentroBorrador', JSON.stringify({
+      guardadoEn: new Date().toISOString(),
+      currentStep: 3,
+      nombreCentro: 'Refugio Esperanza',
+      departamentoId: 2,
+      solicitaVoluntarios: true,
+      actividadesSeleccionadas: ['Cocina']
+    }));
+
+    await component.cargarBorrador();
+
+    expect(component.currentStep).toBe(3);
+    expect(component.nombreCentro).toBe('Refugio Esperanza');
+    expect(component.departamentoId).toBe(2);
+    expect(component.actividadesSeleccionadas).toEqual(['Cocina']);
+    expect(component.borradorRecuperado).toBe(true);
+  });
+
+  it('should not recover anything when there is no draft', async () => {
+    await component.cargarBorrador();
+
+    expect(component.currentStep).toBe(1);
+    expect(component.borradorRecuperado).toBe(false);
+  });
+
+  it('should delete the draft after a successful submission', () => {
+    const eliminar = vi
+      .spyOn(component, 'eliminarBorrador')
+      .mockResolvedValue(undefined);
+
+    localStorage.setItem('token', 'token-de-prueba');
+    llenarFormulario();
+
+    component.enviarSolicitud();
+
+    httpMock
+      .expectOne(URL_SOLICITUDES)
+      .flush({ success: true, message: 'creado', data: { id: 1 }, timestamp: '' });
+
+    expect(eliminar).toHaveBeenCalled();
   });
 });

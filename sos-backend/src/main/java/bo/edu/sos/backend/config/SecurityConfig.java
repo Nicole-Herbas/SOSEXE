@@ -6,6 +6,7 @@ import bo.edu.sos.backend.security.JwtAuthenticationFilter;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -13,12 +14,11 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.http.HttpMethod;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import java.util.List;
 
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
@@ -26,36 +26,24 @@ public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
-
-    public SecurityConfig(
-            JwtAuthenticationFilter jwtAuthenticationFilter) {
-
-        this.jwtAuthenticationFilter =
-                jwtAuthenticationFilter;
+    public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter) {
+        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
     }
-
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-
         return new BCryptPasswordEncoder();
     }
+
     @Bean
-        public CorsConfigurationSource corsConfigurationSource() {
+    public CorsConfigurationSource corsConfigurationSource() {
+
         CorsConfiguration configuration = new CorsConfiguration();
 
-        configuration.setAllowedOrigins(
-                List.of("http://localhost:4200")
-        );
-
+        configuration.setAllowedOrigins(List.of("http://localhost:4200"));
         configuration.setAllowedMethods(
-                List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
-        );
-
-        configuration.setAllowedHeaders(
-                List.of("*")
-        );
-
+                List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
+        configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source =
@@ -64,45 +52,35 @@ public class SecurityConfig {
         source.registerCorsConfiguration("/**", configuration);
 
         return source;
-        }
-
+    }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(
-            HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         http
+                .csrf(csrf -> csrf.disable())
 
-        .csrf(csrf ->
-                csrf.disable()
-        )
+                .cors(cors -> {})
 
-        .cors(cors -> {})
-
-        .sessionManagement(session ->
-                        session.sessionCreationPolicy(
-                                SessionCreationPolicy.STATELESS
-                        )
-                )
-
+                .sessionManagement(session ->
+                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
                 .authorizeHttpRequests(auth -> auth
 
-                // Permitir preflight CORS
-                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                        // Permitir preflight CORS
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
-                // Endpoints públicos de autenticación
-                .requestMatchers(
-                        ApiRoutes.SWAGGER_UI,
-                        ApiRoutes.SWAGGER_HTML,
-                        ApiRoutes.OPENAPI_DOCS,
-                        ApiRoutes.AUTH_LOGIN,
-                        ApiRoutes.AUTH_REGISTRO,
-                        ApiRoutes.AUTH_REFRESH,
-                        ApiRoutes.AUTH_LOGOUT,
-                        "/error"
-                ).permitAll()
-
+                        // Endpoints públicos de autenticación
+                        .requestMatchers(
+                                ApiRoutes.SWAGGER_UI,
+                                ApiRoutes.SWAGGER_HTML,
+                                ApiRoutes.OPENAPI_DOCS,
+                                ApiRoutes.AUTH_LOGIN,
+                                ApiRoutes.AUTH_REGISTRO,
+                                ApiRoutes.AUTH_REFRESH,
+                                ApiRoutes.AUTH_LOGOUT,
+                                "/error"
+                        ).permitAll()
 
                         // Datos públicos de lectura
                         .requestMatchers(
@@ -113,11 +91,11 @@ public class SecurityConfig {
                                 ApiRoutes.PUNTOS_AYUDA + "/**",
                                 ApiRoutes.VOLUNTARIADOS + "/**",
                                 ApiRoutes.MAPA + "/**",
-                                ApiRoutes.DEPARTAMENTOS,
+                                ApiRoutes.DEPARTAMENTOS,          // SOS-41: combo del formulario
                                 ApiRoutes.DEPARTAMENTOS + "/**"
                         ).permitAll()
 
-                        // ── SOS-41: solicitudes de registro de centro ──
+                        // ── SOS-41: solicitudes de registro de centro ──────────────
                         // Enviar una solicitud -> cualquier usuario con sesión
                         .requestMatchers(
                                 HttpMethod.POST,
@@ -131,11 +109,17 @@ public class SecurityConfig {
                                 ApiRoutes.SOLICITUDES_CENTRO + "/**"
                         ).hasAuthority(Roles.ADMIN)
 
-                        // Usuario autenticado
+                        // SOS-43: aprobar / rechazar / solicitar cambios -> solo ADMIN
+                        // (los documentos GET .../{id}/documentos/{tipo} ya quedan
+                        //  cubiertos por la regla GET de arriba)
                         .requestMatchers(
-                                ApiRoutes.AUTH_ME
-                        ).authenticated()
+                                HttpMethod.PATCH,
+                                ApiRoutes.SOLICITUDES_CENTRO + "/**"
+                        ).hasAuthority(Roles.ADMIN)
+                        // ─────────────────────────────────────────────────────────
 
+                        // Usuario autenticado
+                        .requestMatchers(ApiRoutes.AUTH_ME).authenticated()
 
                         // Acciones que puede realizar un usuario autenticado
                         .requestMatchers(
@@ -144,12 +128,8 @@ public class SecurityConfig {
                                 ApiRoutes.POSTULACIONES
                         ).authenticated()
 
-
                         // Administración de usuarios
-                        .requestMatchers(
-                                ApiRoutes.USUARIOS + "/**"
-                        ).hasAuthority(Roles.ADMIN)
-
+                        .requestMatchers(ApiRoutes.USUARIOS + "/**").hasAuthority(Roles.ADMIN)
 
                         // Escritura administrativa (centros, noticias, alertas, puntos)
                         .requestMatchers(
@@ -161,11 +141,7 @@ public class SecurityConfig {
                         ).hasAuthority(Roles.ADMIN)
 
                         // POST voluntariados — usuarios autenticados (responsables)
-                        .requestMatchers(
-                                HttpMethod.POST,
-                                ApiRoutes.VOLUNTARIADOS + "/**"
-                        ).authenticated()
-
+                        .requestMatchers(HttpMethod.POST, ApiRoutes.VOLUNTARIADOS + "/**").authenticated()
 
                         .requestMatchers(
                                 HttpMethod.PUT,
@@ -176,11 +152,8 @@ public class SecurityConfig {
                         ).hasAuthority(Roles.ADMIN)
 
                         // PUT voluntariados — usuarios autenticados (responsables)
-                        .requestMatchers(
-                                HttpMethod.PUT,
-                                ApiRoutes.VOLUNTARIADOS + "/**"
-                        ).authenticated()
-                                       
+                        .requestMatchers(HttpMethod.PUT, ApiRoutes.VOLUNTARIADOS + "/**").authenticated()
+
                         .requestMatchers(
                                 HttpMethod.DELETE,
                                 ApiRoutes.CENTROS + "/**",
@@ -189,86 +162,46 @@ public class SecurityConfig {
                                 ApiRoutes.PUNTOS_AYUDA + "/**"
                         ).hasAuthority(Roles.ADMIN)
 
-
                         // Cambiar estado de postulaciones — autenticado (lógica de permisos en el servicio)
-                        .requestMatchers(
-                          HttpMethod.PATCH,
-                          ApiRoutes.POSTULACIONES + "/**"
-                        ).authenticated()
+                        .requestMatchers(HttpMethod.PATCH, ApiRoutes.POSTULACIONES + "/**").authenticated()
 
-                        .requestMatchers(
-                          HttpMethod.DELETE,
-                          ApiRoutes.VOLUNTARIADOS + "/**"
-                        ).authenticated()
+                        .requestMatchers(HttpMethod.DELETE, ApiRoutes.VOLUNTARIADOS + "/**").authenticated()
 
                         // Consultas administrativas de postulaciones
-                        .requestMatchers(
-                          HttpMethod.GET,
-                          ApiRoutes.POSTULACIONES + "/usuario/**"
-                        ).hasAuthority(Roles.ADMIN)
+                        .requestMatchers(HttpMethod.GET, ApiRoutes.POSTULACIONES + "/usuario/**")
+                                .hasAuthority(Roles.ADMIN)
 
-                        .requestMatchers(
-                          HttpMethod.GET,
-                          ApiRoutes.POSTULACIONES + "/voluntariado/**"
-                        ).authenticated()
-                                       
+                        .requestMatchers(HttpMethod.GET, ApiRoutes.POSTULACIONES + "/voluntariado/**")
+                                .authenticated()
+
                         // Ver todas las donaciones → solo ADMIN
-                        .requestMatchers(
-                           HttpMethod.GET,
-                           ApiRoutes.DONACIONES
-                        ).hasAuthority(Roles.ADMIN)
+                        .requestMatchers(HttpMethod.GET, ApiRoutes.DONACIONES).hasAuthority(Roles.ADMIN)
 
                         // Consultas de donaciones y postulaciones requieren login
+                        // Solicitudes de centros — solo ADMIN
                         .requestMatchers(
                                 HttpMethod.GET,
-                                ApiRoutes.DONACIONES + "/**",
-                                ApiRoutes.POSTULACIONES + "/**"
-                        ).authenticated()
+                                ApiRoutes.SOLICITUDES_CENTRO + "/**"
+                        ).hasAuthority(Roles.ADMIN)
 
-
-                        // Cualquier otro endpoint de API necesita autenticación
                         .requestMatchers(
-                                "/api/**"
-                        ).authenticated()
+                                HttpMethod.PATCH,
+                                ApiRoutes.SOLICITUDES_CENTRO + "/**"
+                        ).hasAuthority(Roles.ADMIN)
+                        // Cualquier otro endpoint de API necesita autenticación
+                        .requestMatchers("/api/**").authenticated()
 
-
-                        .anyRequest()
-                        .authenticated()
+                        .anyRequest().authenticated()
                 )
-
 
                 .exceptionHandling(ex -> ex
-
-                        .authenticationEntryPoint(
-                                (request,
-                                 response,
-                                 authException) ->
-
-                                        response.sendError(
-                                                HttpServletResponse
-                                                        .SC_UNAUTHORIZED
-                                        )
-                        )
-
-
-                        .accessDeniedHandler(
-                                (request,
-                                 response,
-                                 accessDeniedException) ->
-
-                                        response.sendError(
-                                                HttpServletResponse
-                                                        .SC_FORBIDDEN
-                                        )
-                        )
+                        .authenticationEntryPoint((request, response, authException) ->
+                                response.sendError(HttpServletResponse.SC_UNAUTHORIZED))
+                        .accessDeniedHandler((request, response, accessDeniedException) ->
+                                response.sendError(HttpServletResponse.SC_FORBIDDEN))
                 )
 
-
-                .addFilterBefore(
-                        jwtAuthenticationFilter,
-                        UsernamePasswordAuthenticationFilter.class
-                );
-
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }

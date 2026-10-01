@@ -1,0 +1,400 @@
+<div class="admin-page">
+
+  <div class="page-header">
+
+    <div>
+      <span class="eyebrow">ADMINISTRACIÓN</span>
+
+      <h1>
+        Solicitudes de centros
+      </h1>
+
+      <p>
+        Revisa y gestiona las solicitudes de registro de nuevos centros.
+      </p>
+    </div>
+
+    <button
+      class="refresh-button"
+      (click)="cargarSolicitudes()">
+      Actualizar
+    </button>
+
+  </div>
+
+
+  @if (cargando()) {
+
+    <div class="state-message">
+      <div class="loader"></div>
+      <p>Cargando solicitudes...</p>
+    </div>
+
+  } @else if (error()) {
+
+    <div class="state-message error">
+      <p>{{ error() }}</p>
+
+      <button
+        class="primary-button"
+        (click)="cargarSolicitudes()">
+        Intentar nuevamente
+      </button>
+    </div>
+
+  } @else {
+
+    <div class="filters">
+
+      <button
+        [class.active]="filtro() === 'TODAS'"
+        (click)="cambiarFiltro('TODAS')">
+        Todas
+      </button>
+
+      <button
+        [class.active]="filtro() === 'PENDIENTE'"
+        (click)="cambiarFiltro('PENDIENTE')">
+        Pendientes
+      </button>
+
+      <button
+        [class.active]="filtro() === 'APROBADA'"
+        (click)="cambiarFiltro('APROBADA')">
+        Aprobadas
+      </button>
+
+      <button
+        [class.active]="filtro() === 'RECHAZADA'"
+        (click)="cambiarFiltro('RECHAZADA')">
+        Rechazadas
+      </button>
+
+      <button
+        [class.active]="filtro() === 'CAMBIOS_SOLICITADOS'"
+        (click)="cambiarFiltro('CAMBIOS_SOLICITADOS')">
+        Cambios solicitados
+      </button>
+
+    </div>
+
+
+    @if (solicitudesFiltradas().length === 0) {
+
+      <div class="empty-state">
+        <h2>No hay solicitudes</h2>
+        <p>
+          No existen solicitudes con el filtro seleccionado.
+        </p>
+      </div>
+
+    } @else {
+
+      <div class="solicitudes-grid">
+
+        @for (
+          solicitud of solicitudesFiltradas();
+          track solicitud.id
+        ) {
+
+          <article class="solicitud-card">
+
+            <div class="card-top">
+
+              <span
+                class="status"
+                [class.pending]="solicitud.estado === 'PENDIENTE'"
+                [class.approved]="solicitud.estado === 'APROBADA'"
+                [class.rejected]="solicitud.estado === 'RECHAZADA'"
+                [class.changes]="solicitud.estado === 'CAMBIOS_SOLICITADOS'">
+
+                {{ solicitud.estado }}
+
+              </span>
+
+              <span class="request-id">
+                #{{ solicitud.id }}
+              </span>
+
+            </div>
+
+
+            <h2>
+              {{ solicitud.nombreCentro }}
+            </h2>
+
+            <p class="organization">
+              {{ solicitud.tipoOrganizacion }}
+            </p>
+
+
+            <div class="info">
+
+              <div>
+                <span>Ubicación</span>
+                <strong>
+                  {{ solicitud.ciudad }},
+                  {{ solicitud.departamentoUbicacion }}
+                </strong>
+              </div>
+
+              <div>
+                <span>Responsable</span>
+                <strong>
+                  {{ solicitud.nombreResponsable }}
+                </strong>
+              </div>
+
+              <div>
+                <span>Correo</span>
+                <strong>
+                  {{ solicitud.correoResponsable }}
+                </strong>
+              </div>
+
+            </div>
+
+
+            <div class="card-actions">
+
+              <button
+                class="details-button"
+                (click)="abrirSolicitud(solicitud)">
+                Ver solicitud
+              </button>
+
+              @if (solicitud.estado === 'PENDIENTE') {
+
+                <button
+                  class="approve-button"
+                  (click)="abrirSolicitud(solicitud); seleccionarEstado('APROBADA')">
+                  Aprobar
+                </button>
+
+                <button
+                  class="reject-button"
+                  (click)="abrirSolicitud(solicitud); seleccionarEstado('RECHAZADA')">
+                  Rechazar
+                </button>
+
+              }
+
+            </div>
+
+          </article>
+
+        }
+
+      </div>
+
+    }
+
+  }
+
+</div>
+
+
+@if (solicitudSeleccionada()) {
+
+  <div
+    class="modal-backdrop"
+    (click)="cerrarSolicitud()">
+
+    <div
+      class="modal"
+      (click)="$event.stopPropagation()">
+
+      <div class="modal-header">
+
+        <div>
+          <span class="eyebrow">
+            SOLICITUD #{{ solicitudSeleccionada()?.id }}
+          </span>
+
+          <h2>
+            {{ solicitudSeleccionada()?.nombreCentro }}
+          </h2>
+        </div>
+
+        <button
+          class="close-button"
+          (click)="cerrarSolicitud()">
+          ×
+        </button>
+
+      </div>
+
+
+      <div class="modal-content">
+
+        <section>
+          <h3>Información del centro</h3>
+
+          <div class="details-grid">
+
+            <div>
+              <span>Tipo de organización</span>
+              <strong>
+                {{ solicitudSeleccionada()?.tipoOrganizacion }}
+              </strong>
+            </div>
+
+            <div>
+              <span>NIT</span>
+              <strong>
+                {{ solicitudSeleccionada()?.nit }}
+              </strong>
+            </div>
+
+            <div>
+              <span>Ciudad</span>
+              <strong>
+                {{ solicitudSeleccionada()?.ciudad }}
+              </strong>
+            </div>
+
+            <div>
+              <span>Departamento</span>
+              <strong>
+                {{ solicitudSeleccionada()?.departamentoUbicacion }}
+              </strong>
+            </div>
+
+            <div class="full">
+              <span>Dirección</span>
+              <strong>
+                {{ solicitudSeleccionada()?.direccionExacta }}
+              </strong>
+            </div>
+
+            <div class="full">
+              <span>Descripción</span>
+              <strong>
+                {{ solicitudSeleccionada()?.descripcion }}
+              </strong>
+            </div>
+
+          </div>
+        </section>
+
+
+        <section>
+          <h3>Responsable</h3>
+
+          <div class="details-grid">
+
+            <div>
+              <span>Nombre</span>
+              <strong>
+                {{ solicitudSeleccionada()?.nombreResponsable }}
+              </strong>
+            </div>
+
+            <div>
+              <span>Cargo</span>
+              <strong>
+                {{ solicitudSeleccionada()?.cargoResponsable }}
+              </strong>
+            </div>
+
+            <div>
+              <span>Correo</span>
+              <strong>
+                {{ solicitudSeleccionada()?.correoResponsable }}
+              </strong>
+            </div>
+
+            <div>
+              <span>Teléfono</span>
+              <strong>
+                {{ solicitudSeleccionada()?.telefonoResponsable }}
+              </strong>
+            </div>
+
+          </div>
+        </section>
+
+
+        @if (solicitudSeleccionada()?.estado === 'PENDIENTE') {
+
+          <section class="review-section">
+
+            <h3>Revisión administrativa</h3>
+
+            <div class="state-buttons">
+
+              <button
+                [class.selected]="estadoSeleccionado() === 'APROBADA'"
+                (click)="seleccionarEstado('APROBADA')">
+                Aprobar
+              </button>
+
+              <button
+                [class.selected]="estadoSeleccionado() === 'RECHAZADA'"
+                (click)="seleccionarEstado('RECHAZADA')">
+                Rechazar
+              </button>
+
+              <button
+                [class.selected]="estadoSeleccionado() === 'CAMBIOS_SOLICITADOS'"
+                (click)="seleccionarEstado('CAMBIOS_SOLICITADOS')">
+                Solicitar cambios
+              </button>
+
+            </div>
+
+
+            <label for="observacion">
+              Observación
+            </label>
+
+            <textarea
+              id="observacion"
+              maxlength="1000"
+              placeholder="Escribe una observación para la solicitud..."
+              [value]="observacion()"
+              (input)="actualizarObservacion($event)">
+            </textarea>
+
+          </section>
+
+        }
+
+      </div>
+
+
+      <div class="modal-footer">
+
+        <button
+          class="cancel-button"
+          (click)="cerrarSolicitud()">
+          Cerrar
+        </button>
+
+        @if (
+          solicitudSeleccionada()?.estado === 'PENDIENTE'
+          && estadoSeleccionado()
+        ) {
+
+          <button
+            class="confirm-button"
+            [disabled]="procesando()"
+            (click)="confirmarCambio()">
+
+            @if (procesando()) {
+              Guardando...
+            } @else {
+              Confirmar cambio
+            }
+
+          </button>
+
+        }
+
+      </div>
+
+    </div>
+
+  </div>
+
+}
