@@ -178,12 +178,16 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, ApiRoutes.DONACIONES).hasAuthority(Roles.ADMIN)
 
                         // Consultas de donaciones y postulaciones requieren login
+                        // Solicitudes de centros — solo ADMIN
                         .requestMatchers(
                                 HttpMethod.GET,
-                                ApiRoutes.DONACIONES + "/**",
-                                ApiRoutes.POSTULACIONES + "/**"
-                        ).authenticated()
+                                ApiRoutes.SOLICITUDES_CENTRO + "/**"
+                        ).hasAuthority(Roles.ADMIN)
 
+                        .requestMatchers(
+                                HttpMethod.PATCH,
+                                ApiRoutes.SOLICITUDES_CENTRO + "/**"
+                        ).hasAuthority(Roles.ADMIN)
                         // Cualquier otro endpoint de API necesita autenticación
                         .requestMatchers("/api/**").authenticated()
 
