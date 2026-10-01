@@ -1,38 +1,30 @@
 import { TestBed } from '@angular/core/testing';
-
-import {
-  HttpTestingController,
-  provideHttpClientTesting
-} from '@angular/common/http/testing';
-
+import { HttpTestingController } from '@angular/common/http/testing';
 import {
   provideHttpClient
 } from '@angular/common/http';
+import {
+  provideHttpClientTesting
+} from '@angular/common/http/testing';
 
 import { CentroService } from './centro';
 import { Centro } from '../models/centro';
-
 
 describe('CentroService', () => {
 
   let service: CentroService;
   let httpTesting: HttpTestingController;
 
-
   beforeEach(() => {
 
     TestBed.configureTestingModule({
 
       providers: [
-
         provideHttpClient(),
-
         provideHttpClientTesting()
-
       ]
 
     });
-
 
     service = TestBed.inject(CentroService);
 
@@ -40,7 +32,6 @@ describe('CentroService', () => {
       TestBed.inject(HttpTestingController);
 
   });
-
 
   afterEach(() => {
 

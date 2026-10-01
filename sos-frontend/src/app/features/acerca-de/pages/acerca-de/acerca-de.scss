@@ -1,0 +1,490 @@
+.about-page {
+  width: 100%;
+  color: #123047;
+  background: #ffffff;
+}
+
+/* =========================
+   HERO
+========================= */
+
+.hero {
+  padding: 80px 7% 70px;
+  background: #ffffff;
+}
+
+.hero-content {
+  max-width: 900px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.eyebrow,
+.section-label {
+  display: inline-block;
+  color: #078c87;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+
+.hero h1 {
+  margin: 20px auto;
+  max-width: 800px;
+  font-size: clamp(42px, 6vw, 72px);
+  line-height: 1.05;
+  font-weight: 800;
+  letter-spacing: -2px;
+}
+
+.hero h1 span {
+  color: #078c87;
+}
+
+.hero-description {
+  max-width: 760px;
+  margin: 0 auto;
+  color: #48627a;
+  font-size: 20px;
+  line-height: 1.7;
+}
+
+.hero-highlights {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 35px;
+  margin-top: 35px;
+}
+
+.hero-highlights div {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #48627a;
+  font-weight: 600;
+}
+
+.check {
+  color: #078c87;
+  font-size: 20px;
+  font-weight: 800;
+}
+
+
+/* =========================
+   SECCIONES
+========================= */
+
+.mission-section,
+.values-section,
+.roles-section {
+  padding: 80px 7%;
+}
+
+.section-heading {
+  max-width: 850px;
+  margin: 0 auto 45px;
+  text-align: center;
+}
+
+.section-heading h2 {
+  margin: 12px 0;
+  color: #123047;
+  font-size: 38px;
+  line-height: 1.15;
+}
+
+.section-heading p {
+  color: #48627a;
+  font-size: 17px;
+  line-height: 1.7;
+}
+
+
+/* =========================
+   MISIÓN
+========================= */
+
+.mission-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  max-width: 1200px;
+  margin: auto;
+}
+
+.mission-card {
+  padding: 35px;
+  background: #ffffff;
+  border: 1px solid #e4eeee;
+  border-radius: 22px;
+  box-shadow: 0 10px 30px rgba(15, 75, 80, 0.06);
+}
+
+.card-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 55px;
+  height: 55px;
+  margin-bottom: 25px;
+
+  background: #e3f4f2;
+  border-radius: 50%;
+
+  color: #078c87;
+  font-size: 23px;
+}
+
+.mission-card h3,
+.step-card h3,
+.value-card h3,
+.role-card h3 {
+  margin-bottom: 12px;
+  color: #123047;
+  font-size: 22px;
+}
+
+.mission-card p,
+.step-card p,
+.value-card p,
+.role-card p {
+  margin: 0;
+  color: #526b80;
+  line-height: 1.7;
+}
+
+
+/* =========================
+   VERIFICACIÓN
+========================= */
+
+.verification-section {
+  padding: 80px 7%;
+  background: #eef9f7;
+}
+
+.verified-badge {
+  display: inline-block;
+  padding: 9px 18px;
+  margin-top: 10px;
+
+  background: #d8f0ed;
+  border-radius: 30px;
+
+  color: #078c87;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.steps-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+  max-width: 1250px;
+  margin: auto;
+}
+
+.step-card {
+  position: relative;
+
+  padding: 32px 25px;
+
+  background: #ffffff;
+  border: 1px solid #dceceb;
+  border-radius: 20px;
+}
+
+.step-number {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 32px;
+  height: 32px;
+
+  background: #078c87;
+  color: #ffffff;
+  border-radius: 50%;
+
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.step-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 55px;
+  height: 55px;
+  margin-bottom: 22px;
+
+  background: #e3f4f2;
+  border-radius: 15px;
+
+  font-size: 23px;
+}
+
+
+/* =========================
+   VALORES
+========================= */
+
+.values-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+  max-width: 1250px;
+  margin: auto;
+}
+
+.value-card {
+  display: flex;
+  gap: 18px;
+
+  padding: 28px;
+
+  border: 1px solid #e5eeee;
+  border-radius: 18px;
+}
+
+.value-icon {
+  flex-shrink: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 48px;
+  height: 48px;
+
+  background: #e3f4f2;
+  border-radius: 50%;
+
+  color: #078c87;
+  font-size: 20px;
+}
+
+
+/* =========================
+   ROLES
+========================= */
+
+.roles-section {
+  padding-top: 40px;
+}
+
+.roles-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 25px;
+
+  max-width: 1200px;
+  margin: auto;
+}
+
+.role-card {
+  padding: 35px;
+
+  border: 1px solid #e2eeee;
+  border-radius: 22px;
+  background: #ffffff;
+
+  box-shadow: 0 10px 30px rgba(15, 75, 80, 0.05);
+}
+
+.role-card.highlight {
+  border-color: #078c87;
+  box-shadow: 0 15px 35px rgba(7, 140, 135, 0.12);
+}
+
+.role-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 58px;
+  height: 58px;
+  margin-bottom: 25px;
+
+  border: 4px solid #078c87;
+  border-radius: 50%;
+
+  color: #078c87;
+  font-size: 22px;
+}
+
+.role-card button {
+  width: 100%;
+  margin-top: 25px;
+  padding: 13px 18px;
+
+  border: 1px solid #078c87;
+  border-radius: 10px;
+
+  background: #ffffff;
+  color: #078c87;
+
+  font-size: 15px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition: 0.2s ease;
+}
+
+.role-card button:hover {
+  background: #078c87;
+  color: #ffffff;
+}
+
+.role-card.highlight button {
+  background: #078c87;
+  color: #ffffff;
+}
+
+.role-card.highlight button:hover {
+  background: #067570;
+}
+
+
+/* =========================
+   CTA
+========================= */
+
+.cta-section {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 40px;
+
+  max-width: 1200px;
+  margin: 30px auto 80px;
+  padding: 45px 50px;
+
+  background: #078c87;
+  border-radius: 25px;
+
+  color: #ffffff;
+}
+
+.cta-section > div:first-child {
+  max-width: 650px;
+}
+
+.cta-section span {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+}
+
+.cta-section h2 {
+  margin: 12px 0;
+  font-size: 32px;
+  line-height: 1.2;
+}
+
+.cta-section p {
+  margin: 0;
+  line-height: 1.6;
+}
+
+.cta-buttons {
+  display: flex;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.cta-buttons button {
+  padding: 13px 22px;
+  border-radius: 10px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.cta-buttons .primary {
+  border: none;
+  background: #ffffff;
+  color: #078c87;
+}
+
+.cta-buttons .secondary {
+  border: 1px solid #ffffff;
+  background: transparent;
+  color: #ffffff;
+}
+
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 900px) {
+
+  .mission-grid,
+  .roles-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .steps-grid,
+  .values-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .cta-section {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+
+@media (max-width: 600px) {
+
+  .hero {
+    padding: 55px 20px;
+  }
+
+  .mission-section,
+  .verification-section,
+  .values-section,
+  .roles-section {
+    padding: 55px 20px;
+  }
+
+  .hero h1 {
+    font-size: 42px;
+  }
+
+  .hero-description {
+    font-size: 17px;
+  }
+
+  .hero-highlights {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .steps-grid,
+  .values-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .cta-section {
+    margin: 20px;
+    padding: 30px;
+  }
+
+  .cta-buttons {
+    width: 100%;
+    flex-direction: column;
+  }
+}

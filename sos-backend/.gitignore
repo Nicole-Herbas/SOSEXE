@@ -40,3 +40,6 @@ application-*.properties
 !application-local.properties.example
 .env
 .env.*
+
+### Documentos subidos por usuarios (SOS-41) ###
+uploads/

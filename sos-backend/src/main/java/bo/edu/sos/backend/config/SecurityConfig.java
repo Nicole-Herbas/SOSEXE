@@ -14,6 +14,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.http.HttpMethod;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import java.util.List;
 
 
 @Configuration
@@ -36,6 +40,31 @@ public class SecurityConfig {
 
         return new BCryptPasswordEncoder();
     }
+    @Bean
+        public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+
+        configuration.setAllowedOrigins(
+                List.of("http://localhost:4200")
+        );
+
+        configuration.setAllowedMethods(
+                List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
+        );
+
+        configuration.setAllowedHeaders(
+                List.of("*")
+        );
+
+        configuration.setAllowCredentials(true);
+
+        UrlBasedCorsConfigurationSource source =
+                new UrlBasedCorsConfigurationSource();
+
+        source.registerCorsConfiguration("/**", configuration);
+
+        return source;
+        }
 
 
     @Bean
@@ -44,12 +73,13 @@ public class SecurityConfig {
 
         http
 
-                .csrf(csrf ->
-                        csrf.disable()
-                )
+        .csrf(csrf ->
+                csrf.disable()
+        )
 
+        .cors(cors -> {})
 
-                .sessionManagement(session ->
+        .sessionManagement(session ->
                         session.sessionCreationPolicy(
                                 SessionCreationPolicy.STATELESS
                         )
@@ -58,17 +88,20 @@ public class SecurityConfig {
 
                 .authorizeHttpRequests(auth -> auth
 
-                        // Endpoints públicos de autenticación
-                        .requestMatchers(
-                                ApiRoutes.SWAGGER_UI,
-                                ApiRoutes.SWAGGER_HTML,
-                                ApiRoutes.OPENAPI_DOCS,
-                                ApiRoutes.AUTH_LOGIN,
-                                ApiRoutes.AUTH_REGISTRO,
-                                ApiRoutes.AUTH_REFRESH,
-                                ApiRoutes.AUTH_LOGOUT,
-                                "/error"
-                        ).permitAll()
+                // Permitir preflight CORS
+                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+
+                // Endpoints públicos de autenticación
+                .requestMatchers(
+                        ApiRoutes.SWAGGER_UI,
+                        ApiRoutes.SWAGGER_HTML,
+                        ApiRoutes.OPENAPI_DOCS,
+                        ApiRoutes.AUTH_LOGIN,
+                        ApiRoutes.AUTH_REGISTRO,
+                        ApiRoutes.AUTH_REFRESH,
+                        ApiRoutes.AUTH_LOGOUT,
+                        "/error"
+                ).permitAll()
 
 
                         // Datos públicos de lectura
@@ -79,9 +112,24 @@ public class SecurityConfig {
                                 ApiRoutes.ALERTAS + "/**",
                                 ApiRoutes.PUNTOS_AYUDA + "/**",
                                 ApiRoutes.VOLUNTARIADOS + "/**",
-                                ApiRoutes.MAPA + "/**"
+                                ApiRoutes.MAPA + "/**",
+                                ApiRoutes.DEPARTAMENTOS,
+                                ApiRoutes.DEPARTAMENTOS + "/**"
                         ).permitAll()
 
+                        // ── SOS-41: solicitudes de registro de centro ──
+                        // Enviar una solicitud -> cualquier usuario con sesión
+                        .requestMatchers(
+                                HttpMethod.POST,
+                                ApiRoutes.SOLICITUDES_CENTRO
+                        ).authenticated()
+
+                        // Consultar solicitudes -> solo ADMIN
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                ApiRoutes.SOLICITUDES_CENTRO,
+                                ApiRoutes.SOLICITUDES_CENTRO + "/**"
+                        ).hasAuthority(Roles.ADMIN)
 
                         // Usuario autenticado
                         .requestMatchers(

@@ -9,10 +9,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 
 import org.springframework.web.HttpRequestMethodNotSupportedException;
+import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
+import org.springframework.web.multipart.support.MissingServletRequestPartException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.util.HashMap;
@@ -95,11 +98,45 @@ public class GlobalExceptionHandler {
 
                 return ResponseEntity
                         .status(
-                                HttpStatus.UNPROCESSABLE_ENTITY
+                                HttpStatus.UNPROCESSABLE_CONTENT
                         )
                         .body(
                                 response
                         );
+        }
+
+        
+        // SOS-41: un archivo supera el límite de 10 MB
+        @ExceptionHandler(MaxUploadSizeExceededException.class)
+        public ResponseEntity<ApiResponse<Void>> handleMaxUploadSize(
+                MaxUploadSizeExceededException ex) {
+
+                return ResponseEntity
+                        .status(HttpStatus.CONTENT_TOO_LARGE)
+                        .body(ApiResponse.error(
+                                "Los archivos superan el tamaño máximo permitido (10 MB por archivo)"));
+        }
+
+        // SOS-41: falta una parte del multipart (por ejemplo, un documento)
+        @ExceptionHandler(MissingServletRequestPartException.class)
+        public ResponseEntity<ApiResponse<Void>> handleMissingPart(
+                MissingServletRequestPartException ex) {
+
+                return ResponseEntity
+                        .status(HttpStatus.BAD_REQUEST)
+                        .body(ApiResponse.error(
+                                "Falta la parte requerida: " + ex.getRequestPartName()));
+        }
+
+        // SOS-41: se envió un Content-Type que el endpoint no acepta
+        @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
+        public ResponseEntity<ApiResponse<Void>> handleMediaTypeNotSupported(
+                HttpMediaTypeNotSupportedException ex) {
+
+                return ResponseEntity
+                        .status(HttpStatus.UNSUPPORTED_MEDIA_TYPE)
+                        .body(ApiResponse.error(
+                                "Tipo de contenido no soportado por este endpoint"));
         }
 
 

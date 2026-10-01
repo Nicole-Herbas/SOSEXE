@@ -1,0 +1,2217 @@
+<div class="registro-page">
+
+  <!-- ==========================================
+       ENCABEZADO
+       ========================================== -->
+
+  <div class="registro-header">
+
+    <a class="volver-acerca" (click)="cancelar()">
+      ← Volver a Acerca de
+    </a>
+
+    <span class="badge">
+      Solicitud de verificación
+    </span>
+
+    <div class="header-content">
+
+      <div>
+        <h1>Registra tu centro o refugio</h1>
+
+        <p>
+          Completa la información para que el equipo administrador
+          pueda comprobar la organización antes de publicarla.
+        </p>
+      </div>
+
+      <div class="private-box">
+        <strong>🔒 Solicitud privada</strong>
+
+        <span>
+          Nada se publica automáticamente.
+        </span>
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- ==========================================
+       INDICADOR DE PASOS
+       ========================================== -->
+
+  <div class="steps">
+
+    <!-- PASO 1 -->
+
+    <div
+      class="step"
+      [class.active]="currentStep === 1"
+      [class.completed]="currentStep > 1"
+    >
+
+      <span class="step-number">
+
+        @if (currentStep > 1) {
+          ✓
+        } @else {
+          1
+        }
+
+      </span>
+
+      <span>Centro</span>
+
+    </div>
+
+
+    <!-- PASO 2 -->
+
+    <div
+      class="step"
+      [class.active]="currentStep === 2"
+      [class.completed]="currentStep > 2"
+    >
+
+      <span class="step-number">
+
+        @if (currentStep > 2) {
+          ✓
+        } @else {
+          2
+        }
+
+      </span>
+
+      <span>Responsable y ubicación</span>
+
+    </div>
+
+
+    <!-- PASO 3 -->
+
+    <div
+      class="step"
+      [class.active]="currentStep === 3"
+      [class.completed]="currentStep > 3"
+    >
+
+      <span class="step-number">
+
+        @if (currentStep > 3) {
+          ✓
+        } @else {
+          3
+        }
+
+      </span>
+
+      <span>Documentos</span>
+
+    </div>
+
+
+    <!-- PASO 4 -->
+
+    <div
+      class="step"
+      [class.active]="currentStep === 4"
+      [class.completed]="currentStep > 4"
+    >
+
+      <span class="step-number">
+
+        @if (currentStep > 4) {
+          ✓
+        } @else {
+          4
+        }
+
+      </span>
+
+      <span>Necesidades y voluntariado</span>
+
+    </div>
+
+
+    <!-- PASO 5 -->
+
+    <div
+      class="step"
+      [class.active]="currentStep === 5"
+    >
+
+      <span class="step-number">
+        5
+      </span>
+
+      <span>Revisión y envío</span>
+
+    </div>
+
+  </div>
+
+
+  <!-- ==========================================
+       CONTENIDO
+       ========================================== -->
+
+  <div class="content-layout">
+
+    <!-- ========================================
+         FORMULARIO
+         ======================================== -->
+
+    <section class="form-card">
+
+
+      <!-- =================================================
+           PASO 1 - INFORMACIÓN DEL CENTRO
+           ================================================= -->
+
+      @if (currentStep === 1) {
+
+        <div class="form-title">
+
+          <span class="step-label">
+            Paso 1 de 5
+          </span>
+
+          <h2>
+            Información del centro
+          </h2>
+
+          <p>
+            Cuéntanos qué organización solicita ser verificada.
+          </p>
+
+        </div>
+
+
+        <!-- NOMBRE -->
+
+        <div class="field full">
+
+          <label>
+            Nombre oficial del centro o refugio
+            <span>*</span>
+          </label>
+
+          <input
+            type="text"
+            [(ngModel)]="nombreCentro"
+            placeholder="Ej.: Centro de Apoyo San José"
+          />
+
+        </div>
+
+
+        <!-- TIPO + DEPARTAMENTO -->
+
+        <div class="field-row">
+
+          <div class="field">
+
+            <label>
+              Tipo de organización
+              <span>*</span>
+            </label>
+
+            <select
+              [(ngModel)]="tipoOrganizacion"
+            >
+
+              <option value="">
+                Selecciona una opción
+              </option>
+
+              @for (
+                tipo of tiposOrganizacion;
+                track tipo
+              ) {
+
+                <option [value]="tipo">
+                  {{ tipo }}
+                </option>
+
+              }
+
+            </select>
+
+          </div>
+
+
+          <div class="field">
+
+            <label>
+              Departamento
+              <span>*</span>
+            </label>
+
+            <!-- SOS-41: departamentos desde el backend.
+                 [ngValue] conserva el id como número -->
+            <select [(ngModel)]="departamentoId">
+
+              <option [ngValue]="null">
+                Selecciona un departamento
+              </option>
+
+              @for (dep of departamentos; track dep.id) {
+
+                <option [ngValue]="dep.id">
+                  {{ dep.nombre }}
+                </option>
+
+              }
+
+            </select>
+
+            @if (errorDepartamentos) {
+
+              <div class="file-error">
+                {{ errorDepartamentos }}
+              </div>
+
+            }
+
+          </div>
+
+        </div>
+
+
+        <!-- NIT + PERSONERÍA -->
+
+        <div class="field-row">
+
+          <div class="field">
+
+            <label>
+              NIT
+              <span>*</span>
+            </label>
+
+            <input
+              type="text"
+              [(ngModel)]="nit"
+              placeholder="Número de Identificación Tributaria"
+            />
+
+          </div>
+
+
+          <div class="field">
+
+            <label>
+              Personería jurídica
+              <span>*</span>
+            </label>
+
+            <input
+              type="text"
+              [(ngModel)]="personeriaJuridica"
+              placeholder="Número o resolución"
+            />
+
+          </div>
+
+        </div>
+
+
+        <!-- FECHA + WEB -->
+
+        <div class="field-row">
+
+          <div class="field">
+
+            <label>
+              Fecha de fundación
+            </label>
+
+            <input
+              type="date"
+              [(ngModel)]="fechaFundacion"
+            />
+
+          </div>
+
+
+          <div class="field">
+
+            <label>
+              Página web o red social oficial
+            </label>
+
+            <input
+              type="url"
+              [(ngModel)]="paginaWeb"
+              placeholder="https://..."
+            />
+
+          </div>
+
+        </div>
+
+
+        <!-- DESCRIPCIÓN -->
+
+        <div class="field full">
+
+          <label>
+            Descripción del centro
+            <span>*</span>
+          </label>
+
+          <textarea
+            [(ngModel)]="descripcion"
+            rows="4"
+            placeholder="Explica qué hace el centro, a quién ayuda y desde cuándo trabaja."
+          ></textarea>
+
+        </div>
+
+
+        <!-- POBLACIÓN -->
+
+        <div class="field full">
+
+          <label>
+            Población atendida
+          </label>
+
+          <input
+            type="text"
+            [(ngModel)]="poblacionAtendida"
+            placeholder="Ej.: familias afectadas, niños, adultos mayores o animales"
+          />
+
+        </div>
+
+
+        <!-- BOTONES PASO 1 -->
+
+        <div class="form-actions">
+
+          <button
+            type="button"
+            class="btn secondary"
+            (click)="cancelar()"
+          >
+            ← Cancelar
+          </button>
+
+
+          <div class="right-actions">
+
+            <button
+              type="button"
+              class="btn secondary"
+              (click)="guardarBorrador()"
+            >
+              Guardar borrador
+            </button>
+
+
+            <button
+              type="button"
+              class="btn primary"
+              [disabled]="!paso1Valido"
+              (click)="continuar()"
+            >
+              Continuar →
+            </button>
+
+          </div>
+
+        </div>
+
+      }
+
+
+      <!-- =================================================
+           PASO 2 - RESPONSABLE Y UBICACIÓN
+           ================================================= -->
+
+      @if (currentStep === 2) {
+
+        <div class="form-title">
+
+          <span class="step-label">
+            Paso 2 de 5
+          </span>
+
+          <h2>
+            Responsable y ubicación
+          </h2>
+
+          <p>
+            Indica quién representa al centro y dónde se encuentra.
+          </p>
+
+        </div>
+
+
+        <!-- ======================================
+             RESPONSABLE
+             ====================================== -->
+
+        <div class="section-title">
+
+          <h3>
+            Persona responsable
+          </h3>
+
+          <p>
+            Datos de la persona que podrá responder durante la verificación.
+          </p>
+
+        </div>
+
+
+        <!-- NOMBRE + CARGO -->
+
+        <div class="field-row">
+
+          <div class="field">
+
+            <label>
+              Nombre completo
+              <span>*</span>
+            </label>
+
+            <input
+              type="text"
+              [(ngModel)]="nombreResponsable"
+              placeholder="Nombre y apellidos"
+            />
+
+          </div>
+
+
+          <div class="field">
+
+            <label>
+              Cargo o relación con el centro
+              <span>*</span>
+            </label>
+
+            <input
+              type="text"
+              [(ngModel)]="cargoResponsable"
+              placeholder="Ej.: Representante legal"
+            />
+
+          </div>
+
+        </div>
+
+
+        <!-- DOCUMENTO + CORREO -->
+
+        <div class="field-row">
+
+          <div class="field">
+
+            <label>
+              Documento de identidad
+              <span>*</span>
+            </label>
+
+            <input
+              type="text"
+              [(ngModel)]="documentoResponsable"
+              placeholder="Cédula de identidad"
+            />
+
+          </div>
+
+
+          <div class="field">
+
+            <label>
+              Correo electrónico
+              <span>*</span>
+            </label>
+
+            <input
+              type="email"
+              [(ngModel)]="correoResponsable"
+              placeholder="correo@centro.org"
+            />
+
+          </div>
+
+        </div>
+
+
+        <!-- TELÉFONO -->
+
+        <div class="field">
+
+          <label>
+            Teléfono o WhatsApp
+            <span>*</span>
+          </label>
+
+          <input
+            type="tel"
+            [(ngModel)]="telefonoResponsable"
+            placeholder="+591 ..."
+          />
+
+        </div>
+
+
+        <!-- ======================================
+             SEPARADOR
+             ====================================== -->
+
+        <div class="section-divider"></div>
+
+
+        <!-- ======================================
+             UBICACIÓN
+             ====================================== -->
+
+        <div class="section-title">
+
+          <h3>
+            Ubicación del centro
+          </h3>
+
+          <p>
+            Esta información permitirá ubicar el centro en el mapa.
+          </p>
+
+        </div>
+
+
+        <!-- CIUDAD + DEPARTAMENTO -->
+
+        <div class="field-row">
+
+          <div class="field">
+
+            <label>
+              Ciudad o municipio
+              <span>*</span>
+            </label>
+
+            <input
+              type="text"
+              [(ngModel)]="ciudad"
+              placeholder="Ej.: Cochabamba"
+            />
+
+          </div>
+
+
+          <div class="field">
+
+            <label>
+              Departamento
+              <span>*</span>
+            </label>
+
+            <select
+              [(ngModel)]="departamentoUbicacion"
+            >
+
+              <option value="">
+                Selecciona un departamento
+              </option>
+
+              <!-- SOS-41: departamentos desde el backend -->
+              @for (dep of departamentos; track dep.id) {
+
+                <option [value]="dep.nombre">
+                  {{ dep.nombre }}
+                </option>
+
+              }
+
+            </select>
+
+          </div>
+
+        </div>
+
+
+        <!-- DIRECCIÓN -->
+
+        <div class="field full">
+
+          <label>
+            Dirección exacta
+            <span>*</span>
+          </label>
+
+          <input
+            type="text"
+            [(ngModel)]="direccionExacta"
+            placeholder="Zona, avenida, calle y número"
+          />
+
+        </div>
+
+
+        <!-- REFERENCIA -->
+
+        <div class="field full">
+
+          <label>
+            Referencia para llegar
+          </label>
+
+          <input
+            type="text"
+            [(ngModel)]="referencia"
+            placeholder="Ej.: a media cuadra de la plaza principal"
+          />
+
+        </div>
+
+
+        <!-- ======================================
+             BOTONES PASO 2
+             ====================================== -->
+
+        <div class="form-actions">
+
+          <button
+            type="button"
+            class="btn secondary"
+            (click)="volver()"
+          >
+            ← Atrás
+          </button>
+
+
+          <div class="right-actions">
+
+            <button
+              type="button"
+              class="btn secondary"
+              (click)="guardarBorrador()"
+            >
+              Guardar borrador
+            </button>
+
+
+            <button
+              type="button"
+              class="btn primary"
+              [disabled]="!paso2Valido"
+              (click)="continuar()"
+            >
+              Continuar →
+            </button>
+
+          </div>
+
+        </div>
+
+      }
+
+
+      <!-- =================================================
+           PASO 3 - DOCUMENTOS
+           ================================================= -->
+
+      @if (currentStep === 3) {
+
+        <div class="form-title">
+
+          <span class="step-label">
+            Paso 3 de 5
+          </span>
+
+          <h2>
+            Documentos de respaldo
+          </h2>
+
+          <p>
+            Adjunta los documentos que permitan verificar la existencia
+            y representación del centro.
+          </p>
+
+        </div>
+
+
+        <!-- ======================================
+             DOCUMENTO 1 - PERSONERÍA
+             ====================================== -->
+
+        <div
+          class="document-item"
+          [class.document-complete]="personeriaArchivo"
+        >
+
+          <div class="document-info">
+
+            <div class="document-icon">
+
+              @if (personeriaArchivo) {
+                ✓
+              } @else {
+                ▤
+              }
+
+            </div>
+
+            <div>
+
+              <h3>
+                Personería jurídica o documento de constitución
+              </h3>
+
+              <p>
+                Documento que demuestra la existencia legal de la organización.
+              </p>
+
+              @if (personeriaArchivo) {
+
+                <button
+                  type="button"
+                  class="file-name file-preview-button"
+                  (click)="verArchivo(personeriaArchivo)"
+                >
+                  {{ personeriaArchivo.name }}
+                </button>
+
+              }
+
+            </div>
+
+          </div>
+
+
+          <input
+            #personeriaInput
+            type="file"
+            accept=".pdf,image/jpeg,image/png,image/webp"
+            hidden
+            (change)="seleccionarPersoneria($event)"
+          />
+
+
+          @if (personeriaArchivo) {
+
+            <button
+              type="button"
+              class="document-btn remove"
+              (click)="quitarPersoneria(); personeriaInput.value = ''"
+            >
+              Quitar archivo
+            </button>
+
+          } @else {
+
+            <button
+              type="button"
+              class="document-btn"
+              (click)="personeriaInput.click()"
+            >
+              Adjuntar archivo
+            </button>
+
+          }
+
+        </div>
+
+
+        <!-- ======================================
+             DOCUMENTO 2 - NIT
+             ====================================== -->
+
+        <div
+          class="document-item"
+          [class.document-complete]="nitArchivo"
+        >
+
+          <div class="document-info">
+
+            <div class="document-icon">
+
+              @if (nitArchivo) {
+                ✓
+              } @else {
+                ▤
+              }
+
+            </div>
+
+            <div>
+
+              <h3>
+                Documento del NIT
+              </h3>
+
+              <p>
+                Constancia vigente del Número de Identificación Tributaria.
+              </p>
+
+              @if (nitArchivo) {
+
+                <button
+                  type="button"
+                  class="file-name file-preview-button"
+                  (click)="verArchivo(nitArchivo)"
+                >
+                  {{ nitArchivo.name }}
+                </button>
+
+              }
+
+            </div>
+
+          </div>
+
+
+          <input
+            #nitInput
+            type="file"
+            accept=".pdf,image/jpeg,image/png,image/webp"
+            hidden
+            (change)="seleccionarNit($event)"
+          />
+
+
+          @if (nitArchivo) {
+
+            <button
+              type="button"
+              class="document-btn remove"
+              (click)="quitarNit(); nitInput.value = ''"
+            >
+              Quitar archivo
+            </button>
+
+          } @else {
+
+            <button
+              type="button"
+              class="document-btn"
+              (click)="nitInput.click()"
+            >
+              Adjuntar archivo
+            </button>
+
+          }
+
+        </div>
+
+
+        <!-- ======================================
+             DOCUMENTO 3 - IDENTIDAD
+             ====================================== -->
+
+        <div
+          class="document-item"
+          [class.document-complete]="identidadArchivo"
+        >
+
+          <div class="document-info">
+
+            <div class="document-icon">
+
+              @if (identidadArchivo) {
+                ✓
+              } @else {
+                ▤
+              }
+
+            </div>
+
+            <div>
+
+              <h3>
+                Identidad y poder del representante legal
+              </h3>
+
+              <p>
+                Cédula de identidad y documento que respalda su representación.
+              </p>
+
+              @if (identidadArchivo) {
+
+                <button
+                  type="button"
+                  class="file-name file-preview-button"
+                  (click)="verArchivo(identidadArchivo)"
+                >
+                  {{ identidadArchivo.name }}
+                </button>
+
+              }
+
+            </div>
+
+          </div>
+
+
+          <input
+            #identidadInput
+            type="file"
+            accept=".pdf,image/jpeg,image/png,image/webp"
+            hidden
+            (change)="seleccionarIdentidad($event)"
+          />
+
+
+          @if (identidadArchivo) {
+
+            <button
+              type="button"
+              class="document-btn remove"
+              (click)="quitarIdentidad(); identidadInput.value = ''"
+            >
+              Quitar archivo
+            </button>
+
+          } @else {
+
+            <button
+              type="button"
+              class="document-btn"
+              (click)="identidadInput.click()"
+            >
+              Adjuntar archivo
+            </button>
+
+          }
+
+        </div>
+
+
+        <!-- ======================================
+             DOCUMENTO 4 - DOMICILIO
+             ====================================== -->
+
+        <div
+          class="document-item"
+          [class.document-complete]="domicilioArchivo"
+        >
+
+          <div class="document-info">
+
+            <div class="document-icon">
+
+              @if (domicilioArchivo) {
+                ✓
+              } @else {
+                ▤
+              }
+
+            </div>
+
+            <div>
+
+              <h3>
+                Respaldo del domicilio del centro
+              </h3>
+
+              <p>
+                Factura de servicio, contrato o documento con la dirección declarada.
+              </p>
+
+              @if (domicilioArchivo) {
+
+                <button
+                  type="button"
+                  class="file-name file-preview-button"
+                  (click)="verArchivo(domicilioArchivo)"
+                >
+                  {{ domicilioArchivo.name }}
+                </button>
+
+              }
+
+            </div>
+
+          </div>
+
+
+          <input
+            #domicilioInput
+            type="file"
+            accept=".pdf,image/jpeg,image/png,image/webp"
+            hidden
+            (change)="seleccionarDomicilio($event)"
+          />
+
+
+          @if (domicilioArchivo) {
+
+            <button
+              type="button"
+              class="document-btn remove"
+              (click)="quitarDomicilio(); domicilioInput.value = ''"
+            >
+              Quitar archivo
+            </button>
+
+          } @else {
+
+            <button
+              type="button"
+              class="document-btn"
+              (click)="domicilioInput.click()"
+            >
+              Adjuntar archivo
+            </button>
+
+          }
+
+        </div>
+
+
+        <!-- ======================================
+             ERROR DE ARCHIVO
+             ====================================== -->
+
+        @if (errorArchivo) {
+
+          <div class="file-error">
+            {{ errorArchivo }}
+          </div>
+
+        }
+
+
+        <!-- ======================================
+             INFORMACIÓN IMPORTANTE
+             ====================================== -->
+
+        <div class="document-notice">
+
+          <strong>
+            Información importante:
+          </strong>
+
+          Los documentos solo serán visibles para el equipo
+          encargado de revisar la solicitud.
+
+        </div>
+
+
+        <!-- ======================================
+             BOTONES PASO 3
+             ====================================== -->
+
+        <div class="form-actions">
+
+          <button
+            type="button"
+            class="btn secondary"
+            (click)="volver()"
+          >
+            ← Atrás
+          </button>
+
+
+          <div class="right-actions">
+
+            <button
+              type="button"
+              class="btn secondary"
+              (click)="guardarBorrador()"
+            >
+              Guardar borrador
+            </button>
+
+
+            <button
+              type="button"
+              class="btn primary"
+              [disabled]="!paso3Valido"
+              (click)="continuar()"
+            >
+              Continuar →
+            </button>
+
+          </div>
+
+        </div>
+
+      }
+
+
+      <!-- =================================================
+           PASO 4 - NECESIDADES Y VOLUNTARIADO
+           ================================================= -->
+
+      @if (currentStep === 4) {
+
+        <div class="form-title">
+
+          <span class="step-label">
+            Paso 4 de 5
+          </span>
+
+          <h2>
+            Necesidades y voluntariado
+          </h2>
+
+          <p>
+            Indica qué necesita actualmente el centro y si requiere apoyo de voluntarios.
+          </p>
+
+        </div>
+
+
+        <!-- ======================================
+             NECESIDADES PRIORITARIAS
+             ====================================== -->
+
+        <div class="section-title">
+
+          <h3>
+            Necesidades prioritarias
+          </h3>
+
+          <p>
+            Selecciona los recursos que el centro necesita actualmente.
+          </p>
+
+        </div>
+
+
+        <div class="options-grid">
+
+          @for (necesidad of necesidadesDisponibles; track necesidad) {
+
+            <label
+              class="option-card"
+              [class.option-selected]="necesidadesSeleccionadas.includes(necesidad)"
+            >
+
+              <input
+                type="checkbox"
+                [checked]="necesidadesSeleccionadas.includes(necesidad)"
+                (change)="alternarNecesidad(necesidad)"
+              />
+
+              <span class="option-check">
+                @if (necesidadesSeleccionadas.includes(necesidad)) {
+                  ✓
+                }
+              </span>
+
+              <span class="option-text">
+                {{ necesidad }}
+              </span>
+
+            </label>
+
+          }
+
+        </div>
+
+
+        <!-- ======================================
+             DONACIONES
+             ====================================== -->
+
+        <div class="section-divider"></div>
+
+        <div class="section-title">
+
+          <h3>
+            Donaciones que acepta
+          </h3>
+
+          <p>
+            Selecciona los tipos de donaciones que el centro puede recibir.
+          </p>
+
+        </div>
+
+
+        <div class="options-grid">
+
+          @for (donacion of donacionesDisponibles; track donacion) {
+
+            <label
+              class="option-card"
+              [class.option-selected]="donacionesSeleccionadas.includes(donacion)"
+            >
+
+              <input
+                type="checkbox"
+                [checked]="donacionesSeleccionadas.includes(donacion)"
+                (change)="alternarDonacion(donacion)"
+              />
+
+              <span class="option-check">
+                @if (donacionesSeleccionadas.includes(donacion)) {
+                  ✓
+                }
+              </span>
+
+              <span class="option-text">
+                {{ donacion }}
+              </span>
+
+            </label>
+
+          }
+
+        </div>
+
+
+        <!-- ======================================
+             VOLUNTARIADO
+             ====================================== -->
+
+        <div class="section-divider"></div>
+
+        <div class="section-title">
+
+          <h3>
+            Voluntariado
+          </h3>
+
+          <p>
+            Indica si el centro necesita personas voluntarias.
+          </p>
+
+        </div>
+
+
+        <div class="volunteer-options">
+
+          <label
+            class="volunteer-card"
+            [class.option-selected]="solicitaVoluntarios === true"
+          >
+
+            <input
+              type="radio"
+              name="solicitaVoluntarios"
+              [value]="true"
+              [(ngModel)]="solicitaVoluntarios"
+            />
+
+            <div>
+
+              <strong>
+                Sí, necesitamos voluntarios
+              </strong>
+
+              <span>
+                El centro desea recibir apoyo de personas voluntarias.
+              </span>
+
+            </div>
+
+          </label>
+
+
+          <label
+            class="volunteer-card"
+            [class.option-selected]="solicitaVoluntarios === false"
+          >
+
+            <input
+              type="radio"
+              name="solicitaVoluntarios"
+              [value]="false"
+              [(ngModel)]="solicitaVoluntarios"
+            />
+
+            <div>
+
+              <strong>
+                No necesitamos voluntarios
+              </strong>
+
+              <span>
+                Actualmente el centro no requiere voluntariado.
+              </span>
+
+            </div>
+
+          </label>
+
+        </div>
+
+
+        <!-- ======================================
+             TIPOS DE VOLUNTARIADO
+             ====================================== -->
+
+        @if (solicitaVoluntarios === true) {
+
+          <div class="volunteer-detail">
+
+            <label>
+              ¿En qué actividades necesitas voluntarios?
+            </label>
+
+            <div class="options-grid">
+
+              @for (actividad of actividadesVoluntariado; track actividad) {
+
+                <label
+                  class="option-card"
+                  [class.option-selected]="actividadesSeleccionadas.includes(actividad)"
+                >
+
+                  <input
+                    type="checkbox"
+                    [checked]="actividadesSeleccionadas.includes(actividad)"
+                    (change)="alternarActividad(actividad)"
+                  />
+
+                  <span class="option-check">
+                    @if (actividadesSeleccionadas.includes(actividad)) {
+                      ✓
+                    }
+                  </span>
+
+                  <span class="option-text">
+                    {{ actividad }}
+                  </span>
+
+                </label>
+
+              }
+
+            </div>
+
+
+            <div class="field full">
+
+              <label>
+                Describe qué tipo de apoyo necesitas
+              </label>
+
+              <textarea
+                [(ngModel)]="descripcionVoluntariado"
+                rows="4"
+                placeholder="Ej.: Necesitamos personas para apoyar en actividades educativas durante las tardes."
+              ></textarea>
+
+            </div>
+
+          </div>
+
+        }
+
+
+        <!-- ======================================
+             BOTONES PASO 4
+             ====================================== -->
+
+        <div class="form-actions">
+
+          <button
+            type="button"
+            class="btn secondary"
+            (click)="volver()"
+          >
+            ← Atrás
+          </button>
+
+
+          <div class="right-actions">
+
+            <button
+              type="button"
+              class="btn secondary"
+              (click)="guardarBorrador()"
+            >
+              Guardar borrador
+            </button>
+
+
+            <button
+              type="button"
+              class="btn primary"
+              [disabled]="!paso4Valido"
+              (click)="continuar()"
+            >
+              Continuar →
+            </button>
+
+          </div>
+
+        </div>
+
+      }
+
+
+      <!-- =================================================
+           PASO 5 - REVISIÓN Y ENVÍO
+           ================================================= -->
+
+      @if (currentStep === 5) {
+
+        <div class="form-title">
+
+          <span class="step-label">
+            Paso 5 de 5
+          </span>
+
+          <h2>Revisión y envío</h2>
+
+          <p>
+            Revisa la información antes de enviar la solicitud
+            de verificación.
+          </p>
+
+        </div>
+
+
+        <!-- ======================================
+             INFORMACIÓN DEL CENTRO
+             ====================================== -->
+
+        <div class="review-section">
+
+          <div class="review-section-header">
+
+            <div>
+              <h3>Información del centro</h3>
+              <p>Datos principales de la organización.</p>
+            </div>
+
+            <span class="review-badge">
+              ✓ Completo
+            </span>
+
+          </div>
+
+
+          <div class="review-grid">
+
+            <div class="review-item">
+              <span>Nombre</span>
+              <strong>{{ nombreCentro }}</strong>
+            </div>
+
+            <div class="review-item">
+              <span>Tipo de organización</span>
+              <strong>{{ tipoOrganizacion }}</strong>
+            </div>
+
+            <div class="review-item">
+              <span>Departamento</span>
+              <strong>{{ nombreDepartamento }}</strong>
+            </div>
+
+            <div class="review-item">
+              <span>NIT</span>
+              <strong>{{ nit }}</strong>
+            </div>
+
+            <div class="review-item">
+              <span>Personería jurídica</span>
+              <strong>{{ personeriaJuridica }}</strong>
+            </div>
+
+            <div class="review-item">
+              <span>Fecha de fundación</span>
+              <strong>{{ fechaFundacion || 'No especificada' }}</strong>
+            </div>
+
+            <div class="review-item full-review">
+              <span>Página web o red social</span>
+              <strong>{{ paginaWeb || 'No especificada' }}</strong>
+            </div>
+
+            <div class="review-item full-review">
+              <span>Descripción</span>
+              <strong>{{ descripcion }}</strong>
+            </div>
+
+            <div class="review-item full-review">
+              <span>Población atendida</span>
+              <strong>{{ poblacionAtendida || 'No especificada' }}</strong>
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <!-- ======================================
+             RESPONSABLE
+             ====================================== -->
+
+        <div class="review-section">
+
+          <div class="review-section-header">
+
+            <div>
+              <h3>Responsable</h3>
+              <p>Persona encargada del centro.</p>
+            </div>
+
+            <span class="review-badge">
+              ✓ Completo
+            </span>
+
+          </div>
+
+
+          <div class="review-grid">
+
+            <div class="review-item">
+              <span>Nombre</span>
+              <strong>{{ nombreResponsable }}</strong>
+            </div>
+
+            <div class="review-item">
+              <span>Cargo</span>
+              <strong>{{ cargoResponsable }}</strong>
+            </div>
+
+            <div class="review-item">
+              <span>Documento</span>
+              <strong>{{ documentoResponsable }}</strong>
+            </div>
+
+            <div class="review-item">
+              <span>Correo</span>
+              <strong>{{ correoResponsable }}</strong>
+            </div>
+
+            <div class="review-item">
+              <span>Teléfono</span>
+              <strong>{{ telefonoResponsable }}</strong>
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <!-- ======================================
+             UBICACIÓN
+             ====================================== -->
+
+        <div class="review-section">
+
+          <div class="review-section-header">
+
+            <div>
+              <h3>Ubicación</h3>
+              <p>Ubicación registrada del centro.</p>
+            </div>
+
+            <span class="review-badge">
+              ✓ Completo
+            </span>
+
+          </div>
+
+
+          <div class="review-grid">
+
+            <div class="review-item">
+              <span>Ciudad</span>
+              <strong>{{ ciudad }}</strong>
+            </div>
+
+            <div class="review-item">
+              <span>Departamento</span>
+              <strong>{{ departamentoUbicacion }}</strong>
+            </div>
+
+            <div class="review-item full-review">
+              <span>Dirección</span>
+              <strong>{{ direccionExacta }}</strong>
+            </div>
+
+            <div class="review-item full-review">
+              <span>Referencia</span>
+              <strong>{{ referencia || 'No especificada' }}</strong>
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <!-- ======================================
+             DOCUMENTOS
+             ====================================== -->
+
+        <div class="review-section">
+
+          <div class="review-section-header">
+
+            <div>
+              <h3>Documentos</h3>
+              <p>Archivos adjuntados para la verificación.</p>
+            </div>
+
+            <span class="review-badge">
+              {{ documentosAdjuntos }}/4
+            </span>
+
+          </div>
+
+
+          <div class="review-documents">
+
+            <div class="review-document">
+
+              <span class="document-status">✓</span>
+
+              @if (personeriaArchivo) {
+                <button
+                  type="button"
+                  class="file-preview-button"
+                  (click)="verArchivo(personeriaArchivo)"
+                >
+                  {{ personeriaArchivo.name }}
+                </button>
+              }
+
+            </div>
+
+            <div class="review-document">
+
+              <span class="document-status">✓</span>
+
+              @if (nitArchivo) {
+                <button
+                  type="button"
+                  class="file-preview-button"
+                  (click)="verArchivo(nitArchivo)"
+                >
+                  {{ nitArchivo.name }}
+                </button>
+              }
+
+            </div>
+
+            <div class="review-document">
+
+              <span class="document-status">✓</span>
+
+              @if (identidadArchivo) {
+                <button
+                  type="button"
+                  class="file-preview-button"
+                  (click)="verArchivo(identidadArchivo)"
+                >
+                  {{ identidadArchivo.name }}
+                </button>
+              }
+
+            </div>
+
+            <div class="review-document">
+
+              <span class="document-status">✓</span>
+
+              @if (domicilioArchivo) {
+                <button
+                  type="button"
+                  class="file-preview-button"
+                  (click)="verArchivo(domicilioArchivo)"
+                >
+                  {{ domicilioArchivo.name }}
+                </button>
+              }
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <!-- ======================================
+             NECESIDADES Y DONACIONES
+             ====================================== -->
+
+        <div class="review-section">
+
+          <div class="review-section-header">
+
+            <div>
+              <h3>Necesidades y donaciones</h3>
+              <p>Información de apoyo del centro.</p>
+            </div>
+
+          </div>
+
+
+          <div class="review-grid">
+
+            <div class="review-item full-review">
+
+              <span>Necesidades prioritarias</span>
+
+              <strong>
+                {{ necesidadesSeleccionadas.join(', ') }}
+              </strong>
+
+            </div>
+
+            <div class="review-item full-review">
+
+              <span>Donaciones que acepta</span>
+
+              <strong>
+                {{ donacionesSeleccionadas.join(', ') }}
+              </strong>
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <!-- ======================================
+             VOLUNTARIADO
+             ====================================== -->
+
+        <div class="review-section">
+
+          <div class="review-section-header">
+
+            <div>
+              <h3>Voluntariado</h3>
+              <p>Información sobre voluntarios.</p>
+            </div>
+
+          </div>
+
+
+          <div class="review-grid">
+
+            <div class="review-item">
+
+              <span>Solicita voluntarios</span>
+
+              <strong>
+                {{ solicitaVoluntarios ? 'Sí' : 'No' }}
+              </strong>
+
+            </div>
+
+
+            @if (solicitaVoluntarios) {
+
+              <div class="review-item full-review">
+
+                <span>Actividades</span>
+
+                <strong>
+                  {{ actividadesSeleccionadas.join(', ') }}
+                </strong>
+
+              </div>
+
+
+              <div class="review-item full-review">
+
+                <span>Descripción</span>
+
+                <strong>
+                  {{ descripcionVoluntariado || 'No especificada' }}
+                </strong>
+
+              </div>
+
+            }
+
+          </div>
+
+        </div>
+
+
+        <!-- ======================================
+             AVISO
+             ====================================== -->
+
+        <div class="submit-notice">
+
+          <strong>
+            🔒 Antes de enviar
+          </strong>
+
+          <p>
+            La solicitud será enviada al equipo administrador
+            para su revisión. El centro no será publicado
+            automáticamente.
+          </p>
+
+        </div>
+
+
+        <!-- ======================================
+             SOS-41: SIN SESIÓN (el backend exige login)
+             ====================================== -->
+
+        @if (!haySesion) {
+
+          <div class="submit-notice">
+
+            <strong>
+              Inicia sesión para enviar
+            </strong>
+
+            <p>
+              Necesitas una cuenta para enviar la solicitud.
+              <a class="volver-acerca" (click)="irALogin()">
+                Ir a iniciar sesión
+              </a>
+            </p>
+
+          </div>
+
+        }
+
+
+        <!-- ======================================
+             BOTONES
+             ====================================== -->
+
+        <div class="form-actions">
+
+          <button
+            type="button"
+            class="btn secondary"
+            (click)="volver()"
+          >
+            ← Atrás
+          </button>
+
+
+          <div class="right-actions">
+
+            <button
+              type="button"
+              class="btn secondary"
+              (click)="guardarBorrador()"
+            >
+              Guardar borrador
+            </button>
+
+
+            <button
+              type="button"
+              class="btn primary"
+              [disabled]="enviando || !haySesion || !formularioCompleto"
+              (click)="enviarSolicitud()"
+            >
+              {{ enviando ? 'Enviando...' : 'Enviar solicitud →' }}
+            </button>
+
+          </div>
+
+        </div>
+
+      }
+
+    </section>
+
+
+
+    <!-- ========================================
+         RESUMEN LATERAL
+         ======================================== -->
+
+    <aside class="summary-card">
+
+      <div class="summary-header">
+
+        <div>
+
+          <span>
+            RESUMEN DE LA SOLICITUD
+          </span>
+
+          <h3>
+            {{ nombreCentro || 'Tu centro o refugio' }}
+          </h3>
+
+          <p>
+            {{ nombreDepartamento || 'Ubicación pendiente' }}
+          </p>
+
+        </div>
+
+        <span class="summary-step">
+          Paso {{ currentStep }}/5
+        </span>
+
+      </div>
+
+
+      <!-- VERIFICACIÓN -->
+
+      <div class="verification-box">
+
+        <strong>
+          ✓ Se mostrará tras la verificación
+        </strong>
+
+        <p>
+          La información no será pública hasta que un
+          administrador revise y apruebe la solicitud.
+        </p>
+
+      </div>
+
+
+      <!-- NECESIDADES -->
+
+      <div class="summary-section">
+
+        <span>
+          NECESIDADES PRIORITARIAS
+        </span>
+
+        <p>
+          Aún no seleccionadas
+        </p>
+
+      </div>
+
+
+      <!-- DONACIONES -->
+
+      <div class="summary-section">
+
+        <span>
+          DONACIONES QUE ACEPTA
+        </span>
+
+        <p>
+          Aún no seleccionadas
+        </p>
+
+      </div>
+
+
+      <!-- VOLUNTARIADO -->
+
+      <div class="summary-section">
+
+        <span>
+          VOLUNTARIADO
+        </span>
+
+        <p>
+          No solicita voluntarios
+        </p>
+
+      </div>
+
+
+      <!-- DOCUMENTOS -->
+
+      <div class="documents-counter">
+
+        <span>
+          Documentos añadidos
+        </span>
+
+        <strong>
+          {{ documentosAdjuntos }}/4
+        </strong>
+
+      </div>
+
+
+      <p class="summary-footer">
+        Podrás actualizar necesidades, horarios y
+        vacantes cuando cambie la situación del centro.
+      </p>
+
+    </aside>
+
+  </div>
+
+</div>
+
+<!-- ==========================================
+     MODAL - VISTA PREVIA DE ARCHIVO
+     ========================================== -->
+
+@if (mostrarModalArchivo) {
+
+  <div
+    class="modal-overlay"
+    (click)="cerrarVistaPrevia()"
+  >
+
+    <div
+      class="file-preview-modal"
+      (click)="$event.stopPropagation()"
+    >
+
+      <button
+        type="button"
+        class="file-preview-close"
+        (click)="cerrarVistaPrevia()"
+        aria-label="Cerrar vista previa"
+      >
+        ×
+      </button>
+
+      <div class="file-preview-header">
+
+        <div>
+          <h2>Vista previa</h2>
+
+          @if (archivoVistaPrevia) {
+            <p>{{ archivoVistaPrevia.name }}</p>
+          }
+        </div>
+
+        <button
+          type="button"
+          class="file-preview-close"
+          (click)="cerrarVistaPrevia()"
+        >
+          ×
+        </button>
+
+      </div>
+
+      <div class="file-preview-content">
+
+        @if (esImagenArchivoVistaPrevia) {
+
+          <img
+            [src]="urlArchivoVistaPrevia"
+            [alt]="archivoVistaPrevia?.name || 'Documento'"
+          />
+
+        } @else {
+
+          <iframe
+            [src]="urlSeguraVistaPrevia"
+            title="Vista previa del documento"
+          ></iframe>
+
+        }
+
+      </div>
+
+    </div>
+
+  </div>
+
+}
+
+<!-- ==========================================
+     MODAL - SOLICITUD ENVIADA
+     ========================================== -->
+
+@if (mostrarModalEnvio) {
+
+  <div class="modal-overlay" (click)="cerrarModalEnvio()">
+
+    <div class="success-modal" (click)="$event.stopPropagation()">
+
+      <div class="success-icon">✓</div>
+
+      <div class="success-content">
+
+        <span class="modal-badge">Estado: Pendiente de revisión</span>
+
+        <h2>¡Registro recibido!</h2>
+
+        <p>
+          La solicitud de <strong>{{ nombreCentro }}</strong>
+          fue enviada correctamente.
+        </p>
+
+      </div>
+
+      <div class="modal-steps">
+
+        <span class="modal-steps-title">¿Qué sigue?</span>
+
+        <div class="modal-step">
+          <span class="modal-step-number">1</span>
+          <p>El equipo administrador revisará los datos y documentos.</p>
+        </div>
+
+        <div class="modal-step">
+          <span class="modal-step-number">2</span>
+          <p>Podrá contactarte al correo o teléfono del responsable.</p>
+        </div>
+
+        <div class="modal-step">
+          <span class="modal-step-number">3</span>
+          <p>Si todo está en orden, el centro se publicará en la plataforma.</p>
+        </div>
+
+      </div>
+
+      <button type="button" class="success-button" (click)="cerrarModalEnvio()">
+        Entendido
+      </button>
+
+    </div>
+
+  </div>
+
+}
+
+
+<!-- ==========================================
+     MODAL - ERROR AL ENVIAR
+     ========================================== -->
+
+@if (mostrarModalError) {
+
+  <div class="modal-overlay" (click)="cerrarModalError()">
+
+    <div class="success-modal error-modal" (click)="$event.stopPropagation()">
+
+      <div class="success-icon error-icon">!</div>
+
+      <div class="success-content">
+
+        <h2>No se pudo enviar la solicitud</h2>
+
+        <p>{{ errorEnvio }}</p>
+
+        <p class="success-description">
+          Tu información sigue aquí; no se perdió nada.
+          Corrige lo necesario y vuelve a intentarlo.
+        </p>
+
+      </div>
+
+      <div class="modal-actions">
+
+        @if (haySesion) {
+
+          <button type="button" class="success-button" (click)="cerrarModalError()">
+            Revisar y completar
+          </button>
+
+        } @else {
+
+          <button type="button" class="btn secondary" (click)="cerrarModalError()">
+            Cerrar
+          </button>
+
+          <button type="button" class="success-button" (click)="irALoginDesdeError()">
+            Iniciar sesión
+          </button>
+
+        }
+
+      </div>
+
+    </div>
+
+  </div>
+
+}
