@@ -1688,5 +1688,175 @@
     flex-direction: column;
   }
 }
+  
+/* ==========================================
+   SOS-42 - AVISO DE BORRADOR RECUPERADO
+   ========================================== */
+
+.draft-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+  padding: 14px 16px;
+  border: 1px solid #f1d9a6;
+  border-radius: 12px;
+  background: #fffaf0;
+}
+
+.draft-banner-text strong {
+  display: block;
+  margin-bottom: 3px;
+  color: #8a5a00;
+  font-size: 13px;
+}
+
+.draft-banner-text span {
+  color: #7a6a4f;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.draft-banner-button {
+  flex-shrink: 0;
+  min-height: 36px;
+  padding: 0 14px;
+  border: 1px solid #d9b56a;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #8a5a00;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.draft-banner-button:hover {
+  background: #fff3db;
+}
+
+
+/* ==========================================
+   SOS-42 - AVISO DE BORRADOR RECUPERADO
+   ========================================== */
+
+.draft-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+  padding: 14px 16px;
+  border: 1px solid #f1d9a6;
+  border-radius: 12px;
+  background: #fffaf0;
+}
+
+.draft-banner-text strong {
+  display: block;
+  margin-bottom: 3px;
+  color: #8a5a00;
+  font-size: 13px;
+}
+
+.draft-banner-text span {
+  color: #7a6a4f;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.draft-banner-button {
+  flex-shrink: 0;
+  min-height: 36px;
+  padding: 0 14px;
+  border: 1px solid #d9b56a;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #8a5a00;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.draft-banner-button:hover {
+  background: #fff3db;
+}
+
+
+/* ==========================================
+   SOS-42 - MODAL DE BORRADOR
+   ========================================== */
+
+.draft-modal {
+  max-width: 460px;
+}
+
+.draft-icon {
+  box-shadow: 0 0 0 8px rgba(7, 150, 150, 0.12);
+}
+
+/* Circulito que gira mientras guarda */
+.draft-spinner {
+  width: 56px;
+  height: 56px;
+  margin: 4px auto 20px;
+  border: 5px solid #d9eeee;
+  border-top-color: #079696;
+  border-radius: 50%;
+  animation: draftSpin 0.8s linear infinite;
+}
+
+@keyframes draftSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+
+/* ==========================================
+   MODALES - PIEZAS COMPARTIDAS
+   (si ya las tienes del modal de error, no pasa nada si se repiten)
+   ========================================== */
+
+.modal-badge {
+  display: inline-block;
+  margin-bottom: 12px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  background: #e8f7f6;
+  color: #078d8d;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.error-icon {
+  background: #d74b4b;
+  box-shadow: 0 0 0 8px rgba(215, 75, 75, 0.12);
+}
+
+.modal-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 25px;
+}
+
+.modal-actions .success-button,
+.modal-actions .btn {
+  flex: 1;
+  margin-top: 0;
+}
+
+@media (max-width: 650px) {
+
+  .draft-banner,
+  .modal-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+}
 
 }
