@@ -4,6 +4,7 @@ import bo.edu.sos.backend.dto.CentroDTO;
 import bo.edu.sos.backend.entity.Centro;
 import bo.edu.sos.backend.entity.Departamento;
 import bo.edu.sos.backend.entity.Necesidad;
+import bo.edu.sos.backend.exception.BadRequestException;
 import bo.edu.sos.backend.repository.CentroRepository;
 import bo.edu.sos.backend.repository.DepartamentoRepository;
 import bo.edu.sos.backend.repository.UsuarioRepository;
@@ -17,6 +18,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -104,5 +106,59 @@ class CentroServiceTest {
         assertEquals(2, dto.getNecesidadIds().size());
         assertTrue(dto.getNecesidadIds().contains(1L));
         assertTrue(dto.getNecesidadIds().contains(2L));
+    }
+
+    @Test
+    void guardarDebeForzarEstadoPendiente() {
+
+        Departamento departamento = new Departamento();
+        departamento.setId(3L);
+        when(departamentoRepository.findById(3L))
+                .thenReturn(Optional.of(departamento));
+        when(centroRepository.save(any(Centro.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+
+        CentroDTO dto = new CentroDTO();
+        dto.setNombre("Centro nuevo");
+        dto.setTipo("ALBERGUE");
+        dto.setDireccion("Calle Central");
+        dto.setCiudad("Cochabamba");
+        dto.setDepartamentoId(3L);
+        dto.setTelefono("71234567");
+        dto.setLatitud(new BigDecimal("-17.39"));
+        dto.setLongitud(new BigDecimal("-66.15"));
+        dto.setEstadoVerificacion("APROBADO");
+
+        centroService.guardar(dto);
+
+        verify(centroRepository).save(argThat(centro ->
+                "PENDIENTE".equals(centro.getEstadoVerificacion())));
+    }
+
+    @Test
+    void actualizarEstadoDebePersistirEstadosPermitidos() {
+
+        Centro centro = new Centro();
+        when(centroRepository.findById(1L))
+                .thenReturn(Optional.of(centro));
+        when(centroRepository.save(any(Centro.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+
+        for (String estado : List.of("EN_REVISION", "APROBADO", "RECHAZADO")) {
+            CentroDTO resultado = centroService.actualizarEstado(1L, estado);
+
+            assertEquals(estado, resultado.getEstadoVerificacion());
+        }
+
+        verify(centroRepository, times(3)).save(any(Centro.class));
+    }
+
+    @Test
+    void actualizarEstadoDebeRechazarEstadosNoPermitidos() {
+
+        assertThrows(BadRequestException.class,
+                () -> centroService.actualizarEstado(1L, "VERIFICADO"));
+
+        verifyNoInteractions(centroRepository);
     }
 }

@@ -1,3 +1,93 @@
+@if (mostrarFormulario) {
+  <section aria-labelledby="titulo-formulario-centro">
+    <h1 id="titulo-formulario-centro">Registrar centro</h1>
+
+    <form [formGroup]="centroForm" (ngSubmit)="crearCentro()" novalidate>
+      <div>
+        <label for="centro-nombre">Nombre</label>
+        <input id="centro-nombre" type="text" formControlName="nombre">
+        @if (centroForm.controls.nombre.touched && centroForm.controls.nombre.hasError('required')) {
+          <p role="alert">El nombre es obligatorio.</p>
+        }
+        @if (centroForm.controls.nombre.touched && centroForm.controls.nombre.hasError('minlength')) {
+          <p role="alert">El nombre debe tener al menos 5 caracteres.</p>
+        }
+      </div>
+
+      <div>
+        <label for="centro-tipo">Tipo</label>
+        <input id="centro-tipo" type="text" formControlName="tipo">
+        @if (centroForm.controls.tipo.touched && centroForm.controls.tipo.hasError('required')) {
+          <p role="alert">El tipo es obligatorio.</p>
+        }
+      </div>
+
+      <div>
+        <label for="centro-direccion">Dirección</label>
+        <input id="centro-direccion" type="text" formControlName="direccion">
+        @if (centroForm.controls.direccion.touched && centroForm.controls.direccion.hasError('required')) {
+          <p role="alert">La dirección es obligatoria.</p>
+        }
+      </div>
+
+      <div>
+        <label for="centro-telefono">Teléfono</label>
+        <input id="centro-telefono" type="tel" inputmode="numeric" formControlName="telefono">
+        @if (centroForm.controls.telefono.touched && centroForm.controls.telefono.hasError('required')) {
+          <p role="alert">El teléfono es obligatorio.</p>
+        }
+        @if (centroForm.controls.telefono.touched && centroForm.controls.telefono.hasError('pattern')) {
+          <p role="alert">Ingresa entre 8 y 15 dígitos numéricos.</p>
+        }
+      </div>
+
+      <div>
+        <label for="centro-ciudad">Ciudad</label>
+        <input id="centro-ciudad" type="text" formControlName="ciudad">
+        @if (centroForm.controls.ciudad.touched && centroForm.controls.ciudad.hasError('required')) {
+          <p role="alert">La ciudad es obligatoria.</p>
+        }
+      </div>
+
+      <div>
+        <label for="centro-departamento">Departamento</label>
+        <select id="centro-departamento" formControlName="departamentoId">
+          <option [ngValue]="null">Selecciona un departamento</option>
+          @for (departamento of departamentos; track departamento.id) {
+            <option [ngValue]="departamento.id">{{ departamento.nombre }}</option>
+          }
+        </select>
+        @if (centroForm.controls.departamentoId.touched && centroForm.controls.departamentoId.hasError('required')) {
+          <p role="alert">El departamento es obligatorio.</p>
+        }
+      </div>
+
+      <div>
+        <label for="centro-latitud">Latitud</label>
+        <input id="centro-latitud" type="number" step="any" formControlName="latitud">
+        @if (centroForm.controls.latitud.touched && centroForm.controls.latitud.invalid) {
+          <p role="alert">Ingresa una latitud entre -90 y 90.</p>
+        }
+      </div>
+
+      <div>
+        <label for="centro-longitud">Longitud</label>
+        <input id="centro-longitud" type="number" step="any" formControlName="longitud">
+        @if (centroForm.controls.longitud.touched && centroForm.controls.longitud.invalid) {
+          <p role="alert">Ingresa una longitud entre -180 y 180.</p>
+        }
+      </div>
+
+      <button type="submit" [disabled]="creando()">
+        {{ creando() ? 'Registrando...' : 'Registrar centro' }}
+      </button>
+      @if (mensajeFormulario()) {
+        <p role="status">{{ mensajeFormulario() }}</p>
+      }
+    </form>
+  </section>
+}
+
 @if (cargando()) {
 
   <p>

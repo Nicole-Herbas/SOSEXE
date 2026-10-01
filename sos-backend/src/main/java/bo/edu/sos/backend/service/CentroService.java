@@ -6,6 +6,7 @@ import bo.edu.sos.backend.entity.Centro;
 import bo.edu.sos.backend.entity.Departamento;
 import bo.edu.sos.backend.entity.Necesidad;
 import bo.edu.sos.backend.entity.Usuario;
+import bo.edu.sos.backend.exception.BadRequestException;
 import bo.edu.sos.backend.exception.ResourceNotFoundException;
 import bo.edu.sos.backend.repository.CentroRepository;
 import bo.edu.sos.backend.repository.DepartamentoRepository;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class CentroService {
@@ -74,6 +76,26 @@ public class CentroService {
         Centro actualizado = centroRepository.save(centro);
 
         return convertirADTO(actualizado);
+    }
+
+    @Transactional
+    public CentroDTO actualizarEstado(Long id, String estado) {
+
+        Set<String> estadosPermitidos = Set.of(
+                EstadoVerificacion.EN_REVISION,
+                EstadoVerificacion.APROBADO,
+                EstadoVerificacion.RECHAZADO);
+
+        if (!estadosPermitidos.contains(estado)) {
+            throw new BadRequestException("Estado de verificación no permitido");
+        }
+
+        Centro centro = centroRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Centro", id));
+
+        centro.setEstadoVerificacion(estado);
+
+        return convertirADTO(centroRepository.save(centro));
     }
 
     @Transactional

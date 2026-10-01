@@ -6,6 +6,8 @@ package bo.edu.sos.backend.constants;
 public final class EstadoVerificacion {
 
     public static final String PENDIENTE  = "PENDIENTE";
+    public static final String EN_REVISION = "EN_REVISION";
+    public static final String APROBADO   = "APROBADO";
     public static final String VERIFICADO = "VERIFICADO";
     public static final String RECHAZADO  = "RECHAZADO";
 
