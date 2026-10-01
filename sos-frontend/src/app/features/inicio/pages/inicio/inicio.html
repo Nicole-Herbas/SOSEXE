@@ -313,162 +313,56 @@
         <button type="button" (click)="cargarNoticias()">{{ textosNoticias.reintentar }}</button>
       </div>
     } @else if (filteredNews().length > 0) {
-
       <div class="news-grid">
+        @for (news of filteredNews(); track news.id) {
+          <article class="news-card">
+            <div class="news-card__image-wrapper news-card__image-wrapper--small">
+              @if (news.imagenUrl) {
+                <img
+                  [src]="news.imagenUrl"
+                  [alt]="news.titulo"
+                  loading="lazy"
+                  (error)="ocultarImagen($event)"
+                />
+              } @else {
+                <div class="news-card__image-fallback">
+                  {{ textosNoticias.imagenNoDisponible }}
+                </div>
+              }
 
-
-        <!-- Noticia principal -->
-
-        <article class="news-card news-card--featured">
-
-          <div class="news-card__image-wrapper news-card__image-wrapper--large">
-
-            @if (filteredNews()[0].imagenUrl) {
-              <img
-                [src]="filteredNews()[0].imagenUrl"
-                [alt]="filteredNews()[0].titulo"
-                loading="lazy"
-                (error)="ocultarImagen($event)"
-              />
-            } @else {
-              <div class="news-card__image-fallback">
-                {{ textosNoticias.imagenNoDisponible }}
-              </div>
-            }
-
-            <span
-              class="news-card__category-badge"
-              [class.news-card__category-badge--red]="
-                filteredNews()[0].categoria === 'Incendios'
-              "
-              [class.news-card__category-badge--teal]="
-                filteredNews()[0].categoria !== 'Incendios'
-              "
-            >
-              {{ filteredNews()[0].categoria }}
-            </span>
-
-
-            <span class="news-card__verified-badge">
-              {{ textos.noticias.fuenteVerificada }}
-            </span>
-
-
-            <span class="news-card__ref-badge">
-              {{ textos.noticias.imagenReferencial }}
-            </span>
-
-          </div>
-
-
-          <div class="news-card__body">
-
-            <div class="news-card__meta">
-
-              <span class="news-card__location">
-
-                {{ textos.noticias.ubicacionIcono }}
-
-                {{ filteredNews()[0].ubicacion || textosNoticias.ubicacion }}
-
+              <span
+                class="news-card__category-badge"
+                [class.news-card__category-badge--red]="news.categoria === 'Incendios'"
+                [class.news-card__category-badge--teal]="news.categoria !== 'Incendios'"
+              >
+                {{ news.categoria }}
               </span>
-
-              <span class="news-card__date">
-                {{ formatearFecha(filteredNews()[0].fechaPublicacion) }}
+              <span class="news-card__ref-badge">
+                {{ textos.noticias.imagenReferencial }}
               </span>
-
             </div>
 
-
-            <h3 class="news-card__title news-card__title--large">
-              {{ filteredNews()[0].titulo }}
-            </h3>
-
-
-            <p class="news-card__summary">
-              {{ filteredNews()[0].resumen }}
-            </p>
-
-          </div>
-
-        </article>
-
-
-        <!-- Noticias secundarias -->
-
-        <div class="news-grid__secondary">
-
-          @for (
-            news of filteredNews().slice(1);
-            track news.id
-          ) {
-
-            <article class="news-card">
-
-              <div class="news-card__image-wrapper news-card__image-wrapper--small">
-
-                @if (news.imagenUrl) {
-                  <img
-                    [src]="news.imagenUrl"
-                    [alt]="news.titulo"
-                    loading="lazy"
-                    (error)="ocultarImagen($event)"
-                  />
-                } @else {
-                  <div class="news-card__image-fallback">
-                    {{ textosNoticias.imagenNoDisponible }}
-                  </div>
-                }
-
-
-                <span class="news-card__category-badge news-card__category-badge--teal">
-                  {{ news.categoria }}
+            <div class="news-card__body news-card__body--compact">
+              <div class="news-card__meta">
+                <span class="news-card__location">
+                  {{ textos.noticias.ubicacionIcono }}
+                  {{ news.ubicacion || textosNoticias.ubicacion }}
                 </span>
-
-
-                <span class="news-card__ref-badge">
-                  {{ textos.noticias.imagenReferencial }}
-                </span>
-
-              </div>
-
-
-              <div class="news-card__body news-card__body--compact">
-
-                <div class="news-card__meta">
-
-                  <span class="news-card__location">
-
-                    {{ textos.noticias.ubicacionIcono }}
-
-                    {{ news.ubicacion || textosNoticias.ubicacion }}
-
-                  </span>
-
-                  <span class="news-card__date">
+                @if (news.fechaPublicacion) {
+                  <time class="news-card__date" [attr.datetime]="news.fechaPublicacion">
                     {{ formatearFecha(news.fechaPublicacion) }}
-                  </span>
-
-                </div>
-
-
-                <h3 class="news-card__title">
-                  {{ news.titulo }}
-                </h3>
-
-
-                <p class="news-card__summary news-card__summary--small">
-                  {{ news.resumen }}
-                </p>
-
+                  </time>
+                }
               </div>
-
-            </article>
-
-          }
-
-        </div>
-
+              <h3 class="news-card__title">{{ news.titulo }}</h3>
+              @if (news.resumen) {
+                <p class="news-card__summary news-card__summary--small">
+                  {{ resumenVistaPrevia(news.resumen) }}
+                </p>
+              }
+            </div>
+          </article>
+        }
       </div>
 
     } @else {

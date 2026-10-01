@@ -410,15 +410,9 @@ $font-display: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, s
 /* ── News grid ── */
 .news-grid {
   display: grid;
-  grid-template-columns: 1.08fr 0.92fr;
-  gap: 20px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
   margin-top: 28px;
-  align-items: start;
-}
-
-.news-grid__secondary {
-  display: grid;
-  gap: 20px;
 }
 
 /* ── News card ── */
@@ -461,7 +455,7 @@ $font-display: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, s
 }
 
 .news-card__image-wrapper--small {
-  height: 175px;
+  height: 190px;
 }
 
 .news-card__category-badge {
@@ -552,11 +546,16 @@ $font-display: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, s
   font-size: 15px;
   line-height: 1.75;
   color: $color-text;
+  overflow-wrap: anywhere;
 }
 
 .news-card__summary--small {
   font-size: 14px;
   line-height: 1.6;
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
 }
 
 /* ── Empty state ── */
@@ -621,7 +620,7 @@ $font-display: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, s
   }
 
   .news-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
@@ -645,5 +644,9 @@ $font-display: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, s
   .news-section__header {
     flex-direction: column;
     align-items: flex-start;
+  }
+
+  .news-grid {
+    grid-template-columns: 1fr;
   }
 }

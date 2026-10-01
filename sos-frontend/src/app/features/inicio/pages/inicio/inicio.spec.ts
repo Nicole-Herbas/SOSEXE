@@ -108,6 +108,7 @@ describe('Inicio', () => {
 
     expect(fixture.nativeElement.querySelectorAll('.news-card').length).toBe(1);
     expect(fixture.nativeElement.textContent).toContain('Incendio externo');
+    expect(fixture.nativeElement.querySelector('.news-grid > .news-card')).not.toBeNull();
   });
 
   it('debe mantener el filtro Alertas alineado con la tarjeta de referencia', () => {
