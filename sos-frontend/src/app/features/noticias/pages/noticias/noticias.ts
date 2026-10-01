@@ -8,6 +8,7 @@ import { APP_TEXTOS } from '../../../../shared/constants/app-textos.constants';
 import { Noticia } from '../../models/noticia.model';
 import { NoticiaService } from '../../services/noticia.service';
 import { CATEGORIAS_NOTICIAS, filtrarNoticiasPorCategoria } from '../../utils/categoria-noticia';
+import { recortarResumen } from '../../utils/resumen-noticia';
 
 @Component({
   imports: [RouterLink],
@@ -19,6 +20,7 @@ export class Noticias implements OnInit {
   private readonly noticiaService = inject(NoticiaService);
 
   readonly textos = APP_TEXTOS.noticias;
+  readonly resumenVistaPrevia = recortarResumen;
   readonly featureToggles: Pick<FeatureToggles, 'noticias'> = {
     noticias: { ...FEATURE_TOGGLES.noticias },
   };

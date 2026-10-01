@@ -79,7 +79,7 @@
 							</div>
 							<h3>{{ noticia.titulo }}</h3>
 							@if (noticia.resumen) {
-								<p>{{ noticia.resumen }}</p>
+								<p>{{ resumenVistaPrevia(noticia.resumen) }}</p>
 							}
 							@if (noticia.url) {
 								<a
@@ -130,7 +130,7 @@
 								</div>
 								<h3>{{ noticia.titulo }}</h3>
 								@if (noticia.resumen) {
-									<p>{{ noticia.resumen }}</p>
+									<p>{{ resumenVistaPrevia(noticia.resumen) }}</p>
 								}
 								@if (noticia.url) {
 									<a

@@ -11,6 +11,7 @@ import {
   CATEGORIAS_NOTICIAS,
   filtrarNoticiasPorCategoria,
 } from '../../../noticias/utils/categoria-noticia';
+import { recortarResumen } from '../../../noticias/utils/resumen-noticia';
 
 @Component({
   imports: [RouterLink],
@@ -23,6 +24,7 @@ export class Inicio implements OnInit {
 
   readonly textos = APP_TEXTOS.inicio;
   readonly textosNoticias = APP_TEXTOS.noticias;
+  readonly resumenVistaPrevia = recortarResumen;
   readonly featureToggles: Pick<FeatureToggles, 'inicio'> = {
     inicio: { ...FEATURE_TOGGLES.inicio },
   };
