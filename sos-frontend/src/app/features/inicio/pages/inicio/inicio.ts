@@ -13,6 +13,8 @@ import {
 } from '../../../noticias/utils/categoria-noticia';
 import { recortarResumen } from '../../../noticias/utils/resumen-noticia';
 
+const MAX_NOTICIAS_INICIO = 6;
+
 @Component({
   imports: [RouterLink],
   selector: 'app-inicio',
@@ -33,7 +35,10 @@ export class Inicio implements OnInit {
   readonly activeFilter = signal<string>(this.textosNoticias.filtroTodas);
   readonly allNews = signal<Noticia[]>([]);
   readonly filteredNews = computed(() =>
-    filtrarNoticiasPorCategoria(this.allNews(), this.activeFilter()),
+    filtrarNoticiasPorCategoria(this.allNews(), this.activeFilter()).slice(
+      0,
+      MAX_NOTICIAS_INICIO,
+    ),
   );
   readonly cargandoNoticias = signal(true);
   readonly errorNoticias = signal(false);
