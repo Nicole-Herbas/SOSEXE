@@ -3,6 +3,7 @@ package bo.edu.sos.backend.controller;
 import bo.edu.sos.backend.dto.ApiResponse;
 import bo.edu.sos.backend.dto.NoticiaDTO;
 import bo.edu.sos.backend.dto.NoticiaExternaDTO;
+import bo.edu.sos.backend.dto.ResultadoNoticiasExternasDTO;
 import bo.edu.sos.backend.service.NoticiaExternaService;
 import bo.edu.sos.backend.service.NoticiaService;
 import org.junit.jupiter.api.BeforeEach;
@@ -59,17 +60,20 @@ class NoticiaControllerTest {
         noticia.setId("externa-1");
         noticia.setTitulo("Artículo de Bolivia");
         noticia.setUrl("https://example.com/articulo");
-        when(noticiaExternaService.obtenerNoticias()).thenReturn(List.of(noticia));
+        when(noticiaExternaService.obtenerNoticias()).thenReturn(
+            new ResultadoNoticiasExternasDTO(List.of(noticia), true, false));
 
-        ResponseEntity<ApiResponse<List<NoticiaExternaDTO>>> respuesta =
+        ResponseEntity<ApiResponse<ResultadoNoticiasExternasDTO>> respuesta =
                 noticiaController.listarExternas();
 
         assertEquals(200, respuesta.getStatusCode().value());
         assertNotNull(respuesta.getBody());
         assertTrue(respuesta.getBody().isSuccess());
-        assertEquals("externa-1", respuesta.getBody().getData().get(0).getId());
-        assertEquals("https://example.com/articulo", respuesta.getBody().getData().get(0).getUrl());
-        assertTrue(respuesta.getBody().getData().get(0).isEsExterna());
+        assertTrue(respuesta.getBody().getData().apiDisponible());
+        assertFalse(respuesta.getBody().getData().desdeCache());
+        assertEquals("externa-1", respuesta.getBody().getData().noticias().get(0).getId());
+        assertEquals("https://example.com/articulo", respuesta.getBody().getData().noticias().get(0).getUrl());
+        assertTrue(respuesta.getBody().getData().noticias().get(0).isEsExterna());
         verify(noticiaExternaService).obtenerNoticias();
     }
 }

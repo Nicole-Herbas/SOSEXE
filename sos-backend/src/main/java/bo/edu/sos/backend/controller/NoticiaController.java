@@ -3,6 +3,7 @@ package bo.edu.sos.backend.controller;
 import bo.edu.sos.backend.dto.ApiResponse;
 import bo.edu.sos.backend.dto.NoticiaDTO;
 import bo.edu.sos.backend.dto.NoticiaExternaDTO;
+import bo.edu.sos.backend.dto.ResultadoNoticiasExternasDTO;
 import bo.edu.sos.backend.service.NoticiaExternaService;
 import bo.edu.sos.backend.service.NoticiaService;
 import jakarta.validation.Valid;
@@ -100,7 +101,7 @@ public class NoticiaController {
      * No requiere autenticación JWT.
      */
     @GetMapping("/externas")
-    public ResponseEntity<ApiResponse<List<NoticiaExternaDTO>>> listarExternas() {
+        public ResponseEntity<ApiResponse<ResultadoNoticiasExternasDTO>> listarExternas() {
         return ResponseEntity.ok(
                 ApiResponse.ok(noticiaExternaService.obtenerNoticias()));
     }
