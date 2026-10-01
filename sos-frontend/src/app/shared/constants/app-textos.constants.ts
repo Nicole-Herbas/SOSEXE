@@ -387,6 +387,7 @@ noticias: {
     'Sequías',
     'Comunidad',
     'Alertas',
+    'Otras',
   ] as const,
 
   // ── Sección "Últimas actualizaciones" ────────────────────────────────────
@@ -408,6 +409,9 @@ noticias: {
 
   categoriaGeneral:
     'Noticias',
+
+  categoriaOtras:
+    'Otras',
 
   leerNoticia:
     'Leer noticia →',
@@ -461,6 +465,12 @@ noticias: {
 
   errorCarga:
     'No se pudieron cargar las noticias. Intenta de nuevo.',
+
+  apiNoDisponible:
+    'Las noticias externas no están disponibles en este momento.',
+
+  apiNoDisponibleCache:
+    'No se pudieron actualizar las noticias externas. Mostrando los últimos datos disponibles.',
 },
 
 voluntariado: {

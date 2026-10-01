@@ -7,6 +7,7 @@ import {
 import { APP_TEXTOS } from '../../../../shared/constants/app-textos.constants';
 import { Noticia } from '../../models/noticia.model';
 import { NoticiaService } from '../../services/noticia.service';
+import { CATEGORIAS_NOTICIAS, filtrarNoticiasPorCategoria } from '../../utils/categoria-noticia';
 
 @Component({
   imports: [RouterLink],
@@ -18,16 +19,22 @@ export class Noticias implements OnInit {
   private readonly noticiaService = inject(NoticiaService);
 
   readonly textos = APP_TEXTOS.noticias;
-  readonly featureToggles: FeatureToggles = {
-    mapa: { ...FEATURE_TOGGLES.mapa },
+  readonly featureToggles: Pick<FeatureToggles, 'noticias'> = {
     noticias: { ...FEATURE_TOGGLES.noticias },
   };
 
   readonly noticias = signal<Noticia[]>([]);
   readonly cargando = signal(true);
   readonly error = signal(false);
-  readonly noticiasDestacadas = computed(() => this.noticias().slice(0, 3));
-  readonly noticiasSecundarias = computed(() => this.noticias().slice(3));
+  readonly apiNoDisponible = signal(false);
+  readonly externasDesdeCache = signal(false);
+  readonly filtroActivo = signal<string>(APP_TEXTOS.noticias.filtroTodas);
+  readonly categorias = CATEGORIAS_NOTICIAS;
+  readonly noticiasFiltradas = computed(() =>
+    filtrarNoticiasPorCategoria(this.noticias(), this.filtroActivo()),
+  );
+  readonly noticiasDestacadas = computed(() => this.noticiasFiltradas().slice(0, 3));
+  readonly noticiasSecundarias = computed(() => this.noticiasFiltradas().slice(3));
 
   ngOnInit(): void {
     this.cargarNoticias();
@@ -36,10 +43,17 @@ export class Noticias implements OnInit {
   cargarNoticias(): void {
     this.cargando.set(true);
     this.error.set(false);
+    this.apiNoDisponible.set(false);
+    this.externasDesdeCache.set(false);
 
-    this.noticiaService.listarNoticias().subscribe({
-      next: (noticias) => {
-        this.noticias.set(noticias);
+    this.noticiaService.listarNoticias({
+      propias: this.featureToggles.noticias.mostrarPropias,
+      externas: this.featureToggles.noticias.mostrarExternas,
+    }).subscribe({
+      next: (resultado) => {
+        this.noticias.set(resultado.noticias);
+        this.apiNoDisponible.set(resultado.apiExternaDisponible === false);
+        this.externasDesdeCache.set(resultado.noticiasExternasDesdeCache);
         this.cargando.set(false);
       },
       error: () => {
@@ -47,6 +61,10 @@ export class Noticias implements OnInit {
         this.cargando.set(false);
       },
     });
+  }
+
+  seleccionarFiltro(categoria: string): void {
+    this.filtroActivo.set(categoria);
   }
 
   formatearFecha(fecha: string | null): string {
