@@ -29,8 +29,13 @@ export class Navbar implements OnInit, OnDestroy {
   readonly textos = APP_TEXTOS.navbar;
 
   menuAbierto = false;
+  configuracionAbierta = false;
+
   sesionActiva = false;
   nombreUsuario = '';
+
+  // NUEVO
+  esAdmin = false;
 
   private sub!: Subscription;
 
@@ -45,12 +50,50 @@ export class Navbar implements OnInit, OnDestroy {
       .subscribe(activa => {
 
         this.sesionActiva = activa;
+
         this.nombreUsuario =
           activa
             ? this.authService.obtenerNombreUsuario()
             : '';
 
+        // Si hay sesión, verificamos el rol
+        if (activa) {
+          this.obtenerRolUsuario();
+        } else {
+          this.esAdmin = false;
+          this.configuracionAbierta = false;
+        }
+
       });
+
+  }
+
+  // NUEVO
+  private obtenerRolUsuario(): void {
+
+    this.authService.usuarioActual().subscribe({
+
+      next: usuario => {
+
+        this.esAdmin = usuario.rol === 'ADMIN';
+
+        console.log('Rol del usuario:', usuario.rol);
+        console.log('¿Es admin?', this.esAdmin);
+
+      },
+
+      error: error => {
+
+        console.error(
+          'No se pudo obtener el usuario actual:',
+          error
+        );
+
+        this.esAdmin = false;
+
+      }
+
+    });
 
   }
 
@@ -60,14 +103,41 @@ export class Navbar implements OnInit, OnDestroy {
 
   }
 
+  // NUEVO
+  alternarConfiguracion(): void {
+    this.configuracionAbierta =
+      !this.configuracionAbierta;
+  }
+
+  // NUEVO
+  irASolicitudes(): void {
+
+    this.configuracionAbierta = false;
+
+    this.router.navigate(['/admin']);
+
+  }
+
   cerrarSesion(): void {
 
     this.authService.logout().subscribe({
-      next: () => this.router.navigate(['/inicio']),
-      error: () => {
-        // Limpiar la sesión localmente aunque falle el backend
+
+      next: () => {
+
+        this.esAdmin = false;
+
         this.router.navigate(['/inicio']);
+
+      },
+
+      error: () => {
+
+        this.esAdmin = false;
+
+        this.router.navigate(['/inicio']);
+
       }
+
     });
 
   }
