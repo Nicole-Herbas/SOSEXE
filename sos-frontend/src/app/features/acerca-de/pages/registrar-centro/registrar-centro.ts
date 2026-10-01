@@ -55,7 +55,8 @@ export class RegistrarCentroComponent implements OnInit {
   fechaBorrador = '';
   mensajeBorrador = '';
   errorBorrador = false;
-  private temporizadorMensaje: ReturnType<typeof setTimeout> | null = null;
+  mostrarModalBorrador = false;
+  guardandoBorrador = false;
 
   // ==========================================
   // SESIÓN (el POST exige login; el token lo pone el authInterceptor)
@@ -677,6 +678,12 @@ export class RegistrarCentroComponent implements OnInit {
 
   async guardarBorrador(): Promise<void> {
 
+    // Abre el modal en modo "Guardando..."
+    this.mostrarModalBorrador = true;
+    this.guardandoBorrador = true;
+    this.errorBorrador = false;
+    this.cdr.detectChanges();
+
     const borrador = {
       guardadoEn: new Date().toISOString(),
       currentStep: this.currentStep,
@@ -711,20 +718,28 @@ export class RegistrarCentroComponent implements OnInit {
       descripcionVoluntariado: this.descripcionVoluntariado
     };
 
-    try {
+        try {
       // 1. Textos
       localStorage.setItem(this.BORRADOR_KEY, JSON.stringify(borrador));
 
       // 2. Archivos (paso 3)
       await this.guardarArchivosBorrador();
 
+      // Pequeña pausa para que se alcance a ver "Guardando..."
+      await this.esperar(700);
+
       this.fechaBorrador = this.formatearFecha(borrador.guardadoEn);
-      this.mostrarMensajeBorrador(`Borrador guardado · ${this.fechaBorrador}`, false);
+      this.mensajeBorrador = `Borrador guardado · ${this.fechaBorrador}`;
 
     } catch (error) {
       console.error('Error al guardar el borrador:', error);
-      this.mostrarMensajeBorrador('No se pudo guardar el borrador. Inténtalo de nuevo.', true);
+      this.errorBorrador = true;
+      this.mensajeBorrador = 'No se pudo guardar el borrador. Inténtalo de nuevo.';
     }
+
+    // Cambia el modal a "¡Guardado!" o "Error"
+    this.guardandoBorrador = false;
+    this.cdr.detectChanges();
   }
 
   // ==========================================
@@ -900,20 +915,19 @@ export class RegistrarCentroComponent implements OnInit {
   // ==========================================
 
   // Muestra un aviso pequeño que desaparece solo después de 4 segundos
-  private mostrarMensajeBorrador(mensaje: string, esError: boolean): void {
+  // Botón "Seguir completando": cierra el modal y se queda en el mismo paso
+  seguirCompletando(): void {
+    this.mostrarModalBorrador = false;
+  }
 
-    this.mensajeBorrador = mensaje;
-    this.errorBorrador = esError;
-    this.cdr.detectChanges();
+  // Botón "Salir y continuar después": el borrador ya está guardado
+  salirYContinuarDespues(): void {
+    this.mostrarModalBorrador = false;
+    this.router.navigate(['/acerca-de']);
+  }
 
-    if (this.temporizadorMensaje) {
-      clearTimeout(this.temporizadorMensaje);
-    }
-
-    this.temporizadorMensaje = setTimeout(() => {
-      this.mensajeBorrador = '';
-      this.cdr.detectChanges();
-    }, 4000);
+  private esperar(ms: number): Promise<void> {
+    return new Promise(resolve => setTimeout(resolve, ms));
   }
 
   private formatearFecha(iso: string): string {
