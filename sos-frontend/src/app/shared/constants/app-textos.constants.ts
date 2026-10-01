@@ -333,6 +333,15 @@ mapa: {
 
     voluntarios:
       '● Voluntarios',
+
+    higiene:
+      '✦ Higiene',
+
+    primerosAuxilios:
+      '✚ Primeros auxilios',
+
+    alojamiento:
+      '⌂ Alojamiento',
   },
 
   tipos: {

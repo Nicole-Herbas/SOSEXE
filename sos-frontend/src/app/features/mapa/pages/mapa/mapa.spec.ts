@@ -154,5 +154,150 @@ describe('Mapa', () => {
     const mapa = fixture.nativeElement.querySelector('.columna-mapa');
     expect(mapa).toBeNull();
   });
+  it('debe filtrar los puntos por necesidad sin realizar una nueva petición al backend', () => {
+    component.featureToggles.mapa.filtros = true;
+
+    fixture.detectChanges();
+
+    const req =
+      httpTesting.expectOne('/api/mapa/puntos');
+
+    req.flush({
+      success: true,
+      message: 'OK',
+      data: [PUNTO_MOCK, PUNTO_REFUGIO_MOCK],
+      timestamp: ''
+    });
+
+    fixture.detectChanges();
+
+    component.seleccionarFiltroNecesidad('Ropa');
+
+    fixture.detectChanges();
+
+    expect(component.filtroNecesidadActivo())
+      .toBe('Ropa');
+
+    expect(component.puntosFiltrados().length)
+      .toBe(1);
+
+    expect(component.puntosFiltrados()[0].nombre)
+      .toBe('Refugio Santa Cruz');
+
+    httpTesting.expectNone('/api/mapa/puntos');
+  });
+
+  it('debe combinar el filtro por tipo con el filtro por necesidad', () => {
+    component.featureToggles.mapa.filtros = true;
+
+    fixture.detectChanges();
+
+    const req =
+      httpTesting.expectOne('/api/mapa/puntos');
+
+    req.flush({
+      success: true,
+      message: 'OK',
+      data: [PUNTO_MOCK, PUNTO_REFUGIO_MOCK],
+      timestamp: ''
+    });
+
+    fixture.detectChanges();
+
+    component.seleccionarFiltroTipo('REFUGIO');
+    component.seleccionarFiltroNecesidad('Ropa');
+
+    fixture.detectChanges();
+
+    expect(component.filtroTipoActivo())
+      .toBe('REFUGIO');
+
+    expect(component.filtroNecesidadActivo())
+      .toBe('Ropa');
+
+    expect(component.puntosFiltrados().length)
+      .toBe(1);
+
+    expect(component.puntosFiltrados()[0].nombre)
+      .toBe('Refugio Santa Cruz');
+
+    httpTesting.expectNone('/api/mapa/puntos');
+  });
+
+  it('debe filtrar los resultados por tipo sin realizar una nueva petición al backend', () => {
+    component.featureToggles.mapa.filtros = true;
+
+    fixture.detectChanges();
+
+    const req = httpTesting.expectOne('/api/mapa/puntos');
+
+    req.flush({
+      success: true,
+      message: 'OK',
+      data: [PUNTO_MOCK, PUNTO_REFUGIO_MOCK],
+      timestamp: ''
+    });
+
+    fixture.detectChanges();
+
+    const botonRefugios: HTMLButtonElement =
+      fixture.nativeElement.querySelector(
+        '[data-filtro-tipo="REFUGIO"]'
+      );
+
+    botonRefugios.click();
+
+    fixture.detectChanges();
+
+    expect(component.filtroTipoActivo())
+      .toBe('REFUGIO');
+
+    expect(component.puntosFiltrados().length)
+      .toBe(1);
+
+    expect(component.puntosFiltrados()[0].nombre)
+      .toBe('Refugio Santa Cruz');
+
+    httpTesting.expectNone('/api/mapa/puntos');
+  });
+
+  it('debe volver a mostrar todos los puntos al seleccionar Todos sin recargar datos', () => {
+    component.featureToggles.mapa.filtros = true;
+
+    fixture.detectChanges();
+
+    const req = httpTesting.expectOne('/api/mapa/puntos');
+
+    req.flush({
+      success: true,
+      message: 'OK',
+      data: [PUNTO_MOCK, PUNTO_REFUGIO_MOCK],
+      timestamp: ''
+    });
+
+    fixture.detectChanges();
+
+    component.seleccionarFiltroTipo('REFUGIO');
+
+    expect(component.puntosFiltrados().length)
+      .toBe(1);
+
+    const botonTodos: HTMLButtonElement =
+      fixture.nativeElement.querySelector(
+        '[data-filtro-tipo="todos"]'
+      );
+
+    botonTodos.click();
+
+    fixture.detectChanges();
+
+    expect(component.filtroTipoActivo())
+      .toBe('todos');
+
+    expect(component.puntosFiltrados().length)
+      .toBe(2);
+
+    httpTesting.expectNone('/api/mapa/puntos');
+  });
 
 });
