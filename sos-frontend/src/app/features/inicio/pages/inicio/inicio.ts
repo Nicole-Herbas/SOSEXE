@@ -1,15 +1,16 @@
-import { Component } from '@angular/core';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import {
+  FeatureToggles,
+  FEATURE_TOGGLES,
+} from '../../../../shared/config/feature-toggles';
 import { APP_TEXTOS } from '../../../../shared/constants/app-textos.constants';
-
-interface NewsItem {
-  category: string;
-  location: string;
-  date: string;
-  title: string;
-  summary: string;
-  image: string;
-}
+import { Noticia } from '../../../noticias/models/noticia.model';
+import { NoticiaService } from '../../../noticias/services/noticia.service';
+import {
+  CATEGORIAS_NOTICIAS,
+  filtrarNoticiasPorCategoria,
+} from '../../../noticias/utils/categoria-noticia';
 
 @Component({
   imports: [RouterLink],
@@ -17,53 +18,79 @@ interface NewsItem {
   styleUrl: './inicio.scss',
   templateUrl: './inicio.html',
 })
-export class Inicio {
+export class Inicio implements OnInit {
+  private readonly noticiaService = inject(NoticiaService);
+
   readonly textos = APP_TEXTOS.inicio;
-  
-  newsFilters = ['Todas', 'Incendios', 'Inundaciones', 'Sequías', 'Comunidad'];
-  activeFilter = 'Todas';
+  readonly textosNoticias = APP_TEXTOS.noticias;
+  readonly featureToggles: Pick<FeatureToggles, 'inicio'> = {
+    inicio: { ...FEATURE_TOGGLES.inicio },
+  };
 
-  allNews: NewsItem[] = [
-    {
-      category: 'Incendios',
-      location: 'Tarija, Bolivia',
-      date: '16 may, 2024',
-      title: 'Incendios forestales movilizan ayuda en Tarija',
-      summary:
-        'Brigadas y comunidades trabajan juntas para contener los incendios y proteger áreas naturales y poblaciones cercanas.',
-      image:
-        'https://images.unsplash.com/photo-1780607956296-8ce5efde9330?auto=format&fit=crop&w=1200&q=85',
-    },
-    {
-      category: 'Inundaciones',
-      location: 'La Paz, Bolivia',
-      date: '15 may, 2024',
-      title: 'Lluvias intensas afectan comunidades de La Paz',
-      summary:
-        'Las fuertes lluvias provocaron desbordes y afectaciones en varias zonas de la ciudad y el altiplano.',
-      image:
-        'https://images.pexels.com/photos/36829317/pexels-photo-36829317.jpeg?auto=compress&cs=tinysrgb&w=1200',
-    },
-    {
-      category: 'Comunidad',
-      location: 'Cochabamba, Bolivia',
-      date: '14 may, 2024',
-      title: 'Centros habilitan nuevos puntos de acopio',
-      summary:
-        'Nuevos puntos de acopio permiten canalizar donaciones y llegar a más familias que lo necesitan.',
-      image:
-        'https://images.pexels.com/photos/6647119/pexels-photo-6647119.jpeg?auto=compress&cs=tinysrgb&w=1200',
-    },
-  ];
+  readonly newsFilters = CATEGORIAS_NOTICIAS;
+  readonly activeFilter = signal<string>(this.textosNoticias.filtroTodas);
+  readonly allNews = signal<Noticia[]>([]);
+  readonly filteredNews = computed(() =>
+    filtrarNoticiasPorCategoria(this.allNews(), this.activeFilter()),
+  );
+  readonly cargandoNoticias = signal(true);
+  readonly errorNoticias = signal(false);
+  readonly apiNoDisponible = signal(false);
+  readonly externasDesdeCache = signal(false);
 
-  get filteredNews(): NewsItem[] {
-    if (this.activeFilter === 'Todas') {
-      return this.allNews;
+  ngOnInit(): void {
+    if (this.featureToggles.inicio.mostrarSeccionNoticias) {
+      this.cargarNoticias();
+    } else {
+      this.cargandoNoticias.set(false);
     }
-    return this.allNews.filter((n) => n.category === this.activeFilter);
+  }
+
+  cargarNoticias(): void {
+    this.cargandoNoticias.set(true);
+    this.errorNoticias.set(false);
+    this.apiNoDisponible.set(false);
+    this.externasDesdeCache.set(false);
+
+    this.noticiaService.listarNoticias({
+      propias: this.featureToggles.inicio.mostrarNoticiasPropias,
+      externas: this.featureToggles.inicio.mostrarNoticiasExternas,
+    }).subscribe({
+      next: (resultado) => {
+        this.allNews.set(resultado.noticias);
+        this.apiNoDisponible.set(resultado.apiExternaDisponible === false);
+        this.externasDesdeCache.set(resultado.noticiasExternasDesdeCache);
+        this.cargandoNoticias.set(false);
+      },
+      error: () => {
+        this.errorNoticias.set(true);
+        this.cargandoNoticias.set(false);
+      },
+    });
   }
 
   setFilter(filter: string): void {
-    this.activeFilter = filter;
+    this.activeFilter.set(filter);
+  }
+
+  formatearFecha(fecha: string | null): string {
+    if (!fecha) {
+      return '';
+    }
+
+    const fechaParseada = new Date(fecha.replace(' ', 'T'));
+    if (Number.isNaN(fechaParseada.getTime())) {
+      return '';
+    }
+
+    return new Intl.DateTimeFormat('es-BO', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric',
+    }).format(fechaParseada);
+  }
+
+  ocultarImagen(event: Event): void {
+    (event.target as HTMLImageElement).classList.add('imagen-fallida');
   }
 }
