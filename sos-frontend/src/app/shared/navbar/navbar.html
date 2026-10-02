@@ -85,6 +85,62 @@
         {{ textos.cantidadNotificaciones }}
       </span>
     </button>
+        <!-- Configuración: solo usuarios autenticados -->
+    <div
+      *ngIf="sesionActiva"
+      class="navbar-settings"
+    >
+
+      <button
+        class="navbar-settings-button"
+        (click)="alternarConfiguracion()"
+        aria-label="Configuración"
+        title="Configuración"
+      >
+        ⚙
+      </button>
+
+      <!-- Menú de configuración -->
+      <div
+        *ngIf="configuracionAbierta"
+        class="navbar-settings-menu"
+      >
+
+        <div class="settings-title">
+          Configuración
+        </div>
+
+        <!-- Solo ADMIN -->
+        <button
+          *ngIf="esAdmin"
+          class="settings-option"
+          (click)="irASolicitudes()"
+        >
+
+          <span class="settings-option-icon">
+            ✓
+          </span>
+
+          <span>
+            <strong>Solicitudes de centros</strong>
+            <small>
+              Revisar y gestionar solicitudes
+            </small>
+          </span>
+
+        </button>
+
+        <!-- Por si el usuario no es ADMIN -->
+        <div
+          *ngIf="!esAdmin"
+          class="settings-empty"
+        >
+          No hay opciones disponibles.
+        </div>
+
+      </div>
+
+    </div>
 
 
     <!-- Sin sesión: botón Iniciar sesión -->

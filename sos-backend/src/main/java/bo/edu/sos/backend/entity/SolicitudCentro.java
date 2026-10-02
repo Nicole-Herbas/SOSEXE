@@ -1,10 +1,11 @@
 package bo.edu.sos.backend.entity;
 
+import bo.edu.sos.backend.constants.EstadoSolicitudCentro;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import bo.edu.sos.backend.constants.EstadoVerificacion;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -102,7 +103,21 @@ public class SolicitudCentro {
     private String descripcionVoluntariado;
 
     @Column(nullable = false, length = 30)
-    private String estado = EstadoVerificacion.PENDIENTE;
+    private String estado = EstadoSolicitudCentro.PENDIENTE;
+
+    // ===== SOS-43: revisión del administrador =====
+
+    @Column(name = "observacion_admin", length = 1000)
+    private String observacionAdmin;
+
+    @Column(name = "fecha_revision")
+    private LocalDateTime fechaRevision;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "revisado_por")
+    private Usuario revisadoPor;
+
+    // ===== Fechas automáticas (MySQL) =====
 
     @Column(name = "fecha_creacion", nullable = false,
             insertable = false, updatable = false)

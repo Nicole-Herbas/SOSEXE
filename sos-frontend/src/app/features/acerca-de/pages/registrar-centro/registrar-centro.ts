@@ -32,8 +32,16 @@ export class RegistrarCentroComponent implements OnInit {
   private readonly API_SOLICITUDES = '/api/solicitudes-centro';
   private readonly API_DEPARTAMENTOS = '/api/departamentos';
 
+  // SOS-42: borrador guardado en el navegador
+  // Textos -> localStorage | Archivos -> IndexedDB (localStorage no guarda archivos)
+  private readonly BORRADOR_KEY = 'registroCentroBorrador';
+  private readonly DB_NAME = 'SosExeDB';
+  private readonly DB_VERSION = 1;
+  private readonly STORE_ARCHIVOS = 'archivosBorrador';
+
   ngOnInit(): void {
     this.cargarDepartamentos();
+    this.cargarBorrador();
   }
 
   currentStep = 1;
@@ -41,6 +49,14 @@ export class RegistrarCentroComponent implements OnInit {
   mostrarModalError = false;
   enviando = false;
   errorEnvio = '';
+
+  // SOS-42: estado del borrador (para los avisos en pantalla)
+  borradorRecuperado = false;
+  fechaBorrador = '';
+  mensajeBorrador = '';
+  errorBorrador = false;
+  mostrarModalBorrador = false;
+  guardandoBorrador = false;
 
   // ==========================================
   // SESIÓN (el POST exige login; el token lo pone el authInterceptor)
@@ -68,13 +84,13 @@ export class RegistrarCentroComponent implements OnInit {
       .subscribe({
         next: (respuesta) => {
           this.departamentos = respuesta.data ?? [];
-          this.cdr.markForCheck();
+          this.cdr.detectChanges();
         },
         error: (error) => {
           console.error('Error al cargar departamentos:', error);
           this.errorDepartamentos =
             'No se pudieron cargar los departamentos. Recarga la página.';
-          this.cdr.markForCheck();
+          this.cdr.detectChanges();
         }
       });
   }
@@ -385,16 +401,16 @@ export class RegistrarCentroComponent implements OnInit {
 
     this.http
       .post<ApiResponse<unknown>>(this.API_SOLICITUDES, this.construirFormData())
-            .subscribe({
+      .subscribe({
         next: () => {
-          console.log('✅ Solicitud guardada, mostrando modal');
+          this.eliminarBorrador(); // SOS-42: ya no se necesita el borrador
           this.enviando = false;
           this.mostrarModalEnvio = true;
           this.cdr.detectChanges();
         },
         error: (error: HttpErrorResponse) => {
-          console.error('Error al guardar la solicitud:', error);
           this.enviando = false;
+          console.error('Error al guardar la solicitud:', error);
           this.errorEnvio = this.mensajeDeError(error);
           this.mostrarModalError = true;
           this.cdr.detectChanges();
@@ -657,13 +673,22 @@ export class RegistrarCentroComponent implements OnInit {
   }
 
   // ==========================================
-  // GUARDAR BORRADOR (se completa en SOS-42)
+  // SOS-42: GUARDAR BORRADOR
   // ==========================================
 
-  guardarBorrador(): void {
+  async guardarBorrador(): Promise<void> {
 
-    console.log('Borrador guardado:', {
+    // Abre el modal en modo "Guardando..."
+    this.mostrarModalBorrador = true;
+    this.guardandoBorrador = true;
+    this.errorBorrador = false;
+    this.cdr.detectChanges();
 
+    const borrador = {
+      guardadoEn: new Date().toISOString(),
+      currentStep: this.currentStep,
+
+      // Paso 1
       nombreCentro: this.nombreCentro,
       tipoOrganizacion: this.tipoOrganizacion,
       departamentoId: this.departamentoId,
@@ -674,21 +699,244 @@ export class RegistrarCentroComponent implements OnInit {
       descripcion: this.descripcion,
       poblacionAtendida: this.poblacionAtendida,
 
+      // Paso 2
       nombreResponsable: this.nombreResponsable,
       cargoResponsable: this.cargoResponsable,
       documentoResponsable: this.documentoResponsable,
       correoResponsable: this.correoResponsable,
       telefonoResponsable: this.telefonoResponsable,
-
       ciudad: this.ciudad,
       departamentoUbicacion: this.departamentoUbicacion,
       direccionExacta: this.direccionExacta,
       referencia: this.referencia,
 
-      personeriaArchivo: this.personeriaArchivo?.name,
-      nitArchivo: this.nitArchivo?.name,
-      identidadArchivo: this.identidadArchivo?.name,
-      domicilioArchivo: this.domicilioArchivo?.name
+      // Paso 4
+      necesidadesSeleccionadas: [...this.necesidadesSeleccionadas],
+      donacionesSeleccionadas: [...this.donacionesSeleccionadas],
+      solicitaVoluntarios: this.solicitaVoluntarios,
+      actividadesSeleccionadas: [...this.actividadesSeleccionadas],
+      descripcionVoluntariado: this.descripcionVoluntariado
+    };
+
+        try {
+      // 1. Textos
+      localStorage.setItem(this.BORRADOR_KEY, JSON.stringify(borrador));
+
+      // 2. Archivos (paso 3)
+      await this.guardarArchivosBorrador();
+
+      // Pequeña pausa para que se alcance a ver "Guardando..."
+      await this.esperar(700);
+
+      this.fechaBorrador = this.formatearFecha(borrador.guardadoEn);
+      this.mensajeBorrador = `Borrador guardado · ${this.fechaBorrador}`;
+
+    } catch (error) {
+      console.error('Error al guardar el borrador:', error);
+      this.errorBorrador = true;
+      this.mensajeBorrador = 'No se pudo guardar el borrador. Inténtalo de nuevo.';
+    }
+
+    // Cambia el modal a "¡Guardado!" o "Error"
+    this.guardandoBorrador = false;
+    this.cdr.detectChanges();
+  }
+
+  // ==========================================
+  // SOS-42: RECUPERAR BORRADOR
+  // ==========================================
+
+  async cargarBorrador(): Promise<void> {
+
+    if (typeof localStorage === 'undefined') {
+      return;
+    }
+
+    const guardado = localStorage.getItem(this.BORRADOR_KEY);
+
+    if (!guardado) {
+      return;
+    }
+
+    try {
+      const b = JSON.parse(guardado);
+
+      this.currentStep = b.currentStep ?? 1;
+
+      // Paso 1
+      this.nombreCentro = b.nombreCentro ?? '';
+      this.tipoOrganizacion = b.tipoOrganizacion ?? '';
+      this.departamentoId = b.departamentoId ?? null;
+      this.nit = b.nit ?? '';
+      this.personeriaJuridica = b.personeriaJuridica ?? '';
+      this.fechaFundacion = b.fechaFundacion ?? '';
+      this.paginaWeb = b.paginaWeb ?? '';
+      this.descripcion = b.descripcion ?? '';
+      this.poblacionAtendida = b.poblacionAtendida ?? '';
+
+      // Paso 2
+      this.nombreResponsable = b.nombreResponsable ?? '';
+      this.cargoResponsable = b.cargoResponsable ?? '';
+      this.documentoResponsable = b.documentoResponsable ?? '';
+      this.correoResponsable = b.correoResponsable ?? '';
+      this.telefonoResponsable = b.telefonoResponsable ?? '';
+      this.ciudad = b.ciudad ?? '';
+      this.departamentoUbicacion = b.departamentoUbicacion ?? '';
+      this.direccionExacta = b.direccionExacta ?? '';
+      this.referencia = b.referencia ?? '';
+
+      // Paso 4
+      this.necesidadesSeleccionadas = b.necesidadesSeleccionadas ?? [];
+      this.donacionesSeleccionadas = b.donacionesSeleccionadas ?? [];
+      this.solicitaVoluntarios = b.solicitaVoluntarios ?? null;
+      this.actividadesSeleccionadas = b.actividadesSeleccionadas ?? [];
+      this.descripcionVoluntariado = b.descripcionVoluntariado ?? '';
+
+      // Paso 3 (archivos)
+      await this.cargarArchivosBorrador();
+
+      this.borradorRecuperado = true;
+      this.fechaBorrador = b.guardadoEn ? this.formatearFecha(b.guardadoEn) : '';
+
+    } catch (error) {
+      console.error('Error al recuperar el borrador:', error);
+      await this.eliminarBorrador(); // borrador dañado: se descarta
+    }
+
+    this.cdr.detectChanges();
+  }
+
+  // ==========================================
+  // SOS-42: DESCARTAR / ELIMINAR BORRADOR
+  // ==========================================
+
+  // Botón "Empezar de cero": borra el borrador y limpia el formulario
+  async descartarBorrador(): Promise<void> {
+    await this.eliminarBorrador();
+    window.location.reload();
+  }
+
+  async eliminarBorrador(): Promise<void> {
+
+    this.borradorRecuperado = false;
+
+    if (typeof localStorage === 'undefined') {
+      return;
+    }
+
+    localStorage.removeItem(this.BORRADOR_KEY);
+
+    try {
+      const db = await this.abrirBaseDatos();
+
+      await new Promise<void>((resolve, reject) => {
+        const tx = db.transaction(this.STORE_ARCHIVOS, 'readwrite');
+        tx.objectStore(this.STORE_ARCHIVOS).clear();
+        tx.oncomplete = () => { db.close(); resolve(); };
+        tx.onerror = () => { db.close(); reject(tx.error); };
+      });
+    } catch (error) {
+      console.error('Error al eliminar los archivos del borrador:', error);
+    }
+  }
+
+  // ==========================================
+  // SOS-42: ARCHIVOS EN INDEXEDDB
+  // ==========================================
+
+  private abrirBaseDatos(): Promise<IDBDatabase> {
+
+    return new Promise((resolve, reject) => {
+
+      const request = indexedDB.open(this.DB_NAME, this.DB_VERSION);
+
+      request.onupgradeneeded = () => {
+        const db = request.result;
+        if (!db.objectStoreNames.contains(this.STORE_ARCHIVOS)) {
+          db.createObjectStore(this.STORE_ARCHIVOS);
+        }
+      };
+
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => reject(request.error);
+    });
+  }
+
+  private async guardarArchivosBorrador(): Promise<void> {
+
+    const db = await this.abrirBaseDatos();
+
+    return new Promise((resolve, reject) => {
+
+      const tx = db.transaction(this.STORE_ARCHIVOS, 'readwrite');
+      const store = tx.objectStore(this.STORE_ARCHIVOS);
+
+      store.clear();
+
+      if (this.personeriaArchivo) { store.put(this.personeriaArchivo, 'personeria'); }
+      if (this.nitArchivo) { store.put(this.nitArchivo, 'nit'); }
+      if (this.identidadArchivo) { store.put(this.identidadArchivo, 'identidad'); }
+      if (this.domicilioArchivo) { store.put(this.domicilioArchivo, 'domicilio'); }
+
+      tx.oncomplete = () => { db.close(); resolve(); };
+      tx.onerror = () => { db.close(); reject(tx.error); };
+    });
+  }
+
+  private async cargarArchivosBorrador(): Promise<void> {
+
+    const db = await this.abrirBaseDatos();
+
+    const leer = (clave: string) =>
+      new Promise<File | null>((resolve, reject) => {
+        const tx = db.transaction(this.STORE_ARCHIVOS, 'readonly');
+        const request = tx.objectStore(this.STORE_ARCHIVOS).get(clave);
+        request.onsuccess = () => resolve(request.result ?? null);
+        request.onerror = () => reject(request.error);
+      });
+
+    try {
+      this.personeriaArchivo = await leer('personeria');
+      this.nitArchivo = await leer('nit');
+      this.identidadArchivo = await leer('identidad');
+      this.domicilioArchivo = await leer('domicilio');
+
+      this.personeriaAdjunta = !!this.personeriaArchivo;
+      this.nitAdjunto = !!this.nitArchivo;
+      this.identidadAdjunta = !!this.identidadArchivo;
+      this.domicilioAdjunto = !!this.domicilioArchivo;
+    } finally {
+      db.close();
+    }
+  }
+
+  // ==========================================
+  // SOS-42: AYUDAS
+  // ==========================================
+
+  // Muestra un aviso pequeño que desaparece solo después de 4 segundos
+  // Botón "Seguir completando": cierra el modal y se queda en el mismo paso
+  seguirCompletando(): void {
+    this.mostrarModalBorrador = false;
+  }
+
+  // Botón "Salir y continuar después": el borrador ya está guardado
+  salirYContinuarDespues(): void {
+    this.mostrarModalBorrador = false;
+    this.router.navigate(['/acerca-de']);
+  }
+
+  private esperar(ms: number): Promise<void> {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  private formatearFecha(iso: string): string {
+    return new Date(iso).toLocaleString('es-BO', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
     });
   }
 

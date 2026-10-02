@@ -173,6 +173,171 @@
   font-size: 1.5rem;
   cursor: pointer;
 }
+/* ================================
+   Configuración
+   ================================ */
+
+.navbar-settings {
+  position: relative;
+}
+
+.navbar-settings-button {
+  width: 38px;
+  height: 38px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: none;
+  border-radius: 50%;
+
+  background: #f5f7f7;
+  color: #1e1e2f;
+
+  font-size: 1.25rem;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s,
+    color 0.2s,
+    transform 0.2s;
+}
+
+.navbar-settings-button:hover {
+  background: #e6f4f1;
+  color: #1a7a6e;
+  transform: rotate(15deg);
+}
+
+
+/* Menú desplegable */
+
+.navbar-settings-menu {
+  position: absolute;
+
+  top: calc(100% + 0.75rem);
+  right: 0;
+
+  width: 280px;
+
+  background: white;
+
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.12);
+
+  padding: 0.5rem;
+
+  z-index: 100;
+}
+
+
+/* Título */
+
+.settings-title {
+  padding: 0.75rem 0.8rem;
+
+  font-size: 0.85rem;
+  font-weight: 700;
+
+  color: #6b7280;
+
+  border-bottom: 1px solid #eeeeee;
+
+  margin-bottom: 0.35rem;
+}
+
+
+/* Opción */
+
+.settings-option {
+  width: 100%;
+
+  display: flex;
+  align-items: center;
+
+  gap: 0.75rem;
+
+  padding: 0.75rem;
+
+  border: none;
+  border-radius: 9px;
+
+  background: transparent;
+
+  text-align: left;
+
+  cursor: pointer;
+
+  color: #1e1e2f;
+
+  transition:
+    background 0.2s,
+    color 0.2s;
+}
+
+.settings-option:hover {
+  background: #e6f4f1;
+  color: #1a7a6e;
+}
+
+
+/* Icono */
+
+.settings-option-icon {
+  width: 34px;
+  height: 34px;
+
+  flex-shrink: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 8px;
+
+  background: #e6f4f1;
+
+  color: #1a7a6e;
+
+  font-weight: 700;
+}
+
+
+/* Texto */
+
+.settings-option strong {
+  display: block;
+
+  font-size: 0.9rem;
+
+  margin-bottom: 0.15rem;
+}
+
+.settings-option small {
+  display: block;
+
+  font-size: 0.75rem;
+
+  color: #6b7280;
+}
+
+
+/* Sin opciones */
+
+.settings-empty {
+  padding: 0.8rem;
+
+  color: #6b7280;
+
+  font-size: 0.8rem;
+
+  text-align: center;
+}
 
 @media (max-width: 900px) {
   .navbar-toggle {
