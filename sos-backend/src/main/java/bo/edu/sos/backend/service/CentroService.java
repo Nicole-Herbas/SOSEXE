@@ -7,13 +7,16 @@ import bo.edu.sos.backend.entity.Departamento;
 import bo.edu.sos.backend.entity.Necesidad;
 import bo.edu.sos.backend.entity.Usuario;
 import bo.edu.sos.backend.exception.ResourceNotFoundException;
+import bo.edu.sos.backend.helper.LogHelper;
 import bo.edu.sos.backend.repository.CentroRepository;
 import bo.edu.sos.backend.repository.DepartamentoRepository;
 import bo.edu.sos.backend.repository.UsuarioRepository;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+
 
 @Service
 public class CentroService {
@@ -21,6 +24,7 @@ public class CentroService {
     private final CentroRepository centroRepository;
     private final DepartamentoRepository departamentoRepository;
     private final UsuarioRepository usuarioRepository;
+
 
     public CentroService(
             CentroRepository centroRepository,
@@ -32,132 +36,351 @@ public class CentroService {
         this.usuarioRepository = usuarioRepository;
     }
 
+
     @Transactional(readOnly = true)
     public List<CentroDTO> listarTodos() {
-        return centroRepository.findAll()
-                .stream()
-                .map(this::convertirADTO)
-                .toList();
+
+        List<CentroDTO> centros =
+                centroRepository
+                        .findAll()
+                        .stream()
+                        .map(this::convertirADTO)
+                        .toList();
+
+
+        LogHelper.debug(
+                CentroService.class,
+                "Listado de centros obtenido. cantidad={}",
+                centros.size()
+        );
+
+
+        return centros;
     }
+
 
     @Transactional(readOnly = true)
-    public CentroDTO buscarPorId(Long id) {
-        Centro centro = centroRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Centro", id));
+    public CentroDTO buscarPorId(
+            Long id) {
 
-        return convertirADTO(centro);
+        Centro centro =
+                centroRepository
+                        .findById(id)
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "Centro",
+                                        id
+                                )
+                        );
+
+
+        LogHelper.debug(
+                CentroService.class,
+                "Centro consultado correctamente. id={}",
+                id
+        );
+
+
+        return convertirADTO(
+                centro
+        );
     }
 
+
     @Transactional
-    public CentroDTO guardar(CentroDTO dto) {
+    public CentroDTO guardar(
+            CentroDTO dto) {
 
-        Centro centro = new Centro();
+        Centro centro =
+                new Centro();
 
-        copiarDTOaEntidad(dto, centro);
 
-        // Al crear un centro, queda pendiente de verificación.
-        centro.setEstadoVerificacion(EstadoVerificacion.PENDIENTE);
+        copiarDTOaEntidad(
+                dto,
+                centro
+        );
 
-        Centro guardado = centroRepository.save(centro);
 
-        return convertirADTO(guardado);
+        centro.setEstadoVerificacion(
+                EstadoVerificacion.PENDIENTE
+        );
+
+
+        Centro guardado =
+                centroRepository.save(
+                        centro
+                );
+
+
+        LogHelper.info(
+                CentroService.class,
+                "Centro creado correctamente. id={}",
+                guardado.getId()
+        );
+
+
+        return convertirADTO(
+                guardado
+        );
     }
 
+
     @Transactional
-    public CentroDTO actualizar(Long id, CentroDTO dto) {
+    public CentroDTO actualizar(
+            Long id,
+            CentroDTO dto) {
 
-        Centro centro = centroRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Centro", id));
+        Centro centro =
+                centroRepository
+                        .findById(id)
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "Centro",
+                                        id
+                                )
+                        );
 
-        copiarDTOaEntidad(dto, centro);
 
-        Centro actualizado = centroRepository.save(centro);
+        copiarDTOaEntidad(
+                dto,
+                centro
+        );
 
-        return convertirADTO(actualizado);
+
+        Centro actualizado =
+                centroRepository.save(
+                        centro
+                );
+
+
+        LogHelper.info(
+                CentroService.class,
+                "Centro actualizado correctamente. id={}",
+                id
+        );
+
+
+        return convertirADTO(
+                actualizado
+        );
     }
 
+
     @Transactional
-    public void eliminar(Long id) {
+    public void eliminar(
+            Long id) {
 
         if (!centroRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Centro", id);
+
+            throw new ResourceNotFoundException(
+                    "Centro",
+                    id
+            );
         }
 
-        centroRepository.deleteById(id);
+
+        centroRepository.deleteById(
+                id
+        );
+
+
+        LogHelper.info(
+                CentroService.class,
+                "Centro eliminado correctamente. id={}",
+                id
+        );
     }
 
-    private void copiarDTOaEntidad(CentroDTO dto, Centro centro) {
 
-        centro.setNombre(dto.getNombre());
-        centro.setTipo(dto.getTipo());
-        centro.setDescripcion(dto.getDescripcion());
-        centro.setDireccion(dto.getDireccion());
-        centro.setCiudad(dto.getCiudad());
-        centro.setTelefono(dto.getTelefono());
-        centro.setEmail(dto.getEmail());
-        centro.setLatitud(dto.getLatitud());
-        centro.setLongitud(dto.getLongitud());
+    private void copiarDTOaEntidad(
+            CentroDTO dto,
+            Centro centro) {
 
-        Departamento departamento = departamentoRepository
-                .findById(dto.getDepartamentoId())
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "Departamento", dto.getDepartamentoId()));
+        centro.setNombre(
+                dto.getNombre()
+        );
 
-        centro.setDepartamento(departamento);
+        centro.setTipo(
+                dto.getTipo()
+        );
+
+        centro.setDescripcion(
+                dto.getDescripcion()
+        );
+
+        centro.setDireccion(
+                dto.getDireccion()
+        );
+
+        centro.setCiudad(
+                dto.getCiudad()
+        );
+
+        centro.setTelefono(
+                dto.getTelefono()
+        );
+
+        centro.setEmail(
+                dto.getEmail()
+        );
+
+        centro.setLatitud(
+                dto.getLatitud()
+        );
+
+        centro.setLongitud(
+                dto.getLongitud()
+        );
+
+
+        Departamento departamento =
+                departamentoRepository
+                        .findById(
+                                dto.getDepartamentoId()
+                        )
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "Departamento",
+                                        dto.getDepartamentoId()
+                                )
+                        );
+
+
+        centro.setDepartamento(
+                departamento
+        );
+
 
         if (dto.getResponsableId() != null) {
 
-            Usuario responsable = usuarioRepository
-                    .findById(dto.getResponsableId())
-                    .orElseThrow(() -> new ResourceNotFoundException(
-                            "Usuario", dto.getResponsableId()));
+            Usuario responsable =
+                    usuarioRepository
+                            .findById(
+                                    dto.getResponsableId()
+                            )
+                            .orElseThrow(() ->
+                                    new ResourceNotFoundException(
+                                            "Usuario",
+                                            dto.getResponsableId()
+                                    )
+                            );
 
-            centro.setResponsable(responsable);
+
+            centro.setResponsable(
+                    responsable
+            );
 
         } else {
 
-            centro.setResponsable(null);
+            centro.setResponsable(
+                    null
+            );
         }
     }
 
-    private CentroDTO convertirADTO(Centro centro) {
 
-        CentroDTO dto = new CentroDTO();
+    private CentroDTO convertirADTO(
+            Centro centro) {
 
-        dto.setId(centro.getId());
-        dto.setNombre(centro.getNombre());
-        dto.setTipo(centro.getTipo());
-        dto.setDescripcion(centro.getDescripcion());
-        dto.setDireccion(centro.getDireccion());
-        dto.setCiudad(centro.getCiudad());
-        dto.setTelefono(centro.getTelefono());
-        dto.setEmail(centro.getEmail());
-        dto.setLatitud(centro.getLatitud());
-        dto.setLongitud(centro.getLongitud());
-        dto.setEstadoVerificacion(centro.getEstadoVerificacion());
+        CentroDTO dto =
+                new CentroDTO();
+
+
+        dto.setId(
+                centro.getId()
+        );
+
+        dto.setNombre(
+                centro.getNombre()
+        );
+
+        dto.setTipo(
+                centro.getTipo()
+        );
+
+        dto.setDescripcion(
+                centro.getDescripcion()
+        );
+
+        dto.setDireccion(
+                centro.getDireccion()
+        );
+
+        dto.setCiudad(
+                centro.getCiudad()
+        );
+
+        dto.setTelefono(
+                centro.getTelefono()
+        );
+
+        dto.setEmail(
+                centro.getEmail()
+        );
+
+        dto.setLatitud(
+                centro.getLatitud()
+        );
+
+        dto.setLongitud(
+                centro.getLongitud()
+        );
+
+        dto.setEstadoVerificacion(
+                centro.getEstadoVerificacion()
+        );
+
 
         if (centro.getDepartamento() != null) {
+
             dto.setDepartamentoId(
-                    centro.getDepartamento().getId());
+                    centro
+                            .getDepartamento()
+                            .getId()
+            );
+
             dto.setDepartamentoNombre(
-                    centro.getDepartamento().getNombre());
+                    centro
+                            .getDepartamento()
+                            .getNombre()
+            );
         }
+
 
         if (centro.getResponsable() != null) {
+
             dto.setResponsableId(
-                    centro.getResponsable().getId());
+                    centro
+                            .getResponsable()
+                            .getId()
+            );
         }
 
+
         if (centro.getNecesidades() != null) {
+
             dto.setNecesidadIds(
-                    centro.getNecesidades().stream()
-                            .map(Necesidad::getId)
-                            .toList());
+                    centro
+                            .getNecesidades()
+                            .stream()
+                            .map(
+                                    Necesidad::getId
+                            )
+                            .toList()
+            );
+
+
             dto.setNecesidadNombres(
-                    centro.getNecesidades().stream()
-                            .map(Necesidad::getNombre)
-                            .toList());
+                    centro
+                            .getNecesidades()
+                            .stream()
+                            .map(
+                                    Necesidad::getNombre
+                            )
+                            .toList()
+            );
         }
+
 
         return dto;
     }

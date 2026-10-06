@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import bo.edu.sos.backend.helper.LogHelper;
 
 import java.util.List;
 
@@ -26,12 +27,32 @@ public class DepartamentoController {
     @GetMapping
     public ResponseEntity<ApiResponse<List<DepartamentoDTO>>> listar() {
 
-        List<DepartamentoDTO> departamentos = departamentoRepository
-                .findAll(Sort.by("nombre"))
-                .stream()
-                .map(d -> new DepartamentoDTO(d.getId(), d.getNombre()))
-                .toList();
+        List<DepartamentoDTO> departamentos =
+                departamentoRepository
+                        .findAll(
+                                Sort.by("nombre")
+                        )
+                        .stream()
+                        .map(d ->
+                                new DepartamentoDTO(
+                                        d.getId(),
+                                        d.getNombre()
+                                )
+                        )
+                        .toList();
 
-        return ResponseEntity.ok(ApiResponse.ok(departamentos));
+
+        LogHelper.debug(
+                DepartamentoController.class,
+                "Listado de departamentos obtenido. cantidad={}",
+                departamentos.size()
+        );
+
+
+        return ResponseEntity.ok(
+                ApiResponse.ok(
+                        departamentos
+                )
+        );
     }
 }

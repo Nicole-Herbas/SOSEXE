@@ -1,3 +1,4 @@
+
 package bo.edu.sos.backend.service;
 
 import bo.edu.sos.backend.constants.DonacionConstants;
@@ -6,15 +7,16 @@ import bo.edu.sos.backend.entity.Centro;
 import bo.edu.sos.backend.entity.Donacion;
 import bo.edu.sos.backend.entity.Usuario;
 import bo.edu.sos.backend.exception.ResourceNotFoundException;
+import bo.edu.sos.backend.helper.LogHelper;
 import bo.edu.sos.backend.repository.CentroRepository;
 import bo.edu.sos.backend.repository.DonacionRepository;
 import bo.edu.sos.backend.repository.UsuarioRepository;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
-
 
 @Service
 public class DonacionService {
@@ -22,7 +24,6 @@ public class DonacionService {
     private final DonacionRepository donacionRepository;
     private final CentroRepository centroRepository;
     private final UsuarioRepository usuarioRepository;
-
 
     public DonacionService(
             DonacionRepository donacionRepository,
@@ -34,55 +35,70 @@ public class DonacionService {
         this.usuarioRepository = usuarioRepository;
     }
 
-
     @Transactional(readOnly = true)
     public List<DonacionDTO> listarTodas() {
 
-        return donacionRepository
+        List<DonacionDTO> donaciones = donacionRepository
                 .findAll()
                 .stream()
                 .map(this::convertirADTO)
                 .toList();
-    }
 
+        LogHelper.debug(
+                DonacionService.class,
+                "Listado de donaciones obtenido. cantidad={}",
+                donaciones.size()
+        );
+
+        return donaciones;
+    }
 
     @Transactional(readOnly = true)
     public DonacionDTO buscarPorId(Long id) {
 
-        Donacion donacion =
-                donacionRepository
-                        .findById(id)
-                        .orElseThrow(() ->
-                                new ResourceNotFoundException(
-                                        "Donación",
-                                        id
-                                )
-                        );
+        Donacion donacion = donacionRepository
+                .findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Donación",
+                                id
+                        )
+                );
+
+        LogHelper.debug(
+                DonacionService.class,
+                "Donación consultada correctamente. id={}",
+                id
+        );
 
         return convertirADTO(donacion);
     }
 
-
     @Transactional(readOnly = true)
-    public List<DonacionDTO> buscarPorCentro(
-            Long centroId) {
+    public List<DonacionDTO> buscarPorCentro(Long centroId) {
 
-        return donacionRepository
+        List<DonacionDTO> donaciones = donacionRepository
                 .findByCentroId(centroId)
                 .stream()
                 .map(this::convertirADTO)
                 .toList();
-    }
 
+        LogHelper.debug(
+                DonacionService.class,
+                "Donaciones consultadas por centro. centroId={}, cantidad={}",
+                centroId,
+                donaciones.size()
+        );
+
+        return donaciones;
+    }
 
     @Transactional
     public DonacionDTO crear(
             DonacionDTO dto,
             String emailAutenticado) {
 
-        Donacion donacion =
-                new Donacion();
-
+        Donacion donacion = new Donacion();
 
         donacion.setCodigo(
                 DonacionConstants.CODIGO_PREFIJO
@@ -94,7 +110,6 @@ public class DonacionService {
                         )
                         .toUpperCase()
         );
-
 
         donacion.setMonto(
                 dto.getMonto()
@@ -110,146 +125,104 @@ public class DonacionService {
                         : false
         );
 
-
-        Centro centro =
-                centroRepository
-                        .findById(
+        Centro centro = centroRepository
+                .findById(dto.getCentroId())
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Centro",
                                 dto.getCentroId()
                         )
-                        .orElseThrow(() ->
-                                new ResourceNotFoundException(
-                                        "Centro",
-                                        dto.getCentroId()
-                                )
-                        );
+                );
 
-
-        donacion.setCentro(
-                centro
-        );
-
+        donacion.setCentro(centro);
 
         if (!donacion.getAnonima()) {
 
-            Usuario usuario =
-                    usuarioRepository
-                            .findByEmail(
-                                    emailAutenticado
+            Usuario usuario = usuarioRepository
+                    .findByEmail(emailAutenticado)
+                    .orElseThrow(() ->
+                            new ResourceNotFoundException(
+                                    "No existe un usuario con email: "
+                                            + emailAutenticado
                             )
-                            .orElseThrow(() ->
-                                    new ResourceNotFoundException(
-                                            "No existe un usuario con email: "
-                                                    + emailAutenticado
-                                    )
-                            );
+                    );
 
-
-            donacion.setUsuario(
-                    usuario
-            );
+            donacion.setUsuario(usuario);
         }
 
-
-        Donacion guardada =
-                donacionRepository.save(
-                        donacion
-                );
-
-
-        return convertirADTO(
-                guardada
+        Donacion guardada = donacionRepository.save(
+                donacion
         );
-    }
 
+        LogHelper.info(
+                DonacionService.class,
+                "Registro de donación procesado. id={}, centroId={}",
+                guardada.getId(),
+                centro.getId()
+        );
+
+        return convertirADTO(guardada);
+    }
 
     @Transactional(readOnly = true)
     public List<DonacionDTO> listarMias(
             String emailAutenticado) {
 
-        Usuario usuario =
-                usuarioRepository
-                        .findByEmail(
-                                emailAutenticado
+        Usuario usuario = usuarioRepository
+                .findByEmail(emailAutenticado)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "No existe un usuario con email: "
+                                        + emailAutenticado
                         )
-                        .orElseThrow(() ->
-                                new ResourceNotFoundException(
-                                        "No existe un usuario con email: "
-                                                + emailAutenticado
-                                )
-                        );
+                );
 
-
-        return donacionRepository
-                .findByUsuarioId(
-                        usuario.getId()
-                )
+        List<DonacionDTO> donaciones = donacionRepository
+                .findByUsuarioId(usuario.getId())
                 .stream()
                 .map(this::convertirADTO)
                 .toList();
+
+        LogHelper.debug(
+                DonacionService.class,
+                "Consulta de donaciones propias completada. cantidad={}",
+                donaciones.size()
+        );
+
+        return donaciones;
     }
 
+    private DonacionDTO convertirADTO(Donacion donacion) {
 
-    private DonacionDTO convertirADTO(
-            Donacion donacion) {
+        DonacionDTO dto = new DonacionDTO();
 
-        DonacionDTO dto =
-                new DonacionDTO();
-
-
-        dto.setId(
-                donacion.getId()
-        );
-
-        dto.setCodigo(
-                donacion.getCodigo()
-        );
-
-        dto.setMonto(
-                donacion.getMonto()
-        );
-
-        dto.setMetodo(
-                donacion.getMetodo()
-        );
-
-        dto.setAnonima(
-                donacion.getAnonima()
-        );
-
-        dto.setFecha(
-                donacion.getFecha()
-        );
-
+        dto.setId(donacion.getId());
+        dto.setCodigo(donacion.getCodigo());
+        dto.setMonto(donacion.getMonto());
+        dto.setMetodo(donacion.getMetodo());
+        dto.setAnonima(donacion.getAnonima());
+        dto.setFecha(donacion.getFecha());
 
         if (donacion.getCentro() != null) {
 
             dto.setCentroId(
-                    donacion
-                            .getCentro()
-                            .getId()
+                    donacion.getCentro().getId()
             );
 
             dto.setCentroNombre(
-                    donacion
-                            .getCentro()
-                            .getNombre()
+                    donacion.getCentro().getNombre()
             );
         }
-
 
         if (
                 donacion.getUsuario() != null
-                        &&
-                !donacion.getAnonima()
+                        && !donacion.getAnonima()
         ) {
 
             dto.setUsuarioId(
-                    donacion
-                            .getUsuario()
-                            .getId()
+                    donacion.getUsuario().getId()
             );
         }
-
 
         return dto;
     }

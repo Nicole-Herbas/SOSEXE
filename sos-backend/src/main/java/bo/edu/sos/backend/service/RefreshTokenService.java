@@ -2,7 +2,9 @@ package bo.edu.sos.backend.service;
 
 import bo.edu.sos.backend.entity.RefreshToken;
 import bo.edu.sos.backend.entity.Usuario;
+import bo.edu.sos.backend.helper.LogHelper;
 import bo.edu.sos.backend.repository.RefreshTokenRepository;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,6 +16,7 @@ import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.Base64;
 import java.util.Optional;
+
 
 @Service
 public class RefreshTokenService {
@@ -40,14 +43,18 @@ public class RefreshTokenService {
 
 
     @Transactional
-    public String crear(Usuario usuario) {
+    public String crear(
+            Usuario usuario) {
 
         refreshTokenRepository
-                .deleteByUsuario(usuario);
+                .deleteByUsuario(
+                        usuario
+                );
 
 
         byte[] randomBytes =
                 new byte[32];
+
 
         secureRandom.nextBytes(
                 randomBytes
@@ -55,7 +62,8 @@ public class RefreshTokenService {
 
 
         String token =
-                Base64.getUrlEncoder()
+                Base64
+                        .getUrlEncoder()
                         .withoutPadding()
                         .encodeToString(
                                 randomBytes
@@ -65,20 +73,27 @@ public class RefreshTokenService {
         RefreshToken refreshToken =
                 new RefreshToken();
 
+
         refreshToken.setTokenHash(
-                hash(token)
+                hash(
+                        token
+                )
         );
+
 
         refreshToken.setUsuario(
                 usuario
         );
 
+
         refreshToken.setFechaExpiracion(
                 LocalDateTime.now()
                         .plusNanos(
-                                expirationMs * 1_000_000
+                                expirationMs
+                                        * 1_000_000
                         )
         );
+
 
         refreshToken.setRevocado(
                 false
@@ -90,6 +105,13 @@ public class RefreshTokenService {
         );
 
 
+        LogHelper.info(
+                RefreshTokenService.class,
+                "Refresh token creado correctamente. usuarioId={}",
+                usuario.getId()
+        );
+
+
         return token;
     }
 
@@ -98,25 +120,38 @@ public class RefreshTokenService {
     public Optional<Usuario> validar(
             String token) {
 
-        return refreshTokenRepository
-                .findByTokenHash(
-                        hash(token)
-                )
-                .filter(refresh ->
-                        !Boolean.TRUE.equals(
-                                refresh.getRevocado()
-                        )
-                )
-                .filter(refresh ->
-                        refresh
-                                .getFechaExpiracion()
-                                .isAfter(
-                                        LocalDateTime.now()
+        Optional<Usuario> usuario =
+                refreshTokenRepository
+                        .findByTokenHash(
+                                hash(
+                                        token
                                 )
-                )
-                .map(
-                        RefreshToken::getUsuario
-                );
+                        )
+                        .filter(refresh ->
+                                !Boolean.TRUE.equals(
+                                        refresh.getRevocado()
+                                )
+                        )
+                        .filter(refresh ->
+                                refresh
+                                        .getFechaExpiracion()
+                                        .isAfter(
+                                                LocalDateTime.now()
+                                        )
+                        )
+                        .map(
+                                RefreshToken::getUsuario
+                        );
+
+
+        LogHelper.debug(
+                RefreshTokenService.class,
+                "Validación de refresh token completada. valido={}",
+                usuario.isPresent()
+        );
+
+
+        return usuario;
     }
 
 
@@ -124,20 +159,43 @@ public class RefreshTokenService {
     public void revocar(
             String token) {
 
-        refreshTokenRepository
-                .findByTokenHash(
-                        hash(token)
-                )
-                .ifPresent(refresh -> {
+        Optional<RefreshToken> refreshTokenOpt =
+                refreshTokenRepository
+                        .findByTokenHash(
+                                hash(
+                                        token
+                                )
+                        );
 
-                    refresh.setRevocado(
-                            true
-                    );
 
-                    refreshTokenRepository
-                            .save(refresh);
+        if (refreshTokenOpt.isPresent()) {
 
-                });
+            RefreshToken refreshToken =
+                    refreshTokenOpt.get();
+
+
+            refreshToken.setRevocado(
+                    true
+            );
+
+
+            refreshTokenRepository.save(
+                    refreshToken
+            );
+
+
+            LogHelper.info(
+                    RefreshTokenService.class,
+                    "Refresh token revocado correctamente"
+            );
+
+        } else {
+
+            LogHelper.debug(
+                    RefreshTokenService.class,
+                    "No se encontró refresh token para revocar"
+            );
+        }
     }
 
 
@@ -161,11 +219,20 @@ public class RefreshTokenService {
                     );
 
 
-            return bytesToHex(hash);
+            return bytesToHex(
+                    hash
+            );
 
         } catch (
                 NoSuchAlgorithmException ex
         ) {
+
+            LogHelper.error(
+                    RefreshTokenService.class,
+                    "SHA-256 no está disponible",
+                    ex
+            );
+
 
             throw new IllegalStateException(
                     "SHA-256 no disponible",

@@ -9,13 +9,16 @@ import bo.edu.sos.backend.entity.Voluntariado;
 import bo.edu.sos.backend.exception.DuplicateResourceException;
 import bo.edu.sos.backend.exception.ForbiddenException;
 import bo.edu.sos.backend.exception.ResourceNotFoundException;
+import bo.edu.sos.backend.helper.LogHelper;
 import bo.edu.sos.backend.repository.PostulacionRepository;
 import bo.edu.sos.backend.repository.UsuarioRepository;
 import bo.edu.sos.backend.repository.VoluntariadoRepository;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+
 
 @Service
 public class PostulacionService {
@@ -23,6 +26,7 @@ public class PostulacionService {
     private final PostulacionRepository postulacionRepository;
     private final VoluntariadoRepository voluntariadoRepository;
     private final UsuarioRepository usuarioRepository;
+
 
     public PostulacionService(
             PostulacionRepository postulacionRepository,
@@ -33,6 +37,7 @@ public class PostulacionService {
         this.voluntariadoRepository = voluntariadoRepository;
         this.usuarioRepository = usuarioRepository;
     }
+
 
     @Transactional(readOnly = true)
     public List<PostulacionDTO> listarPorVoluntariado(
@@ -74,7 +79,9 @@ public class PostulacionService {
                         voluntariado.getCentro()
                                 .getResponsable()
                                 .getId()
-                                .equals(usuario.getId());
+                                .equals(
+                                        usuario.getId()
+                                );
 
 
         if (!esAdmin && !esResponsable) {
@@ -85,27 +92,61 @@ public class PostulacionService {
         }
 
 
-        return postulacionRepository
-                .findByVoluntariadoId(voluntariadoId)
-                .stream()
-                .map(this::convertirADTO)
-                .toList();
+        List<PostulacionDTO> postulaciones =
+                postulacionRepository
+                        .findByVoluntariadoId(
+                                voluntariadoId
+                        )
+                        .stream()
+                        .map(this::convertirADTO)
+                        .toList();
+
+
+        LogHelper.debug(
+                PostulacionService.class,
+                "Postulaciones consultadas por voluntariado. voluntariadoId={}, cantidad={}",
+                voluntariadoId,
+                postulaciones.size()
+        );
+
+
+        return postulaciones;
     }
 
+
     @Transactional(readOnly = true)
-    public List<PostulacionDTO> listarPorUsuario(Long usuarioId) {
-        return postulacionRepository.findByUsuarioId(usuarioId)
-                .stream()
-                .map(this::convertirADTO)
-                .toList();
+    public List<PostulacionDTO> listarPorUsuario(
+            Long usuarioId) {
+
+        List<PostulacionDTO> postulaciones =
+                postulacionRepository
+                        .findByUsuarioId(
+                                usuarioId
+                        )
+                        .stream()
+                        .map(this::convertirADTO)
+                        .toList();
+
+
+        LogHelper.debug(
+                PostulacionService.class,
+                "Postulaciones consultadas por usuario. usuarioId={}, cantidad={}",
+                usuarioId,
+                postulaciones.size()
+        );
+
+
+        return postulaciones;
     }
+
 
     @Transactional(readOnly = true)
     public List<PostulacionDTO> listarPorEmail(
             String email) {
 
         Usuario usuario =
-                usuarioRepository.findByEmail(email)
+                usuarioRepository
+                        .findByEmail(email)
                         .orElseThrow(() ->
                                 new ResourceNotFoundException(
                                         "No existe un usuario con email: "
@@ -113,12 +154,27 @@ public class PostulacionService {
                                 )
                         );
 
-        return postulacionRepository
-                .findByUsuarioId(usuario.getId())
-                .stream()
-                .map(this::convertirADTO)
-                .toList();
+
+        List<PostulacionDTO> postulaciones =
+                postulacionRepository
+                        .findByUsuarioId(
+                                usuario.getId()
+                        )
+                        .stream()
+                        .map(this::convertirADTO)
+                        .toList();
+
+
+        LogHelper.debug(
+                PostulacionService.class,
+                "Postulaciones consultadas para usuario autenticado. cantidad={}",
+                postulaciones.size()
+        );
+
+
+        return postulaciones;
     }
+
 
     @Transactional
     public PostulacionDTO crear(
@@ -126,30 +182,30 @@ public class PostulacionService {
             String emailAutenticado) {
 
         Usuario usuario =
-                usuarioRepository.findByEmail(
-                        emailAutenticado
-                ).orElseThrow(() ->
-                        new ResourceNotFoundException(
-                                "No existe un usuario con email: "
-                                        + emailAutenticado
+                usuarioRepository
+                        .findByEmail(
+                                emailAutenticado
                         )
-                );
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "No existe un usuario con email: "
+                                                + emailAutenticado
+                                )
+                        );
 
 
-        if (postulacionRepository
-                .existsByVoluntariadoIdAndUsuarioId(
-                        dto.getVoluntariadoId(),
-                        usuario.getId()
-                )) {
+        if (
+                postulacionRepository
+                        .existsByVoluntariadoIdAndUsuarioId(
+                                dto.getVoluntariadoId(),
+                                usuario.getId()
+                        )
+        ) {
 
             throw new DuplicateResourceException(
                     "El usuario ya se postuló a este voluntariado"
             );
         }
-
-
-        Postulacion postulacion =
-                new Postulacion();
 
 
         Voluntariado voluntariado =
@@ -163,6 +219,10 @@ public class PostulacionService {
                                         dto.getVoluntariadoId()
                                 )
                         );
+
+
+        Postulacion postulacion =
+                new Postulacion();
 
 
         postulacion.setVoluntariado(
@@ -192,10 +252,20 @@ public class PostulacionService {
                 );
 
 
+        LogHelper.info(
+                PostulacionService.class,
+                "Postulación creada correctamente. id={}, voluntariadoId={}, estado={}",
+                guardada.getId(),
+                voluntariado.getId(),
+                guardada.getEstado()
+        );
+
+
         return convertirADTO(
                 guardada
         );
     }
+
 
     @Transactional
     public PostulacionDTO actualizarEstado(
@@ -216,7 +286,9 @@ public class PostulacionService {
 
         Usuario usuario =
                 usuarioRepository
-                        .findByEmail(emailAutenticado)
+                        .findByEmail(
+                                emailAutenticado
+                        )
                         .orElseThrow(() ->
                                 new ResourceNotFoundException(
                                         "No existe un usuario con email: "
@@ -236,13 +308,15 @@ public class PostulacionService {
                         .getVoluntariado()
                         .getCentro()
                         .getResponsable() != null
-
-                        && postulacion
-                        .getVoluntariado()
-                        .getCentro()
-                        .getResponsable()
-                        .getId()
-                        .equals(usuario.getId());
+                        &&
+                        postulacion
+                                .getVoluntariado()
+                                .getCentro()
+                                .getResponsable()
+                                .getId()
+                                .equals(
+                                        usuario.getId()
+                                );
 
 
         if (!esAdmin && !esResponsable) {
@@ -264,30 +338,79 @@ public class PostulacionService {
                 );
 
 
+        LogHelper.info(
+                PostulacionService.class,
+                "Estado de postulación actualizado. id={}, estado={}",
+                id,
+                nuevoEstado
+        );
+
+
         return convertirADTO(
                 actualizada
         );
     }
 
-    private PostulacionDTO convertirADTO(Postulacion postulacion) {
 
-        PostulacionDTO dto = new PostulacionDTO();
+    private PostulacionDTO convertirADTO(
+            Postulacion postulacion) {
 
-        dto.setId(postulacion.getId());
-        dto.setEstado(postulacion.getEstado());
-        dto.setDisponibilidad(postulacion.getDisponibilidad());
-        dto.setComentario(postulacion.getComentario());
-        dto.setFechaPostulacion(postulacion.getFechaPostulacion());
+        PostulacionDTO dto =
+                new PostulacionDTO();
+
+
+        dto.setId(
+                postulacion.getId()
+        );
+
+        dto.setEstado(
+                postulacion.getEstado()
+        );
+
+        dto.setDisponibilidad(
+                postulacion.getDisponibilidad()
+        );
+
+        dto.setComentario(
+                postulacion.getComentario()
+        );
+
+        dto.setFechaPostulacion(
+                postulacion.getFechaPostulacion()
+        );
+
 
         if (postulacion.getVoluntariado() != null) {
-            dto.setVoluntariadoId(postulacion.getVoluntariado().getId());
-            dto.setVoluntariadoTitulo(postulacion.getVoluntariado().getTitulo());
+
+            dto.setVoluntariadoId(
+                    postulacion
+                            .getVoluntariado()
+                            .getId()
+            );
+
+            dto.setVoluntariadoTitulo(
+                    postulacion
+                            .getVoluntariado()
+                            .getTitulo()
+            );
         }
 
+
         if (postulacion.getUsuario() != null) {
-            dto.setUsuarioId(postulacion.getUsuario().getId());
-            dto.setUsuarioNombre(postulacion.getUsuario().getNombre());
+
+            dto.setUsuarioId(
+                    postulacion
+                            .getUsuario()
+                            .getId()
+            );
+
+            dto.setUsuarioNombre(
+                    postulacion
+                            .getUsuario()
+                            .getNombre()
+            );
         }
+
 
         return dto;
     }
