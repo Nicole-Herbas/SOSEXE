@@ -1,7 +1,7 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { Router, RouterLink } from '@angular/router';
+import { Router} from '@angular/router';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 
 import { ApiResponse } from '../../../../shared/models/api-response';
@@ -16,7 +16,7 @@ export interface Departamento {
 @Component({
   selector: 'app-registrar-centro',
   standalone: true,
- imports: [FormsModule, RouterLink],
+ imports: [FormsModule],
   templateUrl: './registrar-centro.html',
   styleUrl: './registrar-centro.scss'
 })
