@@ -16,11 +16,12 @@ export interface Departamento {
 @Component({
   selector: 'app-registrar-centro',
   standalone: true,
-  imports: [FormsModule],
+ imports: [FormsModule, RouterLink],
   templateUrl: './registrar-centro.html',
   styleUrl: './registrar-centro.scss'
 })
 export class RegistrarCentroComponent implements OnInit {
+  readonly textos = APP_TEXTOS.registrarCentro;
 
   constructor(
     private http: HttpClient,
@@ -74,7 +75,7 @@ export class RegistrarCentroComponent implements OnInit {
         error: (error) => {
           console.error('Error al cargar departamentos:', error);
           this.errorDepartamentos =
-            'No se pudieron cargar los departamentos. Recarga la página.';
+            this.textos.errores.departamentos;
           this.cdr.markForCheck();
         }
       });
