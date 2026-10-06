@@ -293,6 +293,17 @@ mapa: {
 
     informacionVerificada:
       'Información comprobada pendiente de revisión',
+    emailEtiqueta:
+      'CORREO',
+
+    actualizadoEtiqueta:
+      'ÚLTIMA ACTUALIZACIÓN',
+
+    cargando:
+      'Cargando detalle...',
+
+    errorCarga:
+      'No se pudo cargar el detalle completo.',
   },
 
   filtrosTipo: {

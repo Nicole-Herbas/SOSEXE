@@ -77,7 +77,10 @@
         } @else if (puntosFiltrados().length === 0) {
           <p class="mensaje-estado">{{ textos.sinResultados }}</p>
         } @else {
-          @for (punto of puntosFiltrados(); track punto.id) {
+        @for (
+        punto of puntosFiltrados();
+        track punto.origen + '-' + punto.id
+        ) {
             <article
               class="resultado-card"
               [class.seleccionado]="puntoSeleccionado()?.id === punto.id && puntoSeleccionado()?.origen === punto.origen"
@@ -121,6 +124,23 @@
         <div class="detalle-card">
           <button class="cerrar-detalle" (click)="cerrarDetalle()">✕</button>
 
+          @if (cargandoDetalle()) {
+
+          <p class="mensaje-estado">
+            {{ detalleEtiquetas.cargando }}
+          </p>
+
+          }
+
+
+          @if (errorDetalle()) {
+
+          <p class="mensaje-estado error">
+            {{ errorDetalle() }}
+          </p>
+
+          }
+
           <div class="detalle-etiquetas">
             <span class="tag {{ obtenerClaseTipo(puntoSeleccionado()!.tipo) }}">{{ obtenerEtiquetaTipo(puntoSeleccionado()!.tipo) }}</span>
             @if (estaVerificado(puntoSeleccionado()!)) {
@@ -148,11 +168,42 @@
             </div>
           }
 
-          @if (puntoSeleccionado()!.telefono) {
-            <div class="detalle-dato">
-              <span>{{ detalleEtiquetas.contactoEtiqueta }}</span>
-              <p>{{ puntoSeleccionado()!.telefono }}</p>
-            </div>
+          @if (
+          puntoSeleccionado()!.telefono
+          ||
+          puntoSeleccionado()!.email
+          ) {
+
+          <div class="detalle-dato">
+
+    <span>
+      {{ detalleEtiquetas.contactoEtiqueta }}
+    </span>
+
+
+            @if (puntoSeleccionado()!.telefono) {
+
+            <p>
+              {{ puntoSeleccionado()!.telefono }}
+            </p>
+
+            }
+
+
+            @if (puntoSeleccionado()!.email) {
+
+            <p>
+              <a
+                [href]="'mailto:' + puntoSeleccionado()!.email"
+              >
+                {{ puntoSeleccionado()!.email }}
+              </a>
+            </p>
+
+            }
+
+          </div>
+
           }
 
           @if (puntoSeleccionado()!.necesidades?.length) {
@@ -166,8 +217,34 @@
             </div>
           }
 
+          @if (puntoSeleccionado()!.fechaActualizacion) {
+
+          <div class="detalle-dato">
+
+    <span>
+      {{ detalleEtiquetas.actualizadoEtiqueta }}
+    </span>
+
+            <p>
+              {{
+              formatearFechaActualizacion(
+              puntoSeleccionado()!.fechaActualizacion
+              )
+              }}
+            </p>
+
+          </div>
+
+          }
+
           <div class="acciones">
-            <button class="boton-secundario">{{ detalleEtiquetas.comoLlegar }}</button>
+            <button
+              type="button"
+              class="boton-secundario"
+              (click)="comoLlegar(puntoSeleccionado()!)"
+            >
+              {{ detalleEtiquetas.comoLlegar }}
+            </button>
             <button class="boton-principal">{{ detalleEtiquetas.verCentro }}</button>
           </div>
 

@@ -77,6 +77,10 @@ export class Mapa implements OnInit {
   };
 
 
+  // ==========================================
+  // ESTADO GENERAL
+  // ==========================================
+
   puntos =
     signal<PuntoMapa[]>([]);
 
@@ -90,6 +94,10 @@ export class Mapa implements OnInit {
     signal('');
 
 
+  // ==========================================
+  // FILTROS
+  // ==========================================
+
   filtroTipoActivo =
     signal<string>(
       FILTROS_TIPO_MAPA[0].id
@@ -101,11 +109,28 @@ export class Mapa implements OnInit {
     );
 
 
+  // ==========================================
+  // DETALLE DE PUNTO - SOS-36
+  // ==========================================
+
   puntoSeleccionado =
     signal<PuntoMapa | null>(
       null
     );
 
+  cargandoDetalle =
+    signal(false);
+
+  errorDetalle =
+    signal('');
+
+  mostrarModalDetalle =
+    signal(false);
+
+
+  // ==========================================
+  // PUNTOS FILTRADOS
+  // ==========================================
 
   puntosFiltrados = computed(() => {
 
@@ -188,6 +213,10 @@ export class Mapa implements OnInit {
   });
 
 
+  // ==========================================
+  // CONTADOR
+  // ==========================================
+
   contadorVerificados = computed(() => {
 
     const total =
@@ -204,6 +233,10 @@ export class Mapa implements OnInit {
   });
 
 
+  // ==========================================
+  // INICIO
+  // ==========================================
+
   ngOnInit(): void {
 
     if (
@@ -217,8 +250,8 @@ export class Mapa implements OnInit {
     } else {
 
       this.puntos.set(
-  PUNTOS_MAPA_FALLBACK as unknown as PuntoMapa[]
-);
+        PUNTOS_MAPA_FALLBACK as unknown as PuntoMapa[]
+      );
 
       this.cargando.set(
         false
@@ -227,6 +260,10 @@ export class Mapa implements OnInit {
     }
   }
 
+
+  // ==========================================
+  // FILTROS
+  // ==========================================
 
   seleccionarFiltroTipo(
     id: string
@@ -248,29 +285,171 @@ export class Mapa implements OnInit {
   }
 
 
+  // ==========================================
+  // SELECCIONAR PUNTO Y CARGAR DETALLE
+  // ==========================================
+
   seleccionarPunto(
     punto: PuntoMapa
   ): void {
 
+    // Mostramos inmediatamente
+    // la información disponible en la lista.
     this.puntoSeleccionado.set(
       punto
+    );
+
+    this.errorDetalle.set(
+      ''
+    );
+
+
+    // Si se está usando fallback,
+    // no consultamos al backend.
+    if (
+      !this.featureToggles
+        .mapa
+        .usarBackend
+    ) {
+      return;
+    }
+
+
+    this.cargandoDetalle.set(
+      true
+    );
+
+
+    const origen =
+      punto.origen;
+
+    const id =
+      punto.id;
+
+
+    this.mapaService
+      .obtenerDetalle(
+        origen,
+        id
+      )
+      .subscribe({
+
+        next: (detalle) => {
+
+          const seleccionadoActual =
+            this.puntoSeleccionado();
+
+
+          // Evita que una respuesta antigua
+          // reemplace otro punto seleccionado.
+          if (
+            seleccionadoActual?.id !== id
+            ||
+            seleccionadoActual?.origen !== origen
+          ) {
+            return;
+          }
+
+
+          this.puntoSeleccionado.set(
+            detalle
+          );
+
+          this.cargandoDetalle.set(
+            false
+          );
+
+        },
+
+
+        error: () => {
+
+          const seleccionadoActual =
+            this.puntoSeleccionado();
+
+
+          if (
+            seleccionadoActual?.id !== id
+            ||
+            seleccionadoActual?.origen !== origen
+          ) {
+            return;
+          }
+
+
+          this.errorDetalle.set(
+            this.detalleEtiquetas.errorCarga
+          );
+
+          this.cargandoDetalle.set(
+            false
+          );
+
+        }
+
+      });
+  }
+
+
+  // ==========================================
+  // MODAL DE DETALLE
+  // ==========================================
+
+  abrirModalDetalle(): void {
+
+    if (!this.puntoSeleccionado()) {
+      return;
+    }
+
+
+    this.mostrarModalDetalle.set(
+      true
     );
   }
 
 
+  cerrarModalCompleto(): void {
+
+    this.mostrarModalDetalle.set(
+      false
+    );
+  }
+
+
+  // ==========================================
+  // CERRAR PANEL DE DETALLE
+  // ==========================================
+
   cerrarDetalle(): void {
+
+    this.mostrarModalDetalle.set(
+      false
+    );
 
     this.puntoSeleccionado.set(
       null
     );
+
+    this.errorDetalle.set(
+      ''
+    );
+
+    this.cargandoDetalle.set(
+      false
+    );
   }
 
+
+  // ==========================================
+  // BÚSQUEDA
+  // ==========================================
 
   actualizarBusqueda(
     evento: Event
   ): void {
 
-    const input = evento.target as HTMLInputElement;
+    const input =
+      evento.target as HTMLInputElement;
 
 
     this.busqueda.set(
@@ -278,6 +457,10 @@ export class Mapa implements OnInit {
     );
   }
 
+
+  // ==========================================
+  // TIPO DEL PUNTO
+  // ==========================================
 
   obtenerClaseTipo(
     tipo: string
@@ -305,6 +488,70 @@ export class Mapa implements OnInit {
   }
 
 
+  // ==========================================
+  // FECHA DE ACTUALIZACIÓN
+  // ==========================================
+
+  formatearFechaActualizacion(
+    fecha?: string
+  ): string {
+
+    if (!fecha) {
+      return '';
+    }
+
+
+    const fechaConvertida =
+      new Date(fecha);
+
+
+    if (
+      Number.isNaN(
+        fechaConvertida.getTime()
+      )
+    ) {
+      return fecha;
+    }
+
+
+    return fechaConvertida
+      .toLocaleString(
+        'es-BO',
+        {
+          day: '2-digit',
+          month: '2-digit',
+          year: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit'
+        }
+      );
+  }
+
+
+  // ==========================================
+  // CÓMO LLEGAR
+  // ==========================================
+
+  comoLlegar(
+    punto: PuntoMapa
+  ): void {
+
+    const url =
+      `https://www.google.com/maps/dir/?api=1&destination=${punto.latitud},${punto.longitud}`;
+
+
+    window.open(
+      url,
+      '_blank',
+      'noopener,noreferrer'
+    );
+  }
+
+
+  // ==========================================
+  // VERIFICACIÓN
+  // ==========================================
+
   estaVerificado(
     punto: PuntoMapa
   ): boolean {
@@ -315,6 +562,10 @@ export class Mapa implements OnInit {
     );
   }
 
+
+  // ==========================================
+  // CARGAR PUNTOS
+  // ==========================================
 
   private cargarPuntosDelBackend(): void {
 
@@ -346,7 +597,7 @@ export class Mapa implements OnInit {
             puntos.length > 0
           ) {
 
-            this.puntoSeleccionado.set(
+            this.seleccionarPunto(
               puntos[0]
             );
 
@@ -367,8 +618,8 @@ export class Mapa implements OnInit {
 
 
           this.puntos.set(
-  PUNTOS_MAPA_FALLBACK as unknown as PuntoMapa[]
-);
+            PUNTOS_MAPA_FALLBACK as unknown as PuntoMapa[]
+          );
 
         }
 

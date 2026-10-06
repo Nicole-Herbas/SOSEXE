@@ -1,20 +1,55 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { provideHttpClient } from '@angular/common/http';
-import { provideHttpClientTesting, HttpTestingController } from '@angular/common/http/testing';
-import { MapaLeaflet } from '../../components/mapa-leaflet/mapa-leaflet';
-import { Mapa } from './mapa';
-import { PuntoMapa } from '../../models/punto-mapa.model';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  Output
+} from '@angular/core';
+
+import {
+  ComponentFixture,
+  TestBed
+} from '@angular/core/testing';
+
+import {
+  provideHttpClient
+} from '@angular/common/http';
+
+import {
+  provideHttpClientTesting,
+  HttpTestingController
+} from '@angular/common/http/testing';
+
+import {
+  MapaLeaflet
+} from '../../components/mapa-leaflet/mapa-leaflet';
+
+import {
+  Mapa
+} from './mapa';
+
+import {
+  PuntoMapa
+} from '../../models/punto-mapa.model';
+
 
 @Component({
   selector: 'app-mapa-leaflet',
   template: '',
 })
 class MapaLeafletStub {
-  @Input() puntos: PuntoMapa[] = [];
-  @Input() puntoSeleccionado: PuntoMapa | null = null;
-  @Output() puntoClick = new EventEmitter<PuntoMapa>();
+
+  @Input()
+  puntos: PuntoMapa[] = [];
+
+  @Input()
+  puntoSeleccionado:
+    PuntoMapa | null = null;
+
+  @Output()
+  puntoClick =
+    new EventEmitter<PuntoMapa>();
 }
+
 
 const PUNTO_MOCK: PuntoMapa = {
   id: 1,
@@ -26,8 +61,12 @@ const PUNTO_MOCK: PuntoMapa = {
   latitud: -17.3895,
   longitud: -66.1568,
   estadoVerificacion: 'VERIFICADO',
-  necesidades: ['Agua', 'Alimentos'],
+  necesidades: [
+    'Agua',
+    'Alimentos'
+  ],
 };
+
 
 const PUNTO_REFUGIO_MOCK: PuntoMapa = {
   id: 2,
@@ -39,265 +78,779 @@ const PUNTO_REFUGIO_MOCK: PuntoMapa = {
   latitud: -17.7833,
   longitud: -63.1821,
   estadoVerificacion: 'PENDIENTE',
-  necesidades: ['Ropa'],
+  necesidades: [
+    'Ropa'
+  ],
 };
 
+
 describe('Mapa', () => {
+
   let component: Mapa;
   let fixture: ComponentFixture<Mapa>;
-  let httpTesting: HttpTestingController;
+
+  let httpTesting:
+    HttpTestingController;
+
 
   beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [Mapa],
-      providers: [
-        provideHttpClient(),
-        provideHttpClientTesting(),
-      ],
-    })
-      .overrideComponent(Mapa, {
-        remove: { imports: [MapaLeaflet] },
-        add: { imports: [MapaLeafletStub] },
+
+    await TestBed
+      .configureTestingModule({
+        imports: [
+          Mapa
+        ],
+        providers: [
+          provideHttpClient(),
+          provideHttpClientTesting(),
+        ],
       })
+      .overrideComponent(
+        Mapa,
+        {
+          remove: {
+            imports: [
+              MapaLeaflet
+            ]
+          },
+          add: {
+            imports: [
+              MapaLeafletStub
+            ]
+          },
+        }
+      )
       .compileComponents();
 
-    httpTesting = TestBed.inject(HttpTestingController);
-    fixture = TestBed.createComponent(Mapa);
-    component = fixture.componentInstance;
+
+    httpTesting =
+      TestBed.inject(
+        HttpTestingController
+      );
+
+
+    fixture =
+      TestBed.createComponent(
+        Mapa
+      );
+
+
+    component =
+      fixture.componentInstance;
   });
+
+
+  const responderDetalle = (
+    punto: PuntoMapa
+  ): void => {
+
+    const reqDetalle =
+      httpTesting.expectOne(
+        `/api/mapa/puntos/${punto.origen}/${punto.id}`
+      );
+
+
+    expect(
+      reqDetalle.request.method
+    ).toBe('GET');
+
+
+    reqDetalle.flush({
+      success: true,
+      message: 'OK',
+      data: punto,
+      timestamp: ''
+    });
+
+
+    fixture.detectChanges();
+  };
+
 
   afterEach(() => {
+
     httpTesting.verify();
+
   });
 
-  it('debe mostrar el título y los cinco filtros de tipo cuando mapaFiltros es true', () => {
-    component.featureToggles.mapa.filtros = true;
-    fixture.detectChanges();
 
-    const req = httpTesting.expectOne('/api/mapa/puntos');
-    req.flush({ success: true, message: 'OK', data: [], timestamp: '' });
-    fixture.detectChanges();
+  it(
+    'debe mostrar el título y los cinco filtros de tipo cuando mapaFiltros es true',
+    () => {
 
-    const titulo = fixture.nativeElement.querySelector('h1');
-    const filtros = fixture.nativeElement.querySelectorAll('[data-filtro-tipo]');
+      component
+        .featureToggles
+        .mapa
+        .filtros = true;
 
-    expect(titulo.textContent).toContain('Mapa de ayuda y emergencias');
-    expect(filtros.length).toBe(5);
-  });
 
-  it('debe ocultar los filtros de tipo y necesidad cuando mapaFiltros es false', () => {
-    component.featureToggles.mapa.filtros = false;
-    fixture.detectChanges();
+      fixture.detectChanges();
 
-    const req = httpTesting.expectOne('/api/mapa/puntos');
-    req.flush({ success: true, message: 'OK', data: [], timestamp: '' });
-    fixture.detectChanges();
 
-    const filtrosTipo = fixture.nativeElement.querySelectorAll('[data-filtro-tipo]');
-    const filtrosNecesidad = fixture.nativeElement.querySelectorAll('[data-filtro-necesidad]');
+      const req =
+        httpTesting.expectOne(
+          '/api/mapa/puntos'
+        );
 
-    expect(filtrosTipo.length).toBe(0);
-    expect(filtrosNecesidad.length).toBe(0);
-  });
 
-  it('debe seleccionar un punto y mostrar su detalle', () => {
-    fixture.detectChanges();
+      req.flush({
+        success: true,
+        message: 'OK',
+        data: [],
+        timestamp: ''
+      });
 
-    const req = httpTesting.expectOne('/api/mapa/puntos');
-    req.flush({ success: true, message: 'OK', data: [PUNTO_MOCK, PUNTO_REFUGIO_MOCK], timestamp: '' });
-    fixture.detectChanges();
 
-    component.seleccionarPunto(PUNTO_MOCK);
-    fixture.detectChanges();
+      fixture.detectChanges();
 
-    expect(component.puntoSeleccionado()).toEqual(PUNTO_MOCK);
 
-    const detalle = fixture.nativeElement.querySelector('.detalle-card h2');
-    expect(detalle.textContent).toContain('Centro San José');
-  });
+      const titulo =
+        fixture.nativeElement
+          .querySelector(
+            'h1'
+          );
 
-  it('debe filtrar puntos por tipo cuando se selecciona un filtro y mapaFiltros es true', () => {
-    component.featureToggles.mapa.filtros = true;
-    fixture.detectChanges();
 
-    const req = httpTesting.expectOne('/api/mapa/puntos');
-    req.flush({ success: true, message: 'OK', data: [PUNTO_MOCK, PUNTO_REFUGIO_MOCK], timestamp: '' });
-    fixture.detectChanges();
+      const filtros =
+        fixture.nativeElement
+          .querySelectorAll(
+            '[data-filtro-tipo]'
+          );
 
-    component.seleccionarFiltroTipo('REFUGIO');
-    fixture.detectChanges();
 
-    expect(component.puntosFiltrados().length).toBe(1);
-    expect(component.puntosFiltrados()[0].nombre).toBe('Refugio Santa Cruz');
-  });
-
-  it('debe ocultar la columna izquierda cuando mostrarLista es false', () => {
-    component.featureToggles.mapa.mostrarLista = false;
-    fixture.detectChanges();
-
-    const req = httpTesting.expectOne('/api/mapa/puntos');
-    req.flush({ success: true, message: 'OK', data: [PUNTO_MOCK], timestamp: '' });
-    fixture.detectChanges();
-
-    const lista = fixture.nativeElement.querySelector('.columna-izquierda');
-    expect(lista).toBeNull();
-  });
-
-  it('debe ocultar el mapa cuando mostrarMapa es false', () => {
-    component.featureToggles.mapa.mostrarMapa = false;
-    fixture.detectChanges();
-
-    const req = httpTesting.expectOne('/api/mapa/puntos');
-    req.flush({ success: true, message: 'OK', data: [PUNTO_MOCK], timestamp: '' });
-    fixture.detectChanges();
-
-    const mapa = fixture.nativeElement.querySelector('.columna-mapa');
-    expect(mapa).toBeNull();
-  });
-  it('debe filtrar los puntos por necesidad sin realizar una nueva petición al backend', () => {
-    component.featureToggles.mapa.filtros = true;
-
-    fixture.detectChanges();
-
-    const req =
-      httpTesting.expectOne('/api/mapa/puntos');
-
-    req.flush({
-      success: true,
-      message: 'OK',
-      data: [PUNTO_MOCK, PUNTO_REFUGIO_MOCK],
-      timestamp: ''
-    });
-
-    fixture.detectChanges();
-
-    component.seleccionarFiltroNecesidad('Ropa');
-
-    fixture.detectChanges();
-
-    expect(component.filtroNecesidadActivo())
-      .toBe('Ropa');
-
-    expect(component.puntosFiltrados().length)
-      .toBe(1);
-
-    expect(component.puntosFiltrados()[0].nombre)
-      .toBe('Refugio Santa Cruz');
-
-    httpTesting.expectNone('/api/mapa/puntos');
-  });
-
-  it('debe combinar el filtro por tipo con el filtro por necesidad', () => {
-    component.featureToggles.mapa.filtros = true;
-
-    fixture.detectChanges();
-
-    const req =
-      httpTesting.expectOne('/api/mapa/puntos');
-
-    req.flush({
-      success: true,
-      message: 'OK',
-      data: [PUNTO_MOCK, PUNTO_REFUGIO_MOCK],
-      timestamp: ''
-    });
-
-    fixture.detectChanges();
-
-    component.seleccionarFiltroTipo('REFUGIO');
-    component.seleccionarFiltroNecesidad('Ropa');
-
-    fixture.detectChanges();
-
-    expect(component.filtroTipoActivo())
-      .toBe('REFUGIO');
-
-    expect(component.filtroNecesidadActivo())
-      .toBe('Ropa');
-
-    expect(component.puntosFiltrados().length)
-      .toBe(1);
-
-    expect(component.puntosFiltrados()[0].nombre)
-      .toBe('Refugio Santa Cruz');
-
-    httpTesting.expectNone('/api/mapa/puntos');
-  });
-
-  it('debe filtrar los resultados por tipo sin realizar una nueva petición al backend', () => {
-    component.featureToggles.mapa.filtros = true;
-
-    fixture.detectChanges();
-
-    const req = httpTesting.expectOne('/api/mapa/puntos');
-
-    req.flush({
-      success: true,
-      message: 'OK',
-      data: [PUNTO_MOCK, PUNTO_REFUGIO_MOCK],
-      timestamp: ''
-    });
-
-    fixture.detectChanges();
-
-    const botonRefugios: HTMLButtonElement =
-      fixture.nativeElement.querySelector(
-        '[data-filtro-tipo="REFUGIO"]'
+      expect(
+        titulo.textContent
+      ).toContain(
+        'Mapa de ayuda y emergencias'
       );
 
-    botonRefugios.click();
 
-    fixture.detectChanges();
+      expect(
+        filtros.length
+      ).toBe(5);
+    }
+  );
 
-    expect(component.filtroTipoActivo())
-      .toBe('REFUGIO');
 
-    expect(component.puntosFiltrados().length)
-      .toBe(1);
+  it(
+    'debe ocultar los filtros de tipo y necesidad cuando mapaFiltros es false',
+    () => {
 
-    expect(component.puntosFiltrados()[0].nombre)
-      .toBe('Refugio Santa Cruz');
+      component
+        .featureToggles
+        .mapa
+        .filtros = false;
 
-    httpTesting.expectNone('/api/mapa/puntos');
-  });
 
-  it('debe volver a mostrar todos los puntos al seleccionar Todos sin recargar datos', () => {
-    component.featureToggles.mapa.filtros = true;
+      fixture.detectChanges();
 
-    fixture.detectChanges();
 
-    const req = httpTesting.expectOne('/api/mapa/puntos');
+      const req =
+        httpTesting.expectOne(
+          '/api/mapa/puntos'
+        );
 
-    req.flush({
-      success: true,
-      message: 'OK',
-      data: [PUNTO_MOCK, PUNTO_REFUGIO_MOCK],
-      timestamp: ''
-    });
 
-    fixture.detectChanges();
+      req.flush({
+        success: true,
+        message: 'OK',
+        data: [],
+        timestamp: ''
+      });
 
-    component.seleccionarFiltroTipo('REFUGIO');
 
-    expect(component.puntosFiltrados().length)
-      .toBe(1);
+      fixture.detectChanges();
 
-    const botonTodos: HTMLButtonElement =
-      fixture.nativeElement.querySelector(
-        '[data-filtro-tipo="todos"]'
+
+      const filtrosTipo =
+        fixture.nativeElement
+          .querySelectorAll(
+            '[data-filtro-tipo]'
+          );
+
+
+      const filtrosNecesidad =
+        fixture.nativeElement
+          .querySelectorAll(
+            '[data-filtro-necesidad]'
+          );
+
+
+      expect(
+        filtrosTipo.length
+      ).toBe(0);
+
+
+      expect(
+        filtrosNecesidad.length
+      ).toBe(0);
+    }
+  );
+
+
+  it(
+    'debe seleccionar un punto y cargar su detalle desde el backend',
+    () => {
+
+      fixture.detectChanges();
+
+
+      const req =
+        httpTesting.expectOne(
+          '/api/mapa/puntos'
+        );
+
+
+      req.flush({
+        success: true,
+        message: 'OK',
+        data: [
+          PUNTO_MOCK,
+          PUNTO_REFUGIO_MOCK
+        ],
+        timestamp: ''
+      });
+
+
+      responderDetalle(
+        PUNTO_MOCK
       );
 
-    botonTodos.click();
 
-    fixture.detectChanges();
+      component.seleccionarPunto(
+        PUNTO_REFUGIO_MOCK
+      );
 
-    expect(component.filtroTipoActivo())
-      .toBe('todos');
 
-    expect(component.puntosFiltrados().length)
-      .toBe(2);
+      const reqDetalle =
+        httpTesting.expectOne(
+          '/api/mapa/puntos/PUNTO_AYUDA/2'
+        );
 
-    httpTesting.expectNone('/api/mapa/puntos');
-  });
+
+      expect(
+        reqDetalle.request.method
+      ).toBe('GET');
+
+
+      reqDetalle.flush({
+        success: true,
+        message: 'OK',
+        data: PUNTO_REFUGIO_MOCK,
+        timestamp: ''
+      });
+
+
+      fixture.detectChanges();
+
+
+      expect(
+        component.puntoSeleccionado()
+      ).toEqual(
+        PUNTO_REFUGIO_MOCK
+      );
+
+
+      const detalle =
+        fixture.nativeElement
+          .querySelector(
+            '.detalle-card h2'
+          );
+
+
+      expect(
+        detalle.textContent
+      ).toContain(
+        'Refugio Santa Cruz'
+      );
+    }
+  );
+
+
+  it(
+    'debe filtrar puntos por tipo cuando se selecciona un filtro y mapaFiltros es true',
+    () => {
+
+      component
+        .featureToggles
+        .mapa
+        .filtros = true;
+
+
+      fixture.detectChanges();
+
+
+      const req =
+        httpTesting.expectOne(
+          '/api/mapa/puntos'
+        );
+
+
+      req.flush({
+        success: true,
+        message: 'OK',
+        data: [
+          PUNTO_MOCK,
+          PUNTO_REFUGIO_MOCK
+        ],
+        timestamp: ''
+      });
+
+
+      responderDetalle(
+        PUNTO_MOCK
+      );
+
+
+      component.seleccionarFiltroTipo(
+        'REFUGIO'
+      );
+
+
+      fixture.detectChanges();
+
+
+      expect(
+        component.puntosFiltrados().length
+      ).toBe(1);
+
+
+      expect(
+        component
+          .puntosFiltrados()[0]
+          .nombre
+      ).toBe(
+        'Refugio Santa Cruz'
+      );
+    }
+  );
+
+
+  it(
+    'debe ocultar la columna izquierda cuando mostrarLista es false',
+    () => {
+
+      component
+        .featureToggles
+        .mapa
+        .mostrarLista = false;
+
+
+      fixture.detectChanges();
+
+
+      const req =
+        httpTesting.expectOne(
+          '/api/mapa/puntos'
+        );
+
+
+      req.flush({
+        success: true,
+        message: 'OK',
+        data: [
+          PUNTO_MOCK
+        ],
+        timestamp: ''
+      });
+
+
+      responderDetalle(
+        PUNTO_MOCK
+      );
+
+
+      fixture.detectChanges();
+
+
+      const lista =
+        fixture.nativeElement
+          .querySelector(
+            '.columna-izquierda'
+          );
+
+
+      expect(
+        lista
+      ).toBeNull();
+    }
+  );
+
+
+  it(
+    'debe ocultar el mapa cuando mostrarMapa es false',
+    () => {
+
+      component
+        .featureToggles
+        .mapa
+        .mostrarMapa = false;
+
+
+      fixture.detectChanges();
+
+
+      const req =
+        httpTesting.expectOne(
+          '/api/mapa/puntos'
+        );
+
+
+      req.flush({
+        success: true,
+        message: 'OK',
+        data: [
+          PUNTO_MOCK
+        ],
+        timestamp: ''
+      });
+
+
+      responderDetalle(
+        PUNTO_MOCK
+      );
+
+
+      fixture.detectChanges();
+
+
+      const mapa =
+        fixture.nativeElement
+          .querySelector(
+            '.columna-mapa'
+          );
+
+
+      expect(
+        mapa
+      ).toBeNull();
+    }
+  );
+
+
+  it(
+    'debe filtrar los puntos por necesidad sin realizar una nueva petición al backend',
+    () => {
+
+      component
+        .featureToggles
+        .mapa
+        .filtros = true;
+
+
+      fixture.detectChanges();
+
+
+      const req =
+        httpTesting.expectOne(
+          '/api/mapa/puntos'
+        );
+
+
+      req.flush({
+        success: true,
+        message: 'OK',
+        data: [
+          PUNTO_MOCK,
+          PUNTO_REFUGIO_MOCK
+        ],
+        timestamp: ''
+      });
+
+
+      responderDetalle(
+        PUNTO_MOCK
+      );
+
+
+      component
+        .seleccionarFiltroNecesidad(
+          'Ropa'
+        );
+
+
+      fixture.detectChanges();
+
+
+      expect(
+        component
+          .filtroNecesidadActivo()
+      ).toBe(
+        'Ropa'
+      );
+
+
+      expect(
+        component
+          .puntosFiltrados()
+          .length
+      ).toBe(1);
+
+
+      expect(
+        component
+          .puntosFiltrados()[0]
+          .nombre
+      ).toBe(
+        'Refugio Santa Cruz'
+      );
+
+
+      httpTesting.expectNone(
+        '/api/mapa/puntos'
+      );
+    }
+  );
+
+
+  it(
+    'debe combinar el filtro por tipo con el filtro por necesidad',
+    () => {
+
+      component
+        .featureToggles
+        .mapa
+        .filtros = true;
+
+
+      fixture.detectChanges();
+
+
+      const req =
+        httpTesting.expectOne(
+          '/api/mapa/puntos'
+        );
+
+
+      req.flush({
+        success: true,
+        message: 'OK',
+        data: [
+          PUNTO_MOCK,
+          PUNTO_REFUGIO_MOCK
+        ],
+        timestamp: ''
+      });
+
+
+      responderDetalle(
+        PUNTO_MOCK
+      );
+
+
+      component.seleccionarFiltroTipo(
+        'REFUGIO'
+      );
+
+
+      component
+        .seleccionarFiltroNecesidad(
+          'Ropa'
+        );
+
+
+      fixture.detectChanges();
+
+
+      expect(
+        component
+          .filtroTipoActivo()
+      ).toBe(
+        'REFUGIO'
+      );
+
+
+      expect(
+        component
+          .filtroNecesidadActivo()
+      ).toBe(
+        'Ropa'
+      );
+
+
+      expect(
+        component
+          .puntosFiltrados()
+          .length
+      ).toBe(1);
+
+
+      expect(
+        component
+          .puntosFiltrados()[0]
+          .nombre
+      ).toBe(
+        'Refugio Santa Cruz'
+      );
+
+
+      httpTesting.expectNone(
+        '/api/mapa/puntos'
+      );
+    }
+  );
+
+
+  it(
+    'debe filtrar los resultados por tipo sin realizar una nueva petición al backend',
+    () => {
+
+      component
+        .featureToggles
+        .mapa
+        .filtros = true;
+
+
+      fixture.detectChanges();
+
+
+      const req =
+        httpTesting.expectOne(
+          '/api/mapa/puntos'
+        );
+
+
+      req.flush({
+        success: true,
+        message: 'OK',
+        data: [
+          PUNTO_MOCK,
+          PUNTO_REFUGIO_MOCK
+        ],
+        timestamp: ''
+      });
+
+
+      responderDetalle(
+        PUNTO_MOCK
+      );
+
+
+      const botonRefugios:
+        HTMLButtonElement =
+        fixture.nativeElement
+          .querySelector(
+            '[data-filtro-tipo="REFUGIO"]'
+          );
+
+
+      botonRefugios.click();
+
+
+      fixture.detectChanges();
+
+
+      expect(
+        component
+          .filtroTipoActivo()
+      ).toBe(
+        'REFUGIO'
+      );
+
+
+      expect(
+        component
+          .puntosFiltrados()
+          .length
+      ).toBe(1);
+
+
+      expect(
+        component
+          .puntosFiltrados()[0]
+          .nombre
+      ).toBe(
+        'Refugio Santa Cruz'
+      );
+
+
+      httpTesting.expectNone(
+        '/api/mapa/puntos'
+      );
+    }
+  );
+
+
+  it(
+    'debe volver a mostrar todos los puntos al seleccionar Todos sin recargar datos',
+    () => {
+
+      component
+        .featureToggles
+        .mapa
+        .filtros = true;
+
+
+      fixture.detectChanges();
+
+
+      const req =
+        httpTesting.expectOne(
+          '/api/mapa/puntos'
+        );
+
+
+      req.flush({
+        success: true,
+        message: 'OK',
+        data: [
+          PUNTO_MOCK,
+          PUNTO_REFUGIO_MOCK
+        ],
+        timestamp: ''
+      });
+
+
+      responderDetalle(
+        PUNTO_MOCK
+      );
+
+
+      component.seleccionarFiltroTipo(
+        'REFUGIO'
+      );
+
+
+      expect(
+        component
+          .puntosFiltrados()
+          .length
+      ).toBe(1);
+
+
+      const botonTodos:
+        HTMLButtonElement =
+        fixture.nativeElement
+          .querySelector(
+            '[data-filtro-tipo="todos"]'
+          );
+
+
+      botonTodos.click();
+
+
+      fixture.detectChanges();
+
+
+      expect(
+        component
+          .filtroTipoActivo()
+      ).toBe(
+        'todos'
+      );
+
+
+      expect(
+        component
+          .puntosFiltrados()
+          .length
+      ).toBe(2);
+
+
+      httpTesting.expectNone(
+        '/api/mapa/puntos'
+      );
+    }
+  );
 
 });
