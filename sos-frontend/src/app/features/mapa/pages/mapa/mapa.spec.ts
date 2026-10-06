@@ -139,6 +139,191 @@ describe('Mapa', () => {
       fixture.componentInstance;
   });
 
+  it(
+    'debe mostrar email y fecha de actualización en el detalle',
+    () => {
+
+      const puntoDetalle: PuntoMapa = {
+        ...PUNTO_MOCK,
+        email: 'centro@sos.com',
+        fechaActualizacion:
+          '2026-10-05T20:30:00'
+      };
+
+
+      fixture.detectChanges();
+
+
+      const req =
+        httpTesting.expectOne(
+          '/api/mapa/puntos'
+        );
+
+
+      req.flush({
+        success: true,
+        message: 'OK',
+        data: [
+          puntoDetalle
+        ],
+        timestamp: ''
+      });
+
+
+      responderDetalle(
+        puntoDetalle
+      );
+
+
+      fixture.detectChanges();
+
+
+      expect(
+        fixture.nativeElement.textContent
+      ).toContain(
+        'centro@sos.com'
+      );
+
+
+      expect(
+        component
+          .formatearFechaActualizacion(
+            puntoDetalle.fechaActualizacion
+          )
+      ).not.toBe('');
+    }
+  );
+
+
+  it(
+    'debe mostrar error cuando falla la carga del detalle',
+    () => {
+
+      fixture.detectChanges();
+
+
+      const req =
+        httpTesting.expectOne(
+          '/api/mapa/puntos'
+        );
+
+
+      req.flush({
+        success: true,
+        message: 'OK',
+        data: [
+          PUNTO_MOCK
+        ],
+        timestamp: ''
+      });
+
+
+      const reqDetalle =
+        httpTesting.expectOne(
+          '/api/mapa/puntos/CENTRO/1'
+        );
+
+
+      reqDetalle.flush(
+        {
+          success: false,
+          message: 'Error',
+          data: null,
+          timestamp: ''
+        },
+        {
+          status: 500,
+          statusText:
+            'Server Error'
+        }
+      );
+
+
+      fixture.detectChanges();
+
+
+      expect(
+        component.errorDetalle()
+      ).toBe(
+        component
+          .detalleEtiquetas
+          .errorCarga
+      );
+
+
+      expect(
+        component.cargandoDetalle()
+      ).toBe(false);
+    }
+  );
+
+
+  it(
+    'debe abrir y cerrar el modal de detalle',
+    () => {
+
+      component.puntoSeleccionado.set(
+        PUNTO_MOCK
+      );
+
+
+      component.abrirModalDetalle();
+
+
+      expect(
+        component.mostrarModalDetalle()
+      ).toBe(true);
+
+
+      component.cerrarModalCompleto();
+
+
+      expect(
+        component.mostrarModalDetalle()
+      ).toBe(false);
+    }
+  );
+
+
+  it(
+    'debe distinguir puntos con el mismo id usando el origen',
+    () => {
+
+      const centro: PuntoMapa = {
+        ...PUNTO_MOCK,
+        id: 1,
+        origen: 'CENTRO'
+      };
+
+
+      const puntoAyuda: PuntoMapa = {
+        ...PUNTO_REFUGIO_MOCK,
+        id: 1,
+        origen: 'PUNTO_AYUDA'
+      };
+
+
+      component.puntos.set([
+        centro,
+        puntoAyuda
+      ]);
+
+
+      expect(
+        centro.id
+      ).toBe(
+        puntoAyuda.id
+      );
+
+
+      expect(
+        centro.origen
+      ).not.toBe(
+        puntoAyuda.origen
+      );
+    }
+  );
+
 
   const responderDetalle = (
     punto: PuntoMapa
@@ -854,3 +1039,5 @@ describe('Mapa', () => {
   );
 
 });
+
+

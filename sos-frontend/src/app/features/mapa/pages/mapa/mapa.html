@@ -245,7 +245,13 @@
             >
               {{ detalleEtiquetas.comoLlegar }}
             </button>
-            <button class="boton-principal">{{ detalleEtiquetas.verCentro }}</button>
+            <button
+              type="button"
+              class="boton-principal"
+              (click)="abrirModalDetalle()"
+            >
+              {{ detalleEtiquetas.verCentro }}
+            </button>
           </div>
 
           <button class="reportar">{{ detalleEtiquetas.reportar }}</button>
@@ -254,3 +260,279 @@
     }
   </section>
 </section>
+
+<!-- ==========================================
+     SOS-36 - MODAL DETALLE COMPLETO
+     ========================================== -->
+
+@if (
+mostrarModalDetalle()
+&&
+puntoSeleccionado()
+) {
+
+<div
+  class="detalle-modal-overlay"
+  (click)="cerrarModalCompleto()"
+>
+
+  <article
+    class="detalle-modal"
+    (click)="$event.stopPropagation()"
+  >
+
+    <button
+      type="button"
+      class="detalle-modal-cerrar"
+      (click)="cerrarModalCompleto()"
+      aria-label="Cerrar detalle"
+    >
+      ✕
+    </button>
+
+
+    @if (cargandoDetalle()) {
+
+    <p class="detalle-modal-estado">
+      {{ detalleEtiquetas.cargando }}
+    </p>
+
+    }
+
+
+    @if (errorDetalle()) {
+
+    <p class="detalle-modal-error">
+      {{ errorDetalle() }}
+    </p>
+
+    }
+
+
+    <div class="detalle-modal-etiquetas">
+
+        <span
+          class="tag {{
+            obtenerClaseTipo(
+              puntoSeleccionado()!.tipo
+            )
+          }}"
+        >
+          {{
+            obtenerEtiquetaTipo(
+              puntoSeleccionado()!.tipo
+            )
+          }}
+        </span>
+
+
+      @if (
+      estaVerificado(
+      puntoSeleccionado()!
+      )
+      ) {
+
+      <span class="modal-verificado">
+            ✓ {{ textos.verificado }}
+          </span>
+
+      } @else {
+
+      <span class="modal-pendiente">
+            {{ textos.verificacionPendiente }}
+          </span>
+
+      }
+
+    </div>
+
+
+    <h2 class="detalle-modal-titulo">
+      {{ puntoSeleccionado()!.nombre }}
+    </h2>
+
+
+    <p class="detalle-modal-ubicacion">
+      {{ puntoSeleccionado()!.ciudad }}
+      ·
+      {{ puntoSeleccionado()!.departamentoNombre }}
+    </p>
+
+
+    @if (
+    puntoSeleccionado()!.descripcion
+    ) {
+
+    <p class="detalle-modal-descripcion">
+      {{ puntoSeleccionado()!.descripcion }}
+    </p>
+
+    }
+
+
+    @if (
+    puntoSeleccionado()!.direccion
+    ) {
+
+    <section class="modal-bloque">
+
+          <span class="modal-label">
+            {{ detalleEtiquetas.direccionEtiqueta }}
+          </span>
+
+      <p>
+        {{ puntoSeleccionado()!.direccion }}
+      </p>
+
+    </section>
+
+    }
+
+
+    @if (
+    puntoSeleccionado()!.telefono
+    ||
+    puntoSeleccionado()!.email
+    ) {
+
+    <section class="modal-bloque">
+
+          <span class="modal-label">
+            {{ detalleEtiquetas.contactoEtiqueta }}
+          </span>
+
+
+      @if (
+      puntoSeleccionado()!.telefono
+      ) {
+
+      <p>
+        {{ puntoSeleccionado()!.telefono }}
+      </p>
+
+      }
+
+
+      @if (
+      puntoSeleccionado()!.email
+      ) {
+
+      <p>
+        <a
+          class="modal-contacto-link"
+          [href]="
+                  'mailto:'
+                  +
+                  puntoSeleccionado()!.email
+                "
+        >
+          {{ puntoSeleccionado()!.email }}
+        </a>
+      </p>
+
+      }
+
+    </section>
+
+    }
+
+
+    @if (
+    puntoSeleccionado()!
+    .necesidades
+    ?.length
+    ) {
+
+    <section class="modal-bloque">
+
+          <span class="modal-label">
+            {{
+              detalleEtiquetas
+                .necesidadesEtiqueta
+            }}
+          </span>
+
+
+      <div class="modal-necesidades">
+
+        @for (
+        necesidad
+        of
+        puntoSeleccionado()!.necesidades;
+        track necesidad
+        ) {
+
+        <span>
+                {{ necesidad }}
+              </span>
+
+        }
+
+      </div>
+
+    </section>
+
+    }
+
+
+    @if (
+    puntoSeleccionado()!
+    .fechaActualizacion
+    ) {
+
+    <section class="modal-actualizacion">
+
+          <span>
+            {{
+              detalleEtiquetas
+                .actualizadoEtiqueta
+            }}
+          </span>
+
+      <strong>
+        {{
+        formatearFechaActualizacion(
+        puntoSeleccionado()!
+        .fechaActualizacion
+        )
+        }}
+      </strong>
+
+    </section>
+
+    }
+
+
+    <div class="modal-acciones">
+
+      <button
+        type="button"
+        class="modal-como-llegar"
+        (click)="
+            comoLlegar(
+              puntoSeleccionado()!
+            )
+          "
+      >
+        ⌖
+        {{ detalleEtiquetas.comoLlegar }}
+      </button>
+
+    </div>
+
+
+    <button
+      type="button"
+      class="modal-reportar"
+      disabled
+      title="Funcionalidad pendiente"
+    >
+      ⚠
+      {{ detalleEtiquetas.reportar }}
+    </button>
+
+  </article>
+
+</div>
+
+}
