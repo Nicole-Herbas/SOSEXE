@@ -516,7 +516,7 @@ readonly actividadesVoluntariado =
     if (archivo.size > this.MAX_FILE_SIZE) {
 
       this.errorArchivo =
-        this.textos.archivos.formatoInvalido;
+        this.textos.archivos.archivoGrande;
 
       input.value = '';
 
