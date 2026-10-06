@@ -759,10 +759,10 @@ describe('Mapa', () => {
 
       expect(
         component
-          .filtroNecesidadActivo()
-      ).toBe(
+          .filtrosNecesidadActivos()
+      ).toEqual([
         'Ropa'
-      );
+      ]);
 
 
       expect(
@@ -847,10 +847,10 @@ describe('Mapa', () => {
 
       expect(
         component
-          .filtroNecesidadActivo()
-      ).toBe(
+          .filtrosNecesidadActivos()
+      ).toEqual([
         'Ropa'
-      );
+      ]);
 
 
       expect(

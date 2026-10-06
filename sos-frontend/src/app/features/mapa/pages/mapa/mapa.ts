@@ -103,10 +103,8 @@ export class Mapa implements OnInit {
       FILTROS_TIPO_MAPA[0].id
     );
 
-  filtroNecesidadActivo =
-    signal<string>(
-      FILTROS_NECESIDAD_MAPA[0].id
-    );
+  filtrosNecesidadActivos =
+    signal<string[]>([]);
 
 
   // ==========================================
@@ -157,18 +155,19 @@ export class Mapa implements OnInit {
 
       }
 
+      const necesidades =
+        this.filtrosNecesidadActivos();
 
-      const necesidad =
-        this.filtroNecesidadActivo();
 
-
-      if (necesidad !== 'todas') {
+      if (necesidades.length > 0) {
 
         resultado =
           resultado.filter(
-            p =>
-              p.necesidades?.includes(
-                necesidad
+            punto =>
+              necesidades.every(
+                necesidad =>
+                  punto.necesidades
+                    ?.includes(necesidad)
               )
           );
 
@@ -279,9 +278,39 @@ export class Mapa implements OnInit {
     id: string
   ): void {
 
-    this.filtroNecesidadActivo.set(
+    if (id === 'todas') {
+
+      this.filtrosNecesidadActivos.set(
+        []
+      );
+
+      return;
+    }
+
+
+    const seleccionadas =
+      this.filtrosNecesidadActivos();
+
+
+    if (
+      seleccionadas.includes(id)
+    ) {
+
+      this.filtrosNecesidadActivos.set(
+        seleccionadas.filter(
+          necesidad =>
+            necesidad !== id
+        )
+      );
+
+      return;
+    }
+
+
+    this.filtrosNecesidadActivos.set([
+      ...seleccionadas,
       id
-    );
+    ]);
   }
 
 

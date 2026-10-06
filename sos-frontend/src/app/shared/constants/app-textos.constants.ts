@@ -266,9 +266,20 @@ mapa: {
   contadorVerificados:
     'puntos verificados',
 
+  seleccionaPuntoTitulo:
+    'Selecciona un punto',
+
+  seleccionaPuntoDescripcion:
+    'Elige un punto del mapa o de la lista para consultar su información.',
+
   detalle: {
     direccionEtiqueta:
       'DIRECCIÓN',
+    seleccionaPuntoTitulo:
+      'Selecciona un punto',
+
+    seleccionaPuntoDescripcion:
+      'Elige un punto del mapa o de la lista para consultar su información.',
 
     horarioEtiqueta:
       'HORARIO O ESTADO',
