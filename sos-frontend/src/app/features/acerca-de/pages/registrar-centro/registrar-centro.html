@@ -544,18 +544,42 @@
 
           <div class="field">
 
-            <label>
-              Correo electrónico
-              <span>*</span>
-            </label>
+  <label for="correoResponsable">
+    Correo electrónico
+    <span>*</span>
+  </label>
 
-            <input
-              type="email"
-              [(ngModel)]="correoResponsable"
-              placeholder="correo@centro.org"
-            />
+  <input
+    id="correoResponsable"
+    name="correoResponsable"
+    type="email"
+    [(ngModel)]="correoResponsable"
+    #correoResponsableControl="ngModel"
+    placeholder="correo@centro.org"
+    required
+    email
+  />
 
-          </div>
+  @if (
+    correoResponsableControl.invalid &&
+    correoResponsableControl.touched
+  ) {
+
+      @if (correoResponsableControl.errors?.['required']) {
+        <div class="field-error">
+          El correo electrónico es obligatorio.
+        </div>
+      }
+
+      @if (correoResponsableControl.errors?.['email']) {
+        <div class="field-error">
+          Ingresa un correo electrónico válido.
+        </div>
+      }
+
+    }
+
+  </div>
 
         </div>
 
@@ -708,7 +732,7 @@
             <button
               type="button"
               class="btn primary"
-              [disabled]="!paso2Valido"
+              [disabled]="!paso2Valido || correoResponsableControl.invalid"
               (click)="continuar()"
             >
               Continuar →
@@ -2342,21 +2366,15 @@
       <div class="file-preview-content">
 
         @if (esImagenArchivoVistaPrevia) {
-
           <img
             [src]="urlArchivoVistaPrevia"
-            [alt]="
-              archivoVistaPrevia?.name || 'Documento'
-            "
+            [alt]="archivoVistaPrevia?.name || 'Documento'"
           />
-
         } @else {
-
           <iframe
             [src]="urlSeguraVistaPrevia"
             title="Vista previa del documento"
           ></iframe>
-
         }
 
       </div>
