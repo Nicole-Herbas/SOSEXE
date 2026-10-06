@@ -1,14 +1,19 @@
 package bo.edu.sos.backend.service;
 
-import bo.edu.sos.backend.constants.EstadoVerificacion;
+import bo.edu.sos.backend.constants.EstadoSolicitudCentro;
+import bo.edu.sos.backend.dto.CambiarEstadoSolicitudDTO;
 import bo.edu.sos.backend.dto.SolicitudCentroDTO;
 import bo.edu.sos.backend.entity.Departamento;
 import bo.edu.sos.backend.entity.SolicitudCentro;
+import bo.edu.sos.backend.entity.Usuario;
 import bo.edu.sos.backend.exception.BadRequestException;
 import bo.edu.sos.backend.exception.ResourceNotFoundException;
 import bo.edu.sos.backend.repository.DepartamentoRepository;
 import bo.edu.sos.backend.repository.SolicitudCentroRepository;
+import bo.edu.sos.backend.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.FileSystemUtils;
@@ -20,6 +25,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -37,24 +43,38 @@ public class SolicitudCentroService {
             "image/webp", ".webp"
     );
 
+    // SOS-43: extensión -> tipo de contenido (para devolver el documento)
+    private static final Map<String, String> TIPO_POR_EXTENSION = Map.of(
+            ".pdf", "application/pdf",
+            ".jpg", "image/jpeg",
+            ".png", "image/png",
+            ".webp", "image/webp"
+    );
+
+    /** SOS-43: documento listo para enviarlo al navegador. */
+    public record DocumentoSolicitud(Resource recurso, String contentType, String nombre) {}
+
     private final SolicitudCentroRepository solicitudCentroRepository;
     private final DepartamentoRepository departamentoRepository;
+    private final UsuarioRepository usuarioRepository;
+    private final Path carpetaUploads;
     private final Path carpetaBase;
 
     public SolicitudCentroService(
             SolicitudCentroRepository solicitudCentroRepository,
             DepartamentoRepository departamentoRepository,
+            UsuarioRepository usuarioRepository,
             @Value("${app.uploads.dir:uploads}") String uploadsDir) {
 
         this.solicitudCentroRepository = solicitudCentroRepository;
         this.departamentoRepository = departamentoRepository;
-        this.carpetaBase = Paths.get(uploadsDir, "solicitudes-centro")
-                .toAbsolutePath()
-                .normalize();
+        this.usuarioRepository = usuarioRepository;
+        this.carpetaUploads = Paths.get(uploadsDir).toAbsolutePath().normalize();
+        this.carpetaBase = carpetaUploads.resolve("solicitudes-centro");
     }
 
     // ==========================================
-    // CREAR SOLICITUD (datos + documentos)
+    // CREAR SOLICITUD (SOS-41)
     // ==========================================
 
     @Transactional
@@ -65,28 +85,24 @@ public class SolicitudCentroService {
             MultipartFile identidad,
             MultipartFile domicilio) {
 
-        // 1. Validar los 4 documentos ANTES de guardar nada
         validarArchivo(personeria, "personería jurídica");
         validarArchivo(nit, "NIT");
         validarArchivo(identidad, "identidad del representante");
         validarArchivo(domicilio, "respaldo de domicilio");
 
-        // 2. Guardar la solicitud para obtener su ID (siempre PENDIENTE)
         SolicitudCentro solicitud = new SolicitudCentro();
         copiarDTOaEntidad(dto, solicitud);
-        solicitud.setEstado(EstadoVerificacion.PENDIENTE);
+        solicitud.setEstado(EstadoSolicitudCentro.PENDIENTE);
 
         SolicitudCentro guardada = solicitudCentroRepository.save(solicitud);
         Long id = guardada.getId();
 
-        // 3. Guardar los archivos en disco y registrar sus rutas
         try {
             guardada.setPersoneriaArchivo(guardarArchivo(personeria, id, "personeria"));
             guardada.setNitArchivo(guardarArchivo(nit, id, "nit"));
             guardada.setIdentidadArchivo(guardarArchivo(identidad, id, "identidad"));
             guardada.setDomicilioArchivo(guardarArchivo(domicilio, id, "domicilio"));
         } catch (RuntimeException e) {
-            // La BD hace rollback sola; aquí borramos los archivos que alcanzaron a guardarse
             eliminarCarpeta(id);
             throw e;
         }
@@ -101,7 +117,7 @@ public class SolicitudCentroService {
     @Transactional(readOnly = true)
     public List<SolicitudCentroDTO> listarTodas() {
 
-        return solicitudCentroRepository.findAll()
+        return solicitudCentroRepository.findAllByOrderByFechaCreacionDesc()
                 .stream()
                 .map(this::convertirADTO)
                 .toList();
@@ -109,22 +125,116 @@ public class SolicitudCentroService {
 
     @Transactional(readOnly = true)
     public SolicitudCentroDTO buscarPorId(Long id) {
-
-        SolicitudCentro solicitud = solicitudCentroRepository.findById(id)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Solicitud de centro", id));
-
-        return convertirADTO(solicitud);
+        return convertirADTO(obtenerSolicitud(id));
     }
 
     @Transactional(readOnly = true)
     public List<SolicitudCentroDTO> listarPorEstado(String estado) {
 
+        String estadoNormalizado = estado.trim().toUpperCase();
+
+        if (!EstadoSolicitudCentro.TODOS.contains(estadoNormalizado)) {
+            throw new BadRequestException("Estado no válido: " + estado);
+        }
+
         return solicitudCentroRepository
-                .findByEstado(estado.toUpperCase())
+                .findByEstadoOrderByFechaCreacionDesc(estadoNormalizado)
                 .stream()
                 .map(this::convertirADTO)
                 .toList();
+    }
+
+    // ==========================================
+    // SOS-43: CAMBIAR ESTADO (aprobar / rechazar / pedir cambios)
+    // ==========================================
+
+    @Transactional
+    public SolicitudCentroDTO cambiarEstado(
+            Long id,
+            CambiarEstadoSolicitudDTO dto,
+            String emailAdmin) {
+
+        SolicitudCentro solicitud = obtenerSolicitud(id);
+
+        String nuevoEstado = dto.getEstado().trim().toUpperCase();
+        String observacion = dto.getObservacion() == null
+                ? null
+                : dto.getObservacion().trim();
+
+        // 1. Solo APROBADA, RECHAZADA o CAMBIOS_SOLICITADOS
+        if (!EstadoSolicitudCentro.RESULTADOS_REVISION.contains(nuevoEstado)) {
+            throw new BadRequestException(
+                    "Estado no válido. Usa APROBADA, RECHAZADA o CAMBIOS_SOLICITADOS.");
+        }
+
+        // 2. Una solicitud aprobada o rechazada ya no se puede volver a revisar
+        String estadoActual = solicitud.getEstado();
+
+        if (!EstadoSolicitudCentro.PENDIENTE.equals(estadoActual)
+                && !EstadoSolicitudCentro.CAMBIOS_SOLICITADOS.equals(estadoActual)) {
+            throw new BadRequestException(
+                    "La solicitud ya fue revisada (estado actual: " + estadoActual + ").");
+        }
+
+        // 3. Rechazar o pedir cambios exige explicar el motivo
+        if (EstadoSolicitudCentro.REQUIEREN_OBSERVACION.contains(nuevoEstado)
+                && (observacion == null || observacion.isEmpty())) {
+            throw new BadRequestException(
+                    "Debes escribir una observación para rechazar o solicitar cambios.");
+        }
+
+        // 4. Quién revisó
+        Usuario admin = usuarioRepository.findByEmail(emailAdmin)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "No se encontró el usuario administrador"));
+
+        // 5. Guardar el resultado de la revisión
+        solicitud.setEstado(nuevoEstado);
+        solicitud.setObservacionAdmin(
+                (observacion == null || observacion.isEmpty()) ? null : observacion);
+        solicitud.setFechaRevision(LocalDateTime.now());
+        solicitud.setRevisadoPor(admin);
+
+        return convertirADTO(solicitudCentroRepository.save(solicitud));
+    }
+
+    // ==========================================
+    // SOS-43: VER DOCUMENTOS (solo ADMIN)
+    // ==========================================
+
+    @Transactional(readOnly = true)
+    public DocumentoSolicitud obtenerDocumento(Long id, String tipo) {
+
+        SolicitudCentro solicitud = obtenerSolicitud(id);
+
+        String rutaRelativa = switch (tipo) {
+            case "personeria" -> solicitud.getPersoneriaArchivo();
+            case "nit" -> solicitud.getNitArchivo();
+            case "identidad" -> solicitud.getIdentidadArchivo();
+            case "domicilio" -> solicitud.getDomicilioArchivo();
+            default -> throw new BadRequestException(
+                    "Tipo de documento no válido: " + tipo);
+        };
+
+        if (rutaRelativa == null || rutaRelativa.isBlank()) {
+            throw new ResourceNotFoundException(
+                    "La solicitud no tiene el documento: " + tipo);
+        }
+
+        Path archivo = carpetaUploads.resolve(rutaRelativa).normalize();
+
+        // Seguridad: nunca leer fuera de la carpeta uploads
+        if (!archivo.startsWith(carpetaUploads) || !Files.exists(archivo)) {
+            throw new ResourceNotFoundException(
+                    "No se encontró el archivo del documento: " + tipo);
+        }
+
+        String nombre = archivo.getFileName().toString();
+        String extension = nombre.substring(nombre.lastIndexOf('.'));
+        String contentType = TIPO_POR_EXTENSION
+                .getOrDefault(extension, "application/octet-stream");
+
+        return new DocumentoSolicitud(new FileSystemResource(archivo), contentType, nombre);
     }
 
     // ==========================================
@@ -134,8 +244,7 @@ public class SolicitudCentroService {
     private void validarArchivo(MultipartFile archivo, String nombreDocumento) {
 
         if (archivo == null || archivo.isEmpty()) {
-            throw new BadRequestException(
-                    "Falta el documento: " + nombreDocumento);
+            throw new BadRequestException("Falta el documento: " + nombreDocumento);
         }
 
         if (!TIPOS_PERMITIDOS.containsKey(archivo.getContentType())) {
@@ -156,8 +265,6 @@ public class SolicitudCentroService {
             Path carpeta = carpetaBase.resolve(String.valueOf(solicitudId));
             Files.createDirectories(carpeta);
 
-            // Nombre generado por el servidor: evita choques de nombres
-            // y que alguien mande nombres peligrosos como "../../archivo"
             String extension = TIPOS_PERMITIDOS.get(archivo.getContentType());
             String nombreArchivo = tipo + "_" + UUID.randomUUID() + extension;
 
@@ -167,7 +274,6 @@ public class SolicitudCentroService {
                 Files.copy(entrada, destino, StandardCopyOption.REPLACE_EXISTING);
             }
 
-            // En BD se guarda la ruta relativa: solicitudes-centro/{id}/{archivo}
             return "solicitudes-centro/" + solicitudId + "/" + nombreArchivo;
 
         } catch (IOException e) {
@@ -177,16 +283,21 @@ public class SolicitudCentroService {
 
     private void eliminarCarpeta(Long solicitudId) {
         try {
-            FileSystemUtils.deleteRecursively(
-                    carpetaBase.resolve(String.valueOf(solicitudId)));
+            FileSystemUtils.deleteRecursively(carpetaBase.resolve(String.valueOf(solicitudId)));
         } catch (IOException ignored) {
-            // Si no se puede borrar, no ocultamos el error original
+            // No ocultamos el error original
         }
     }
 
     // ==========================================
     // CONVERSIONES
     // ==========================================
+
+    private SolicitudCentro obtenerSolicitud(Long id) {
+        return solicitudCentroRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Solicitud de centro", id));
+    }
 
     private void copiarDTOaEntidad(SolicitudCentroDTO dto, SolicitudCentro solicitud) {
 
@@ -211,8 +322,7 @@ public class SolicitudCentroService {
         solicitud.setDireccionExacta(dto.getDireccionExacta());
         solicitud.setReferencia(dto.getReferencia());
 
-        // Las rutas de archivos y el estado NO se toman del DTO:
-        // los define el servidor.
+        // Rutas de archivos, estado y revisión los define el servidor
 
         solicitud.setNecesidades(unirLista(dto.getNecesidades()));
         solicitud.setDonaciones(unirLista(dto.getDonaciones()));
@@ -239,6 +349,7 @@ public class SolicitudCentroService {
 
         if (solicitud.getDepartamento() != null) {
             dto.setDepartamentoId(solicitud.getDepartamento().getId());
+            dto.setDepartamentoNombre(solicitud.getDepartamento().getNombre());
         }
 
         dto.setNit(solicitud.getNit());
@@ -272,6 +383,15 @@ public class SolicitudCentroService {
         dto.setDescripcionVoluntariado(solicitud.getDescripcionVoluntariado());
 
         dto.setEstado(solicitud.getEstado());
+
+        // SOS-43
+        dto.setObservacionAdmin(solicitud.getObservacionAdmin());
+        dto.setFechaRevision(solicitud.getFechaRevision());
+        dto.setFechaCreacion(solicitud.getFechaCreacion());
+
+        if (solicitud.getRevisadoPor() != null) {
+            dto.setRevisadoPor(solicitud.getRevisadoPor().getNombre());
+        }
 
         return dto;
     }

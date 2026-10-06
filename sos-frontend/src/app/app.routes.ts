@@ -10,6 +10,7 @@ import { RegistrarCentroComponent } from './features/acerca-de/pages/registrar-c
 import { LoginComponent } from './features/auth/pages/login/login';
 import { RegistroComponent } from './features/auth/pages/registro/registro';
 import { adminGuard } from './admin-guard';
+import { ListaSolicitudes } from './features/solicitudes-centro/pages/lista-solicitudes/lista-solicitudes';
 
 export const routes: Routes = [
   {
@@ -58,8 +59,9 @@ export const routes: Routes = [
     component: RegistroComponent
   },
   {
-    path: 'admin',
-    component: ListaCentros,
-    canActivate: [adminGuard]
-  }
+  path: 'admin',
+  component: ListaSolicitudes,
+  canActivate: [adminGuard]
+}
+
 ];

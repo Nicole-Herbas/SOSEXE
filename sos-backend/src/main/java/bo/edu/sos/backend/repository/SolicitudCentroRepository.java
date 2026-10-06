@@ -8,5 +8,7 @@ import java.util.List;
 public interface SolicitudCentroRepository
         extends JpaRepository<SolicitudCentro, Long> {
 
-    List<SolicitudCentro> findByEstado(String estado);
+    List<SolicitudCentro> findAllByOrderByFechaCreacionDesc();
+
+    List<SolicitudCentro> findByEstadoOrderByFechaCreacionDesc(String estado);
 }

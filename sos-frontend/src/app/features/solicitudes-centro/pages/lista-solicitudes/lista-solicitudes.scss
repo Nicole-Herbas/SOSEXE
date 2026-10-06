@@ -1,0 +1,404 @@
+:host {
+  display: block;
+}
+
+.admin-page {
+  min-height: calc(100vh - 80px);
+  padding: 40px 6%;
+  background: #f6f8f9;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 24px;
+  margin-bottom: 32px;
+}
+
+.eyebrow {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  color: #168276;
+}
+
+h1 {
+  margin: 0;
+  color: #183b45;
+  font-size: 32px;
+}
+
+.page-header p {
+  margin-top: 8px;
+  color: #66777c;
+}
+
+.refresh-button,
+.primary-button {
+  border: none;
+  border-radius: 10px;
+  padding: 11px 18px;
+  background: #168276;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 28px;
+}
+
+.filters button {
+  border: 1px solid #d8e1e3;
+  border-radius: 20px;
+  padding: 9px 16px;
+  background: white;
+  color: #52666b;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.filters button:hover {
+  border-color: #168276;
+}
+
+.filters button.active {
+  background: #168276;
+  color: white;
+  border-color: #168276;
+}
+
+.solicitudes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
+  gap: 20px;
+}
+
+.solicitud-card {
+  background: white;
+  border: 1px solid #e3eaec;
+  border-radius: 18px;
+  padding: 22px;
+  box-shadow: 0 5px 20px rgba(24, 59, 69, 0.06);
+}
+
+.card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 18px;
+}
+
+.status {
+  display: inline-flex;
+  padding: 6px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.status.pending {
+  background: #fff4d6;
+  color: #986b00;
+}
+
+.status.approved {
+  background: #dcf6ec;
+  color: #18794e;
+}
+
+.status.rejected {
+  background: #fde5e5;
+  color: #a63131;
+}
+
+.status.changes {
+  background: #e8e5ff;
+  color: #5548a6;
+}
+
+.request-id {
+  color: #87979b;
+  font-size: 13px;
+}
+
+.solicitud-card h2 {
+  margin: 0;
+  color: #183b45;
+  font-size: 20px;
+}
+
+.organization {
+  margin: 6px 0 22px;
+  color: #718287;
+}
+
+.info {
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+  margin-bottom: 22px;
+}
+
+.info div {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.info span,
+.details-grid span {
+  color: #8a999d;
+  font-size: 12px;
+}
+
+.info strong,
+.details-grid strong {
+  color: #30474d;
+  font-size: 14px;
+}
+
+.card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.card-actions button {
+  border: none;
+  border-radius: 9px;
+  padding: 9px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.details-button {
+  background: #edf2f3;
+  color: #365159;
+}
+
+.approve-button {
+  background: #168276;
+  color: white;
+}
+
+.reject-button {
+  background: #f9e6e6;
+  color: #a33131;
+}
+
+.state-message,
+.empty-state {
+  background: white;
+  border-radius: 16px;
+  padding: 50px;
+  text-align: center;
+  color: #718287;
+}
+
+.loader {
+  width: 30px;
+  height: 30px;
+  margin: 0 auto 15px;
+  border: 3px solid #dce8e8;
+  border-top-color: #168276;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(15, 35, 40, 0.55);
+}
+
+.modal {
+  width: min(760px, 100%);
+  max-height: 90vh;
+  overflow: auto;
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 26px 28px;
+  border-bottom: 1px solid #edf1f2;
+}
+
+.modal-header h2 {
+  margin: 0;
+  color: #183b45;
+}
+
+.close-button {
+  border: none;
+  background: transparent;
+  font-size: 28px;
+  color: #6d7c80;
+  cursor: pointer;
+}
+
+.modal-content {
+  padding: 28px;
+}
+
+.modal-content section {
+  margin-bottom: 30px;
+}
+
+.modal-content h3 {
+  margin-bottom: 18px;
+  color: #183b45;
+}
+
+.details-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 18px;
+}
+
+.details-grid div {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.details-grid .full {
+  grid-column: 1 / -1;
+}
+
+.review-section {
+  padding-top: 25px;
+  border-top: 1px solid #edf1f2;
+}
+
+.state-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.state-buttons button {
+  border: 1px solid #d8e1e3;
+  border-radius: 9px;
+  padding: 10px 14px;
+  background: white;
+  color: #455b61;
+  cursor: pointer;
+}
+
+.state-buttons button.selected {
+  border-color: #168276;
+  background: #e4f4f1;
+  color: #126e64;
+  font-weight: 700;
+}
+
+.review-section label {
+  display: block;
+  margin-bottom: 8px;
+  color: #455b61;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.review-section textarea {
+  width: 100%;
+  min-height: 100px;
+  box-sizing: border-box;
+  resize: vertical;
+  border: 1px solid #d8e1e3;
+  border-radius: 10px;
+  padding: 12px;
+  font-family: inherit;
+  outline: none;
+}
+
+.review-section textarea:focus {
+  border-color: #168276;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 20px 28px;
+  border-top: 1px solid #edf1f2;
+}
+
+.cancel-button,
+.confirm-button {
+  border: none;
+  border-radius: 9px;
+  padding: 11px 18px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.cancel-button {
+  background: #edf2f3;
+  color: #455b61;
+}
+
+.confirm-button {
+  background: #168276;
+  color: white;
+}
+
+.confirm-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+@media (max-width: 700px) {
+
+  .admin-page {
+    padding: 28px 20px;
+  }
+
+  .page-header {
+    flex-direction: column;
+  }
+
+  .details-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .details-grid .full {
+    grid-column: auto;
+  }
+
+  .modal-backdrop {
+    padding: 10px;
+  }
+
+  .modal-header,
+  .modal-content,
+  .modal-footer {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+}
