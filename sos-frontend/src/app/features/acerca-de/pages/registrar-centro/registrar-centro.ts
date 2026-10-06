@@ -168,44 +168,6 @@ export class RegistrarCentroComponent implements OnInit {
     return this.documentosAdjuntos === 4;
   }
 
-  // ==========================================
-  // NECESIDADES Y VOLUNTARIADO - PASO 4
-  // ==========================================
-
-  necesidadesDisponibles = [
-    'Alimentos',
-    'Medicamentos',
-    'Ropa',
-    'Útiles escolares',
-    'Productos de higiene',
-    'Artículos para animales',
-    'Apoyo económico',
-    'Otro'
-  ];
-
-  donacionesDisponibles = [
-    'Alimentos',
-    'Ropa',
-    'Medicamentos',
-    'Útiles escolares',
-    'Productos de higiene',
-    'Dinero',
-    'Artículos para animales',
-    'Otro'
-  ];
-
-  actividadesVoluntariado = [
-    'Atención y acompañamiento',
-    'Apoyo educativo',
-    'Salud',
-    'Logística',
-    'Cocina',
-    'Limpieza',
-    'Cuidado de animales',
-    'Comunicación',
-    'Otro'
-  ];
-
   necesidadesSeleccionadas: string[] = [];
 
   donacionesSeleccionadas: string[] = [];
@@ -422,19 +384,17 @@ export class RegistrarCentroComponent implements OnInit {
       ?? 'No se pudo registrar la solicitud. Revisa los datos e intenta nuevamente.';
   }
 
-  // ==========================================
-  // TIPOS DE ORGANIZACIÓN
-  // ==========================================
+ readonly tiposOrganizacion =
+  this.textos.opciones.tiposOrganizacion;
 
-  tiposOrganizacion = [
-    'Centro de apoyo',
-    'Refugio',
-    'Organización no gubernamental',
-    'Fundación',
-    'Institución pública',
-    'Organización comunitaria',
-    'Otro'
-  ];
+readonly necesidadesDisponibles =
+  this.textos.opciones.necesidades;
+
+readonly donacionesDisponibles =
+  this.textos.opciones.donaciones;
+
+readonly actividadesVoluntariado =
+  this.textos.opciones.actividadesVoluntariado;
 
   // ==========================================
   // VALIDACIÓN DEL PASO 1
