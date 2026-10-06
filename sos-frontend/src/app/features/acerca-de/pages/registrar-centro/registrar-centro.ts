@@ -368,21 +368,21 @@ export class RegistrarCentroComponent implements OnInit {
 
   private mensajeDeError(error: HttpErrorResponse): string {
 
-    if (error.status === 401) {
-      return 'Tu sesión expiró. Inicia sesión nuevamente para enviar la solicitud.';
-    }
-
-    if (error.status === 413) {
-      return 'Los archivos superan el tamaño máximo permitido (10 MB por archivo).';
-    }
-
-    if (error.status === 422) {
-      return 'Algunos datos no son válidos. Revisa la información y completa lo que falta.';
-    }
-
-    return error.error?.message
-      ?? 'No se pudo registrar la solicitud. Revisa los datos e intenta nuevamente.';
+  if (error.status === 401) {
+    return this.textos.errores.sesionExpirada;
   }
+
+  if (error.status === 413) {
+    return this.textos.errores.archivosGrandes;
+  }
+
+  if (error.status === 422) {
+    return this.textos.errores.datosInvalidos;
+  }
+
+  return error.error?.message
+    ?? this.textos.errores.errorEnvio;
+}
 
  readonly tiposOrganizacion =
   this.textos.opciones.tiposOrganizacion;
