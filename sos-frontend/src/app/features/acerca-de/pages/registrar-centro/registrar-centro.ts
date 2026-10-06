@@ -516,7 +516,7 @@ readonly actividadesVoluntariado =
     if (archivo.size > this.MAX_FILE_SIZE) {
 
       this.errorArchivo =
-        'El archivo es demasiado grande. El tamaño máximo permitido es de 10 MB.';
+        this.textos.archivos.formatoInvalido;
 
       input.value = '';
 
