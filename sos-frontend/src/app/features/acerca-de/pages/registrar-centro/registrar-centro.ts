@@ -504,8 +504,8 @@ readonly actividadesVoluntariado =
 
     if (!tiposPermitidos.includes(archivo.type)) {
 
-      this.errorArchivo =
-        'Formato no válido. Solo se permiten archivos PDF, JPG, PNG o WEBP.';
+     this.errorArchivo =
+       this.textos.archivos.formatoInvalido;
 
       input.value = '';
 
