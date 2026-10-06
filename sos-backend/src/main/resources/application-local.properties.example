@@ -20,3 +20,4 @@ JWT_SECRET=sos-exe-desarrollo-local-secret-key-super-segura-2026-minimo-32-carac
 
 # Puerto del servidor (opcional, 8080 por defecto)
 # server.port=8080
+logging.level.bo.edu.sos.backend=DEBUG

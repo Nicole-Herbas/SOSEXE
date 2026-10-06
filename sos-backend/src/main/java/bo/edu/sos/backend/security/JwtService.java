@@ -2,17 +2,22 @@ package bo.edu.sos.backend.security;
 
 import bo.edu.sos.backend.constants.JwtClaims;
 import bo.edu.sos.backend.entity.Usuario;
+import bo.edu.sos.backend.helper.LogHelper;
+
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
+
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
+
 
 @Service
 public class JwtService {
@@ -20,55 +25,92 @@ public class JwtService {
     private final SecretKey key;
     private final long accessExpirationMs;
 
+
     public JwtService(
             @Value("${jwt.secret}") String secret,
             @Value("${jwt.access-expiration-ms}") long accessExpirationMs) {
 
-        this.key = Keys.hmacShaKeyFor(
-                secret.getBytes(StandardCharsets.UTF_8)
-        );
+        this.key =
+                Keys.hmacShaKeyFor(
+                        secret.getBytes(
+                                StandardCharsets.UTF_8
+                        )
+                );
 
-        this.accessExpirationMs = accessExpirationMs;
+        this.accessExpirationMs =
+                accessExpirationMs;
     }
 
 
-    public String generarToken(Usuario usuario) {
+    public String generarToken(
+            Usuario usuario) {
 
-        Date ahora = new Date();
+        Date ahora =
+                new Date();
+
 
         Date expiracion =
                 new Date(
-                        ahora.getTime() + accessExpirationMs
+                        ahora.getTime()
+                                + accessExpirationMs
                 );
 
 
-        return Jwts.builder()
-                .setSubject(usuario.getEmail())
-                .claim(JwtClaims.USUARIO_ID, usuario.getId())
-                .claim(
-                        JwtClaims.ROL,
-                        usuario.getRol().getNombre()
-                )
-                .setIssuedAt(ahora)
-                .setExpiration(expiracion)
-                .signWith(
-                        key,
-                        SignatureAlgorithm.HS256
-                )
-                .compact();
+        String token =
+                Jwts.builder()
+                        .setSubject(
+                                usuario.getEmail()
+                        )
+                        .claim(
+                                JwtClaims.USUARIO_ID,
+                                usuario.getId()
+                        )
+                        .claim(
+                                JwtClaims.ROL,
+                                usuario
+                                        .getRol()
+                                        .getNombre()
+                        )
+                        .setIssuedAt(
+                                ahora
+                        )
+                        .setExpiration(
+                                expiracion
+                        )
+                        .signWith(
+                                key,
+                                SignatureAlgorithm.HS256
+                        )
+                        .compact();
+
+
+        LogHelper.debug(
+                JwtService.class,
+                "JWT generado correctamente. usuarioId={}",
+                usuario.getId()
+        );
+
+
+        return token;
     }
 
 
-    public String extraerEmail(String token) {
+    public String extraerEmail(
+            String token) {
 
-        return extraerClaims(token)
+        return extraerClaims(
+                token
+        )
                 .getSubject();
     }
 
 
-    public String extraerRol(String token) {
+    public String extraerRol(
+            String token) {
 
-        return extraerClaims(token)
+        return extraerClaims(
+                token
+        )
                 .get(
                         JwtClaims.ROL,
                         String.class
@@ -76,31 +118,46 @@ public class JwtService {
     }
 
 
-    public boolean esValido(String token) {
+    public boolean esValido(
+            String token) {
 
         try {
 
             Claims claims =
-                    extraerClaims(token);
+                    extraerClaims(
+                            token
+                    );
+
 
             return claims
                     .getExpiration()
-                    .after(new Date());
+                    .after(
+                            new Date()
+                    );
 
-        } catch (JwtException |
-                 IllegalArgumentException ex) {
+        } catch (
+                JwtException
+                |
+                IllegalArgumentException ex
+        ) {
 
             return false;
         }
     }
 
 
-    private Claims extraerClaims(String token) {
+    private Claims extraerClaims(
+            String token) {
 
-        return Jwts.parserBuilder()
-                .setSigningKey(key)
+        return Jwts
+                .parserBuilder()
+                .setSigningKey(
+                        key
+                )
                 .build()
-                .parseClaimsJws(token)
+                .parseClaimsJws(
+                        token
+                )
                 .getBody();
     }
 }

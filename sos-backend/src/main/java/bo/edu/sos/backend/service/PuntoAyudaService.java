@@ -7,16 +7,19 @@ import bo.edu.sos.backend.entity.Necesidad;
 import bo.edu.sos.backend.entity.PuntoAyuda;
 import bo.edu.sos.backend.entity.Usuario;
 import bo.edu.sos.backend.exception.ResourceNotFoundException;
+import bo.edu.sos.backend.helper.LogHelper;
 import bo.edu.sos.backend.repository.DepartamentoRepository;
 import bo.edu.sos.backend.repository.NecesidadRepository;
 import bo.edu.sos.backend.repository.PuntoAyudaRepository;
 import bo.edu.sos.backend.repository.UsuarioRepository;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
 
 @Service
 public class PuntoAyudaService {
@@ -25,6 +28,7 @@ public class PuntoAyudaService {
     private final DepartamentoRepository departamentoRepository;
     private final UsuarioRepository usuarioRepository;
     private final NecesidadRepository necesidadRepository;
+
 
     public PuntoAyudaService(
             PuntoAyudaRepository puntoAyudaRepository,
@@ -38,130 +42,368 @@ public class PuntoAyudaService {
         this.necesidadRepository = necesidadRepository;
     }
 
+
     @Transactional(readOnly = true)
     public List<PuntoAyudaDTO> listarTodos() {
-        return puntoAyudaRepository.findAll()
-                .stream()
-                .map(this::convertirADTO)
-                .toList();
+
+        List<PuntoAyudaDTO> puntos =
+                puntoAyudaRepository
+                        .findAll()
+                        .stream()
+                        .map(this::convertirADTO)
+                        .toList();
+
+
+        LogHelper.debug(
+                PuntoAyudaService.class,
+                "Listado de puntos de ayuda obtenido. cantidad={}",
+                puntos.size()
+        );
+
+
+        return puntos;
     }
+
 
     @Transactional(readOnly = true)
-    public PuntoAyudaDTO buscarPorId(Long id) {
-        PuntoAyuda punto = puntoAyudaRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Punto de ayuda", id));
+    public PuntoAyudaDTO buscarPorId(
+            Long id) {
 
-        return convertirADTO(punto);
+        PuntoAyuda punto =
+                puntoAyudaRepository
+                        .findById(id)
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "Punto de ayuda",
+                                        id
+                                )
+                        );
+
+
+        LogHelper.debug(
+                PuntoAyudaService.class,
+                "Punto de ayuda consultado correctamente. id={}",
+                id
+        );
+
+
+        return convertirADTO(
+                punto
+        );
     }
+
 
     @Transactional(readOnly = true)
-    public List<PuntoAyudaDTO> buscarPorDepartamento(Long departamentoId) {
-        return puntoAyudaRepository.findByDepartamentoId(departamentoId)
-                .stream()
-                .map(this::convertirADTO)
-                .toList();
+    public List<PuntoAyudaDTO> buscarPorDepartamento(
+            Long departamentoId) {
+
+        List<PuntoAyudaDTO> puntos =
+                puntoAyudaRepository
+                        .findByDepartamentoId(
+                                departamentoId
+                        )
+                        .stream()
+                        .map(this::convertirADTO)
+                        .toList();
+
+
+        LogHelper.debug(
+                PuntoAyudaService.class,
+                "Puntos de ayuda consultados por departamento. departamentoId={}, cantidad={}",
+                departamentoId,
+                puntos.size()
+        );
+
+
+        return puntos;
     }
 
+
     @Transactional
-    public PuntoAyudaDTO guardar(PuntoAyudaDTO dto) {
+    public PuntoAyudaDTO guardar(
+            PuntoAyudaDTO dto) {
 
-        PuntoAyuda punto = new PuntoAyuda();
-        copiarDTOaEntidad(dto, punto);
-        punto.setEstadoVerificacion(EstadoVerificacion.PENDIENTE);
+        PuntoAyuda punto =
+                new PuntoAyuda();
 
-        PuntoAyuda guardado = puntoAyudaRepository.save(punto);
 
-        return convertirADTO(guardado);
+        copiarDTOaEntidad(
+                dto,
+                punto
+        );
+
+
+        punto.setEstadoVerificacion(
+                EstadoVerificacion.PENDIENTE
+        );
+
+
+        PuntoAyuda guardado =
+                puntoAyudaRepository.save(
+                        punto
+                );
+
+
+        LogHelper.info(
+                PuntoAyudaService.class,
+                "Punto de ayuda creado correctamente. id={}, estado={}",
+                guardado.getId(),
+                guardado.getEstadoVerificacion()
+        );
+
+
+        return convertirADTO(
+                guardado
+        );
     }
 
+
     @Transactional
-    public PuntoAyudaDTO actualizar(Long id, PuntoAyudaDTO dto) {
+    public PuntoAyudaDTO actualizar(
+            Long id,
+            PuntoAyudaDTO dto) {
 
-        PuntoAyuda punto = puntoAyudaRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Punto de ayuda", id));
+        PuntoAyuda punto =
+                puntoAyudaRepository
+                        .findById(id)
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "Punto de ayuda",
+                                        id
+                                )
+                        );
 
-        copiarDTOaEntidad(dto, punto);
 
-        PuntoAyuda actualizado = puntoAyudaRepository.save(punto);
+        copiarDTOaEntidad(
+                dto,
+                punto
+        );
 
-        return convertirADTO(actualizado);
+
+        PuntoAyuda actualizado =
+                puntoAyudaRepository.save(
+                        punto
+                );
+
+
+        LogHelper.info(
+                PuntoAyudaService.class,
+                "Punto de ayuda actualizado correctamente. id={}",
+                id
+        );
+
+
+        return convertirADTO(
+                actualizado
+        );
     }
 
+
     @Transactional
-    public void eliminar(Long id) {
+    public void eliminar(
+            Long id) {
 
         if (!puntoAyudaRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Punto de ayuda", id);
+
+            throw new ResourceNotFoundException(
+                    "Punto de ayuda",
+                    id
+            );
         }
 
-        puntoAyudaRepository.deleteById(id);
+
+        puntoAyudaRepository.deleteById(
+                id
+        );
+
+
+        LogHelper.info(
+                PuntoAyudaService.class,
+                "Punto de ayuda eliminado correctamente. id={}",
+                id
+        );
     }
 
-    private void copiarDTOaEntidad(PuntoAyudaDTO dto, PuntoAyuda punto) {
 
-        punto.setNombre(dto.getNombre());
-        punto.setTipo(dto.getTipo());
-        punto.setDescripcion(dto.getDescripcion());
-        punto.setDireccion(dto.getDireccion());
-        punto.setCiudad(dto.getCiudad());
-        punto.setLatitud(dto.getLatitud());
-        punto.setLongitud(dto.getLongitud());
+    private void copiarDTOaEntidad(
+            PuntoAyudaDTO dto,
+            PuntoAyuda punto) {
 
-        Departamento departamento = departamentoRepository
-                .findById(dto.getDepartamentoId())
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "Departamento", dto.getDepartamentoId()));
-        punto.setDepartamento(departamento);
+        punto.setNombre(
+                dto.getNombre()
+        );
 
-        Usuario creador = usuarioRepository
-                .findById(dto.getCreadorId())
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "Usuario", dto.getCreadorId()));
-        punto.setCreador(creador);
+        punto.setTipo(
+                dto.getTipo()
+        );
 
-        if (dto.getNecesidadIds() != null && !dto.getNecesidadIds().isEmpty()) {
-            Set<Necesidad> necesidades = new HashSet<>(
-                    necesidadRepository.findAllById(dto.getNecesidadIds()));
-            punto.setNecesidades(necesidades);
+        punto.setDescripcion(
+                dto.getDescripcion()
+        );
+
+        punto.setDireccion(
+                dto.getDireccion()
+        );
+
+        punto.setCiudad(
+                dto.getCiudad()
+        );
+
+        punto.setLatitud(
+                dto.getLatitud()
+        );
+
+        punto.setLongitud(
+                dto.getLongitud()
+        );
+
+
+        Departamento departamento =
+                departamentoRepository
+                        .findById(
+                                dto.getDepartamentoId()
+                        )
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "Departamento",
+                                        dto.getDepartamentoId()
+                                )
+                        );
+
+
+        punto.setDepartamento(
+                departamento
+        );
+
+
+        Usuario creador =
+                usuarioRepository
+                        .findById(
+                                dto.getCreadorId()
+                        )
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "Usuario",
+                                        dto.getCreadorId()
+                                )
+                        );
+
+
+        punto.setCreador(
+                creador
+        );
+
+
+        if (
+                dto.getNecesidadIds() != null
+                        &&
+                        !dto.getNecesidadIds().isEmpty()
+        ) {
+
+            Set<Necesidad> necesidades =
+                    new HashSet<>(
+                            necesidadRepository
+                                    .findAllById(
+                                            dto.getNecesidadIds()
+                                    )
+                    );
+
+
+            punto.setNecesidades(
+                    necesidades
+            );
+
         } else {
-            punto.setNecesidades(new HashSet<>());
+
+            punto.setNecesidades(
+                    new HashSet<>()
+            );
         }
     }
 
-    private PuntoAyudaDTO convertirADTO(PuntoAyuda punto) {
 
-        PuntoAyudaDTO dto = new PuntoAyudaDTO();
+    private PuntoAyudaDTO convertirADTO(
+            PuntoAyuda punto) {
 
-        dto.setId(punto.getId());
-        dto.setNombre(punto.getNombre());
-        dto.setTipo(punto.getTipo());
-        dto.setDescripcion(punto.getDescripcion());
-        dto.setDireccion(punto.getDireccion());
-        dto.setCiudad(punto.getCiudad());
-        dto.setLatitud(punto.getLatitud());
-        dto.setLongitud(punto.getLongitud());
-        dto.setEstadoVerificacion(punto.getEstadoVerificacion());
+        PuntoAyudaDTO dto =
+                new PuntoAyudaDTO();
+
+
+        dto.setId(
+                punto.getId()
+        );
+
+        dto.setNombre(
+                punto.getNombre()
+        );
+
+        dto.setTipo(
+                punto.getTipo()
+        );
+
+        dto.setDescripcion(
+                punto.getDescripcion()
+        );
+
+        dto.setDireccion(
+                punto.getDireccion()
+        );
+
+        dto.setCiudad(
+                punto.getCiudad()
+        );
+
+        dto.setLatitud(
+                punto.getLatitud()
+        );
+
+        dto.setLongitud(
+                punto.getLongitud()
+        );
+
+        dto.setEstadoVerificacion(
+                punto.getEstadoVerificacion()
+        );
+
 
         if (punto.getDepartamento() != null) {
-            dto.setDepartamentoId(punto.getDepartamento().getId());
+
+            dto.setDepartamentoId(
+                    punto.getDepartamento().getId()
+            );
+
             dto.setDepartamentoNombre(
-                    punto.getDepartamento().getNombre());
+                    punto.getDepartamento().getNombre()
+            );
         }
+
 
         if (punto.getCreador() != null) {
-            dto.setCreadorId(punto.getCreador().getId());
+
+            dto.setCreadorId(
+                    punto.getCreador().getId()
+            );
         }
 
+
         if (punto.getNecesidades() != null) {
+
             dto.setNecesidadIds(
-                    punto.getNecesidades().stream()
+                    punto.getNecesidades()
+                            .stream()
                             .map(Necesidad::getId)
-                            .toList());
+                            .toList()
+            );
+
+
             dto.setNecesidadNombres(
-                    punto.getNecesidades().stream()
+                    punto.getNecesidades()
+                            .stream()
                             .map(Necesidad::getNombre)
-                            .toList());
+                            .toList()
+            );
         }
+
 
         return dto;
     }

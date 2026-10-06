@@ -18,6 +18,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import java.util.List;
+import bo.edu.sos.backend.helper.LogHelper;
 
 
 @Configuration
@@ -242,24 +243,42 @@ public class SecurityConfig {
                         .authenticationEntryPoint(
                                 (request,
                                  response,
-                                 authException) ->
+                                 authException) -> {
 
-                                        response.sendError(
-                                                HttpServletResponse
-                                                        .SC_UNAUTHORIZED
-                                        )
+                                    LogHelper.debug(
+                                            SecurityConfig.class,
+                                            "Solicitud no autenticada rechazada. metodo={}, ruta={}",
+                                            request.getMethod(),
+                                            request.getRequestURI()
+                                    );
+
+
+                                    response.sendError(
+                                            HttpServletResponse
+                                                    .SC_UNAUTHORIZED
+                                    );
+                                }
                         )
 
 
                         .accessDeniedHandler(
                                 (request,
                                  response,
-                                 accessDeniedException) ->
+                                 accessDeniedException) -> {
 
-                                        response.sendError(
-                                                HttpServletResponse
-                                                        .SC_FORBIDDEN
-                                        )
+                                    LogHelper.debug(
+                                            SecurityConfig.class,
+                                            "Acceso denegado por permisos insuficientes. metodo={}, ruta={}",
+                                            request.getMethod(),
+                                            request.getRequestURI()
+                                    );
+
+
+                                    response.sendError(
+                                            HttpServletResponse
+                                                    .SC_FORBIDDEN
+                                    );
+                                }
                         )
                 )
 
