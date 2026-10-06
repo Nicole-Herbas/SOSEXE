@@ -10,6 +10,7 @@ import { RegistrarCentroComponent } from './features/acerca-de/pages/registrar-c
 import { LoginComponent } from './features/auth/pages/login/login';
 import { RegistroComponent } from './features/auth/pages/registro/registro';
 import { adminGuard } from './admin-guard';
+import { authGuard } from './auth-guard';
 
 export const routes: Routes = [
   {
@@ -43,7 +44,8 @@ export const routes: Routes = [
   },
   {
     path: 'acerca-de/registrar-centro',
-    component: RegistrarCentroComponent
+    component: RegistrarCentroComponent,
+    canActivate: [authGuard]
   },
   {
     path: 'centros',
