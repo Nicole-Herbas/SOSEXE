@@ -560,24 +560,28 @@
     email
   />
 
-  @if (
-    correoResponsableControl.invalid &&
-    correoResponsableControl.touched
-  ) {
+ @if (
+  correoResponsableControl.invalid &&
+  correoResponsableControl.touched
+) {
 
-      @if (correoResponsableControl.errors?.['required']) {
-        <div class="field-error">
-          El correo electrónico es obligatorio.
-        </div>
+  @if (correoResponsableControl.errors?.['required']) {
+    <div class="field-error">
+      El correo electrónico es obligatorio.
+    </div>
+  }
+
+  @if (correoResponsableControl.errors?.['email']) {
+    <div class="field-error">
+      @if (!correoResponsable.includes('@')) {
+        Te falta el símbolo @ en el correo.
+      } @else {
+        Ingresa un correo electrónico válido.
       }
+    </div>
+  }
 
-      @if (correoResponsableControl.errors?.['email']) {
-        <div class="field-error">
-          Ingresa un correo electrónico válido.
-        </div>
-      }
-
-    }
+}
 
   </div>
 
