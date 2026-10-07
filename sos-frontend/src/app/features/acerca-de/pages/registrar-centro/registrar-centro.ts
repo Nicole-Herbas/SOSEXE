@@ -1,10 +1,11 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { Router } from '@angular/router';
+import { Router} from '@angular/router';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 
 import { ApiResponse } from '../../../../shared/models/api-response';
+import { APP_TEXTOS } from '../../../../shared/constants/app-textos.constants';
 
 // Forma en que el backend devuelve cada departamento
 export interface Departamento {
@@ -15,11 +16,12 @@ export interface Departamento {
 @Component({
   selector: 'app-registrar-centro',
   standalone: true,
-  imports: [FormsModule],
+ imports: [FormsModule],
   templateUrl: './registrar-centro.html',
   styleUrl: './registrar-centro.scss'
 })
 export class RegistrarCentroComponent implements OnInit {
+  readonly textos = APP_TEXTOS.registrarCentro;
 
   constructor(
     private http: HttpClient,
@@ -89,8 +91,9 @@ export class RegistrarCentroComponent implements OnInit {
         error: (error) => {
           console.error('Error al cargar departamentos:', error);
           this.errorDepartamentos =
-            'No se pudieron cargar los departamentos. Recarga la página.';
-          this.cdr.detectChanges();
+            this.textos.errores.departamentos;
+          this.cdr.markForCheck();
+
         }
       });
   }
@@ -181,44 +184,6 @@ export class RegistrarCentroComponent implements OnInit {
   get paso3Valido(): boolean {
     return this.documentosAdjuntos === 4;
   }
-
-  // ==========================================
-  // NECESIDADES Y VOLUNTARIADO - PASO 4
-  // ==========================================
-
-  necesidadesDisponibles = [
-    'Alimentos',
-    'Medicamentos',
-    'Ropa',
-    'Útiles escolares',
-    'Productos de higiene',
-    'Artículos para animales',
-    'Apoyo económico',
-    'Otro'
-  ];
-
-  donacionesDisponibles = [
-    'Alimentos',
-    'Ropa',
-    'Medicamentos',
-    'Útiles escolares',
-    'Productos de higiene',
-    'Dinero',
-    'Artículos para animales',
-    'Otro'
-  ];
-
-  actividadesVoluntariado = [
-    'Atención y acompañamiento',
-    'Apoyo educativo',
-    'Salud',
-    'Logística',
-    'Cocina',
-    'Limpieza',
-    'Cuidado de animales',
-    'Comunicación',
-    'Otro'
-  ];
 
   necesidadesSeleccionadas: string[] = [];
 
@@ -420,35 +385,33 @@ export class RegistrarCentroComponent implements OnInit {
 
   private mensajeDeError(error: HttpErrorResponse): string {
 
-    if (error.status === 401) {
-      return 'Tu sesión expiró. Inicia sesión nuevamente para enviar la solicitud.';
-    }
-
-    if (error.status === 413) {
-      return 'Los archivos superan el tamaño máximo permitido (10 MB por archivo).';
-    }
-
-    if (error.status === 422) {
-      return 'Algunos datos no son válidos. Revisa la información y completa lo que falta.';
-    }
-
-    return error.error?.message
-      ?? 'No se pudo registrar la solicitud. Revisa los datos e intenta nuevamente.';
+  if (error.status === 401) {
+    return this.textos.errores.sesionExpirada;
   }
 
-  // ==========================================
-  // TIPOS DE ORGANIZACIÓN
-  // ==========================================
+  if (error.status === 413) {
+    return this.textos.errores.archivosGrandes;
+  }
 
-  tiposOrganizacion = [
-    'Centro de apoyo',
-    'Refugio',
-    'Organización no gubernamental',
-    'Fundación',
-    'Institución pública',
-    'Organización comunitaria',
-    'Otro'
-  ];
+  if (error.status === 422) {
+    return this.textos.errores.datosInvalidos;
+  }
+
+  return error.error?.message
+    ?? this.textos.errores.errorEnvio;
+}
+
+ readonly tiposOrganizacion =
+  this.textos.opciones.tiposOrganizacion;
+
+readonly necesidadesDisponibles =
+  this.textos.opciones.necesidades;
+
+readonly donacionesDisponibles =
+  this.textos.opciones.donaciones;
+
+readonly actividadesVoluntariado =
+  this.textos.opciones.actividadesVoluntariado;
 
   // ==========================================
   // VALIDACIÓN DEL PASO 1
@@ -558,8 +521,8 @@ export class RegistrarCentroComponent implements OnInit {
 
     if (!tiposPermitidos.includes(archivo.type)) {
 
-      this.errorArchivo =
-        'Formato no válido. Solo se permiten archivos PDF, JPG, PNG o WEBP.';
+     this.errorArchivo =
+       this.textos.archivos.formatoInvalido;
 
       input.value = '';
 
@@ -570,7 +533,7 @@ export class RegistrarCentroComponent implements OnInit {
     if (archivo.size > this.MAX_FILE_SIZE) {
 
       this.errorArchivo =
-        'El archivo es demasiado grande. El tamaño máximo permitido es de 10 MB.';
+        this.textos.archivos.archivoGrande;
 
       input.value = '';
 

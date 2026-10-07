@@ -1,38 +1,63 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { forkJoin, map, Observable } from 'rxjs';
+import { catchError, forkJoin, map, Observable, of } from 'rxjs';
 
 import { ApiResponse } from '../../../shared/models/api-response';
 import {
   Noticia,
   NoticiaExterna,
   NoticiaPublicada,
+  ResultadoNoticias,
+  ResultadoNoticiasExternas,
 } from '../models/noticia.model';
+import { normalizarCategoriaExterna } from '../utils/categoria-noticia';
 
 @Injectable({ providedIn: 'root' })
 export class NoticiaService {
   private readonly http = inject(HttpClient);
   private readonly apiUrl = '/api/noticias';
 
-  listarNoticias(): Observable<Noticia[]> {
+  listarNoticias(
+    fuentes: { propias?: boolean; externas?: boolean } = {},
+  ): Observable<ResultadoNoticias> {
+    const incluirPropias = fuentes.propias ?? true;
+    const incluirExternas = fuentes.externas ?? true;
+    const propias$ = incluirPropias
+      ? this.http.get<ApiResponse<NoticiaPublicada[]>>(`${this.apiUrl}/publicas`)
+      : of<ApiResponse<NoticiaPublicada[]>>({
+          success: true,
+          message: '',
+          data: [],
+          timestamp: '',
+        });
+    const externas$ = incluirExternas
+      ? this.http
+          .get<ApiResponse<ResultadoNoticiasExternas>>(`${this.apiUrl}/externas`)
+          .pipe(catchError(() => of(null)))
+      : of(null);
+
     return forkJoin({
-      publicadas: this.http.get<ApiResponse<NoticiaPublicada[]>>(
-        `${this.apiUrl}/publicas`,
-      ),
-      externas: this.http.get<ApiResponse<NoticiaExterna[]>>(
-        `${this.apiUrl}/externas`,
-      ),
+      publicadas: propias$,
+      externas: externas$,
     }).pipe(
-      map(({ publicadas, externas }) =>
-        [
+      map(({ publicadas, externas }) => {
+        const noticias = [
           ...publicadas.data.map((noticia) => this.normalizarPublicada(noticia)),
-          ...externas.data.map((noticia) => this.normalizarExterna(noticia)),
+          ...(externas?.data.noticias ?? []).map((noticia) => this.normalizarExterna(noticia)),
         ].sort(
           (a, b) =>
             this.aMilisegundos(b.fechaPublicacion) -
             this.aMilisegundos(a.fechaPublicacion),
-        ),
-      ),
+        );
+
+        return {
+          noticias,
+          apiExternaDisponible: incluirExternas
+            ? externas?.data.apiDisponible ?? false
+            : null,
+          noticiasExternasDesdeCache: externas?.data.desdeCache ?? false,
+        };
+      }),
     );
   }
 
@@ -58,7 +83,7 @@ export class NoticiaService {
       url: noticia.url,
       imagenUrl: noticia.imagenUrl,
       fuente: noticia.fuente,
-      categoria: noticia.categoria ?? '',
+      categoria: normalizarCategoriaExterna(noticia.categoria),
       ubicacion: noticia.pais ?? '',
       fechaPublicacion: noticia.fechaPublicacion,
       esExterna: true,

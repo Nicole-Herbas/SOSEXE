@@ -39,7 +39,9 @@
 	padding: 6px 15px;
 	border: 1px solid #dfe8ec;
 	border-radius: 999px;
+	background: transparent;
 	color: #526b7c;
+	cursor: pointer;
 	font-size: 13px;
 	white-space: nowrap;
 
@@ -47,6 +49,10 @@
 		border-color: #07847e;
 		background: #07847e;
 		color: #fff;
+	}
+
+	&:focus-visible {
+		outline: 2px solid #07847e;
 	}
 }
 
@@ -280,10 +286,6 @@
 
 	.noticia-tarjeta--principal {
 		grid-row: auto;
-	}
-
-	.noticias-categorias {
-		justify-content: flex-start;
 	}
 
 	.noticia-alerta {

@@ -47,5 +47,9 @@ public final class NoticiaConstants {
     /** Duración del caché de noticias externas: 15 minutos. */
     public static final long CACHE_DURACION_MS = 15L * 60L * 1_000L;
 
+        /** Mensaje sanitizado para fallos de la API externa; no registrar su URL ni API key. */
+        public static final String LOG_API_EXTERNA_FALLO =
+            "Falló la consulta a newsdata.io (tipo de error: {}).";
+
     private NoticiaConstants() {}
 }

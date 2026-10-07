@@ -4,9 +4,13 @@ import bo.edu.sos.backend.constants.NoticiaConstants;
 import bo.edu.sos.backend.dto.NewsdataRespuestaDTO;
 import bo.edu.sos.backend.dto.NewsdataRespuestaDTO.Articulo;
 import bo.edu.sos.backend.dto.NoticiaExternaDTO;
+import bo.edu.sos.backend.dto.ResultadoNoticiasExternasDTO;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
@@ -22,6 +26,8 @@ import java.util.List;
 @Service
 public class NoticiaExternaService {
 
+    private static final Logger log = LoggerFactory.getLogger(NoticiaExternaService.class);
+
     private final RestClient restClient;
 
     @Value("${newsdata.apikey}")
@@ -30,6 +36,8 @@ public class NoticiaExternaService {
     // ── Caché en memoria (hilo-seguro) ───────────────────────────────────────
     private volatile List<NoticiaExternaDTO> cache = List.of();
     private volatile long ultimaActualizacion = 0L;
+    private volatile boolean consultaRealizada;
+    private volatile boolean apiDisponible;
 
     public NoticiaExternaService(RestClient.Builder builder) {
         this.restClient = builder
@@ -44,27 +52,40 @@ public class NoticiaExternaService {
      *
      * @return lista de {@link NoticiaExternaDTO}, nunca {@code null}.
      */
-    public synchronized List<NoticiaExternaDTO> obtenerNoticias() {
+    public synchronized ResultadoNoticiasExternasDTO obtenerNoticias() {
 
         long ahora = System.currentTimeMillis();
 
-        if (!cache.isEmpty()
+        if (consultaRealizada
                 && ahora - ultimaActualizacion < NoticiaConstants.CACHE_DURACION_MS) {
-            return cache; // Servir desde caché — no consume créditos de la API
+            return new ResultadoNoticiasExternasDTO(
+                cache,
+                apiDisponible,
+                apiDisponible || !cache.isEmpty());
         }
 
-        NewsdataRespuestaDTO respuesta = restClient.get()
-                .uri(uri -> uri
-                        .queryParam("apikey",   apiKey)
-                        .queryParam("q",        NoticiaConstants.API_EXTERNA_QUERY)
-                        .queryParam("language", NoticiaConstants.API_EXTERNA_LANG)
-                        .build())
-                .retrieve()
-                .body(NewsdataRespuestaDTO.class);
+        try {
+            NewsdataRespuestaDTO respuesta = restClient.get()
+                    .uri(uri -> uri
+                            .queryParam("apikey",   apiKey)
+                            .queryParam("q",        NoticiaConstants.API_EXTERNA_QUERY)
+                            .queryParam("language", NoticiaConstants.API_EXTERNA_LANG)
+                            .build())
+                    .retrieve()
+                    .body(NewsdataRespuestaDTO.class);
 
-        cache = mapearArticulos(respuesta);
-        ultimaActualizacion = ahora;
-        return cache;
+            cache = mapearArticulos(respuesta);
+            apiDisponible = true;
+            consultaRealizada = true;
+            ultimaActualizacion = ahora;
+            return new ResultadoNoticiasExternasDTO(cache, true, false);
+        } catch (RestClientException ex) {
+            log.warn(NoticiaConstants.LOG_API_EXTERNA_FALLO, ex.getClass().getSimpleName());
+            apiDisponible = false;
+            consultaRealizada = true;
+            ultimaActualizacion = ahora;
+            return new ResultadoNoticiasExternasDTO(cache, false, !cache.isEmpty());
+        }
     }
 
     // ── Métodos privados ─────────────────────────────────────────────────────
