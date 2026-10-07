@@ -1,0 +1,456 @@
+/* ================================================================
+   VOLUNTARIADO PAGE – Fiel al prototipo Figma / diseño de Inicio
+   ================================================================ */
+
+/* ── Design tokens (idénticos a inicio.scss) ── */
+$color-teal:       #087f7b;
+$color-teal-dark:  #05635f;
+$color-teal-light: #e5f4f2;
+$color-red:        #e85d4a;
+$color-red-light:  #fdecea;
+$color-dark:       #102a3a;
+$color-text:       #475569;
+$color-muted:      #64748b;
+$color-border:     #f1f5f9;
+$color-bg:         #ffffff;
+
+$radius-sm:   12px;
+$radius-md:   16px;
+$radius-lg:   22px;
+$radius-xl:   24px;
+$radius-full: 9999px;
+
+$shadow-card:       0 8px 30px rgba(16, 42, 58, 0.07);
+$shadow-card-hover: 0 12px 36px rgba(16, 42, 58, 0.11);
+$shadow-btn:        0 8px 24px rgba(8, 127, 123, 0.20);
+
+$font-display: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+/* ── Host ── */
+:host {
+  display: block;
+  width: 100%;
+  background: $color-bg;
+  font-family: $font-display;
+  color: $color-dark;
+}
+
+/* ================================================================
+   MAIN CONTAINER
+   ================================================================ */
+.voluntariado-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 48px 40px 80px;
+  background: $color-bg;
+}
+
+/* ================================================================
+   HERO SECTION
+   ================================================================ */
+.vol-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 56px 24px 64px;
+  border-bottom: 1px solid $color-border;
+}
+
+.vol-hero__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 18px;
+  border: 1px solid rgba($color-teal, 0.25);
+  border-radius: $radius-full;
+  background: $color-teal-light;
+  font-size: 14px;
+  font-weight: 700;
+  color: $color-teal-dark;
+  margin-bottom: 28px;
+}
+
+.vol-hero__badge-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: $color-teal;
+  flex-shrink: 0;
+}
+
+.vol-hero__title {
+  font-family: $font-display;
+  font-size: 52px;
+  font-weight: 800;
+  line-height: 1.08;
+  letter-spacing: -0.04em;
+  color: $color-dark;
+  margin: 0 0 20px;
+}
+
+.vol-hero__description {
+  max-width: 540px;
+  font-size: 17px;
+  line-height: 1.75;
+  color: $color-text;
+  margin: 0 0 36px;
+}
+
+/* ── Shared button styles (mismo patrón que inicio) ── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px 28px;
+  border-radius: $radius-sm;
+  font-size: 15px;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+}
+
+.btn--primary {
+  background: $color-teal;
+  color: #fff;
+  box-shadow: $shadow-btn;
+
+  &:hover {
+    background: $color-teal-dark;
+  }
+}
+
+.btn--outline {
+  background: $color-bg;
+  color: $color-teal;
+  border: 2px solid $color-teal;
+
+  &:hover {
+    background: $color-teal-light;
+  }
+}
+
+.vol-hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  justify-content: center;
+  margin-bottom: 32px;
+}
+
+.vol-hero__features {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 32px;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 600;
+  color: $color-text;
+}
+
+.vol-hero__feature {
+  white-space: nowrap;
+}
+
+/* ================================================================
+   OPORTUNIDADES DISPONIBLES
+   ================================================================ */
+.vol-oportunidades {
+  padding-top: 64px;
+}
+
+.vol-oportunidades__header {
+  margin-bottom: 32px;
+}
+
+.vol-oportunidades__titulo {
+  font-family: $font-display;
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: $color-dark;
+  margin: 0 0 8px;
+}
+
+.vol-oportunidades__subtitulo {
+  font-size: 14px;
+  color: $color-muted;
+  margin: 0;
+}
+
+/* ── Cards grid ── */
+.vol-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+/* ── Single card ── */
+.vol-card {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid $color-border;
+  border-radius: $radius-lg;
+  background: $color-bg;
+  box-shadow: $shadow-card;
+  overflow: hidden;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: $shadow-card-hover;
+  }
+}
+
+/* ── Colored top bar ── */
+.vol-card__top-bar {
+  height: 8px;
+  flex-shrink: 0;
+}
+
+.vol-card__top-bar--teal {
+  background: $color-teal;
+}
+
+.vol-card__top-bar--red {
+  background: $color-red;
+}
+
+/* ── Card body ── */
+.vol-card__body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding: 24px;
+}
+
+/* ── Icon badge ── */
+.vol-card__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: $radius-md;
+  font-size: 22px;
+  font-weight: 800;
+  margin-bottom: 16px;
+  flex-shrink: 0;
+}
+
+.vol-card__icon--teal {
+  background: $color-teal-light;
+  color: $color-teal;
+}
+
+.vol-card__icon--red {
+  background: $color-red-light;
+  color: $color-red;
+}
+
+/* ── Card text ── */
+.vol-card__title {
+  font-family: $font-display;
+  font-size: 17px;
+  font-weight: 800;
+  color: $color-dark;
+  margin: 0 0 6px;
+}
+
+.vol-card__location {
+  font-size: 13px;
+  font-weight: 600;
+  color: $color-teal;
+  margin: 0 0 12px;
+}
+
+.vol-card__desc {
+  font-size: 14px;
+  line-height: 1.6;
+  color: $color-text;
+  margin: 0;
+  flex: 1;
+}
+
+/* ── Footer (cupos + boton) ── */
+.vol-card__footer {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid $color-border;
+}
+
+.vol-card__cupos {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.vol-card__cupos-label {
+  font-size: 13px;
+  color: $color-muted;
+}
+
+.vol-card__cupos-badge {
+  padding: 5px 12px;
+  border-radius: $radius-full;
+  font-size: 13px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.vol-card__cupos-badge--teal {
+  background: $color-teal;
+}
+
+.vol-card__cupos-badge--red {
+  background: $color-red;
+}
+
+/* ── Participar button ── */
+.vol-card__btn {
+  display: block;
+  width: 100%;
+  padding: 14px;
+  border: none;
+  border-radius: $radius-sm;
+  font-size: 15px;
+  font-weight: 700;
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.vol-card__btn--teal {
+  background: $color-teal;
+
+  &:hover {
+    background: $color-teal-dark;
+  }
+}
+
+.vol-card__btn--red {
+  background: $color-red;
+
+  &:hover {
+    background: darken($color-red, 8%);
+  }
+}
+
+/* ================================================================
+   CÓMO FUNCIONA
+   ================================================================ */
+.vol-como {
+  margin-top: 72px;
+  padding-top: 56px;
+  border-top: 1px solid $color-border;
+}
+
+.vol-como__title {
+  font-family: $font-display;
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: $color-dark;
+  margin: 0 0 6px;
+}
+
+.vol-como__subtitle {
+  font-size: 14px;
+  color: $color-muted;
+  margin: 0 0 36px;
+}
+
+.vol-como__steps {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 32px;
+}
+
+.vol-como__step {
+  display: flex;
+  flex-direction: column;
+}
+
+.vol-como__step-num {
+  font-family: $font-display;
+  font-size: 40px;
+  font-weight: 800;
+  color: $color-border;
+  line-height: 1;
+  margin-bottom: 12px;
+}
+
+.vol-como__step-title {
+  font-family: $font-display;
+  font-size: 16px;
+  font-weight: 800;
+  color: $color-dark;
+  margin: 0 0 8px;
+}
+
+.vol-como__step-desc {
+  font-size: 14px;
+  line-height: 1.65;
+  color: $color-teal;
+  margin: 0;
+}
+
+/* ================================================================
+   RESPONSIVE
+   ================================================================ */
+@media (max-width: 1024px) {
+  .voluntariado-page {
+    padding: 36px 24px 64px;
+  }
+
+  .vol-hero__title {
+    font-size: 42px;
+  }
+
+  .vol-cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .vol-como__steps {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .voluntariado-page {
+    padding: 24px 16px 48px;
+  }
+
+  .vol-hero {
+    padding: 40px 0 48px;
+  }
+
+  .vol-hero__title {
+    font-size: 32px;
+  }
+
+  .vol-hero__actions {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .vol-cards {
+    grid-template-columns: 1fr;
+  }
+
+  .vol-como__steps {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+}
