@@ -76,4 +76,37 @@ describe('Voluntariado', () => {
     expect(btn).not.toBeNull();
     expect(btn.textContent?.trim()).toContain(APP_TEXTOS.voluntariado.hero.serVoluntario);
   });
+
+  // ── Feature toggles ─────────────────────────────────────────────────────
+
+  it('debe ocultar la sección de oportunidades cuando mostrarSeccionOportunidades es false', async () => {
+    const freshFixture = TestBed.createComponent(Voluntariado);
+    freshFixture.componentInstance.featureToggles.voluntariado.mostrarSeccionOportunidades = false;
+    freshFixture.detectChanges();
+    await freshFixture.whenStable();
+
+    expect(freshFixture.nativeElement.querySelector('.vol-oportunidades')).toBeNull();
+    expect(freshFixture.nativeElement.querySelector('.vol-como')).not.toBeNull();
+  });
+
+  it('debe ocultar la sección ¿Cómo funciona? cuando mostrarSeccionComoFunciona es false', async () => {
+    const freshFixture = TestBed.createComponent(Voluntariado);
+    freshFixture.componentInstance.featureToggles.voluntariado.mostrarSeccionComoFunciona = false;
+    freshFixture.detectChanges();
+    await freshFixture.whenStable();
+
+    expect(freshFixture.nativeElement.querySelector('.vol-como')).toBeNull();
+    expect(freshFixture.nativeElement.querySelectorAll('.vol-card').length).toBe(3);
+  });
+
+  it('debe ocultar los badges de cupos cuando mostrarCupos es false', async () => {
+    const freshFixture = TestBed.createComponent(Voluntariado);
+    freshFixture.componentInstance.featureToggles.voluntariado.mostrarCupos = false;
+    freshFixture.detectChanges();
+    await freshFixture.whenStable();
+
+    expect(freshFixture.nativeElement.querySelector('.vol-card__cupos')).toBeNull();
+    // Las tarjetas y el botón Participar deben seguir visibles
+    expect(freshFixture.nativeElement.querySelectorAll('.vol-card').length).toBe(3);
+  });
 });

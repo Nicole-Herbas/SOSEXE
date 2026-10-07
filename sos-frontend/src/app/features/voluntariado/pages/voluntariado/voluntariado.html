@@ -31,6 +31,7 @@
 
 
   <!-- ===== OPORTUNIDADES DISPONIBLES ===== -->
+  @if (featureToggles.voluntariado.mostrarSeccionOportunidades) {
   <section class="vol-oportunidades">
 
     <div class="vol-oportunidades__header">
@@ -49,12 +50,14 @@
           <p class="vol-card__location">⌖ {{ textos.oportunidades.refugios.ubicacion }}</p>
           <p class="vol-card__desc">{{ textos.oportunidades.refugios.descripcion }}</p>
           <div class="vol-card__footer">
+            @if (featureToggles.voluntariado.mostrarCupos) {
             <div class="vol-card__cupos">
               <span class="vol-card__cupos-label">{{ textos.oportunidades.cuposLabel }}</span>
               <span class="vol-card__cupos-badge vol-card__cupos-badge--teal">
                 {{ textos.oportunidades.refugios.cupos }}
               </span>
             </div>
+            }
             <button class="vol-card__btn vol-card__btn--teal" type="button">
               {{ textos.oportunidades.participar }}
             </button>
@@ -71,12 +74,14 @@
           <p class="vol-card__location">⌖ {{ textos.oportunidades.distribucion.ubicacion }}</p>
           <p class="vol-card__desc">{{ textos.oportunidades.distribucion.descripcion }}</p>
           <div class="vol-card__footer">
+            @if (featureToggles.voluntariado.mostrarCupos) {
             <div class="vol-card__cupos">
               <span class="vol-card__cupos-label">{{ textos.oportunidades.cuposLabel }}</span>
               <span class="vol-card__cupos-badge vol-card__cupos-badge--teal">
                 {{ textos.oportunidades.distribucion.cupos }}
               </span>
             </div>
+            }
             <button class="vol-card__btn vol-card__btn--teal" type="button">
               {{ textos.oportunidades.participar }}
             </button>
@@ -93,12 +98,14 @@
           <p class="vol-card__location">⌖ {{ textos.oportunidades.emergencias.ubicacion }}</p>
           <p class="vol-card__desc">{{ textos.oportunidades.emergencias.descripcion }}</p>
           <div class="vol-card__footer">
+            @if (featureToggles.voluntariado.mostrarCupos) {
             <div class="vol-card__cupos">
               <span class="vol-card__cupos-label">{{ textos.oportunidades.cuposLabel }}</span>
               <span class="vol-card__cupos-badge vol-card__cupos-badge--red">
                 {{ textos.oportunidades.emergencias.cupos }}
               </span>
             </div>
+            }
             <button class="vol-card__btn vol-card__btn--red" type="button">
               {{ textos.oportunidades.participar }}
             </button>
@@ -109,9 +116,11 @@
     </div>
 
   </section>
+  }
 
 
   <!-- ===== CÓMO FUNCIONA ===== -->
+  @if (featureToggles.voluntariado.mostrarSeccionComoFunciona) {
   <section class="vol-como">
 
     <h2 class="vol-como__title">{{ textos.comoFunciona.titulo }}</h2>
@@ -140,5 +149,6 @@
     </div>
 
   </section>
+  }
 
 </main>

@@ -99,6 +99,7 @@
 
 
   <!-- VERIFICACIÓN -->
+  @if (featureToggles.acercaDe.mostrarSeccionVerificacion) {
   <section class="verification-section">
 
     <div class="section-heading">
@@ -170,9 +171,11 @@
     </div>
 
   </section>
+  }
 
 
   <!-- VALORES -->
+  @if (featureToggles.acercaDe.mostrarSeccionValores) {
   <section class="values-section">
 
     <div class="section-heading">
@@ -187,7 +190,7 @@
     <div class="values-grid">
 
       <article class="value-card">
-        <div class="value-icon">⌕</div>
+        <div class="value-icon">⎕</div>
 
         <div>
           <h3>Transparencia</h3>
@@ -244,9 +247,11 @@
     </div>
 
   </section>
+  }
 
 
   <!-- ROLES -->
+  @if (featureToggles.acercaDe.mostrarSeccionRoles) {
   <section class="roles-section">
 
     <div class="section-heading">
@@ -320,6 +325,7 @@
     </div>
 
   </section>
+  }
 
 
   <!-- CTA -->
