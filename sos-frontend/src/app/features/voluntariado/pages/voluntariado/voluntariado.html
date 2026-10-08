@@ -1,3 +1,154 @@
-<p>
-  {{ textos.mensaje }}
-</p>
+<main class="voluntariado-page">
+
+  <!-- ===== HERO ===== -->
+  <section class="vol-hero">
+
+    <div class="vol-hero__badge">
+      <span class="vol-hero__badge-dot"></span>
+      {{ textos.hero.badge }}
+    </div>
+
+    <h1 class="vol-hero__title">{{ textos.hero.titulo }}</h1>
+
+    <p class="vol-hero__description">{{ textos.hero.descripcion }}</p>
+
+    <div class="vol-hero__actions">
+      <a routerLink="/login" class="btn btn--primary">
+        {{ textos.hero.serVoluntario }}
+      </a>
+      <a routerLink="/mapa" class="btn btn--outline">
+        {{ textos.hero.verMapa }}
+      </a>
+    </div>
+
+    <div class="vol-hero__features">
+      <span class="vol-hero__feature">{{ textos.hero.feat1 }}</span>
+      <span class="vol-hero__feature">{{ textos.hero.feat2 }}</span>
+      <span class="vol-hero__feature">{{ textos.hero.feat3 }}</span>
+    </div>
+
+  </section>
+
+
+  <!-- ===== OPORTUNIDADES DISPONIBLES ===== -->
+  @if (featureToggles.voluntariado.mostrarSeccionOportunidades) {
+  <section class="vol-oportunidades">
+
+    <div class="vol-oportunidades__header">
+      <h2 class="vol-oportunidades__titulo">{{ textos.oportunidades.titulo }}</h2>
+      <p class="vol-oportunidades__subtitulo">{{ textos.oportunidades.subtitulo }}</p>
+    </div>
+
+    <div class="vol-cards">
+
+      <!-- Tarjeta 1: Refugios y albergues -->
+      <article class="vol-card">
+        <div class="vol-card__top-bar vol-card__top-bar--teal"></div>
+        <div class="vol-card__body">
+          <div class="vol-card__icon vol-card__icon--teal">🏠</div>
+          <h3 class="vol-card__title">{{ textos.oportunidades.refugios.titulo }}</h3>
+          <p class="vol-card__location">⌖ {{ textos.oportunidades.refugios.ubicacion }}</p>
+          <p class="vol-card__desc">{{ textos.oportunidades.refugios.descripcion }}</p>
+          <div class="vol-card__footer">
+            @if (featureToggles.voluntariado.mostrarCupos) {
+            <div class="vol-card__cupos">
+              <span class="vol-card__cupos-label">{{ textos.oportunidades.cuposLabel }}</span>
+              <span class="vol-card__cupos-badge vol-card__cupos-badge--teal">
+                {{ textos.oportunidades.refugios.cupos }}
+              </span>
+            </div>
+            }
+            <button class="vol-card__btn vol-card__btn--teal" type="button">
+              {{ textos.oportunidades.participar }}
+            </button>
+          </div>
+        </div>
+      </article>
+
+      <!-- Tarjeta 2: Distribución de donaciones -->
+      <article class="vol-card">
+        <div class="vol-card__top-bar vol-card__top-bar--teal"></div>
+        <div class="vol-card__body">
+          <div class="vol-card__icon vol-card__icon--teal">🔒</div>
+          <h3 class="vol-card__title">{{ textos.oportunidades.distribucion.titulo }}</h3>
+          <p class="vol-card__location">⌖ {{ textos.oportunidades.distribucion.ubicacion }}</p>
+          <p class="vol-card__desc">{{ textos.oportunidades.distribucion.descripcion }}</p>
+          <div class="vol-card__footer">
+            @if (featureToggles.voluntariado.mostrarCupos) {
+            <div class="vol-card__cupos">
+              <span class="vol-card__cupos-label">{{ textos.oportunidades.cuposLabel }}</span>
+              <span class="vol-card__cupos-badge vol-card__cupos-badge--teal">
+                {{ textos.oportunidades.distribucion.cupos }}
+              </span>
+            </div>
+            }
+            <button class="vol-card__btn vol-card__btn--teal" type="button">
+              {{ textos.oportunidades.participar }}
+            </button>
+          </div>
+        </div>
+      </article>
+
+      <!-- Tarjeta 3: Apoyo en emergencias -->
+      <article class="vol-card">
+        <div class="vol-card__top-bar vol-card__top-bar--red"></div>
+        <div class="vol-card__body">
+          <div class="vol-card__icon vol-card__icon--red">!</div>
+          <h3 class="vol-card__title">{{ textos.oportunidades.emergencias.titulo }}</h3>
+          <p class="vol-card__location">⌖ {{ textos.oportunidades.emergencias.ubicacion }}</p>
+          <p class="vol-card__desc">{{ textos.oportunidades.emergencias.descripcion }}</p>
+          <div class="vol-card__footer">
+            @if (featureToggles.voluntariado.mostrarCupos) {
+            <div class="vol-card__cupos">
+              <span class="vol-card__cupos-label">{{ textos.oportunidades.cuposLabel }}</span>
+              <span class="vol-card__cupos-badge vol-card__cupos-badge--red">
+                {{ textos.oportunidades.emergencias.cupos }}
+              </span>
+            </div>
+            }
+            <button class="vol-card__btn vol-card__btn--red" type="button">
+              {{ textos.oportunidades.participar }}
+            </button>
+          </div>
+        </div>
+      </article>
+
+    </div>
+
+  </section>
+  }
+
+
+  <!-- ===== CÓMO FUNCIONA ===== -->
+  @if (featureToggles.voluntariado.mostrarSeccionComoFunciona) {
+  <section class="vol-como">
+
+    <h2 class="vol-como__title">{{ textos.comoFunciona.titulo }}</h2>
+    <p class="vol-como__subtitle">{{ textos.comoFunciona.subtitulo }}</p>
+
+    <div class="vol-como__steps">
+
+      <div class="vol-como__step">
+        <span class="vol-como__step-num">01</span>
+        <h3 class="vol-como__step-title">{{ textos.comoFunciona.paso1.titulo }}</h3>
+        <p class="vol-como__step-desc">{{ textos.comoFunciona.paso1.descripcion }}</p>
+      </div>
+
+      <div class="vol-como__step">
+        <span class="vol-como__step-num">02</span>
+        <h3 class="vol-como__step-title">{{ textos.comoFunciona.paso2.titulo }}</h3>
+        <p class="vol-como__step-desc">{{ textos.comoFunciona.paso2.descripcion }}</p>
+      </div>
+
+      <div class="vol-como__step">
+        <span class="vol-como__step-num">03</span>
+        <h3 class="vol-como__step-title">{{ textos.comoFunciona.paso3.titulo }}</h3>
+        <p class="vol-como__step-desc">{{ textos.comoFunciona.paso3.descripcion }}</p>
+      </div>
+
+    </div>
+
+  </section>
+  }
+
+</main>

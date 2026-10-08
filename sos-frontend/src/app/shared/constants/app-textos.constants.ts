@@ -266,9 +266,20 @@ mapa: {
   contadorVerificados:
     'puntos verificados',
 
+  seleccionaPuntoTitulo:
+    'Selecciona un punto',
+
+  seleccionaPuntoDescripcion:
+    'Elige un punto del mapa o de la lista para consultar su información.',
+
   detalle: {
     direccionEtiqueta:
       'DIRECCIÓN',
+    seleccionaPuntoTitulo:
+      'Selecciona un punto',
+
+    seleccionaPuntoDescripcion:
+      'Elige un punto del mapa o de la lista para consultar su información.',
 
     horarioEtiqueta:
       'HORARIO O ESTADO',
@@ -293,6 +304,41 @@ mapa: {
 
     informacionVerificada:
       'Información comprobada pendiente de revisión',
+    emailEtiqueta:
+      'CORREO',
+
+    actualizadoEtiqueta:
+      'ÚLTIMA ACTUALIZACIÓN',
+
+    cargando:
+      'Cargando detalle...',
+
+    errorCarga:
+      'No se pudo cargar el detalle completo.',
+
+    reporte: {
+
+      titulo:
+        '¿Qué pasa con este punto?',
+
+      yaNoRecibe:
+        'Ya no recibe donaciones',
+
+      direccionIncorrecta:
+        'La dirección u horario son incorrectos',
+
+      contactoNoResponde:
+        'El contacto no responde',
+
+      noEsReal:
+        'Creo que no es real',
+
+      aviso:
+        'No se cambia el estado de un punto solo por reportes. Un moderador revisará la información antes de realizar cambios.',
+
+      confirmacion:
+        'Gracias. Pasa a revisión del equipo.',
+    },
   },
 
   filtrosTipo: {
@@ -474,8 +520,125 @@ noticias: {
 },
 
 voluntariado: {
-  mensaje:
-    'voluntariado works!',
+
+  hero: {
+    badge:
+      'Voluntariado activo en Bolivia',
+
+    titulo:
+      'Únete como voluntario',
+
+    descripcion:
+      'Las comunidades afectadas por desastres necesitan manos. Crea tu perfil y encuentra oportunidades adaptadas a tus habilidades.',
+
+    serVoluntario:
+      'Ser voluntario',
+
+    verMapa:
+      'Ver el mapa →',
+
+    feat1:
+      '✓ Centros verificados',
+
+    feat2:
+      '✓ Sin experiencia previa requerida',
+
+    feat3:
+      '✓ Impacto inmediato',
+  },
+
+
+  oportunidades: {
+    titulo:
+      'Oportunidades disponibles',
+
+    subtitulo:
+      'Crea tu perfil para ver recomendaciones personalizadas, o explora todas las oportunidades directamente.',
+
+    cuposLabel:
+      'Cupos disponibles',
+
+    participar:
+      'Participar',
+
+    refugios: {
+      titulo:
+        'Refugios y albergues',
+
+      ubicacion:
+        'Cochabamba, Bolivia',
+
+      descripcion:
+        'Ayuda a gestionar albergues temporales: registro de familias, asignación de espacios y atención básica a personas desplazadas.',
+
+      cupos:
+        '12 cupos',
+    },
+
+
+    distribucion: {
+      titulo:
+        'Distribución de donaciones',
+
+      ubicacion:
+        'La Paz, Bolivia',
+
+      descripcion:
+        'Participa en la clasificación, empaque y entrega de donaciones a comunidades afectadas. Se necesita disponibilidad de tiempo y esfuerzo físico.',
+
+      cupos:
+        '8 cupos',
+    },
+
+
+    emergencias: {
+      titulo:
+        'Apoyo en emergencias',
+
+      ubicacion:
+        'Santa Cruz, Bolivia',
+
+      descripcion:
+        'Brinda asistencia directa durante emergencias activas: comunicación, logística y coordinación con brigadas locales y cuerpos de rescate.',
+
+      cupos:
+        '5 cupos',
+    },
+  },
+
+
+  comoFunciona: {
+    titulo:
+      '¿Cómo funciona?',
+
+    subtitulo:
+      'Tres pasos para empezar a ayudar.',
+
+    paso1: {
+      titulo:
+        'Crea tu perfil',
+
+      descripcion:
+        'Indica tus habilidades y disponibilidad para recibir recomendaciones personalizadas.',
+    },
+
+    paso2: {
+      titulo:
+        'Elige una oportunidad',
+
+      descripcion:
+        'Selecciona la actividad que mejor se adapte a tu tiempo y ubicación.',
+    },
+
+    paso3: {
+      titulo:
+        'Empieza a ayudar',
+
+      descripcion:
+        'Recibirás confirmación e instrucciones para presentarte al centro de coordinación.',
+    },
+  },
+
 },
 
 acercaDe: {
