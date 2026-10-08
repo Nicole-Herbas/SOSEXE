@@ -407,19 +407,34 @@ export class RegistrarCentroComponent implements OnInit {
     this.http
       .post<ApiResponse<unknown>>(this.API_SOLICITUDES, this.construirFormData())
       .subscribe({
-        next: () => {
-          this.eliminarBorrador(); // SOS-42: ya no se necesita el borrador
+              next: async () => {
+
+        try {
+
+          await this.eliminarBorrador();
+
           this.enviando = false;
           this.mostrarModalEnvio = true;
-          this.cdr.detectChanges();
-        },
-        error: (error: HttpErrorResponse) => {
+
+        } catch (error) {
+
+          console.error(
+            'La solicitud fue enviada, pero no se pudo eliminar el borrador:',
+            error
+          );
+
           this.enviando = false;
-          console.error('Error al guardar la solicitud:', error);
-          this.errorEnvio = this.mensajeDeError(error);
+
+          this.errorEnvio =
+            'La solicitud fue enviada correctamente, pero no se pudo eliminar el borrador local.';
+
           this.mostrarModalError = true;
-          this.cdr.detectChanges();
+
         }
+
+        this.cdr.detectChanges();
+
+      },
       });
   }
 
