@@ -1397,6 +1397,7 @@
   .success-content h2 {
     font-size: 22px;
   }
+}
   /* ==========================================
    SOS-41 - BOTÓN CON NOMBRE DE ARCHIVO
    (paso 3 y paso 5: abre la vista previa)
@@ -1454,7 +1455,7 @@
   animation: modalSlideUp 0.25s ease;
 }
 
-// El HTML tiene 2 botones "×"; se oculta el que está fuera del encabezado
+/* El HTML tiene 2 botones "×"; se oculta el que está fuera del encabezado */
 .file-preview-modal > .file-preview-close {
   display: none;
 }
@@ -1720,23 +1721,83 @@
 
 .draft-banner-button {
   flex-shrink: 0;
-  min-height: 36px;
-  padding: 0 14px;
-  border: 1px solid #d9b56a;
-  border-radius: 8px;
-  background: #ffffff;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  min-height: 40px;
+  padding: 0 16px;
+
+  border: 1px solid #e5c477;
+  border-radius: 10px;
+
+  background: #fff8e8;
   color: #8a5a00;
+
   font-family: inherit;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 600;
+
   cursor: pointer;
-  transition: background 0.2s;
+
+  box-shadow: 0 2px 6px rgba(138, 90, 0, 0.08);
+
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+}
+
+.draft-button-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 18px;
+  height: 18px;
+
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.draft-banner-button:hover {
+  background: #fff0cf;
+  border-color: #d9ad52;
+
+  box-shadow: 0 4px 10px rgba(138, 90, 0, 0.12);
+
+  transform: translateY(-1px);
+}
+
+.draft-banner-button:active {
+  transform: translateY(0);
+
+  box-shadow: 0 2px 5px rgba(138, 90, 0, 0.08);
+}
+
+.draft-banner-button:focus-visible {
+  outline: 3px solid rgba(7, 150, 150, 0.18);
+  outline-offset: 2px;
 }
 
 .draft-banner-button:hover {
   background: #fff3db;
 }
 
+@media (max-width: 650px) {
+  .draft-banner {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .draft-banner-button {
+    width: 100%;
+  }
+}
 
 /* ==========================================
    SOS-42 - AVISO DE BORRADOR RECUPERADO
@@ -1747,16 +1808,20 @@
   align-items: center;
   justify-content: space-between;
   gap: 16px;
+
   margin-bottom: 24px;
   padding: 14px 16px;
+
   border: 1px solid #f1d9a6;
   border-radius: 12px;
+
   background: #fffaf0;
 }
 
 .draft-banner-text strong {
   display: block;
   margin-bottom: 3px;
+
   color: #8a5a00;
   font-size: 13px;
 }
@@ -1767,24 +1832,82 @@
   line-height: 1.5;
 }
 
+/* Botón para reiniciar el borrador */
 .draft-banner-button {
   flex-shrink: 0;
-  min-height: 36px;
-  padding: 0 14px;
-  border: 1px solid #d9b56a;
-  border-radius: 8px;
-  background: #ffffff;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  min-height: 40px;
+  padding: 0 16px;
+
+  border: 1px solid #e5c477;
+  border-radius: 10px;
+
+  background: #fff8e8;
   color: #8a5a00;
+
   font-family: inherit;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 600;
+
   cursor: pointer;
+
+  box-shadow: 0 2px 6px rgba(138, 90, 0, 0.08);
+
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+}
+
+.draft-button-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 18px;
+  height: 18px;
+
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1;
 }
 
 .draft-banner-button:hover {
-  background: #fff3db;
+  background: #fff0cf;
+  border-color: #d9ad52;
+
+  box-shadow: 0 4px 10px rgba(138, 90, 0, 0.12);
+
+  transform: translateY(-1px);
 }
 
+.draft-banner-button:active {
+  transform: translateY(0);
+
+  box-shadow: 0 2px 5px rgba(138, 90, 0, 0.08);
+}
+
+.draft-banner-button:focus-visible {
+  outline: 3px solid rgba(7, 150, 150, 0.18);
+  outline-offset: 2px;
+}
+
+@media (max-width: 650px) {
+  .draft-banner {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .draft-banner-button {
+    width: 100%;
+  }
+}
 
 /* ==========================================
    SOS-42 - MODAL DE BORRADOR
@@ -1859,4 +1982,3 @@
 
 }
 
-}

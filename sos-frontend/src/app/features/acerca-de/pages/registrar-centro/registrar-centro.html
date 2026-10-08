@@ -182,12 +182,14 @@
           </div>
 
           <button
-            type="button"
-            class="draft-banner-button"
-            (click)="descartarBorrador()"
-          >
-            Empezar de cero
-          </button>
+          type="button"
+          class="draft-banner-button"
+          (click)="descartarBorrador()"
+          aria-label="Empezar de cero y eliminar el borrador"
+        >
+          <span class="draft-button-icon" aria-hidden="true">↻</span>
+          <span>Empezar de cero</span>
+        </button>
 
         </div>
 
