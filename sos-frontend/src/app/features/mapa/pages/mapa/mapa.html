@@ -48,15 +48,19 @@
 
           <div class="filtros-necesidades">
             @for (filtro of filtrosNecesidad; track filtro.id) {
-              <button
-                type="button"
-                class="necesidad"
-                [class.activo]="filtroNecesidadActivo() === filtro.id"
-                [attr.data-filtro-necesidad]="filtro.id"
-                (click)="seleccionarFiltroNecesidad(filtro.id)"
-              >
-                {{ filtro.etiqueta }}
-              </button>
+            <button
+              type="button"
+              class="necesidad"
+              [class.activa]="
+    filtro.id === 'todas'
+      ? filtrosNecesidadActivos().length === 0
+      : filtrosNecesidadActivos().includes(filtro.id)
+  "
+              [attr.data-filtro-necesidad]="filtro.id"
+              (click)="seleccionarFiltroNecesidad(filtro.id)"
+            >
+              {{ filtro.etiqueta }}
+            </button>
             }
           </div>
         </div>
@@ -77,7 +81,10 @@
         } @else if (puntosFiltrados().length === 0) {
           <p class="mensaje-estado">{{ textos.sinResultados }}</p>
         } @else {
-          @for (punto of puntosFiltrados(); track punto.id) {
+        @for (
+        punto of puntosFiltrados();
+        track punto.origen + '-' + punto.id
+        ) {
             <article
               class="resultado-card"
               [class.seleccionado]="puntoSeleccionado()?.id === punto.id && puntoSeleccionado()?.origen === punto.origen"
@@ -106,74 +113,701 @@
   }
 
     @if (featureToggles.mapa.mostrarMapa) {
-      <main class="columna-mapa">
-        <app-mapa-leaflet
-          [puntos]="puntosFiltrados()"
-          [puntoSeleccionado]="puntoSeleccionado()"
-          (puntoClick)="seleccionarPunto($event)"
-        ></app-mapa-leaflet>
-        <div class="mensaje-mapa">{{ textos.mensajeMapa }}</div>
-      </main>
+
+    <main class="columna-mapa">
+
+      <app-mapa-leaflet
+        [puntos]="puntosFiltrados()"
+        [puntoSeleccionado]="puntoSeleccionado()"
+        (puntoClick)="seleccionarPunto($event)"
+      ></app-mapa-leaflet>
+
+      <div class="mensaje-mapa">
+        {{ textos.mensajeMapa }}
+      </div>
+
+    </main>
+
     }
 
-    @if (featureToggles.mapa.mostrarDetalle && puntoSeleccionado()) {
-      <aside class="columna-derecha">
-        <div class="detalle-card">
-          <button class="cerrar-detalle" (click)="cerrarDetalle()">✕</button>
+    @if (featureToggles.mapa.mostrarDetalle) {
 
-          <div class="detalle-etiquetas">
-            <span class="tag {{ obtenerClaseTipo(puntoSeleccionado()!.tipo) }}">{{ obtenerEtiquetaTipo(puntoSeleccionado()!.tipo) }}</span>
-            @if (estaVerificado(puntoSeleccionado()!)) {
-              <span class="tag-verificado">{{ textos.verificado }}</span>
-            } @else {
-              <span class="tag-verificado pendiente">{{ textos.verificacionPendiente }}</span>
-            }
-          </div>
+    <aside class="columna-derecha">
 
-          <h2>{{ puntoSeleccionado()!.nombre }}</h2>
-          <p class="detalle-ubicacion">{{ puntoSeleccionado()!.ciudad }}, {{ puntoSeleccionado()!.departamentoNombre }}</p>
+      @if (puntoSeleccionado()) {
 
-          @if (puntoSeleccionado()!.descripcion) {
-            <p class="descripcion">{{ puntoSeleccionado()!.descripcion }}</p>
+      <div class="detalle-card">
+
+        <button
+          type="button"
+          class="cerrar-detalle"
+          (click)="cerrarDetalle()"
+        >
+          ✕
+        </button>
+
+
+        @if (cargandoDetalle()) {
+        <p class="mensaje-estado">
+          {{ detalleEtiquetas.cargando }}
+        </p>
+        }
+
+
+        @if (errorDetalle()) {
+        <p class="mensaje-estado error">
+          {{ errorDetalle() }}
+        </p>
+        }
+
+
+        <div class="detalle-etiquetas">
+
+          <span
+            class="tag {{ obtenerClaseTipo(puntoSeleccionado()!.tipo) }}"
+          >
+            {{
+              obtenerEtiquetaTipo(
+                puntoSeleccionado()!.tipo
+              )
+            }}
+          </span>
+
+
+          @if (estaVerificado(puntoSeleccionado()!)) {
+
+          <span class="tag-verificado">
+              {{ textos.verificado }}
+            </span>
+
+          } @else {
+
+          <span class="tag-verificado pendiente">
+              {{ textos.verificacionPendiente }}
+            </span>
+
           }
 
-          <div class="informacion-verificada">
-            {{ detalleEtiquetas.informacionVerificada }}
-          </div>
+        </div>
 
-          @if (puntoSeleccionado()!.direccion) {
-            <div class="detalle-dato">
-              <span>{{ detalleEtiquetas.direccionEtiqueta }}</span>
-              <p>{{ puntoSeleccionado()!.direccion }}</p>
-            </div>
-          }
+
+        <h2>
+          {{ puntoSeleccionado()!.nombre }}
+        </h2>
+
+        <p class="detalle-ubicacion">
+          {{ puntoSeleccionado()!.ciudad }},
+          {{ puntoSeleccionado()!.departamentoNombre }}
+        </p>
+
+
+        @if (puntoSeleccionado()!.descripcion) {
+
+        <p class="descripcion">
+          {{ puntoSeleccionado()!.descripcion }}
+        </p>
+
+        }
+
+
+        <div class="informacion-verificada">
+          {{ detalleEtiquetas.informacionVerificada }}
+        </div>
+
+
+        @if (puntoSeleccionado()!.direccion) {
+
+        <div class="detalle-dato">
+
+            <span>
+              {{ detalleEtiquetas.direccionEtiqueta }}
+            </span>
+
+          <p>
+            {{ puntoSeleccionado()!.direccion }}
+          </p>
+
+        </div>
+
+        }
+
+
+        @if (
+        puntoSeleccionado()!.telefono
+        ||
+        puntoSeleccionado()!.email
+        ) {
+
+        <div class="detalle-dato">
+
+            <span>
+              {{ detalleEtiquetas.contactoEtiqueta }}
+            </span>
+
 
           @if (puntoSeleccionado()!.telefono) {
-            <div class="detalle-dato">
-              <span>{{ detalleEtiquetas.contactoEtiqueta }}</span>
-              <p>{{ puntoSeleccionado()!.telefono }}</p>
-            </div>
+          <p>
+            {{ puntoSeleccionado()!.telefono }}
+          </p>
           }
 
-          @if (puntoSeleccionado()!.necesidades?.length) {
-            <div class="detalle-dato">
-              <span>{{ detalleEtiquetas.necesidadesEtiqueta }}</span>
-              <div class="mini-tags">
-                @for (necesidad of puntoSeleccionado()!.necesidades; track necesidad) {
-                  <span>{{ necesidad }}</span>
-                }
-              </div>
-            </div>
+
+          @if (puntoSeleccionado()!.email) {
+          <p>
+            <a
+              [href]="'mailto:' + puntoSeleccionado()!.email"
+            >
+              {{ puntoSeleccionado()!.email }}
+            </a>
+          </p>
           }
 
-          <div class="acciones">
-            <button class="boton-secundario">{{ detalleEtiquetas.comoLlegar }}</button>
-            <button class="boton-principal">{{ detalleEtiquetas.verCentro }}</button>
+        </div>
+
+        }
+
+
+        @if (puntoSeleccionado()!.necesidades?.length) {
+
+        <div class="detalle-dato">
+
+            <span>
+              {{ detalleEtiquetas.necesidadesEtiqueta }}
+            </span>
+
+          <div class="mini-tags">
+
+            @for (
+            necesidad of puntoSeleccionado()!.necesidades;
+            track necesidad
+            ) {
+            <span>
+                  {{ necesidad }}
+                </span>
+            }
+
           </div>
 
-          <button class="reportar">{{ detalleEtiquetas.reportar }}</button>
         </div>
-      </aside>
+
+        }
+
+
+        @if (puntoSeleccionado()!.fechaActualizacion) {
+
+        <div class="detalle-dato">
+
+            <span>
+              {{ detalleEtiquetas.actualizadoEtiqueta }}
+            </span>
+
+          <p>
+            {{
+            formatearFechaActualizacion(
+            puntoSeleccionado()!.fechaActualizacion
+            )
+            }}
+          </p>
+
+        </div>
+
+        }
+
+
+        <div class="acciones">
+
+          <button
+            type="button"
+            class="boton-secundario"
+            (click)="comoLlegar(puntoSeleccionado()!)"
+          >
+            {{ detalleEtiquetas.comoLlegar }}
+          </button>
+
+
+          <button
+            type="button"
+            class="boton-principal"
+            (click)="abrirModalDetalle()"
+          >
+            {{ detalleEtiquetas.verCentro }}
+          </button>
+
+        </div>
+
+
+        <button
+          type="button"
+          class="reportar"
+          (click)="abrirReporte(false)"
+        >
+          {{ detalleEtiquetas.reportar }}
+        </button>
+
+      </div>
+
+
+      } @else {
+
+
+      <div class="detalle-vacio">
+
+        <div class="detalle-vacio-icono">
+          ⌖
+        </div>
+
+        <h3>
+          {{ detalleEtiquetas.seleccionaPuntoTitulo }}
+        </h3>
+
+        <p>
+          {{ detalleEtiquetas.seleccionaPuntoDescripcion }}
+        </p>
+
+      </div>
+
+      }
+
+    </aside>
+
     }
+
   </section>
 </section>
+
+<!-- ==========================================
+     SOS-36 - MODAL DETALLE COMPLETO
+     ========================================== -->
+
+@if (
+mostrarModalDetalle()
+&&
+puntoSeleccionado()
+) {
+
+<div
+  class="detalle-modal-overlay"
+  (click)="cerrarModalCompleto()"
+>
+
+  <article
+    class="detalle-modal"
+    (click)="$event.stopPropagation()"
+  >
+
+    <button
+      type="button"
+      class="detalle-modal-cerrar"
+      (click)="cerrarModalCompleto()"
+      aria-label="Cerrar detalle"
+    >
+      ✕
+    </button>
+
+
+    @if (cargandoDetalle()) {
+
+    <p class="detalle-modal-estado">
+      {{ detalleEtiquetas.cargando }}
+    </p>
+
+    }
+
+
+    @if (errorDetalle()) {
+
+    <p class="detalle-modal-error">
+      {{ errorDetalle() }}
+    </p>
+
+    }
+
+
+    <div class="detalle-modal-etiquetas">
+
+        <span
+          class="tag {{
+            obtenerClaseTipo(
+              puntoSeleccionado()!.tipo
+            )
+          }}"
+        >
+          {{
+            obtenerEtiquetaTipo(
+              puntoSeleccionado()!.tipo
+            )
+          }}
+        </span>
+
+
+      @if (
+      estaVerificado(
+      puntoSeleccionado()!
+      )
+      ) {
+
+      <span class="modal-verificado">
+            ✓ {{ textos.verificado }}
+          </span>
+
+      } @else {
+
+      <span class="modal-pendiente">
+            {{ textos.verificacionPendiente }}
+          </span>
+
+      }
+
+    </div>
+
+
+    <h2 class="detalle-modal-titulo">
+      {{ puntoSeleccionado()!.nombre }}
+    </h2>
+
+
+    <p class="detalle-modal-ubicacion">
+      {{ puntoSeleccionado()!.ciudad }}
+      ·
+      {{ puntoSeleccionado()!.departamentoNombre }}
+    </p>
+
+
+    @if (
+    puntoSeleccionado()!.descripcion
+    ) {
+
+    <p class="detalle-modal-descripcion">
+      {{ puntoSeleccionado()!.descripcion }}
+    </p>
+
+    }
+
+
+    @if (
+    puntoSeleccionado()!.direccion
+    ) {
+
+    <section class="modal-bloque">
+
+          <span class="modal-label">
+            {{ detalleEtiquetas.direccionEtiqueta }}
+          </span>
+
+      <p>
+        {{ puntoSeleccionado()!.direccion }}
+      </p>
+
+    </section>
+
+    }
+
+
+    @if (
+    puntoSeleccionado()!.telefono
+    ||
+    puntoSeleccionado()!.email
+    ) {
+
+    <section class="modal-bloque">
+
+          <span class="modal-label">
+            {{ detalleEtiquetas.contactoEtiqueta }}
+          </span>
+
+
+      @if (
+      puntoSeleccionado()!.telefono
+      ) {
+
+      <p>
+        {{ puntoSeleccionado()!.telefono }}
+      </p>
+
+      }
+
+
+      @if (
+      puntoSeleccionado()!.email
+      ) {
+
+      <p>
+        <a
+          class="modal-contacto-link"
+          [href]="
+                  'mailto:'
+                  +
+                  puntoSeleccionado()!.email
+                "
+        >
+          {{ puntoSeleccionado()!.email }}
+        </a>
+      </p>
+
+      }
+
+    </section>
+
+    }
+
+
+    @if (
+    puntoSeleccionado()!
+    .necesidades
+    ?.length
+    ) {
+
+    <section class="modal-bloque">
+
+          <span class="modal-label">
+            {{
+              detalleEtiquetas
+                .necesidadesEtiqueta
+            }}
+          </span>
+
+
+      <div class="modal-necesidades">
+
+        @for (
+        necesidad
+        of
+        puntoSeleccionado()!.necesidades;
+        track necesidad
+        ) {
+
+        <span>
+                {{ necesidad }}
+              </span>
+
+        }
+
+      </div>
+
+    </section>
+
+    }
+
+
+    @if (
+    puntoSeleccionado()!
+    .fechaActualizacion
+    ) {
+
+    <section class="modal-actualizacion">
+
+          <span>
+            {{
+              detalleEtiquetas
+                .actualizadoEtiqueta
+            }}
+          </span>
+
+      <strong>
+        {{
+        formatearFechaActualizacion(
+        puntoSeleccionado()!
+        .fechaActualizacion
+        )
+        }}
+      </strong>
+
+    </section>
+
+    }
+
+
+    <div class="modal-acciones">
+
+      <button
+        type="button"
+        class="modal-como-llegar"
+        (click)="
+            comoLlegar(
+              puntoSeleccionado()!
+            )
+          "
+      >
+        ⌖
+        {{ detalleEtiquetas.comoLlegar }}
+      </button>
+
+    </div>
+
+
+    <button
+      type="button"
+      class="modal-reportar"
+      (click)="abrirReporte(true)"
+    >
+      ⚠
+      {{ detalleEtiquetas.reportar }}
+    </button>
+
+  </article>
+
+</div>
+
+}
+
+<!-- ==========================================
+     SOS-36 - REPORTE DE INFORMACIÓN
+     ========================================== -->
+
+@if (
+mostrarReporte()
+&&
+puntoSeleccionado()
+) {
+
+<div
+  class="reporte-overlay"
+  (click)="cerrarReporte()"
+>
+
+  <section
+    class="reporte-sheet"
+    (click)="$event.stopPropagation()"
+  >
+
+    <div class="reporte-handle"></div>
+
+
+    <button
+      type="button"
+      class="reporte-cerrar"
+      aria-label="Cerrar reporte"
+      [disabled]="procesandoReporte()"
+      (click)="cerrarReporte()"
+    >
+      ✕
+    </button>
+
+
+    <h2>
+      {{ detalleEtiquetas.reporte.titulo }}
+    </h2>
+
+
+    <p class="reporte-punto">
+      {{ puntoSeleccionado()!.nombre }}
+    </p>
+
+
+    <div class="reporte-opciones">
+
+      <button
+        type="button"
+        class="reporte-opcion"
+        [disabled]="procesandoReporte()"
+        [class.seleccionada]="
+          motivoReporteSeleccionado()
+          === 'YA_NO_RECIBE'
+        "
+        (click)="
+          seleccionarMotivoReporte(
+            'YA_NO_RECIBE'
+          )
+        "
+      >
+        {{
+        detalleEtiquetas
+        .reporte
+        .yaNoRecibe
+        }}
+      </button>
+
+
+      <button
+        type="button"
+        class="reporte-opcion"
+        [disabled]="procesandoReporte()"
+        [class.seleccionada]="
+          motivoReporteSeleccionado()
+          === 'DATOS_INCORRECTOS'
+        "
+        (click)="
+          seleccionarMotivoReporte(
+            'DATOS_INCORRECTOS'
+          )
+        "
+      >
+        {{
+        detalleEtiquetas
+        .reporte
+        .direccionIncorrecta
+        }}
+      </button>
+
+
+      <button
+        type="button"
+        class="reporte-opcion"
+        [disabled]="procesandoReporte()"
+        [class.seleccionada]="
+          motivoReporteSeleccionado()
+          === 'CONTACTO_NO_RESPONDE'
+        "
+        (click)="
+          seleccionarMotivoReporte(
+            'CONTACTO_NO_RESPONDE'
+          )
+        "
+      >
+        {{
+        detalleEtiquetas
+        .reporte
+        .contactoNoResponde
+        }}
+      </button>
+
+
+      <button
+        type="button"
+        class="reporte-opcion"
+        [disabled]="procesandoReporte()"
+        [class.seleccionada]="
+          motivoReporteSeleccionado()
+          === 'NO_ES_REAL'
+        "
+        (click)="
+          seleccionarMotivoReporte(
+            'NO_ES_REAL'
+          )
+        "
+      >
+        {{
+        detalleEtiquetas
+        .reporte
+        .noEsReal
+        }}
+      </button>
+
+    </div>
+
+
+    <p class="reporte-aviso">
+      {{ detalleEtiquetas.reporte.aviso }}
+    </p>
+
+  </section>
+
+</div>
+
+}
+
+@if (mostrarToastReporte()) {
+
+<div
+  class="reporte-toast"
+  role="status"
+  aria-live="polite"
+>
+  {{
+  detalleEtiquetas
+  .reporte
+  .confirmacion
+  }}
+</div>
+
+}

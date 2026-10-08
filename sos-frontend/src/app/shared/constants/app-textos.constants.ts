@@ -266,9 +266,20 @@ mapa: {
   contadorVerificados:
     'puntos verificados',
 
+  seleccionaPuntoTitulo:
+    'Selecciona un punto',
+
+  seleccionaPuntoDescripcion:
+    'Elige un punto del mapa o de la lista para consultar su información.',
+
   detalle: {
     direccionEtiqueta:
       'DIRECCIÓN',
+    seleccionaPuntoTitulo:
+      'Selecciona un punto',
+
+    seleccionaPuntoDescripcion:
+      'Elige un punto del mapa o de la lista para consultar su información.',
 
     horarioEtiqueta:
       'HORARIO O ESTADO',
@@ -293,6 +304,41 @@ mapa: {
 
     informacionVerificada:
       'Información comprobada pendiente de revisión',
+    emailEtiqueta:
+      'CORREO',
+
+    actualizadoEtiqueta:
+      'ÚLTIMA ACTUALIZACIÓN',
+
+    cargando:
+      'Cargando detalle...',
+
+    errorCarga:
+      'No se pudo cargar el detalle completo.',
+
+    reporte: {
+
+      titulo:
+        '¿Qué pasa con este punto?',
+
+      yaNoRecibe:
+        'Ya no recibe donaciones',
+
+      direccionIncorrecta:
+        'La dirección u horario son incorrectos',
+
+      contactoNoResponde:
+        'El contacto no responde',
+
+      noEsReal:
+        'Creo que no es real',
+
+      aviso:
+        'No se cambia el estado de un punto solo por reportes. Un moderador revisará la información antes de realizar cambios.',
+
+      confirmacion:
+        'Gracias. Pasa a revisión del equipo.',
+    },
   },
 
   filtrosTipo: {
