@@ -2,6 +2,8 @@ import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Router} from '@angular/router';
+import { AuthService } from '../../../auth/services/auth.service';
+import { firstValueFrom } from 'rxjs';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 
 import { ApiResponse } from '../../../../shared/models/api-response';
@@ -36,10 +38,19 @@ export class RegistrarCentroComponent implements OnInit {
 
   // SOS-42: borrador guardado en el navegador
   // Textos -> localStorage | Archivos -> IndexedDB (localStorage no guarda archivos)
-  private readonly BORRADOR_KEY = 'registroCentroBorrador';
-  private readonly DB_NAME = 'SosExeDB';
-  private readonly DB_VERSION = 1;
-  private readonly STORE_ARCHIVOS = 'archivosBorrador';
+    private usuarioEmail = '';
+
+    private readonly DB_NAME = 'SosExeDB';
+    private readonly DB_VERSION = 1;
+    private readonly STORE_ARCHIVOS = 'archivosBorrador';
+
+    private get BORRADOR_KEY(): string {
+      return `registroCentroBorrador_${this.usuarioEmail}`;
+    }
+
+    private archivoKey(tipo: string): string {
+      return `${this.usuarioEmail}_${tipo}`;
+    }
 
   ngOnInit(): void {
     this.cargarDepartamentos();
