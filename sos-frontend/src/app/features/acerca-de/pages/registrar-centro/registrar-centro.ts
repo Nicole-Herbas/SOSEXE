@@ -1154,30 +1154,84 @@ readonly actividadesVoluntariado =
 
   private async cargarArchivosBorrador(): Promise<void> {
 
-    const db = await this.abrirBaseDatos();
+  const db = await this.abrirBaseDatos();
 
-    const leer = (clave: string) =>
-      new Promise<File | null>((resolve, reject) => {
-        const tx = db.transaction(this.STORE_ARCHIVOS, 'readonly');
-        const request = tx.objectStore(this.STORE_ARCHIVOS).get(clave);
-        request.onsuccess = () => resolve(request.result ?? null);
-        request.onerror = () => reject(request.error);
-      });
 
-    try {
-      this.personeriaArchivo = await leer('personeria');
-      this.nitArchivo = await leer('nit');
-      this.identidadArchivo = await leer('identidad');
-      this.domicilioArchivo = await leer('domicilio');
+  const leer = (clave: string) =>
+    new Promise<File | null>((resolve, reject) => {
 
-      this.personeriaAdjunta = !!this.personeriaArchivo;
-      this.nitAdjunto = !!this.nitArchivo;
-      this.identidadAdjunta = !!this.identidadArchivo;
-      this.domicilioAdjunto = !!this.domicilioArchivo;
-    } finally {
-      db.close();
-    }
+      const tx =
+        db.transaction(
+          this.STORE_ARCHIVOS,
+          'readonly'
+        );
+
+      const request =
+        tx
+          .objectStore(this.STORE_ARCHIVOS)
+          .get(clave);
+
+
+      request.onsuccess = () => {
+
+        resolve(
+          request.result ?? null
+        );
+
+      };
+
+
+      request.onerror = () => {
+
+        reject(request.error);
+
+      };
+
+    });
+
+
+  try {
+
+    this.personeriaArchivo =
+      await leer(
+        this.archivoKey('personeria')
+      );
+
+    this.nitArchivo =
+      await leer(
+        this.archivoKey('nit')
+      );
+
+    this.identidadArchivo =
+      await leer(
+        this.archivoKey('identidad')
+      );
+
+    this.domicilioArchivo =
+      await leer(
+        this.archivoKey('domicilio')
+      );
+
+
+    this.personeriaAdjunta =
+      !!this.personeriaArchivo;
+
+    this.nitAdjunto =
+      !!this.nitArchivo;
+
+    this.identidadAdjunta =
+      !!this.identidadArchivo;
+
+    this.domicilioAdjunto =
+      !!this.domicilioArchivo;
+
+
+  } finally {
+
+    db.close();
+
   }
+}
 
   // ==========================================
   // SOS-42: AYUDAS
