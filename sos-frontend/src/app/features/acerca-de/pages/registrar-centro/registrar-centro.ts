@@ -998,27 +998,106 @@ readonly actividadesVoluntariado =
 
   async eliminarBorrador(): Promise<void> {
 
-    this.borradorRecuperado = false;
+  this.borradorRecuperado = false;
 
-    if (typeof localStorage === 'undefined') {
-      return;
-    }
 
-    localStorage.removeItem(this.BORRADOR_KEY);
-
-    try {
-      const db = await this.abrirBaseDatos();
-
-      await new Promise<void>((resolve, reject) => {
-        const tx = db.transaction(this.STORE_ARCHIVOS, 'readwrite');
-        tx.objectStore(this.STORE_ARCHIVOS).clear();
-        tx.oncomplete = () => { db.close(); resolve(); };
-        tx.onerror = () => { db.close(); reject(tx.error); };
-      });
-    } catch (error) {
-      console.error('Error al eliminar los archivos del borrador:', error);
-    }
+  if (
+    typeof localStorage === 'undefined' ||
+    !this.usuarioEmail
+  ) {
+    return;
   }
+
+
+  const db =
+    await this.abrirBaseDatos();
+
+
+  try {
+
+    await new Promise<void>(
+      (resolve, reject) => {
+
+        const tx =
+          db.transaction(
+            this.STORE_ARCHIVOS,
+            'readwrite'
+          );
+
+        const store =
+          tx.objectStore(
+            this.STORE_ARCHIVOS
+          );
+
+
+        const tipos = [
+          'personeria',
+          'nit',
+          'identidad',
+          'domicilio'
+        ];
+
+
+        tipos.forEach(tipo => {
+
+          store.delete(
+            this.archivoKey(tipo)
+          );
+
+        });
+
+
+        tx.oncomplete = () => {
+
+          resolve();
+
+        };
+
+
+        tx.onerror = () => {
+
+          reject(tx.error);
+
+        };
+
+
+        tx.onabort = () => {
+
+          reject(
+            tx.error ??
+            new Error(
+              'La eliminación del borrador fue abortada.'
+            )
+          );
+
+        };
+
+      }
+    );
+
+
+    // Solo eliminamos el texto después
+    // de eliminar correctamente los archivos.
+    localStorage.removeItem(
+      this.BORRADOR_KEY
+    );
+
+
+  } catch (error) {
+
+    console.error(
+      'Error al eliminar el borrador:',
+      error
+    );
+
+    throw error;
+
+  } finally {
+
+    db.close();
+
+  }
+}
 
   // ==========================================
   // SOS-42: ARCHIVOS EN INDEXEDDB
