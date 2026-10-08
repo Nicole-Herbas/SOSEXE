@@ -396,28 +396,32 @@ export class RegistrarCentroComponent implements OnInit {
   }
 
   enviarSolicitud(): void {
+  if (
+    this.enviando ||
+    !this.formularioCompleto ||
+    !this.haySesion
+  ) {
+    return;
+  }
 
-    if (this.enviando || !this.formularioCompleto || !this.haySesion) {
-      return;
-    }
+  this.enviando = true;
+  this.errorEnvio = '';
+  this.mostrarModalError = false;
 
-    this.enviando = true;
-    this.errorEnvio = '';
-
-    this.http
-      .post<ApiResponse<unknown>>(this.API_SOLICITUDES, this.construirFormData())
-      .subscribe({
-              next: async () => {
-
+  this.http
+    .post<ApiResponse<unknown>>(
+      this.API_SOLICITUDES,
+      this.construirFormData()
+    )
+    .subscribe({
+      next: async () => {
         try {
-
           await this.eliminarBorrador();
 
           this.enviando = false;
           this.mostrarModalEnvio = true;
 
         } catch (error) {
-
           console.error(
             'La solicitud fue enviada, pero no se pudo eliminar el borrador:',
             error
@@ -429,14 +433,23 @@ export class RegistrarCentroComponent implements OnInit {
             'La solicitud fue enviada correctamente, pero no se pudo eliminar el borrador local.';
 
           this.mostrarModalError = true;
-
         }
 
         this.cdr.detectChanges();
-
       },
-      });
-  }
+
+      error: (error: HttpErrorResponse) => {
+        this.enviando = false;
+
+        this.errorEnvio =
+          this.mensajeDeError(error);
+
+        this.mostrarModalError = true;
+
+        this.cdr.detectChanges();
+      }
+    });
+}
 
   private mensajeDeError(error: HttpErrorResponse): string {
 
