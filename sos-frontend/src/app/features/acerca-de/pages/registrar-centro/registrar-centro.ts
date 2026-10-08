@@ -1044,24 +1044,113 @@ readonly actividadesVoluntariado =
 
   private async guardarArchivosBorrador(): Promise<void> {
 
-    const db = await this.abrirBaseDatos();
+  const db = await this.abrirBaseDatos();
 
-    return new Promise((resolve, reject) => {
 
-      const tx = db.transaction(this.STORE_ARCHIVOS, 'readwrite');
-      const store = tx.objectStore(this.STORE_ARCHIVOS);
+  return new Promise((resolve, reject) => {
 
-      store.clear();
+    const tx =
+      db.transaction(
+        this.STORE_ARCHIVOS,
+        'readwrite'
+      );
 
-      if (this.personeriaArchivo) { store.put(this.personeriaArchivo, 'personeria'); }
-      if (this.nitArchivo) { store.put(this.nitArchivo, 'nit'); }
-      if (this.identidadArchivo) { store.put(this.identidadArchivo, 'identidad'); }
-      if (this.domicilioArchivo) { store.put(this.domicilioArchivo, 'domicilio'); }
+    const store =
+      tx.objectStore(
+        this.STORE_ARCHIVOS
+      );
 
-      tx.oncomplete = () => { db.close(); resolve(); };
-      tx.onerror = () => { db.close(); reject(tx.error); };
+
+    const tipos = [
+      'personeria',
+      'nit',
+      'identidad',
+      'domicilio'
+    ];
+
+
+    // Eliminar solamente los archivos
+    // del usuario actual.
+    tipos.forEach(tipo => {
+
+      store.delete(
+        this.archivoKey(tipo)
+      );
+
     });
-  }
+
+
+    // Guardar nuevamente los archivos
+    // del usuario actual.
+
+    if (this.personeriaArchivo) {
+
+      store.put(
+        this.personeriaArchivo,
+        this.archivoKey('personeria')
+      );
+
+    }
+
+    if (this.nitArchivo) {
+
+      store.put(
+        this.nitArchivo,
+        this.archivoKey('nit')
+      );
+
+    }
+
+    if (this.identidadArchivo) {
+
+      store.put(
+        this.identidadArchivo,
+        this.archivoKey('identidad')
+      );
+
+    }
+
+    if (this.domicilioArchivo) {
+
+      store.put(
+        this.domicilioArchivo,
+        this.archivoKey('domicilio')
+      );
+
+    }
+
+
+    tx.oncomplete = () => {
+
+      db.close();
+      resolve();
+
+    };
+
+
+    tx.onerror = () => {
+
+      db.close();
+      reject(tx.error);
+
+    };
+
+
+    tx.onabort = () => {
+
+      db.close();
+
+      reject(
+        tx.error ??
+        new Error(
+          'La transacción de IndexedDB fue abortada.'
+        )
+      );
+
+    };
+
+  });
+}
 
   private async cargarArchivosBorrador(): Promise<void> {
 
