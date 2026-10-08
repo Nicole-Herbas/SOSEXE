@@ -339,6 +339,7 @@
         <button
           type="button"
           class="reportar"
+          (click)="abrirReporte(false)"
         >
           {{ detalleEtiquetas.reportar }}
         </button>
@@ -637,8 +638,7 @@ puntoSeleccionado()
     <button
       type="button"
       class="modal-reportar"
-      disabled
-      title="Funcionalidad pendiente"
+      (click)="abrirReporte(true)"
     >
       ⚠
       {{ detalleEtiquetas.reportar }}
@@ -646,6 +646,168 @@ puntoSeleccionado()
 
   </article>
 
+</div>
+
+}
+
+<!-- ==========================================
+     SOS-36 - REPORTE DE INFORMACIÓN
+     ========================================== -->
+
+@if (
+mostrarReporte()
+&&
+puntoSeleccionado()
+) {
+
+<div
+  class="reporte-overlay"
+  (click)="cerrarReporte()"
+>
+
+  <section
+    class="reporte-sheet"
+    (click)="$event.stopPropagation()"
+  >
+
+    <div class="reporte-handle"></div>
+
+
+    <button
+      type="button"
+      class="reporte-cerrar"
+      aria-label="Cerrar reporte"
+      [disabled]="procesandoReporte()"
+      (click)="cerrarReporte()"
+    >
+      ✕
+    </button>
+
+
+    <h2>
+      {{ detalleEtiquetas.reporte.titulo }}
+    </h2>
+
+
+    <p class="reporte-punto">
+      {{ puntoSeleccionado()!.nombre }}
+    </p>
+
+
+    <div class="reporte-opciones">
+
+      <button
+        type="button"
+        class="reporte-opcion"
+        [disabled]="procesandoReporte()"
+        [class.seleccionada]="
+          motivoReporteSeleccionado()
+          === 'YA_NO_RECIBE'
+        "
+        (click)="
+          seleccionarMotivoReporte(
+            'YA_NO_RECIBE'
+          )
+        "
+      >
+        {{
+        detalleEtiquetas
+        .reporte
+        .yaNoRecibe
+        }}
+      </button>
+
+
+      <button
+        type="button"
+        class="reporte-opcion"
+        [disabled]="procesandoReporte()"
+        [class.seleccionada]="
+          motivoReporteSeleccionado()
+          === 'DATOS_INCORRECTOS'
+        "
+        (click)="
+          seleccionarMotivoReporte(
+            'DATOS_INCORRECTOS'
+          )
+        "
+      >
+        {{
+        detalleEtiquetas
+        .reporte
+        .direccionIncorrecta
+        }}
+      </button>
+
+
+      <button
+        type="button"
+        class="reporte-opcion"
+        [disabled]="procesandoReporte()"
+        [class.seleccionada]="
+          motivoReporteSeleccionado()
+          === 'CONTACTO_NO_RESPONDE'
+        "
+        (click)="
+          seleccionarMotivoReporte(
+            'CONTACTO_NO_RESPONDE'
+          )
+        "
+      >
+        {{
+        detalleEtiquetas
+        .reporte
+        .contactoNoResponde
+        }}
+      </button>
+
+
+      <button
+        type="button"
+        class="reporte-opcion"
+        [disabled]="procesandoReporte()"
+        [class.seleccionada]="
+          motivoReporteSeleccionado()
+          === 'NO_ES_REAL'
+        "
+        (click)="
+          seleccionarMotivoReporte(
+            'NO_ES_REAL'
+          )
+        "
+      >
+        {{
+        detalleEtiquetas
+        .reporte
+        .noEsReal
+        }}
+      </button>
+
+    </div>
+
+
+    <p class="reporte-aviso">
+      {{ detalleEtiquetas.reporte.aviso }}
+    </p>
+
+  </section>
+
+</div>
+
+}
+
+@if (mostrarToastReporte()) {
+
+<div
+  class="reporte-toast"
+  role="status"
+  aria-live="polite"
+>
+  {{
+  detalleEtiquetas
+  .reporte
+  .confirmacion
+  }}
 </div>
 
 }

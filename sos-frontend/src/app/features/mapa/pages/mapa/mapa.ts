@@ -125,6 +125,23 @@ export class Mapa implements OnInit {
   mostrarModalDetalle =
     signal(false);
 
+  mostrarReporte =
+    signal(false);
+
+  motivoReporteSeleccionado =
+    signal<string | null>(
+      null
+    );
+
+  reporteDesdeModalDetalle =
+    signal(false);
+
+  procesandoReporte =
+    signal(false);
+
+  mostrarToastReporte =
+    signal(false);
+
 
   // ==========================================
   // PUNTOS FILTRADOS
@@ -444,6 +461,135 @@ export class Mapa implements OnInit {
     );
   }
 
+  // ==========================================
+// REPORTE DE INFORMACIÓN
+// ==========================================
+
+  abrirReporte(
+    desdeModalDetalle = false
+  ): void {
+
+    if (!this.puntoSeleccionado()) {
+      return;
+    }
+
+
+    this.reporteDesdeModalDetalle.set(
+      desdeModalDetalle
+    );
+
+    this.motivoReporteSeleccionado.set(
+      null
+    );
+
+    this.procesandoReporte.set(
+      false
+    );
+
+    this.mostrarReporte.set(
+      true
+    );
+  }
+
+
+  cerrarReporte(): void {
+
+    if (this.procesandoReporte()) {
+      return;
+    }
+
+
+    this.mostrarReporte.set(
+      false
+    );
+
+    this.motivoReporteSeleccionado.set(
+      null
+    );
+
+    this.reporteDesdeModalDetalle.set(
+      false
+    );
+  }
+
+
+  seleccionarMotivoReporte(
+    motivo: string
+  ): void {
+
+    if (this.procesandoReporte()) {
+      return;
+    }
+
+
+    this.motivoReporteSeleccionado.set(
+      motivo
+    );
+
+    this.procesandoReporte.set(
+      true
+    );
+
+
+    setTimeout(
+      () => {
+
+        const cerrarModalDetalle =
+          this.reporteDesdeModalDetalle();
+
+
+        this.mostrarReporte.set(
+          false
+        );
+
+        this.procesandoReporte.set(
+          false
+        );
+
+        this.motivoReporteSeleccionado.set(
+          null
+        );
+
+        this.reporteDesdeModalDetalle.set(
+          false
+        );
+
+
+        if (cerrarModalDetalle) {
+
+          this.mostrarModalDetalle.set(
+            false
+          );
+        }
+
+
+        this.mostrarConfirmacionReporte();
+
+      },
+      700
+    );
+  }
+
+
+  private mostrarConfirmacionReporte(): void {
+
+    this.mostrarToastReporte.set(
+      true
+    );
+
+
+    setTimeout(
+      () => {
+
+        this.mostrarToastReporte.set(
+          false
+        );
+
+      },
+      3000
+    );
+  }
+
 
   // ==========================================
   // CERRAR PANEL DE DETALLE
@@ -464,6 +610,22 @@ export class Mapa implements OnInit {
     );
 
     this.cargandoDetalle.set(
+      false
+    );
+
+    this.mostrarReporte.set(
+      false
+    );
+
+    this.motivoReporteSeleccionado.set(
+      null
+    );
+
+    this.reporteDesdeModalDetalle.set(
+      false
+    );
+
+    this.procesandoReporte.set(
       false
     );
   }

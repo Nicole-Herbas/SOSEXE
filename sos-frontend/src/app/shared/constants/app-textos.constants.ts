@@ -315,6 +315,30 @@ mapa: {
 
     errorCarga:
       'No se pudo cargar el detalle completo.',
+
+    reporte: {
+
+      titulo:
+        '¿Qué pasa con este punto?',
+
+      yaNoRecibe:
+        'Ya no recibe donaciones',
+
+      direccionIncorrecta:
+        'La dirección u horario son incorrectos',
+
+      contactoNoResponde:
+        'El contacto no responde',
+
+      noEsReal:
+        'Creo que no es real',
+
+      aviso:
+        'No se cambia el estado de un punto solo por reportes. Un moderador revisará la información antes de realizar cambios.',
+
+      confirmacion:
+        'Gracias. Pasa a revisión del equipo.',
+    },
   },
 
   filtrosTipo: {
