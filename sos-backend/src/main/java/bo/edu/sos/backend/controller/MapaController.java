@@ -4,10 +4,7 @@ import bo.edu.sos.backend.dto.ApiResponse;
 import bo.edu.sos.backend.dto.PuntoMapaDTO;
 import bo.edu.sos.backend.service.MapaService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -22,18 +19,32 @@ public class MapaController {
     }
 
     @GetMapping("/puntos")
-    public ResponseEntity<ApiResponse<List<PuntoMapaDTO>>> listarPuntos() {
+    public ResponseEntity<ApiResponse<List<PuntoMapaDTO>>> listarPuntos(
+            @RequestParam(required = false) String tipo,
+            @RequestParam(required = false) String necesidad,
+            @RequestParam(required = false) String departamento,
+            @RequestParam(required = false) String buscar) {
+
         return ResponseEntity.ok(
-                ApiResponse.ok(mapaService.listarPuntosMapa()));
+                ApiResponse.ok(
+                        mapaService.listarPuntosMapa(
+                                tipo,
+                                necesidad,
+                                departamento,
+                                buscar
+                        )
+                )
+        );
     }
+
     @GetMapping("/puntos/{origen}/{id}")
-    public ResponseEntity<ApiResponse<PuntoMapaDTO>> obtenerDetalle(
+    public ResponseEntity<ApiResponse<PuntoMapaDTO>> buscarDetalle(
             @PathVariable String origen,
             @PathVariable Long id) {
 
         return ResponseEntity.ok(
                 ApiResponse.ok(
-                        mapaService.obtenerDetallePunto(origen, id)
+                        mapaService.buscarDetalle(origen, id)
                 )
         );
     }

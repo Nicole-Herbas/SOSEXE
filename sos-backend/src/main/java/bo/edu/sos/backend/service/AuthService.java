@@ -11,15 +11,18 @@ import bo.edu.sos.backend.entity.Rol;
 import bo.edu.sos.backend.entity.Usuario;
 import bo.edu.sos.backend.exception.DuplicateResourceException;
 import bo.edu.sos.backend.exception.ResourceNotFoundException;
+import bo.edu.sos.backend.helper.LogHelper;
 import bo.edu.sos.backend.repository.DepartamentoRepository;
 import bo.edu.sos.backend.repository.RolRepository;
 import bo.edu.sos.backend.repository.UsuarioRepository;
 import bo.edu.sos.backend.security.JwtService;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
+
 
 @Service
 public class AuthService {
@@ -50,18 +53,31 @@ public class AuthService {
 
 
     @Transactional
-    public void registrar(RegistroRequestDTO request) {
+    public void registrar(
+            RegistroRequestDTO request) {
 
-        if (usuarioRepository.existsByEmail(request.getEmail())) {
+        if (usuarioRepository.existsByEmail(
+                request.getEmail()
+        )) {
+
             throw new DuplicateResourceException(
                     "El correo ya está registrado"
             );
         }
 
-        Usuario usuario = new Usuario();
 
-        usuario.setNombre(request.getNombre());
-        usuario.setEmail(request.getEmail());
+        Usuario usuario =
+                new Usuario();
+
+
+        usuario.setNombre(
+                request.getNombre()
+        );
+
+        usuario.setEmail(
+                request.getEmail()
+        );
+
 
         usuario.setPassword(
                 passwordEncoder.encode(
@@ -69,20 +85,27 @@ public class AuthService {
                 )
         );
 
+
         usuario.setTelefono(
                 request.getTelefono()
         );
 
 
         Rol rolUsuario =
-                rolRepository.findByNombre(Roles.USER)
+                rolRepository
+                        .findByNombre(
+                                Roles.USER
+                        )
                         .orElseThrow(() ->
                                 new IllegalStateException(
                                         "El rol USER no existe en la base de datos"
                                 )
                         );
 
-        usuario.setRol(rolUsuario);
+
+        usuario.setRol(
+                rolUsuario
+        );
 
 
         if (request.getDepartamentoId() != null) {
@@ -99,16 +122,26 @@ public class AuthService {
                                     )
                             );
 
+
             usuario.setDepartamento(
                     departamento
             );
         }
 
 
-        usuario.setActivo(true);
+        usuario.setActivo(
+                true
+        );
+
 
         usuarioRepository.save(
                 usuario
+        );
+
+
+        LogHelper.info(
+                AuthService.class,
+                "Registro de usuario completado correctamente"
         );
     }
 
@@ -124,6 +157,12 @@ public class AuthService {
 
 
         if (usuarioOpt.isEmpty()) {
+
+            LogHelper.warn(
+                    AuthService.class,
+                    "Intento de inicio de sesión rechazado"
+            );
+
             return Optional.empty();
         }
 
@@ -131,9 +170,15 @@ public class AuthService {
         Usuario usuario =
                 usuarioOpt.get();
 
+
         if (!Boolean.TRUE.equals(
                 usuario.getActivo()
         )) {
+
+            LogHelper.warn(
+                    AuthService.class,
+                    "Inicio de sesión rechazado por usuario inactivo"
+            );
 
             return Optional.empty();
         }
@@ -147,6 +192,12 @@ public class AuthService {
 
 
         if (!passwordCorrecto) {
+
+            LogHelper.warn(
+                    AuthService.class,
+                    "Intento de inicio de sesión con credenciales inválidas"
+            );
+
             return Optional.empty();
         }
 
@@ -179,6 +230,12 @@ public class AuthService {
                 );
 
 
+        LogHelper.info(
+                AuthService.class,
+                "Inicio de sesión completado correctamente"
+        );
+
+
         return Optional.of(
                 resultado
         );
@@ -190,7 +247,10 @@ public class AuthService {
             String email) {
 
         Usuario usuario =
-                usuarioRepository.findByEmail(email)
+                usuarioRepository
+                        .findByEmail(
+                                email
+                        )
                         .orElseThrow(() ->
                                 new ResourceNotFoundException(
                                         "No existe un usuario con email: "
@@ -199,12 +259,19 @@ public class AuthService {
                         );
 
 
+        LogHelper.debug(
+                AuthService.class,
+                "Consulta de usuario autenticado completada"
+        );
+
+
         return new UsuarioAutenticadoDTO(
                 usuario.getNombre(),
                 usuario.getEmail(),
                 usuario.getRol().getNombre()
         );
     }
+
 
     @Transactional
     public Optional<LoginResultDTO> refrescar(
@@ -217,6 +284,12 @@ public class AuthService {
 
 
         if (usuarioOpt.isEmpty()) {
+
+            LogHelper.warn(
+                    AuthService.class,
+                    "Intento de renovación con refresh token inválido"
+            );
+
             return Optional.empty();
         }
 
@@ -232,6 +305,13 @@ public class AuthService {
             refreshTokenService.revocar(
                     refreshToken
             );
+
+
+            LogHelper.warn(
+                    AuthService.class,
+                    "Renovación de sesión rechazada por usuario inactivo"
+            );
+
 
             return Optional.empty();
         }
@@ -265,19 +345,36 @@ public class AuthService {
                 );
 
 
+        LogHelper.info(
+                AuthService.class,
+                "Token de acceso renovado correctamente"
+        );
+
+
         return Optional.of(
                 resultado
         );
     }
+
+
     @Transactional
     public void logout(
             String refreshToken) {
 
-        if (refreshToken != null &&
-                !refreshToken.isBlank()) {
+        if (
+                refreshToken != null
+                        &&
+                        !refreshToken.isBlank()
+        ) {
 
             refreshTokenService.revocar(
                     refreshToken
+            );
+
+
+            LogHelper.info(
+                    AuthService.class,
+                    "Sesión cerrada correctamente"
             );
         }
     }

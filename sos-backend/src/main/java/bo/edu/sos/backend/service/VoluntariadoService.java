@@ -5,15 +5,18 @@ import bo.edu.sos.backend.entity.Centro;
 import bo.edu.sos.backend.entity.Usuario;
 import bo.edu.sos.backend.entity.Voluntariado;
 import bo.edu.sos.backend.exception.BadRequestException;
+import bo.edu.sos.backend.exception.ForbiddenException;
 import bo.edu.sos.backend.exception.ResourceNotFoundException;
+import bo.edu.sos.backend.helper.LogHelper;
 import bo.edu.sos.backend.repository.CentroRepository;
 import bo.edu.sos.backend.repository.UsuarioRepository;
 import bo.edu.sos.backend.repository.VoluntariadoRepository;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import bo.edu.sos.backend.exception.ForbiddenException;
 
 import java.util.List;
+
 
 @Service
 public class VoluntariadoService {
@@ -21,6 +24,7 @@ public class VoluntariadoService {
     private final VoluntariadoRepository voluntariadoRepository;
     private final CentroRepository centroRepository;
     private final UsuarioRepository usuarioRepository;
+
 
     public VoluntariadoService(
             VoluntariadoRepository voluntariadoRepository,
@@ -32,37 +36,93 @@ public class VoluntariadoService {
         this.usuarioRepository = usuarioRepository;
     }
 
+
     @Transactional(readOnly = true)
     public List<VoluntariadoDTO> listarTodos() {
-        return voluntariadoRepository.findAll()
-                .stream()
-                .map(this::convertirADTO)
-                .toList();
+
+        List<VoluntariadoDTO> voluntariados =
+                voluntariadoRepository
+                        .findAll()
+                        .stream()
+                        .map(this::convertirADTO)
+                        .toList();
+
+
+        LogHelper.debug(
+                VoluntariadoService.class,
+                "Listado de voluntariados obtenido. cantidad={}",
+                voluntariados.size()
+        );
+
+
+        return voluntariados;
     }
+
 
     @Transactional(readOnly = true)
-    public VoluntariadoDTO buscarPorId(Long id) {
-        Voluntariado voluntariado = voluntariadoRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Voluntariado", id));
+    public VoluntariadoDTO buscarPorId(
+            Long id) {
 
-        return convertirADTO(voluntariado);
+        Voluntariado voluntariado =
+                voluntariadoRepository
+                        .findById(id)
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "Voluntariado",
+                                        id
+                                )
+                        );
+
+
+        LogHelper.debug(
+                VoluntariadoService.class,
+                "Voluntariado consultado correctamente. id={}",
+                id
+        );
+
+
+        return convertirADTO(
+                voluntariado
+        );
     }
+
 
     @Transactional(readOnly = true)
-    public List<VoluntariadoDTO> buscarPorCentro(Long centroId) {
-        return voluntariadoRepository.findByCentroId(centroId)
-                .stream()
-                .map(this::convertirADTO)
-                .toList();
+    public List<VoluntariadoDTO> buscarPorCentro(
+            Long centroId) {
+
+        List<VoluntariadoDTO> voluntariados =
+                voluntariadoRepository
+                        .findByCentroId(
+                                centroId
+                        )
+                        .stream()
+                        .map(this::convertirADTO)
+                        .toList();
+
+
+        LogHelper.debug(
+                VoluntariadoService.class,
+                "Voluntariados consultados por centro. centroId={}, cantidad={}",
+                centroId,
+                voluntariados.size()
+        );
+
+
+        return voluntariados;
     }
+
 
     @Transactional
     public VoluntariadoDTO guardar(
             VoluntariadoDTO dto,
             String emailAutenticado) {
 
-        if (dto.getFechaFin().isBefore(
-                dto.getFechaInicio())) {
+        if (
+                dto.getFechaFin().isBefore(
+                        dto.getFechaInicio()
+                )
+        ) {
 
             throw new BadRequestException(
                     "La fecha de fin no puede ser anterior a la fecha de inicio"
@@ -72,7 +132,9 @@ public class VoluntariadoService {
 
         Usuario usuario =
                 usuarioRepository
-                        .findByEmail(emailAutenticado)
+                        .findByEmail(
+                                emailAutenticado
+                        )
                         .orElseThrow(() ->
                                 new ResourceNotFoundException(
                                         "No existe un usuario con email: "
@@ -83,7 +145,9 @@ public class VoluntariadoService {
 
         Centro centro =
                 centroRepository
-                        .findById(dto.getCentroId())
+                        .findById(
+                                dto.getCentroId()
+                        )
                         .orElseThrow(() ->
                                 new ResourceNotFoundException(
                                         "Centro",
@@ -92,9 +156,12 @@ public class VoluntariadoService {
                         );
 
 
-        if (!puedeAdministrarCentro(
-                usuario,
-                centro)) {
+        if (
+                !puedeAdministrarCentro(
+                        usuario,
+                        centro
+                )
+        ) {
 
             throw new ForbiddenException(
                     "No tienes permiso para crear voluntariados para este centro"
@@ -128,10 +195,20 @@ public class VoluntariadoService {
                 );
 
 
+        LogHelper.info(
+                VoluntariadoService.class,
+                "Voluntariado creado correctamente. id={}, centroId={}, estado={}",
+                guardado.getId(),
+                centro.getId(),
+                guardado.getEstado()
+        );
+
+
         return convertirADTO(
                 guardado
         );
     }
+
 
     @Transactional
     public VoluntariadoDTO actualizar(
@@ -139,12 +216,22 @@ public class VoluntariadoService {
             VoluntariadoDTO dto,
             String emailAutenticado) {
 
-        Voluntariado voluntariado = voluntariadoRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Voluntariado", id));
+        Voluntariado voluntariado =
+                voluntariadoRepository
+                        .findById(id)
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "Voluntariado",
+                                        id
+                                )
+                        );
+
 
         Usuario usuario =
                 usuarioRepository
-                        .findByEmail(emailAutenticado)
+                        .findByEmail(
+                                emailAutenticado
+                        )
                         .orElseThrow(() ->
                                 new ResourceNotFoundException(
                                         "No existe un usuario con email: "
@@ -153,26 +240,56 @@ public class VoluntariadoService {
                         );
 
 
-        if (!puedeAdministrarCentro(
-                usuario,
-                voluntariado.getCentro())) {
+        if (
+                !puedeAdministrarCentro(
+                        usuario,
+                        voluntariado.getCentro()
+                )
+        ) {
 
             throw new ForbiddenException(
                     "No tienes permiso para modificar este voluntariado"
             );
         }
 
-        if (dto.getFechaFin().isBefore(dto.getFechaInicio())) {
+
+        if (
+                dto.getFechaFin().isBefore(
+                        dto.getFechaInicio()
+                )
+        ) {
+
             throw new BadRequestException(
-                    "La fecha de fin no puede ser anterior a la fecha de inicio");
+                    "La fecha de fin no puede ser anterior a la fecha de inicio"
+            );
         }
 
-        copiarDTOaEntidad(dto, voluntariado);
 
-        Voluntariado actualizado = voluntariadoRepository.save(voluntariado);
+        copiarDTOaEntidad(
+                dto,
+                voluntariado
+        );
 
-        return convertirADTO(actualizado);
+
+        Voluntariado actualizado =
+                voluntariadoRepository.save(
+                        voluntariado
+                );
+
+
+        LogHelper.info(
+                VoluntariadoService.class,
+                "Voluntariado actualizado correctamente. id={}, estado={}",
+                id,
+                actualizado.getEstado()
+        );
+
+
+        return convertirADTO(
+                actualizado
+        );
     }
+
 
     @Transactional
     public void eliminar(
@@ -192,7 +309,9 @@ public class VoluntariadoService {
 
         Usuario usuario =
                 usuarioRepository
-                        .findByEmail(emailAutenticado)
+                        .findByEmail(
+                                emailAutenticado
+                        )
                         .orElseThrow(() ->
                                 new ResourceNotFoundException(
                                         "No existe un usuario con email: "
@@ -201,9 +320,12 @@ public class VoluntariadoService {
                         );
 
 
-        if (!puedeAdministrarCentro(
-                usuario,
-                voluntariado.getCentro())) {
+        if (
+                !puedeAdministrarCentro(
+                        usuario,
+                        voluntariado.getCentro()
+                )
+        ) {
 
             throw new ForbiddenException(
                     "No tienes permiso para eliminar este voluntariado"
@@ -214,66 +336,155 @@ public class VoluntariadoService {
         voluntariadoRepository.delete(
                 voluntariado
         );
+
+
+        LogHelper.info(
+                VoluntariadoService.class,
+                "Voluntariado eliminado correctamente. id={}",
+                id
+        );
     }
 
-    private void copiarDTOaEntidad(VoluntariadoDTO dto, Voluntariado voluntariado) {
 
-        voluntariado.setTitulo(dto.getTitulo());
-        voluntariado.setDescripcion(dto.getDescripcion());
-        voluntariado.setFechaInicio(dto.getFechaInicio());
-        voluntariado.setFechaFin(dto.getFechaFin());
-        voluntariado.setHabilidadesRequeridas(dto.getHabilidadesRequeridas());
+    private void copiarDTOaEntidad(
+            VoluntariadoDTO dto,
+            Voluntariado voluntariado) {
+
+        voluntariado.setTitulo(
+                dto.getTitulo()
+        );
+
+        voluntariado.setDescripcion(
+                dto.getDescripcion()
+        );
+
+        voluntariado.setFechaInicio(
+                dto.getFechaInicio()
+        );
+
+        voluntariado.setFechaFin(
+                dto.getFechaFin()
+        );
+
+        voluntariado.setHabilidadesRequeridas(
+                dto.getHabilidadesRequeridas()
+        );
+
 
         if (dto.getEstado() != null) {
-            voluntariado.setEstado(dto.getEstado());
+
+            voluntariado.setEstado(
+                    dto.getEstado()
+            );
         }
 
-        Centro centro = centroRepository.findById(dto.getCentroId())
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "Centro", dto.getCentroId()));
-        voluntariado.setCentro(centro);
+
+        Centro centro =
+                centroRepository
+                        .findById(
+                                dto.getCentroId()
+                        )
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "Centro",
+                                        dto.getCentroId()
+                                )
+                        );
 
 
+        voluntariado.setCentro(
+                centro
+        );
     }
 
-    private VoluntariadoDTO convertirADTO(Voluntariado voluntariado) {
 
-        VoluntariadoDTO dto = new VoluntariadoDTO();
+    private VoluntariadoDTO convertirADTO(
+            Voluntariado voluntariado) {
 
-        dto.setId(voluntariado.getId());
-        dto.setTitulo(voluntariado.getTitulo());
-        dto.setDescripcion(voluntariado.getDescripcion());
-        dto.setFechaInicio(voluntariado.getFechaInicio());
-        dto.setFechaFin(voluntariado.getFechaFin());
-        dto.setHabilidadesRequeridas(voluntariado.getHabilidadesRequeridas());
-        dto.setEstado(voluntariado.getEstado());
+        VoluntariadoDTO dto =
+                new VoluntariadoDTO();
+
+
+        dto.setId(
+                voluntariado.getId()
+        );
+
+        dto.setTitulo(
+                voluntariado.getTitulo()
+        );
+
+        dto.setDescripcion(
+                voluntariado.getDescripcion()
+        );
+
+        dto.setFechaInicio(
+                voluntariado.getFechaInicio()
+        );
+
+        dto.setFechaFin(
+                voluntariado.getFechaFin()
+        );
+
+        dto.setHabilidadesRequeridas(
+                voluntariado.getHabilidadesRequeridas()
+        );
+
+        dto.setEstado(
+                voluntariado.getEstado()
+        );
+
 
         if (voluntariado.getCentro() != null) {
-            dto.setCentroId(voluntariado.getCentro().getId());
-            dto.setCentroNombre(voluntariado.getCentro().getNombre());
+
+            dto.setCentroId(
+                    voluntariado
+                            .getCentro()
+                            .getId()
+            );
+
+            dto.setCentroNombre(
+                    voluntariado
+                            .getCentro()
+                            .getNombre()
+            );
         }
 
+
         if (voluntariado.getCreadoPor() != null) {
-            dto.setCreadoPorId(voluntariado.getCreadoPor().getId());
+
+            dto.setCreadoPorId(
+                    voluntariado
+                            .getCreadoPor()
+                            .getId()
+            );
         }
+
 
         return dto;
     }
+
+
     private boolean puedeAdministrarCentro(
             Usuario usuario,
             Centro centro) {
 
         boolean esAdmin =
                 "ADMIN".equals(
-                        usuario.getRol().getNombre()
+                        usuario
+                                .getRol()
+                                .getNombre()
                 );
 
 
         boolean esResponsable =
                 centro.getResponsable() != null
-                        && centro.getResponsable()
-                        .getId()
-                        .equals(usuario.getId());
+                        &&
+                        centro
+                                .getResponsable()
+                                .getId()
+                                .equals(
+                                        usuario.getId()
+                                );
 
 
         return esAdmin || esResponsable;
