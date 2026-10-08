@@ -681,13 +681,29 @@ readonly actividadesVoluntariado =
 
   async guardarBorrador(): Promise<void> {
 
+    if (!this.haySesion || !this.usuarioEmail) {
+
+      this.mostrarModalBorrador = true;
+      this.guardandoBorrador = false;
+      this.errorBorrador = true;
+
+      this.mensajeBorrador =
+        'Debes iniciar sesión para guardar el borrador.';
+
+      this.cdr.detectChanges();
+
+      return;
+    }
+
     // Abre el modal en modo "Guardando..."
     this.mostrarModalBorrador = true;
     this.guardandoBorrador = true;
     this.errorBorrador = false;
     this.cdr.detectChanges();
 
+
     const borrador = {
+
       guardadoEn: new Date().toISOString(),
       currentStep: this.currentStep,
 
@@ -714,33 +730,95 @@ readonly actividadesVoluntariado =
       referencia: this.referencia,
 
       // Paso 4
-      necesidadesSeleccionadas: [...this.necesidadesSeleccionadas],
-      donacionesSeleccionadas: [...this.donacionesSeleccionadas],
-      solicitaVoluntarios: this.solicitaVoluntarios,
-      actividadesSeleccionadas: [...this.actividadesSeleccionadas],
-      descripcionVoluntariado: this.descripcionVoluntariado
+      necesidadesSeleccionadas: [
+        ...this.necesidadesSeleccionadas
+      ],
+
+      donacionesSeleccionadas: [
+        ...this.donacionesSeleccionadas
+      ],
+
+      solicitaVoluntarios:
+        this.solicitaVoluntarios,
+
+      actividadesSeleccionadas: [
+        ...this.actividadesSeleccionadas
+      ],
+
+      descripcionVoluntariado:
+        this.descripcionVoluntariado
     };
 
-        try {
-      // 1. Textos
-      localStorage.setItem(this.BORRADOR_KEY, JSON.stringify(borrador));
 
-      // 2. Archivos (paso 3)
-      await this.guardarArchivosBorrador();
+    const clave = this.BORRADOR_KEY;
 
-      // Pequeña pausa para que se alcance a ver "Guardando..."
+    // Guardamos el estado anterior por si IndexedDB falla.
+    const borradorAnterior =
+      localStorage.getItem(clave);
+
+
+    try {
+
+      // 1. Guardar textos en localStorage
+      localStorage.setItem(
+        clave,
+        JSON.stringify(borrador)
+      );
+
+
+      // 2. Guardar archivos en IndexedDB
+      try {
+
+        await this.guardarArchivosBorrador();
+
+      } catch (errorIndexedDB) {
+
+        // Restaurar el borrador anterior
+        // para no dejar un guardado incompleto.
+
+        if (borradorAnterior === null) {
+
+          localStorage.removeItem(clave);
+
+        } else {
+
+          localStorage.setItem(
+            clave,
+            borradorAnterior
+          );
+
+        }
+
+        throw errorIndexedDB;
+      }
+
+
+      // Pequeña pausa para mostrar "Guardando..."
       await this.esperar(700);
 
-      this.fechaBorrador = this.formatearFecha(borrador.guardadoEn);
-      this.mensajeBorrador = `Borrador guardado · ${this.fechaBorrador}`;
+
+      this.fechaBorrador =
+        this.formatearFecha(
+          borrador.guardadoEn
+        );
+
+      this.mensajeBorrador =
+        `Borrador guardado · ${this.fechaBorrador}`;
 
     } catch (error) {
-      console.error('Error al guardar el borrador:', error);
+
+      console.error(
+        'Error al guardar el borrador:',
+        error
+      );
+
       this.errorBorrador = true;
-      this.mensajeBorrador = 'No se pudo guardar el borrador. Inténtalo de nuevo.';
+
+      this.mensajeBorrador =
+        'No se pudo guardar el borrador. Inténtalo de nuevo.';
     }
 
-    // Cambia el modal a "¡Guardado!" o "Error"
+
     this.guardandoBorrador = false;
     this.cdr.detectChanges();
   }
