@@ -1,7 +1,12 @@
 .pagina-mapa {
-  max-width: 1400px;
+  width: 100%;
+  max-width: none;
+
   margin: 0 auto;
   padding: 32px;
+
+  box-sizing: border-box;
+
   font-family: Arial, sans-serif;
   color: #263238;
 }
@@ -98,11 +103,15 @@
   display: grid;
 
   grid-template-columns:
-    300px
-    minmax(400px, 1fr)
-    330px;
+    minmax(250px, 300px)
+    minmax(0, 1fr)
+    minmax(300px, 360px);
 
-  height: 610px;
+  height: clamp(
+    560px,
+    72vh,
+    760px
+  );
 
   overflow: hidden;
 
@@ -335,23 +344,38 @@
 }
 
 .columna-derecha {
+  min-width: 0;
+  min-height: 0;
+
   padding: 14px;
+
+  overflow: hidden;
+
+  box-sizing: border-box;
 
   background: #f7f7f6;
 }
 
 .detalle-card {
+  position: relative;
+
+  width: 100%;
   height: 100%;
+
+  min-height: 0;
 
   box-sizing: border-box;
 
   padding: 20px;
 
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  scrollbar-gutter: stable;
+
   border-radius: 18px;
 
   background: white;
-
-  overflow-y: auto;
 }
 
 .detalle-etiquetas {
@@ -541,9 +565,6 @@
   cursor: pointer;
 }
 
-.detalle-card {
-  position: relative;
-}
 
 .tag-verificado.pendiente {
   background: #fef3d9;
@@ -952,3 +973,142 @@
 }
 
 
+@media (max-width: 1100px) {
+
+  .pagina-mapa {
+    padding: 24px;
+  }
+
+  .contenedor-mapa {
+    grid-template-columns:
+      260px
+      minmax(0, 1fr);
+
+    grid-template-rows:
+      minmax(500px, 65vh)
+      auto;
+
+    height: auto;
+  }
+
+  .columna-izquierda {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .columna-mapa {
+    grid-column: 2;
+    grid-row: 1;
+
+    min-height: 500px;
+  }
+
+  .columna-derecha {
+    grid-column: 1 / -1;
+    grid-row: 2;
+
+    max-height: 420px;
+
+    border-top: 1px solid #e1e5e5;
+  }
+
+  .detalle-card {
+    max-height: 390px;
+  }
+}
+
+@media (max-width: 768px) {
+
+  .pagina-mapa {
+    padding: 16px;
+  }
+
+  .encabezado-mapa {
+    flex-direction: column;
+
+    align-items: flex-start;
+
+    gap: 16px;
+  }
+
+  .encabezado-mapa h1 {
+    font-size: 26px;
+  }
+
+  .contador-verificados {
+    align-self: flex-start;
+  }
+
+  .filtros-tipo {
+    overflow-x: auto;
+
+    flex-wrap: nowrap;
+
+    padding-bottom: 5px;
+  }
+
+  .filtro {
+    flex-shrink: 0;
+  }
+
+
+  .contenedor-mapa {
+    display: grid;
+
+    grid-template-columns: 1fr;
+
+    grid-template-rows:
+      auto
+      420px
+      auto;
+
+    height: auto;
+
+    overflow: visible;
+  }
+
+
+  .columna-izquierda {
+    grid-column: 1;
+    grid-row: 1;
+
+    border-right: none;
+    border-bottom: 1px solid #e1e5e5;
+  }
+
+
+  .lista-resultados {
+    height: auto;
+    max-height: 280px;
+  }
+
+
+  .columna-mapa {
+    grid-column: 1;
+    grid-row: 2;
+
+    min-height: 420px;
+  }
+
+
+  .columna-derecha {
+    grid-column: 1;
+    grid-row: 3;
+
+    max-height: none;
+
+    border-top: 1px solid #e1e5e5;
+  }
+
+
+  .detalle-card {
+    height: auto;
+
+    max-height: 60vh;
+  }
+
+
+  .acciones {
+    grid-template-columns: 1fr;
+  }
+}
