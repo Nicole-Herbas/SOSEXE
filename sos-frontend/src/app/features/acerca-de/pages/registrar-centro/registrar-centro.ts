@@ -829,63 +829,162 @@ readonly actividadesVoluntariado =
 
   async cargarBorrador(): Promise<void> {
 
-    if (typeof localStorage === 'undefined') {
-      return;
-    }
+  if (
+    typeof localStorage === 'undefined' ||
+    !this.usuarioEmail
+  ) {
+    return;
+  }
 
-    const guardado = localStorage.getItem(this.BORRADOR_KEY);
 
-    if (!guardado) {
-      return;
-    }
+  const guardado =
+    localStorage.getItem(this.BORRADOR_KEY);
+
+
+  if (!guardado) {
+    return;
+  }
+
+
+  try {
+
+    const b = JSON.parse(guardado);
+
+
+    // currentStep válido solamente entre 1 y 5
+    const paso =
+      Number(b.currentStep);
+
+    this.currentStep =
+      Number.isInteger(paso) &&
+      paso >= 1 &&
+      paso <= 5
+        ? paso
+        : 1;
+
+
+    // ==========================================
+    // PASO 1
+    // ==========================================
+
+    this.nombreCentro =
+      b.nombreCentro ?? '';
+
+    this.tipoOrganizacion =
+      b.tipoOrganizacion ?? '';
+
+    this.departamentoId =
+      b.departamentoId ?? null;
+
+    this.nit =
+      b.nit ?? '';
+
+    this.personeriaJuridica =
+      b.personeriaJuridica ?? '';
+
+    this.fechaFundacion =
+      b.fechaFundacion ?? '';
+
+    this.paginaWeb =
+      b.paginaWeb ?? '';
+
+    this.descripcion =
+      b.descripcion ?? '';
+
+    this.poblacionAtendida =
+      b.poblacionAtendida ?? '';
+
+
+    // ==========================================
+    // PASO 2
+    // ==========================================
+
+    this.nombreResponsable =
+      b.nombreResponsable ?? '';
+
+    this.cargoResponsable =
+      b.cargoResponsable ?? '';
+
+    this.documentoResponsable =
+      b.documentoResponsable ?? '';
+
+    this.correoResponsable =
+      b.correoResponsable ?? '';
+
+    this.telefonoResponsable =
+      b.telefonoResponsable ?? '';
+
+    this.ciudad =
+      b.ciudad ?? '';
+
+    this.departamentoUbicacion =
+      b.departamentoUbicacion ?? '';
+
+    this.direccionExacta =
+      b.direccionExacta ?? '';
+
+    this.referencia =
+      b.referencia ?? '';
+
+
+    // ==========================================
+    // PASO 4
+    // ==========================================
+
+    this.necesidadesSeleccionadas =
+      b.necesidadesSeleccionadas ?? [];
+
+    this.donacionesSeleccionadas =
+      b.donacionesSeleccionadas ?? [];
+
+    this.solicitaVoluntarios =
+      b.solicitaVoluntarios ?? null;
+
+    this.actividadesSeleccionadas =
+      b.actividadesSeleccionadas ?? [];
+
+    this.descripcionVoluntariado =
+      b.descripcionVoluntariado ?? '';
+
+
+    // ==========================================
+    // PASO 3 - ARCHIVOS
+    // ==========================================
+
+    await this.cargarArchivosBorrador();
+
+
+    this.borradorRecuperado = true;
+
+    this.fechaBorrador =
+      b.guardadoEn
+        ? this.formatearFecha(b.guardadoEn)
+        : '';
+
+  } catch (error) {
+
+    console.error(
+      'Error al recuperar el borrador:',
+      error
+    );
 
     try {
-      const b = JSON.parse(guardado);
 
-      this.currentStep = b.currentStep ?? 1;
+      await this.eliminarBorrador();
 
-      // Paso 1
-      this.nombreCentro = b.nombreCentro ?? '';
-      this.tipoOrganizacion = b.tipoOrganizacion ?? '';
-      this.departamentoId = b.departamentoId ?? null;
-      this.nit = b.nit ?? '';
-      this.personeriaJuridica = b.personeriaJuridica ?? '';
-      this.fechaFundacion = b.fechaFundacion ?? '';
-      this.paginaWeb = b.paginaWeb ?? '';
-      this.descripcion = b.descripcion ?? '';
-      this.poblacionAtendida = b.poblacionAtendida ?? '';
+    } catch (errorEliminacion) {
 
-      // Paso 2
-      this.nombreResponsable = b.nombreResponsable ?? '';
-      this.cargoResponsable = b.cargoResponsable ?? '';
-      this.documentoResponsable = b.documentoResponsable ?? '';
-      this.correoResponsable = b.correoResponsable ?? '';
-      this.telefonoResponsable = b.telefonoResponsable ?? '';
-      this.ciudad = b.ciudad ?? '';
-      this.departamentoUbicacion = b.departamentoUbicacion ?? '';
-      this.direccionExacta = b.direccionExacta ?? '';
-      this.referencia = b.referencia ?? '';
+      console.error(
+        'No se pudo eliminar el borrador dañado:',
+        errorEliminacion
+      );
 
-      // Paso 4
-      this.necesidadesSeleccionadas = b.necesidadesSeleccionadas ?? [];
-      this.donacionesSeleccionadas = b.donacionesSeleccionadas ?? [];
-      this.solicitaVoluntarios = b.solicitaVoluntarios ?? null;
-      this.actividadesSeleccionadas = b.actividadesSeleccionadas ?? [];
-      this.descripcionVoluntariado = b.descripcionVoluntariado ?? '';
-
-      // Paso 3 (archivos)
-      await this.cargarArchivosBorrador();
-
-      this.borradorRecuperado = true;
-      this.fechaBorrador = b.guardadoEn ? this.formatearFecha(b.guardadoEn) : '';
-
-    } catch (error) {
-      console.error('Error al recuperar el borrador:', error);
-      await this.eliminarBorrador(); // borrador dañado: se descarta
     }
-
-    this.cdr.detectChanges();
   }
+
+
+  this.cdr.detectChanges();
+}
 
   // ==========================================
   // SOS-42: DESCARTAR / ELIMINAR BORRADOR
