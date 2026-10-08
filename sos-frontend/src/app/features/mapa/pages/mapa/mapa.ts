@@ -70,12 +70,9 @@ export class Mapa implements OnInit {
     TIPO_CLASE_MAPA;
 
 
-  featureToggles: FeatureToggles = {
+  featureToggles: Pick<FeatureToggles, 'mapa'> = {
     mapa: {
       ...FEATURE_TOGGLES.mapa
-    },
-    noticias: {
-      ...FEATURE_TOGGLES.noticias
     }
   };
 

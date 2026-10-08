@@ -41,6 +41,32 @@ export interface MapaToggles {
 export interface NoticiasToggles {
   /** true → muestra la alerta estática de referencia; false → la oculta */
   mostrarAlertas: boolean;
+
+  /** true → habilita filtros por categoría en /noticias */
+  mostrarFiltros: boolean;
+
+  /** true → consulta y muestra noticias externas */
+  mostrarExternas: boolean;
+
+  /** true → consulta y muestra noticias propias publicadas */
+  mostrarPropias: boolean;
+}
+
+// ---------------------------------------------------------------------------
+// 🏠 Módulo: Inicio
+// ---------------------------------------------------------------------------
+export interface InicioToggles {
+  /** true → muestra la sección de noticias en /inicio */
+  mostrarSeccionNoticias: boolean;
+
+  /** true → muestra filtros de categoría en /inicio */
+  mostrarFiltrosNoticias: boolean;
+
+  /** true → consulta y muestra noticias externas en /inicio */
+  mostrarNoticiasExternas: boolean;
+
+  /** true → consulta y muestra noticias propias en /inicio */
+  mostrarNoticiasPropias: boolean;
 }
 
 // ---------------------------------------------------------------------------
@@ -49,6 +75,7 @@ export interface NoticiasToggles {
 export interface FeatureToggles {
   mapa: MapaToggles;
   noticias: NoticiasToggles;
+  inicio: InicioToggles;
   // donaciones: DonacionesToggles;
 }
 
@@ -67,6 +94,16 @@ export const FEATURE_TOGGLES: FeatureToggles = {
 
   noticias: {
     mostrarAlertas: true,
+    mostrarFiltros: true,
+    mostrarExternas: true,
+    mostrarPropias: true,
+  },
+
+  inicio: {
+    mostrarSeccionNoticias: true,
+    mostrarFiltrosNoticias: true,
+    mostrarNoticiasExternas: true,
+    mostrarNoticiasPropias: true,
   },
 
 };

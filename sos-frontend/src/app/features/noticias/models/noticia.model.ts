@@ -35,3 +35,15 @@ export interface Noticia {
   fechaPublicacion: string | null;
   esExterna: boolean;
 }
+
+export interface ResultadoNoticiasExternas {
+  noticias: NoticiaExterna[];
+  apiDisponible: boolean;
+  desdeCache: boolean;
+}
+
+export interface ResultadoNoticias {
+  noticias: Noticia[];
+  apiExternaDisponible: boolean | null;
+  noticiasExternasDesdeCache: boolean;
+}

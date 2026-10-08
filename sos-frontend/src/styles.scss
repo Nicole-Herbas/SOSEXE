@@ -37,3 +37,21 @@ button {
   font-family: inherit;
 }
 
+.noticias-aviso-api {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 20px;
+  padding: 12px 16px;
+  border: 1px solid #d9e3e8;
+  border-radius: 10px;
+  background: #f7fafa;
+  color: #526b7c;
+  font-size: 13px;
+}
+
+.noticias-aviso-api__icono {
+  color: #07847e;
+  font-weight: 700;
+}
+

@@ -1,11 +1,14 @@
 package bo.edu.sos.backend.security;
 
 import bo.edu.sos.backend.entity.Usuario;
+import bo.edu.sos.backend.helper.LogHelper;
 import bo.edu.sos.backend.repository.UsuarioRepository;
+
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -15,6 +18,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
+
 
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
@@ -40,39 +44,76 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
 
         String authorizationHeader =
-                request.getHeader("Authorization");
+                request.getHeader(
+                        "Authorization"
+                );
 
 
-        if (authorizationHeader == null ||
-                !authorizationHeader.startsWith("Bearer ")) {
+        if (
+                authorizationHeader == null
+                        ||
+                        !authorizationHeader.startsWith(
+                                "Bearer "
+                        )
+        ) {
 
-            filterChain.doFilter(request, response);
+            filterChain.doFilter(
+                    request,
+                    response
+            );
+
             return;
         }
 
 
         String token =
-                authorizationHeader.substring(7);
+                authorizationHeader.substring(
+                        7
+                );
 
 
         if (!jwtService.esValido(token)) {
 
-            filterChain.doFilter(request, response);
+            LogHelper.debug(
+                    JwtAuthenticationFilter.class,
+                    "Solicitud con JWT inválido o expirado"
+            );
+
+
+            filterChain.doFilter(
+                    request,
+                    response
+            );
+
             return;
         }
 
 
         String email =
-                jwtService.extraerEmail(token);
+                jwtService.extraerEmail(
+                        token
+                );
 
 
         Optional<Usuario> usuarioOpt =
-                usuarioRepository.findByEmail(email);
+                usuarioRepository.findByEmail(
+                        email
+                );
 
 
         if (usuarioOpt.isEmpty()) {
 
-            filterChain.doFilter(request, response);
+            LogHelper.debug(
+                    JwtAuthenticationFilter.class,
+                    "JWT válido pero no existe usuario asociado"
+            );
+
+
+            filterChain.doFilter(
+                    request,
+                    response
+            );
+
             return;
         }
 
@@ -81,21 +122,40 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 usuarioOpt.get();
 
 
-        if (!Boolean.TRUE.equals(usuario.getActivo())) {
+        if (
+                !Boolean.TRUE.equals(
+                        usuario.getActivo()
+                )
+        ) {
 
-            filterChain.doFilter(request, response);
+            LogHelper.debug(
+                    JwtAuthenticationFilter.class,
+                    "Autenticación rechazada por usuario inactivo. usuarioId={}",
+                    usuario.getId()
+            );
+
+
+            filterChain.doFilter(
+                    request,
+                    response
+            );
+
             return;
         }
 
 
-        if (SecurityContextHolder
-                .getContext()
-                .getAuthentication() == null) {
-
+        if (
+                SecurityContextHolder
+                        .getContext()
+                        .getAuthentication()
+                        == null
+        ) {
 
             SimpleGrantedAuthority autoridad =
                     new SimpleGrantedAuthority(
-                            usuario.getRol().getNombre()
+                            usuario
+                                    .getRol()
+                                    .getNombre()
                     );
 
 
@@ -103,16 +163,31 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     new UsernamePasswordAuthenticationToken(
                             usuario.getEmail(),
                             null,
-                            List.of(autoridad)
+                            List.of(
+                                    autoridad
+                            )
                     );
 
 
             SecurityContextHolder
                     .getContext()
-                    .setAuthentication(authentication);
+                    .setAuthentication(
+                            authentication
+                    );
+
+
+            LogHelper.debug(
+                    JwtAuthenticationFilter.class,
+                    "Autenticación JWT establecida correctamente. usuarioId={}, rol={}",
+                    usuario.getId(),
+                    usuario.getRol().getNombre()
+            );
         }
 
 
-        filterChain.doFilter(request, response);
+        filterChain.doFilter(
+                request,
+                response
+        );
     }
 }
