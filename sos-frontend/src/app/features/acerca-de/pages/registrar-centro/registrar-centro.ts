@@ -29,7 +29,8 @@ export class RegistrarCentroComponent implements OnInit {
     private http: HttpClient,
     private router: Router,
     private cdr: ChangeDetectorRef,
-    private sanitizer: DomSanitizer
+    private sanitizer: DomSanitizer,
+    private authService: AuthService
   ) {}
 
   // Rutas relativas: proxy.conf.json las envía al backend
@@ -52,10 +53,38 @@ export class RegistrarCentroComponent implements OnInit {
       return `${this.usuarioEmail}_${tipo}`;
     }
 
-  ngOnInit(): void {
+    async ngOnInit(): Promise<void> {
+
     this.cargarDepartamentos();
-    this.cargarBorrador();
-  }
+
+    if (!this.haySesion) {
+      return;
+    }
+
+    try {
+
+      const usuario = await firstValueFrom(
+        this.authService.usuarioActual()
+      );
+
+      if (!usuario?.email) {
+        return;
+      }
+
+      this.usuarioEmail =
+        usuario.email.trim().toLowerCase();
+
+      await this.cargarBorrador();
+
+    } catch (error) {
+
+      console.error(
+        'No se pudo obtener el usuario autenticado:',
+        error
+      );
+
+    }
+}
 
   currentStep = 1;
   mostrarModalEnvio = false;
