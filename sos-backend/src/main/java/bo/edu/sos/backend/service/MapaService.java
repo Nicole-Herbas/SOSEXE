@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import bo.edu.sos.backend.constants.MapaConstants;
 import java.text.Normalizer;
+import bo.edu.sos.backend.exception.BadRequestException;
+import bo.edu.sos.backend.exception.ResourceNotFoundException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,6 +42,53 @@ public class MapaService {
                 puntos.add(convertirPuntoAyuda(punto)));
 
         return puntos;
+    }
+
+    @Transactional(readOnly = true)
+    public PuntoMapaDTO obtenerDetallePunto(
+            String origen,
+            Long id) {
+
+        if (origen == null || origen.isBlank()) {
+            throw new BadRequestException(
+                    "El origen del punto es obligatorio"
+            );
+        }
+
+        String origenNormalizado =
+                origen.trim().toUpperCase();
+
+        return switch (origenNormalizado) {
+
+            case MapaConstants.ORIGEN_CENTRO ->
+                    centroRepository
+                            .findById(id)
+                            .map(this::convertirCentro)
+                            .orElseThrow(
+                                    () ->
+                                            new ResourceNotFoundException(
+                                                    "Centro",
+                                                    id
+                                            )
+                            );
+
+            case MapaConstants.ORIGEN_PUNTO_AYUDA ->
+                    puntoAyudaRepository
+                            .findById(id)
+                            .map(this::convertirPuntoAyuda)
+                            .orElseThrow(
+                                    () ->
+                                            new ResourceNotFoundException(
+                                                    "Punto de ayuda",
+                                                    id
+                                            )
+                            );
+
+            default ->
+                    throw new BadRequestException(
+                            "Origen de punto no válido: " + origen
+                    );
+        };
     }
 
     private PuntoMapaDTO convertirCentro(Centro centro) {
@@ -148,5 +197,6 @@ public class MapaService {
 
         default -> normalizado;
     };
+
 }
 }
