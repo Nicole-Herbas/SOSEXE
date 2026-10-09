@@ -51,6 +51,9 @@ public final class ApiRoutes {
     public static final String MAPA           = "/api/mapa";
     public static final String MAPA_PUNTOS    = MAPA + "/puntos";
 
+    // ── Perfil de voluntario (SOS-40) ─────────────────────────────────────────
+    public static final String PERFIL_VOLUNTARIO = "/api/perfil-voluntario";
+
     // ── Swagger / OpenAPI ─────────────────────────────────────────────────────
     public static final String SWAGGER_UI     = "/swagger-ui/**";
     public static final String SWAGGER_HTML   = "/swagger-ui.html";
