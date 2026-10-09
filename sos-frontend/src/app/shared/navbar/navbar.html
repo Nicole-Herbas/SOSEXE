@@ -1,5 +1,6 @@
 ﻿<nav class="navbar">
 
+  <!-- Marca -->
   <div class="navbar-brand">
 
     <div class="navbar-icon">
@@ -21,51 +22,80 @@
   </div>
 
 
+  <!-- Botón menú móvil -->
   <button
+    type="button"
     class="navbar-toggle"
     (click)="menuAbierto = !menuAbierto"
+    [attr.aria-expanded]="menuAbierto"
+    aria-label="Abrir menú de navegación"
   >
     {{ textos.iconoMenu }}
   </button>
 
 
+  <!-- Navegación -->
   <ul
     class="navbar-links"
     [class.abierto]="menuAbierto"
   >
 
     <li>
-      <a routerLink="/inicio" routerLinkActive="active">
+      <a
+        routerLink="/inicio"
+        routerLinkActive="active"
+        (click)="cerrarMenus()"
+      >
         {{ textos.enlaces.inicio }}
       </a>
     </li>
 
     <li>
-      <a routerLink="/mapa" routerLinkActive="active">
+      <a
+        routerLink="/mapa"
+        routerLinkActive="active"
+        (click)="cerrarMenus()"
+      >
         {{ textos.enlaces.mapa }}
       </a>
     </li>
 
     <li>
-      <a routerLink="/donar" routerLinkActive="active">
+      <a
+        routerLink="/donar"
+        routerLinkActive="active"
+        (click)="cerrarMenus()"
+      >
         {{ textos.enlaces.donar }}
       </a>
     </li>
 
     <li>
-      <a routerLink="/voluntariado" routerLinkActive="active">
+      <a
+        routerLink="/voluntariado"
+        routerLinkActive="active"
+        (click)="cerrarMenus()"
+      >
         {{ textos.enlaces.voluntariados }}
       </a>
     </li>
 
     <li>
-      <a routerLink="/noticias" routerLinkActive="active">
+      <a
+        routerLink="/noticias"
+        routerLinkActive="active"
+        (click)="cerrarMenus()"
+      >
         {{ textos.enlaces.noticias }}
       </a>
     </li>
 
     <li>
-      <a routerLink="/acerca-de" routerLinkActive="active">
+      <a
+        routerLink="/acerca-de"
+        routerLinkActive="active"
+        (click)="cerrarMenus()"
+      >
         {{ textos.enlaces.acercaDe }}
       </a>
     </li>
@@ -73,9 +103,12 @@
   </ul>
 
 
+  <!-- Acciones -->
   <div class="navbar-actions">
 
+    <!-- Notificaciones -->
     <button
+      type="button"
       class="navbar-bell"
       [attr.aria-label]="textos.notificacionesAria"
     >
@@ -87,43 +120,113 @@
     </button>
 
 
-    <!-- Sin sesión: botón Iniciar sesión -->
+    <!-- Sin sesión -->
     <a
       *ngIf="!sesionActiva"
       class="navbar-login"
       routerLink="/login"
       routerLinkActive="active"
+      (click)="cerrarMenus()"
     >
       {{ textos.iniciarSesion }}
     </a>
 
 
-    <!-- Con sesión: avatar + nombre + cerrar sesión -->
+    <!-- Con sesión -->
     <div
       *ngIf="sesionActiva"
       class="navbar-user"
     >
 
-      <div class="navbar-avatar">
-        <span class="navbar-avatar-icon">👤</span>
-      </div>
-
-      <span class="navbar-username">
-        {{ nombreUsuario }}
-      </span>
-
+      <!-- Botón del usuario -->
       <button
-        class="navbar-logout"
-        (click)="cerrarSesion()"
-        title="Cerrar sesión"
+        type="button"
+        class="navbar-user-trigger"
+        (click)="toggleUsuarioMenu()"
+        [attr.aria-expanded]="usuarioMenuAbierto"
+        aria-haspopup="true"
       >
-        Salir
+
+        <div class="navbar-avatar">
+          <span class="navbar-avatar-icon">
+            👤
+          </span>
+        </div>
+
+        <span class="navbar-username">
+          {{ nombreUsuario }}
+        </span>
+
+        <span
+          class="navbar-user-arrow"
+          [class.abierto]="usuarioMenuAbierto"
+          aria-hidden="true"
+        >
+          ▾
+        </span>
+
       </button>
+
+
+      <!-- Menú del usuario -->
+      <div
+        *ngIf="usuarioMenuAbierto"
+        class="navbar-user-menu"
+        role="menu"
+      >
+
+        <!-- Mis postulaciones -->
+        <a
+          class="navbar-user-menu-item"
+          routerLink="/mis-postulaciones"
+          routerLinkActive="active"
+          (click)="cerrarMenus()"
+          role="menuitem"
+        >
+
+          <span class="navbar-user-menu-icon">
+            📋
+          </span>
+
+          <span>
+            Mis postulaciones
+          </span>
+
+        </a>
+
+
+        <!-- Separador -->
+        <div class="navbar-user-menu-divider"></div>
+
+
+        <!-- Cerrar sesión -->
+        <button
+          type="button"
+          class="navbar-user-menu-item navbar-user-menu-logout"
+          (click)="cerrarSesion()"
+          role="menuitem"
+        >
+
+          <span class="navbar-user-menu-icon">
+            🚪
+          </span>
+
+          <span>
+            Cerrar sesión
+          </span>
+
+        </button>
+
+      </div>
 
     </div>
 
 
-    <button class="navbar-cta">
+    <!-- Botón quiero ayudar -->
+    <button
+      type="button"
+      class="navbar-cta"
+    >
       {{ textos.quieroAyudar }}
     </button>
 

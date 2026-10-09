@@ -7,12 +7,18 @@
   color: #1e1e2f;
   box-shadow: 0 1px 6px rgba(0, 0, 0, 0.08);
   position: relative;
+  z-index: 100;
 }
+
+/* =========================================================
+   MARCA
+   ========================================================= */
 
 .navbar-brand {
   display: flex;
   align-items: center;
   gap: 0.6rem;
+  flex-shrink: 0;
 }
 
 .navbar-icon {
@@ -25,6 +31,7 @@
   align-items: center;
   justify-content: center;
   font-size: 1.1rem;
+  flex-shrink: 0;
 }
 
 .navbar-titles {
@@ -44,8 +51,13 @@
   color: #d98c2b;
 }
 
+/* =========================================================
+   ENLACES
+   ========================================================= */
+
 .navbar-links {
   display: flex;
+  align-items: center;
   gap: 1.5rem;
   list-style: none;
   margin: 0;
@@ -58,7 +70,9 @@
   font-size: 0.95rem;
   padding: 0.4rem 0.6rem;
   border-radius: 6px;
-  transition: background 0.2s;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
 }
 
 .navbar-links a:hover {
@@ -71,11 +85,20 @@
   font-weight: 600;
 }
 
+/* =========================================================
+   ACCIONES
+   ========================================================= */
+
 .navbar-actions {
   display: flex;
   align-items: center;
   gap: 1.2rem;
+  flex-shrink: 0;
 }
+
+/* =========================================================
+   NOTIFICACIONES
+   ========================================================= */
 
 .navbar-bell {
   position: relative;
@@ -83,12 +106,26 @@
   border: none;
   font-size: 1.2rem;
   cursor: pointer;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    background-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.navbar-bell:hover {
+  background-color: #f1f7f6;
+  transform: translateY(-1px);
 }
 
 .navbar-badge {
   position: absolute;
-  top: -4px;
-  right: -6px;
+  top: -2px;
+  right: -2px;
   background: #e74c3c;
   color: white;
   font-size: 0.65rem;
@@ -98,34 +135,62 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  font-weight: 700;
 }
+
+/* =========================================================
+   LOGIN
+   ========================================================= */
 
 .navbar-login {
   color: #1a7a6e;
   text-decoration: none;
   font-size: 0.95rem;
+  font-weight: 600;
+  transition: color 0.2s ease;
 }
 
-.navbar-cta {
-  background-color: #1a7a6e;
-  color: white;
-  border: none;
-  padding: 0.6rem 1.2rem;
-  border-radius: 999px;
-  font-size: 0.9rem;
-  cursor: pointer;
+.navbar-login:hover {
+  color: #145f56;
 }
 
-.navbar-cta:hover {
-  background-color: #145f56;
-}
+/* =========================================================
+   USUARIO AUTENTICADO
+   ========================================================= */
 
-/* Usuario autenticado */
 .navbar-user {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+/* Botón que contiene avatar + nombre + flecha */
+
+.navbar-user-trigger {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  background: transparent;
+  border: none;
+  border-radius: 999px;
+  padding: 0.25rem 0.5rem 0.25rem 0.25rem;
+  cursor: pointer;
+  color: #1e1e2f;
+  transition:
+    background-color 0.2s ease,
+    box-shadow 0.2s ease;
 }
+
+.navbar-user-trigger:hover {
+  background-color: #f1f7f6;
+}
+
+.navbar-user-trigger:focus-visible {
+  outline: 2px solid #1a7a6e;
+  outline-offset: 2px;
+}
+
+/* Avatar */
 
 .navbar-avatar {
   width: 34px;
@@ -137,7 +202,14 @@
   justify-content: center;
   font-size: 1rem;
   flex-shrink: 0;
+  box-shadow: 0 2px 5px rgba(26, 122, 110, 0.18);
 }
+
+.navbar-avatar-icon {
+  line-height: 1;
+}
+
+/* Nombre */
 
 .navbar-username {
   font-size: 0.9rem;
@@ -149,22 +221,158 @@
   white-space: nowrap;
 }
 
-.navbar-logout {
-  background: none;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
-  color: #666;
-  font-size: 0.8rem;
-  padding: 0.3rem 0.7rem;
-  cursor: pointer;
-  transition: background 0.2s, color 0.2s, border-color 0.2s;
+/* Flecha */
 
-  &:hover {
-    background: #fee2e2;
-    color: #dc2626;
-    border-color: #dc2626;
-  }
+.navbar-user-arrow {
+  font-size: 0.85rem;
+  color: #6b7280;
+  margin-left: 0.1rem;
+  transition: transform 0.2s ease;
 }
+
+.navbar-user-arrow.abierto {
+  transform: rotate(180deg);
+}
+
+/* =========================================================
+   MENÚ DEL USUARIO
+   ========================================================= */
+
+.navbar-user-menu {
+  position: absolute;
+  top: calc(100% + 0.65rem);
+  right: 0;
+  width: 230px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  padding: 0.45rem;
+  box-shadow:
+    0 12px 30px rgba(0, 0, 0, 0.12),
+    0 3px 8px rgba(0, 0, 0, 0.06);
+  z-index: 200;
+  animation: navbarUserMenuAppear 0.16s ease-out;
+}
+
+/* Pequeño indicador superior */
+
+.navbar-user-menu::before {
+  content: '';
+  position: absolute;
+  top: -6px;
+  right: 28px;
+  width: 11px;
+  height: 11px;
+  background: #ffffff;
+  border-left: 1px solid #e5e7eb;
+  border-top: 1px solid #e5e7eb;
+  transform: rotate(45deg);
+}
+
+/* Elementos del menú */
+
+.navbar-user-menu-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.7rem 0.75rem;
+  border-radius: 10px;
+  background: transparent;
+  border: none;
+  text-decoration: none;
+  color: #374151;
+  font-size: 0.9rem;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+  box-sizing: border-box;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.navbar-user-menu-item:hover {
+  background-color: #eaf6f3;
+  color: #1a7a6e;
+}
+
+/* Iconos */
+
+.navbar-user-menu-icon {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  background-color: #f1f7f6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.95rem;
+  flex-shrink: 0;
+}
+
+/* Estado activo de Mis postulaciones */
+
+.navbar-user-menu-item.active {
+  background-color: #e6f4f1;
+  color: #1a7a6e;
+  font-weight: 600;
+}
+
+/* Separador */
+
+.navbar-user-menu-divider {
+  height: 1px;
+  background-color: #eeeeee;
+  margin: 0.35rem 0.5rem;
+}
+
+/* Cerrar sesión */
+
+.navbar-user-menu-logout {
+  color: #6b7280;
+}
+
+.navbar-user-menu-logout:hover {
+  background-color: #fff1f1;
+  color: #dc2626;
+}
+
+.navbar-user-menu-logout:hover .navbar-user-menu-icon {
+  background-color: #fee2e2;
+}
+
+/* =========================================================
+   BOTÓN QUIERO AYUDAR
+   ========================================================= */
+
+.navbar-cta {
+  background-color: #1a7a6e;
+  color: white;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 999px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.navbar-cta:hover {
+  background-color: #145f56;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(26, 122, 110, 0.2);
+}
+
+.navbar-cta:active {
+  transform: translateY(0);
+}
+
+/* =========================================================
+   BOTÓN MENÚ MÓVIL
+   ========================================================= */
 
 .navbar-toggle {
   display: none;
@@ -172,31 +380,194 @@
   border: none;
   font-size: 1.5rem;
   cursor: pointer;
+  color: #1e1e2f;
+  padding: 0.35rem;
+  border-radius: 8px;
 }
 
+.navbar-toggle:hover {
+  background-color: #f2f2f2;
+}
+
+/* =========================================================
+   ANIMACIÓN DEL MENÚ DE USUARIO
+   ========================================================= */
+
+@keyframes navbarUserMenuAppear {
+  from {
+    opacity: 0;
+    transform: translateY(-5px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* =========================================================
+   TABLET / PANTALLAS MEDIANAS
+   ========================================================= */
+
+@media (max-width: 1100px) {
+
+  .navbar {
+    padding: 0.8rem 1.25rem;
+  }
+
+  .navbar-links {
+    gap: 0.7rem;
+  }
+
+  .navbar-links a {
+    font-size: 0.88rem;
+    padding: 0.35rem 0.45rem;
+  }
+
+  .navbar-actions {
+    gap: 0.7rem;
+  }
+
+  .navbar-username {
+    max-width: 95px;
+  }
+
+  .navbar-cta {
+    padding: 0.55rem 0.9rem;
+  }
+}
+
+/* =========================================================
+   MÓVIL / TABLET PEQUEÑA
+   ========================================================= */
+
 @media (max-width: 900px) {
+
+  .navbar {
+    padding: 0.75rem 1rem;
+  }
+
   .navbar-toggle {
     display: block;
+    order: 2;
   }
 
   .navbar-links {
     display: none;
     flex-direction: column;
+    align-items: stretch;
+    gap: 0.25rem;
     position: absolute;
-    top: 70px;
+    top: 100%;
     left: 0;
     right: 0;
-    background-color: white;
-    padding: 1rem 2rem;
-    z-index: 10;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.08);
+    background-color: #ffffff;
+    padding: 0.75rem 1rem 1rem;
+    z-index: 150;
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.08);
+    border-top: 1px solid #eeeeee;
   }
 
   .navbar-links.abierto {
     display: flex;
   }
 
+  .navbar-links a {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 0.7rem 0.8rem;
+  }
+
   .navbar-actions {
+    display: flex;
+    margin-left: auto;
+    margin-right: 0.5rem;
+    gap: 0.6rem;
+  }
+
+  .navbar-cta {
     display: none;
+  }
+
+  .navbar-user-menu {
+    right: 0;
+  }
+}
+
+/* =========================================================
+   MÓVIL
+   ========================================================= */
+
+@media (max-width: 600px) {
+
+  .navbar {
+    padding: 0.7rem 0.8rem;
+  }
+
+  .navbar-tagline {
+    display: none;
+  }
+
+  .navbar-logo {
+    font-size: 1rem;
+  }
+
+  .navbar-icon {
+    width: 32px;
+    height: 32px;
+  }
+
+  .navbar-user-trigger {
+    padding-right: 0.35rem;
+  }
+
+  .navbar-username {
+    max-width: 90px;
+  }
+
+  .navbar-user-menu {
+    width: 215px;
+  }
+
+  .navbar-bell {
+    width: 32px;
+    height: 32px;
+  }
+}
+
+/* =========================================================
+   MÓVIL MUY PEQUEÑO
+   ========================================================= */
+
+@media (max-width: 430px) {
+
+  .navbar {
+    padding: 0.65rem;
+  }
+
+  .navbar-actions {
+    gap: 0.3rem;
+  }
+
+  .navbar-username {
+    display: none;
+  }
+
+  .navbar-user-trigger {
+    padding: 0.2rem;
+  }
+
+  .navbar-user-arrow {
+    display: none;
+  }
+
+  .navbar-user-menu {
+    right: -0.25rem;
+    width: 210px;
+  }
+
+  .navbar-user-menu::before {
+    right: 17px;
   }
 }

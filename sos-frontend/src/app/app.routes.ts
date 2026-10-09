@@ -10,6 +10,7 @@ import { RegistrarCentroComponent } from './features/acerca-de/pages/registrar-c
 import { LoginComponent } from './features/auth/pages/login/login';
 import { RegistroComponent } from './features/auth/pages/registro/registro';
 import { adminGuard } from './admin-guard';
+import { MisPostulaciones } from './features/voluntariado/pages/mis-postulaciones/mis-postulaciones';
 
 export const routes: Routes = [
   {
@@ -32,6 +33,10 @@ export const routes: Routes = [
   {
     path: 'voluntariado',
     component: Voluntariado
+  },
+  {
+    path: 'mis-postulaciones',
+    component: MisPostulaciones
   },
   {
     path: 'noticias',

@@ -13,7 +13,6 @@ import {
 
 import { AuthService } from '../../features/auth/services/auth.service';
 
-
 @Component({
   imports: [
     CommonModule,
@@ -29,6 +28,8 @@ export class Navbar implements OnInit, OnDestroy {
   readonly textos = APP_TEXTOS.navbar;
 
   menuAbierto = false;
+  usuarioMenuAbierto = false;
+
   sesionActiva = false;
   nombreUsuario = '';
 
@@ -45,10 +46,16 @@ export class Navbar implements OnInit, OnDestroy {
       .subscribe(activa => {
 
         this.sesionActiva = activa;
+
         this.nombreUsuario =
           activa
             ? this.authService.obtenerNombreUsuario()
             : '';
+
+        // Cerramos el menú del usuario cuando cambia la sesión
+        if (!activa) {
+          this.usuarioMenuAbierto = false;
+        }
 
       });
 
@@ -60,10 +67,37 @@ export class Navbar implements OnInit, OnDestroy {
 
   }
 
+  /**
+   * Abre o cierra el menú del usuario.
+   */
+  toggleUsuarioMenu(): void {
+
+    this.usuarioMenuAbierto =
+      !this.usuarioMenuAbierto;
+
+  }
+
+  /**
+   * Cierra los menús de navegación.
+   */
+  cerrarMenus(): void {
+
+    this.menuAbierto = false;
+    this.usuarioMenuAbierto = false;
+
+  }
+
+  /**
+   * Cierra sesión y vuelve al inicio.
+   */
   cerrarSesion(): void {
 
+    this.usuarioMenuAbierto = false;
+
     this.authService.logout().subscribe({
-      next: () => this.router.navigate(['/inicio']),
+      next: () => {
+        this.router.navigate(['/inicio']);
+      },
       error: () => {
         // Limpiar la sesión localmente aunque falle el backend
         this.router.navigate(['/inicio']);
