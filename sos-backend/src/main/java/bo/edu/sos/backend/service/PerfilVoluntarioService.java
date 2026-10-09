@@ -6,6 +6,7 @@ import bo.edu.sos.backend.entity.PerfilVoluntario;
 import bo.edu.sos.backend.entity.Usuario;
 import bo.edu.sos.backend.exception.DuplicateResourceException;
 import bo.edu.sos.backend.exception.ResourceNotFoundException;
+import bo.edu.sos.backend.helper.LogHelper;
 import bo.edu.sos.backend.repository.DepartamentoRepository;
 import bo.edu.sos.backend.repository.PerfilVoluntarioRepository;
 import bo.edu.sos.backend.repository.UsuarioRepository;
@@ -49,6 +50,11 @@ public class PerfilVoluntarioService {
                         );
 
         if (perfilRepository.existsByUsuarioId(usuario.getId())) {
+            LogHelper.warn(
+                    PerfilVoluntarioService.class,
+                    "Intento de registrar perfil de voluntario duplicado. usuarioId={}",
+                    usuario.getId()
+            );
             throw new DuplicateResourceException(
                     "El usuario ya tiene un perfil de voluntario"
             );
@@ -61,7 +67,7 @@ public class PerfilVoluntarioService {
                                 new ResourceNotFoundException(
                                         "Departamento",
                                         dto.getDepartamentoId()
-                                )
+                                 )
                         );
 
         PerfilVoluntario perfil = new PerfilVoluntario();
@@ -80,6 +86,14 @@ public class PerfilVoluntarioService {
 
         PerfilVoluntario guardado =
                 perfilRepository.save(perfil);
+
+        LogHelper.info(
+                PerfilVoluntarioService.class,
+                "Perfil de voluntario creado correctamente. id={}, usuarioId={}, departamentoId={}",
+                guardado.getId(),
+                usuario.getId(),
+                departamento.getId()
+        );
 
         return convertirADTO(guardado);
     }
@@ -105,6 +119,13 @@ public class PerfilVoluntarioService {
                                         "El usuario no tiene un perfil de voluntario"
                                 )
                         );
+
+        LogHelper.debug(
+                PerfilVoluntarioService.class,
+                "Perfil de voluntario consultado. usuarioId={}, perfilId={}",
+                usuario.getId(),
+                perfil.getId()
+        );
 
         return convertirADTO(perfil);
     }
@@ -156,6 +177,14 @@ public class PerfilVoluntarioService {
         PerfilVoluntario actualizado =
                 perfilRepository.save(perfil);
 
+        LogHelper.info(
+                PerfilVoluntarioService.class,
+                "Perfil de voluntario actualizado correctamente. id={}, usuarioId={}, departamentoId={}",
+                actualizado.getId(),
+                usuario.getId(),
+                departamento.getId()
+        );
+
         return convertirADTO(actualizado);
     }
 
@@ -172,9 +201,18 @@ public class PerfilVoluntarioService {
                                 )
                         );
 
-        return perfilRepository.existsByUsuarioId(
+        boolean existe = perfilRepository.existsByUsuarioId(
                 usuario.getId()
         );
+
+        LogHelper.debug(
+                PerfilVoluntarioService.class,
+                "Verificación de perfil de voluntario. usuarioId={}, existe={}",
+                usuario.getId(),
+                existe
+        );
+
+        return existe;
     }
 
 

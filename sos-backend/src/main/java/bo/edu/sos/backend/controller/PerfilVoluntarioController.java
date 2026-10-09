@@ -3,6 +3,7 @@ package bo.edu.sos.backend.controller;
 import bo.edu.sos.backend.constants.ApiRoutes;
 import bo.edu.sos.backend.dto.ApiResponse;
 import bo.edu.sos.backend.dto.PerfilVoluntarioDTO;
+import bo.edu.sos.backend.helper.LogHelper;
 import bo.edu.sos.backend.service.PerfilVoluntarioService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -29,6 +30,12 @@ public class PerfilVoluntarioController {
             @Valid @RequestBody PerfilVoluntarioDTO dto,
             Authentication authentication) {
 
+        LogHelper.debug(
+                PerfilVoluntarioController.class,
+                "Petición para crear perfil de voluntario recibida. usuario={}",
+                authentication.getName()
+        );
+
         PerfilVoluntarioDTO creado =
                 perfilService.crear(
                         authentication.getName(),
@@ -45,6 +52,12 @@ public class PerfilVoluntarioController {
     public ResponseEntity<ApiResponse<PerfilVoluntarioDTO>> obtenerMiPerfil(
             Authentication authentication) {
 
+        LogHelper.debug(
+                PerfilVoluntarioController.class,
+                "Petición para consultar perfil de voluntario recibida. usuario={}",
+                authentication.getName()
+        );
+
         PerfilVoluntarioDTO perfil =
                 perfilService.obtenerPorUsuario(
                         authentication.getName()
@@ -60,6 +73,12 @@ public class PerfilVoluntarioController {
     public ResponseEntity<ApiResponse<PerfilVoluntarioDTO>> actualizarMiPerfil(
             @Valid @RequestBody PerfilVoluntarioDTO dto,
             Authentication authentication) {
+
+        LogHelper.debug(
+                PerfilVoluntarioController.class,
+                "Petición para actualizar perfil de voluntario recibida. usuario={}",
+                authentication.getName()
+        );
 
         PerfilVoluntarioDTO actualizado =
                 perfilService.actualizar(
@@ -79,6 +98,12 @@ public class PerfilVoluntarioController {
     @GetMapping("/me/existe")
     public ResponseEntity<ApiResponse<Boolean>> existeMiPerfil(
             Authentication authentication) {
+
+        LogHelper.debug(
+                PerfilVoluntarioController.class,
+                "Petición para verificar existencia de perfil de voluntario recibida. usuario={}",
+                authentication.getName()
+        );
 
         boolean existe =
                 perfilService.existePerfil(
