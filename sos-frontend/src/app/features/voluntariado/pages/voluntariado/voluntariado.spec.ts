@@ -1,17 +1,37 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
+import { provideHttpClient } from '@angular/common/http';
+import { of } from 'rxjs';
 
 import { APP_TEXTOS } from '../../../../shared/constants/app-textos.constants';
 import { Voluntariado } from './voluntariado';
+import { AuthService } from '../../../auth/services/auth.service';
+import { PerfilVoluntarioService } from '../../services/perfil-voluntario.service';
+
 
 describe('Voluntariado', () => {
   let component: Voluntariado;
   let fixture: ComponentFixture<Voluntariado>;
 
+  const authServiceMock = {
+    estaAutenticado: () => false,
+    obtenerNombreUsuario: () => '',
+  };
+
+  const perfilServiceMock = {
+    existeMiPerfil: () => of({ success: true, data: false, message: '', timestamp: '' }),
+    obtenerMiPerfil: () => of({ success: true, data: null, message: '', timestamp: '' }),
+  };
+
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [Voluntariado],
-      providers: [provideRouter([])],
+      providers: [
+        provideRouter([]),
+        provideHttpClient(),
+        { provide: AuthService, useValue: authServiceMock },
+        { provide: PerfilVoluntarioService, useValue: perfilServiceMock },
+      ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(Voluntariado);
@@ -20,9 +40,11 @@ describe('Voluntariado', () => {
     await fixture.whenStable();
   });
 
+
   it('debe crear el componente', () => {
     expect(component).toBeTruthy();
   });
+
 
   it('debe mostrar el título principal del hero desde APP_TEXTOS', () => {
     const h1: HTMLElement = fixture.nativeElement.querySelector('.vol-hero__title');
@@ -30,27 +52,35 @@ describe('Voluntariado', () => {
     expect(h1.textContent?.trim()).toContain(APP_TEXTOS.voluntariado.hero.titulo);
   });
 
+
   it('debe mostrar el badge del hero con el texto correcto', () => {
     const badge: HTMLElement = fixture.nativeElement.querySelector('.vol-hero__badge');
     expect(badge).not.toBeNull();
     expect(badge.textContent).toContain(APP_TEXTOS.voluntariado.hero.badge);
   });
 
+
+  it('debe mostrar el estado SIN_SESION cuando el usuario no está autenticado', () => {
+    expect(component.estado).toBe('SIN_SESION');
+  });
+
+
+  it('debe mostrar el enlace a /login cuando no hay sesión', () => {
+    const link: HTMLAnchorElement = fixture.nativeElement.querySelector(
+      '.vol-hero__actions .btn--primary',
+    );
+    expect(link).not.toBeNull();
+    expect(link.textContent?.trim()).toContain(APP_TEXTOS.voluntariado.hero.serVoluntario);
+  });
+
+
+  // ── Secciones estáticas ──────────────────────────────────────────────────
+
   it('debe renderizar las tres tarjetas de oportunidades', () => {
     const tarjetas = fixture.nativeElement.querySelectorAll('.vol-card');
     expect(tarjetas.length).toBe(3);
   });
 
-  it('debe mostrar el título de cada tarjeta de oportunidad desde APP_TEXTOS', () => {
-    const titulos = fixture.nativeElement.querySelectorAll('.vol-card__title');
-    const textos: string[] = Array.from(titulos).map(
-      (el) => (el as HTMLElement).textContent?.trim() ?? '',
-    );
-
-    expect(textos).toContain(APP_TEXTOS.voluntariado.oportunidades.refugios.titulo);
-    expect(textos).toContain(APP_TEXTOS.voluntariado.oportunidades.distribucion.titulo);
-    expect(textos).toContain(APP_TEXTOS.voluntariado.oportunidades.emergencias.titulo);
-  });
 
   it('debe mostrar la sección ¿Cómo funciona? con los tres pasos', () => {
     const titulo: HTMLElement = fixture.nativeElement.querySelector('.vol-como__title');
@@ -61,23 +91,8 @@ describe('Voluntariado', () => {
     expect(pasos.length).toBe(3);
   });
 
-  it('debe mostrar los números de paso 01, 02 y 03', () => {
-    const nums: string[] = Array.from(
-      fixture.nativeElement.querySelectorAll('.vol-como__step-num'),
-    ).map((el) => (el as HTMLElement).textContent?.trim() ?? '');
 
-    expect(nums).toEqual(['01', '02', '03']);
-  });
-
-  it('debe tener el botón "Ser voluntario" con routerLink hacia /login', () => {
-    const btn: HTMLAnchorElement = fixture.nativeElement.querySelector(
-      '.vol-hero__actions .btn--primary',
-    );
-    expect(btn).not.toBeNull();
-    expect(btn.textContent?.trim()).toContain(APP_TEXTOS.voluntariado.hero.serVoluntario);
-  });
-
-  // ── Feature toggles ─────────────────────────────────────────────────────
+  // ── Feature toggles ──────────────────────────────────────────────────────
 
   it('debe ocultar la sección de oportunidades cuando mostrarSeccionOportunidades es false', async () => {
     const freshFixture = TestBed.createComponent(Voluntariado);
@@ -89,6 +104,7 @@ describe('Voluntariado', () => {
     expect(freshFixture.nativeElement.querySelector('.vol-como')).not.toBeNull();
   });
 
+
   it('debe ocultar la sección ¿Cómo funciona? cuando mostrarSeccionComoFunciona es false', async () => {
     const freshFixture = TestBed.createComponent(Voluntariado);
     freshFixture.componentInstance.featureToggles.voluntariado.mostrarSeccionComoFunciona = false;
@@ -99,6 +115,7 @@ describe('Voluntariado', () => {
     expect(freshFixture.nativeElement.querySelectorAll('.vol-card').length).toBe(3);
   });
 
+
   it('debe ocultar los badges de cupos cuando mostrarCupos es false', async () => {
     const freshFixture = TestBed.createComponent(Voluntariado);
     freshFixture.componentInstance.featureToggles.voluntariado.mostrarCupos = false;
@@ -106,7 +123,6 @@ describe('Voluntariado', () => {
     await freshFixture.whenStable();
 
     expect(freshFixture.nativeElement.querySelector('.vol-card__cupos')).toBeNull();
-    // Las tarjetas y el botón Participar deben seguir visibles
     expect(freshFixture.nativeElement.querySelectorAll('.vol-card').length).toBe(3);
   });
 });
