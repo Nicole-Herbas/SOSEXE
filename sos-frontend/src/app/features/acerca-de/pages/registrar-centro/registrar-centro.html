@@ -7,30 +7,37 @@
   <div class="registro-header">
 
     <a class="volver-acerca" (click)="cancelar()">
-      ← Volver a Acerca de
+      {{ textos.header.volverAcerca }}
     </a>
 
     <span class="badge">
-      Solicitud de verificación
+      {{ textos.header.badge }}
     </span>
 
     <div class="header-content">
 
       <div>
-        <h1>Registra tu centro o refugio</h1>
+
+        <h1>
+          {{ textos.header.titulo }}
+        </h1>
 
         <p>
-          Completa la información para que el equipo administrador
-          pueda comprobar la organización antes de publicarla.
+          {{ textos.header.descripcion }}
         </p>
+
       </div>
 
       <div class="private-box">
-        <strong>🔒 Solicitud privada</strong>
+
+        <strong>
+          {{ textos.header.solicitudPrivada }}
+        </strong>
 
         <span>
-          Nada se publica automáticamente.
+          {{ textos.header.noPublicacionAutomatica }}
         </span>
+
       </div>
 
     </div>
@@ -62,7 +69,9 @@
 
       </span>
 
-      <span>Centro</span>
+      <span>
+        {{ textos.pasos.centro }}
+      </span>
 
     </div>
 
@@ -85,7 +94,9 @@
 
       </span>
 
-      <span>Responsable y ubicación</span>
+      <span>
+        {{ textos.pasos.responsableUbicacion }}
+      </span>
 
     </div>
 
@@ -108,7 +119,9 @@
 
       </span>
 
-      <span>Documentos</span>
+      <span>
+        {{ textos.pasos.documentos }}
+      </span>
 
     </div>
 
@@ -131,7 +144,9 @@
 
       </span>
 
-      <span>Necesidades y voluntariado</span>
+      <span>
+        {{ textos.pasos.necesidadesVoluntariado }}
+      </span>
 
     </div>
 
@@ -147,7 +162,9 @@
         5
       </span>
 
-      <span>Revisión y envío</span>
+      <span>
+        {{ textos.pasos.revisionEnvio }}
+      </span>
 
     </div>
 
@@ -166,6 +183,32 @@
 
     <section class="form-card">
 
+      <!-- SOS-42: AVISO DE BORRADOR RECUPERADO -->
+      @if (borradorRecuperado) {
+
+        <div class="draft-banner">
+
+          <div class="draft-banner-text">
+            <strong>📝 Continuando tu borrador</strong>
+            <span>
+              Recuperamos la información que guardaste
+              @if (fechaBorrador) {
+                el {{ fechaBorrador }}
+              }.
+            </span>
+          </div>
+
+          <button
+            type="button"
+            class="draft-banner-button"
+            (click)="descartarBorrador()"
+          >
+            Empezar de cero
+          </button>
+
+        </div>
+
+      }
 
       <!-- =================================================
            PASO 1 - INFORMACIÓN DEL CENTRO
@@ -250,9 +293,9 @@
               <span>*</span>
             </label>
 
-            <!-- SOS-41: departamentos desde el backend.
-                 [ngValue] conserva el id como número -->
-            <select [(ngModel)]="departamentoId">
+            <select
+              [(ngModel)]="departamentoId"
+            >
 
               <option [ngValue]="null">
                 Selecciona un departamento
@@ -389,7 +432,7 @@
         </div>
 
 
-        <!-- BOTONES PASO 1 -->
+        <!-- BOTONES -->
 
         <div class="form-actions">
 
@@ -452,9 +495,7 @@
         </div>
 
 
-        <!-- ======================================
-             RESPONSABLE
-             ====================================== -->
+        <!-- RESPONSABLE -->
 
         <div class="section-title">
 
@@ -529,18 +570,46 @@
 
           <div class="field">
 
-            <label>
-              Correo electrónico
-              <span>*</span>
-            </label>
+  <label for="correoResponsable">
+    Correo electrónico
+    <span>*</span>
+  </label>
 
-            <input
-              type="email"
-              [(ngModel)]="correoResponsable"
-              placeholder="correo@centro.org"
-            />
+  <input
+    id="correoResponsable"
+    name="correoResponsable"
+    type="email"
+    [(ngModel)]="correoResponsable"
+    #correoResponsableControl="ngModel"
+    placeholder="correo@centro.org"
+    required
+    email
+  />
 
-          </div>
+ @if (
+  correoResponsableControl.invalid &&
+  correoResponsableControl.touched
+) {
+
+  @if (correoResponsableControl.errors?.['required']) {
+    <div class="field-error">
+      El correo electrónico es obligatorio.
+    </div>
+  }
+
+  @if (correoResponsableControl.errors?.['email']) {
+    <div class="field-error">
+      @if (!correoResponsable.includes('@')) {
+        Te falta el símbolo @ en el correo.
+      } @else {
+        Ingresa un correo electrónico válido.
+      }
+    </div>
+  }
+
+}
+
+  </div>
 
         </div>
 
@@ -563,16 +632,10 @@
         </div>
 
 
-        <!-- ======================================
-             SEPARADOR
-             ====================================== -->
-
         <div class="section-divider"></div>
 
 
-        <!-- ======================================
-             UBICACIÓN
-             ====================================== -->
+        <!-- UBICACIÓN -->
 
         <div class="section-title">
 
@@ -622,7 +685,6 @@
                 Selecciona un departamento
               </option>
 
-              <!-- SOS-41: departamentos desde el backend -->
               @for (dep of departamentos; track dep.id) {
 
                 <option [value]="dep.nombre">
@@ -673,9 +735,7 @@
         </div>
 
 
-        <!-- ======================================
-             BOTONES PASO 2
-             ====================================== -->
+        <!-- BOTONES -->
 
         <div class="form-actions">
 
@@ -702,7 +762,7 @@
             <button
               type="button"
               class="btn primary"
-              [disabled]="!paso2Valido"
+              [disabled]="!paso2Valido || correoResponsableControl.invalid"
               (click)="continuar()"
             >
               Continuar →
@@ -739,9 +799,7 @@
         </div>
 
 
-        <!-- ======================================
-             DOCUMENTO 1 - PERSONERÍA
-             ====================================== -->
+        <!-- PERSONERÍA -->
 
         <div
           class="document-item"
@@ -821,9 +879,7 @@
         </div>
 
 
-        <!-- ======================================
-             DOCUMENTO 2 - NIT
-             ====================================== -->
+        <!-- NIT -->
 
         <div
           class="document-item"
@@ -903,9 +959,7 @@
         </div>
 
 
-        <!-- ======================================
-             DOCUMENTO 3 - IDENTIDAD
-             ====================================== -->
+        <!-- IDENTIDAD -->
 
         <div
           class="document-item"
@@ -985,9 +1039,7 @@
         </div>
 
 
-        <!-- ======================================
-             DOCUMENTO 4 - DOMICILIO
-             ====================================== -->
+        <!-- DOMICILIO -->
 
         <div
           class="document-item"
@@ -1067,9 +1119,7 @@
         </div>
 
 
-        <!-- ======================================
-             ERROR DE ARCHIVO
-             ====================================== -->
+        <!-- ERROR DE ARCHIVO -->
 
         @if (errorArchivo) {
 
@@ -1080,9 +1130,7 @@
         }
 
 
-        <!-- ======================================
-             INFORMACIÓN IMPORTANTE
-             ====================================== -->
+        <!-- INFORMACIÓN -->
 
         <div class="document-notice">
 
@@ -1096,9 +1144,7 @@
         </div>
 
 
-        <!-- ======================================
-             BOTONES PASO 3
-             ====================================== -->
+        <!-- BOTONES -->
 
         <div class="form-actions">
 
@@ -1161,9 +1207,7 @@
         </div>
 
 
-        <!-- ======================================
-             NECESIDADES PRIORITARIAS
-             ====================================== -->
+        <!-- NECESIDADES -->
 
         <div class="section-title">
 
@@ -1180,23 +1224,34 @@
 
         <div class="options-grid">
 
-          @for (necesidad of necesidadesDisponibles; track necesidad) {
+          @for (
+            necesidad of necesidadesDisponibles;
+            track necesidad
+          ) {
 
             <label
               class="option-card"
-              [class.option-selected]="necesidadesSeleccionadas.includes(necesidad)"
+              [class.option-selected]="
+                necesidadesSeleccionadas.includes(necesidad)
+              "
             >
 
               <input
                 type="checkbox"
-                [checked]="necesidadesSeleccionadas.includes(necesidad)"
+                [checked]="
+                  necesidadesSeleccionadas.includes(necesidad)
+                "
                 (change)="alternarNecesidad(necesidad)"
               />
 
               <span class="option-check">
-                @if (necesidadesSeleccionadas.includes(necesidad)) {
+
+                @if (
+                  necesidadesSeleccionadas.includes(necesidad)
+                ) {
                   ✓
                 }
+
               </span>
 
               <span class="option-text">
@@ -1210,9 +1265,7 @@
         </div>
 
 
-        <!-- ======================================
-             DONACIONES
-             ====================================== -->
+        <!-- DONACIONES -->
 
         <div class="section-divider"></div>
 
@@ -1231,23 +1284,34 @@
 
         <div class="options-grid">
 
-          @for (donacion of donacionesDisponibles; track donacion) {
+          @for (
+            donacion of donacionesDisponibles;
+            track donacion
+          ) {
 
             <label
               class="option-card"
-              [class.option-selected]="donacionesSeleccionadas.includes(donacion)"
+              [class.option-selected]="
+                donacionesSeleccionadas.includes(donacion)
+              "
             >
 
               <input
                 type="checkbox"
-                [checked]="donacionesSeleccionadas.includes(donacion)"
+                [checked]="
+                  donacionesSeleccionadas.includes(donacion)
+                "
                 (change)="alternarDonacion(donacion)"
               />
 
               <span class="option-check">
-                @if (donacionesSeleccionadas.includes(donacion)) {
+
+                @if (
+                  donacionesSeleccionadas.includes(donacion)
+                ) {
                   ✓
                 }
+
               </span>
 
               <span class="option-text">
@@ -1261,9 +1325,7 @@
         </div>
 
 
-        <!-- ======================================
-             VOLUNTARIADO
-             ====================================== -->
+        <!-- VOLUNTARIADO -->
 
         <div class="section-divider"></div>
 
@@ -1338,9 +1400,7 @@
         </div>
 
 
-        <!-- ======================================
-             TIPOS DE VOLUNTARIADO
-             ====================================== -->
+        <!-- DETALLE VOLUNTARIADO -->
 
         @if (solicitaVoluntarios === true) {
 
@@ -1352,23 +1412,34 @@
 
             <div class="options-grid">
 
-              @for (actividad of actividadesVoluntariado; track actividad) {
+              @for (
+                actividad of actividadesVoluntariado;
+                track actividad
+              ) {
 
                 <label
                   class="option-card"
-                  [class.option-selected]="actividadesSeleccionadas.includes(actividad)"
+                  [class.option-selected]="
+                    actividadesSeleccionadas.includes(actividad)
+                  "
                 >
 
                   <input
                     type="checkbox"
-                    [checked]="actividadesSeleccionadas.includes(actividad)"
+                    [checked]="
+                      actividadesSeleccionadas.includes(actividad)
+                    "
                     (change)="alternarActividad(actividad)"
                   />
 
                   <span class="option-check">
-                    @if (actividadesSeleccionadas.includes(actividad)) {
+
+                    @if (
+                      actividadesSeleccionadas.includes(actividad)
+                    ) {
                       ✓
                     }
+
                   </span>
 
                   <span class="option-text">
@@ -1401,9 +1472,7 @@
         }
 
 
-        <!-- ======================================
-             BOTONES PASO 4
-             ====================================== -->
+        <!-- BOTONES -->
 
         <div class="form-actions">
 
@@ -1455,7 +1524,9 @@
             Paso 5 de 5
           </span>
 
-          <h2>Revisión y envío</h2>
+          <h2>
+            Revisión y envío
+          </h2>
 
           <p>
             Revisa la información antes de enviar la solicitud
@@ -1465,17 +1536,22 @@
         </div>
 
 
-        <!-- ======================================
-             INFORMACIÓN DEL CENTRO
-             ====================================== -->
+        <!-- INFORMACIÓN DEL CENTRO -->
 
         <div class="review-section">
 
           <div class="review-section-header">
 
             <div>
-              <h3>Información del centro</h3>
-              <p>Datos principales de la organización.</p>
+
+              <h3>
+                Información del centro
+              </h3>
+
+              <p>
+                Datos principales de la organización.
+              </p>
+
             </div>
 
             <span class="review-badge">
@@ -1488,48 +1564,119 @@
           <div class="review-grid">
 
             <div class="review-item">
-              <span>Nombre</span>
-              <strong>{{ nombreCentro }}</strong>
+
+              <span>
+                Nombre
+              </span>
+
+              <strong>
+                {{ nombreCentro }}
+              </strong>
+
             </div>
 
-            <div class="review-item">
-              <span>Tipo de organización</span>
-              <strong>{{ tipoOrganizacion }}</strong>
-            </div>
 
             <div class="review-item">
-              <span>Departamento</span>
-              <strong>{{ nombreDepartamento }}</strong>
+
+              <span>
+                Tipo de organización
+              </span>
+
+              <strong>
+                {{ tipoOrganizacion }}
+              </strong>
+
             </div>
 
-            <div class="review-item">
-              <span>NIT</span>
-              <strong>{{ nit }}</strong>
-            </div>
 
             <div class="review-item">
-              <span>Personería jurídica</span>
-              <strong>{{ personeriaJuridica }}</strong>
+
+              <span>
+                Departamento
+              </span>
+
+              <strong>
+                {{ nombreDepartamento }}
+              </strong>
+
             </div>
 
+
             <div class="review-item">
-              <span>Fecha de fundación</span>
-              <strong>{{ fechaFundacion || 'No especificada' }}</strong>
+
+              <span>
+                NIT
+              </span>
+
+              <strong>
+                {{ nit }}
+              </strong>
+
             </div>
+
+
+            <div class="review-item">
+
+              <span>
+                Personería jurídica
+              </span>
+
+              <strong>
+                {{ personeriaJuridica }}
+              </strong>
+
+            </div>
+
+
+            <div class="review-item">
+
+              <span>
+                Fecha de fundación
+              </span>
+
+              <strong>
+                {{ fechaFundacion || 'No especificada' }}
+              </strong>
+
+            </div>
+
 
             <div class="review-item full-review">
-              <span>Página web o red social</span>
-              <strong>{{ paginaWeb || 'No especificada' }}</strong>
+
+              <span>
+                Página web o red social
+              </span>
+
+              <strong>
+                {{ paginaWeb || 'No especificada' }}
+              </strong>
+
             </div>
 
-            <div class="review-item full-review">
-              <span>Descripción</span>
-              <strong>{{ descripcion }}</strong>
-            </div>
 
             <div class="review-item full-review">
-              <span>Población atendida</span>
-              <strong>{{ poblacionAtendida || 'No especificada' }}</strong>
+
+              <span>
+                Descripción
+              </span>
+
+              <strong>
+                {{ descripcion }}
+              </strong>
+
+            </div>
+
+
+            <div class="review-item full-review">
+
+              <span>
+                Población atendida
+              </span>
+
+              <strong>
+                {{ poblacionAtendida || 'No especificada' }}
+              </strong>
+
             </div>
 
           </div>
@@ -1537,17 +1684,22 @@
         </div>
 
 
-        <!-- ======================================
-             RESPONSABLE
-             ====================================== -->
+        <!-- RESPONSABLE -->
 
         <div class="review-section">
 
           <div class="review-section-header">
 
             <div>
-              <h3>Responsable</h3>
-              <p>Persona encargada del centro.</p>
+
+              <h3>
+                Responsable
+              </h3>
+
+              <p>
+                Persona encargada del centro.
+              </p>
+
             </div>
 
             <span class="review-badge">
@@ -1560,28 +1712,67 @@
           <div class="review-grid">
 
             <div class="review-item">
-              <span>Nombre</span>
-              <strong>{{ nombreResponsable }}</strong>
+
+              <span>
+                Nombre
+              </span>
+
+              <strong>
+                {{ nombreResponsable }}
+              </strong>
+
             </div>
 
-            <div class="review-item">
-              <span>Cargo</span>
-              <strong>{{ cargoResponsable }}</strong>
-            </div>
 
             <div class="review-item">
-              <span>Documento</span>
-              <strong>{{ documentoResponsable }}</strong>
+
+              <span>
+                Cargo
+              </span>
+
+              <strong>
+                {{ cargoResponsable }}
+              </strong>
+
             </div>
 
-            <div class="review-item">
-              <span>Correo</span>
-              <strong>{{ correoResponsable }}</strong>
-            </div>
 
             <div class="review-item">
-              <span>Teléfono</span>
-              <strong>{{ telefonoResponsable }}</strong>
+
+              <span>
+                Documento
+              </span>
+
+              <strong>
+                {{ documentoResponsable }}
+              </strong>
+
+            </div>
+
+
+            <div class="review-item">
+
+              <span>
+                Correo
+              </span>
+
+              <strong>
+                {{ correoResponsable }}
+              </strong>
+
+            </div>
+
+
+            <div class="review-item">
+
+              <span>
+                Teléfono
+              </span>
+
+              <strong>
+                {{ telefonoResponsable }}
+              </strong>
+
             </div>
 
           </div>
@@ -1589,17 +1780,22 @@
         </div>
 
 
-        <!-- ======================================
-             UBICACIÓN
-             ====================================== -->
+        <!-- UBICACIÓN -->
 
         <div class="review-section">
 
           <div class="review-section-header">
 
             <div>
-              <h3>Ubicación</h3>
-              <p>Ubicación registrada del centro.</p>
+
+              <h3>
+                Ubicación
+              </h3>
+
+              <p>
+                Ubicación registrada del centro.
+              </p>
+
             </div>
 
             <span class="review-badge">
@@ -1612,23 +1808,54 @@
           <div class="review-grid">
 
             <div class="review-item">
-              <span>Ciudad</span>
-              <strong>{{ ciudad }}</strong>
+
+              <span>
+                Ciudad
+              </span>
+
+              <strong>
+                {{ ciudad }}
+              </strong>
+
             </div>
+
 
             <div class="review-item">
-              <span>Departamento</span>
-              <strong>{{ departamentoUbicacion }}</strong>
+
+              <span>
+                Departamento
+              </span>
+
+              <strong>
+                {{ departamentoUbicacion }}
+              </strong>
+
             </div>
 
-            <div class="review-item full-review">
-              <span>Dirección</span>
-              <strong>{{ direccionExacta }}</strong>
-            </div>
 
             <div class="review-item full-review">
-              <span>Referencia</span>
-              <strong>{{ referencia || 'No especificada' }}</strong>
+
+              <span>
+                Dirección
+              </span>
+
+              <strong>
+                {{ direccionExacta }}
+              </strong>
+
+            </div>
+
+
+            <div class="review-item full-review">
+
+              <span>
+                Referencia
+              </span>
+
+              <strong>
+                {{ referencia || 'No especificada' }}
+              </strong>
+
             </div>
 
           </div>
@@ -1636,17 +1863,22 @@
         </div>
 
 
-        <!-- ======================================
-             DOCUMENTOS
-             ====================================== -->
+        <!-- DOCUMENTOS -->
 
         <div class="review-section">
 
           <div class="review-section-header">
 
             <div>
-              <h3>Documentos</h3>
-              <p>Archivos adjuntados para la verificación.</p>
+
+              <h3>
+                Documentos
+              </h3>
+
+              <p>
+                Archivos adjuntados para la verificación.
+              </p>
+
             </div>
 
             <span class="review-badge">
@@ -1660,9 +1892,12 @@
 
             <div class="review-document">
 
-              <span class="document-status">✓</span>
+              <span class="document-status">
+                ✓
+              </span>
 
               @if (personeriaArchivo) {
+
                 <button
                   type="button"
                   class="file-preview-button"
@@ -1670,15 +1905,20 @@
                 >
                   {{ personeriaArchivo.name }}
                 </button>
+
               }
 
             </div>
 
+
             <div class="review-document">
 
-              <span class="document-status">✓</span>
+              <span class="document-status">
+                ✓
+              </span>
 
               @if (nitArchivo) {
+
                 <button
                   type="button"
                   class="file-preview-button"
@@ -1686,15 +1926,20 @@
                 >
                   {{ nitArchivo.name }}
                 </button>
+
               }
 
             </div>
 
+
             <div class="review-document">
 
-              <span class="document-status">✓</span>
+              <span class="document-status">
+                ✓
+              </span>
 
               @if (identidadArchivo) {
+
                 <button
                   type="button"
                   class="file-preview-button"
@@ -1702,15 +1947,20 @@
                 >
                   {{ identidadArchivo.name }}
                 </button>
+
               }
 
             </div>
 
+
             <div class="review-document">
 
-              <span class="document-status">✓</span>
+              <span class="document-status">
+                ✓
+              </span>
 
               @if (domicilioArchivo) {
+
                 <button
                   type="button"
                   class="file-preview-button"
@@ -1718,6 +1968,7 @@
                 >
                   {{ domicilioArchivo.name }}
                 </button>
+
               }
 
             </div>
@@ -1727,17 +1978,22 @@
         </div>
 
 
-        <!-- ======================================
-             NECESIDADES Y DONACIONES
-             ====================================== -->
+        <!-- NECESIDADES Y DONACIONES -->
 
         <div class="review-section">
 
           <div class="review-section-header">
 
             <div>
-              <h3>Necesidades y donaciones</h3>
-              <p>Información de apoyo del centro.</p>
+
+              <h3>
+                Necesidades y donaciones
+              </h3>
+
+              <p>
+                Información de apoyo del centro.
+              </p>
+
             </div>
 
           </div>
@@ -1747,7 +2003,9 @@
 
             <div class="review-item full-review">
 
-              <span>Necesidades prioritarias</span>
+              <span>
+                Necesidades prioritarias
+              </span>
 
               <strong>
                 {{ necesidadesSeleccionadas.join(', ') }}
@@ -1755,9 +2013,12 @@
 
             </div>
 
+
             <div class="review-item full-review">
 
-              <span>Donaciones que acepta</span>
+              <span>
+                Donaciones que acepta
+              </span>
 
               <strong>
                 {{ donacionesSeleccionadas.join(', ') }}
@@ -1770,17 +2031,22 @@
         </div>
 
 
-        <!-- ======================================
-             VOLUNTARIADO
-             ====================================== -->
+        <!-- VOLUNTARIADO -->
 
         <div class="review-section">
 
           <div class="review-section-header">
 
             <div>
-              <h3>Voluntariado</h3>
-              <p>Información sobre voluntarios.</p>
+
+              <h3>
+                Voluntariado
+              </h3>
+
+              <p>
+                Información sobre voluntarios.
+              </p>
+
             </div>
 
           </div>
@@ -1790,7 +2056,9 @@
 
             <div class="review-item">
 
-              <span>Solicita voluntarios</span>
+              <span>
+                Solicita voluntarios
+              </span>
 
               <strong>
                 {{ solicitaVoluntarios ? 'Sí' : 'No' }}
@@ -1803,7 +2071,9 @@
 
               <div class="review-item full-review">
 
-                <span>Actividades</span>
+                <span>
+                  Actividades
+                </span>
 
                 <strong>
                   {{ actividadesSeleccionadas.join(', ') }}
@@ -1814,7 +2084,9 @@
 
               <div class="review-item full-review">
 
-                <span>Descripción</span>
+                <span>
+                  Descripción
+                </span>
 
                 <strong>
                   {{ descripcionVoluntariado || 'No especificada' }}
@@ -1829,9 +2101,7 @@
         </div>
 
 
-        <!-- ======================================
-             AVISO
-             ====================================== -->
+        <!-- AVISO -->
 
         <div class="submit-notice">
 
@@ -1848,9 +2118,7 @@
         </div>
 
 
-        <!-- ======================================
-             SOS-41: SIN SESIÓN (el backend exige login)
-             ====================================== -->
+        <!-- SIN SESIÓN -->
 
         @if (!haySesion) {
 
@@ -1861,10 +2129,16 @@
             </strong>
 
             <p>
+
               Necesitas una cuenta para enviar la solicitud.
-              <a class="volver-acerca" (click)="irALogin()">
+
+              <a
+                class="volver-acerca"
+                (click)="irALogin()"
+              >
                 Ir a iniciar sesión
               </a>
+
             </p>
 
           </div>
@@ -1872,9 +2146,7 @@
         }
 
 
-        <!-- ======================================
-             BOTONES
-             ====================================== -->
+        <!-- BOTONES -->
 
         <div class="form-actions">
 
@@ -1901,7 +2173,11 @@
             <button
               type="button"
               class="btn primary"
-              [disabled]="enviando || !haySesion || !formularioCompleto"
+              [disabled]="
+                enviando ||
+                !haySesion ||
+                !formularioCompleto
+              "
               (click)="enviarSolicitud()"
             >
               {{ enviando ? 'Enviando...' : 'Enviar solicitud →' }}
@@ -1914,7 +2190,6 @@
       }
 
     </section>
-
 
 
     <!-- ========================================
@@ -1972,9 +2247,19 @@
           NECESIDADES PRIORITARIAS
         </span>
 
-        <p>
-          Aún no seleccionadas
-        </p>
+        @if (necesidadesSeleccionadas.length > 0) {
+
+          <p>
+            {{ necesidadesSeleccionadas.join(', ') }}
+          </p>
+
+        } @else {
+
+          <p>
+            Aún no seleccionadas
+          </p>
+
+        }
 
       </div>
 
@@ -1987,9 +2272,19 @@
           DONACIONES QUE ACEPTA
         </span>
 
-        <p>
-          Aún no seleccionadas
-        </p>
+        @if (donacionesSeleccionadas.length > 0) {
+
+          <p>
+            {{ donacionesSeleccionadas.join(', ') }}
+          </p>
+
+        } @else {
+
+          <p>
+            Aún no seleccionadas
+          </p>
+
+        }
 
       </div>
 
@@ -2002,9 +2297,25 @@
           VOLUNTARIADO
         </span>
 
-        <p>
-          No solicita voluntarios
-        </p>
+        @if (solicitaVoluntarios === true) {
+
+          <p>
+            Sí solicita voluntarios
+          </p>
+
+        } @else if (solicitaVoluntarios === false) {
+
+          <p>
+            No solicita voluntarios
+          </p>
+
+        } @else {
+
+          <p>
+            Aún no definido
+          </p>
+
+        }
 
       </div>
 
@@ -2035,6 +2346,7 @@
 
 </div>
 
+
 <!-- ==========================================
      MODAL - VISTA PREVIA DE ARCHIVO
      ========================================== -->
@@ -2051,51 +2363,48 @@
       (click)="$event.stopPropagation()"
     >
 
-      <button
-        type="button"
-        class="file-preview-close"
-        (click)="cerrarVistaPrevia()"
-        aria-label="Cerrar vista previa"
-      >
-        ×
-      </button>
-
       <div class="file-preview-header">
 
         <div>
-          <h2>Vista previa</h2>
+
+          <h2>
+            Vista previa
+          </h2>
 
           @if (archivoVistaPrevia) {
-            <p>{{ archivoVistaPrevia.name }}</p>
+
+            <p>
+              {{ archivoVistaPrevia.name }}
+            </p>
+
           }
+
         </div>
 
         <button
           type="button"
           class="file-preview-close"
           (click)="cerrarVistaPrevia()"
+          aria-label="Cerrar vista previa"
         >
           ×
         </button>
 
       </div>
 
+
       <div class="file-preview-content">
 
         @if (esImagenArchivoVistaPrevia) {
-
           <img
             [src]="urlArchivoVistaPrevia"
             [alt]="archivoVistaPrevia?.name || 'Documento'"
           />
-
         } @else {
-
           <iframe
             [src]="urlSeguraVistaPrevia"
             title="Vista previa del documento"
           ></iframe>
-
         }
 
       </div>
@@ -2106,53 +2415,105 @@
 
 }
 
+
 <!-- ==========================================
      MODAL - SOLICITUD ENVIADA
      ========================================== -->
 
 @if (mostrarModalEnvio) {
 
-  <div class="modal-overlay" (click)="cerrarModalEnvio()">
+  <div
+    class="modal-overlay"
+    (click)="cerrarModalEnvio()"
+  >
 
-    <div class="success-modal" (click)="$event.stopPropagation()">
+    <div
+      class="success-modal"
+      (click)="$event.stopPropagation()"
+    >
 
-      <div class="success-icon">✓</div>
+      <div class="success-icon">
+        ✓
+      </div>
+
 
       <div class="success-content">
 
-        <span class="modal-badge">Estado: Pendiente de revisión</span>
+        <span class="modal-badge">
+          Estado: Pendiente de revisión
+        </span>
 
-        <h2>¡Registro recibido!</h2>
+        <h2>
+          ¡Registro recibido!
+        </h2>
 
         <p>
-          La solicitud de <strong>{{ nombreCentro }}</strong>
+
+          La solicitud de
+          <strong>
+            {{ nombreCentro }}
+          </strong>
+
           fue enviada correctamente.
+
         </p>
 
       </div>
 
+
       <div class="modal-steps">
 
-        <span class="modal-steps-title">¿Qué sigue?</span>
+        <span class="modal-steps-title">
+          ¿Qué sigue?
+        </span>
+
 
         <div class="modal-step">
-          <span class="modal-step-number">1</span>
-          <p>El equipo administrador revisará los datos y documentos.</p>
+
+          <span class="modal-step-number">
+            1
+          </span>
+
+          <p>
+            El equipo administrador revisará los datos y documentos.
+          </p>
+
         </div>
 
-        <div class="modal-step">
-          <span class="modal-step-number">2</span>
-          <p>Podrá contactarte al correo o teléfono del responsable.</p>
-        </div>
 
         <div class="modal-step">
-          <span class="modal-step-number">3</span>
-          <p>Si todo está en orden, el centro se publicará en la plataforma.</p>
+
+          <span class="modal-step-number">
+            2
+          </span>
+
+          <p>
+            Podrá contactarte al correo o teléfono del responsable.
+          </p>
+
+        </div>
+
+
+        <div class="modal-step">
+
+          <span class="modal-step-number">
+            3
+          </span>
+
+          <p>
+            Si todo está en orden, el centro se publicará en la plataforma.
+          </p>
+
         </div>
 
       </div>
 
-      <button type="button" class="success-button" (click)="cerrarModalEnvio()">
+
+      <button
+        type="button"
+        class="success-button"
+        (click)="cerrarModalEnvio()"
+      >
         Entendido
       </button>
 
@@ -2169,46 +2530,160 @@
 
 @if (mostrarModalError) {
 
-  <div class="modal-overlay" (click)="cerrarModalError()">
+  <div
+    class="modal-overlay"
+    (click)="cerrarModalError()"
+  >
 
-    <div class="success-modal error-modal" (click)="$event.stopPropagation()">
+    <div
+      class="success-modal error-modal"
+      (click)="$event.stopPropagation()"
+    >
 
-      <div class="success-icon error-icon">!</div>
+      <div class="success-icon error-icon">
+        !
+      </div>
+
 
       <div class="success-content">
 
-        <h2>No se pudo enviar la solicitud</h2>
+        <h2>
+          No se pudo enviar la solicitud
+        </h2>
 
-        <p>{{ errorEnvio }}</p>
+        <p>
+          {{ errorEnvio }}
+        </p>
 
         <p class="success-description">
+
           Tu información sigue aquí; no se perdió nada.
           Corrige lo necesario y vuelve a intentarlo.
+
         </p>
 
       </div>
+
 
       <div class="modal-actions">
 
         @if (haySesion) {
 
-          <button type="button" class="success-button" (click)="cerrarModalError()">
+          <button
+            type="button"
+            class="success-button"
+            (click)="cerrarModalError()"
+          >
             Revisar y completar
           </button>
 
         } @else {
 
-          <button type="button" class="btn secondary" (click)="cerrarModalError()">
+          <button
+            type="button"
+            class="btn secondary"
+            (click)="cerrarModalError()"
+          >
             Cerrar
           </button>
 
-          <button type="button" class="success-button" (click)="irALoginDesdeError()">
+
+          <button
+            type="button"
+            class="success-button"
+            (click)="irALoginDesdeError()"
+          >
             Iniciar sesión
           </button>
 
         }
 
       </div>
+
+    </div>
+
+  </div>
+
+}
+
+
+<!-- ==========================================
+     SOS-42: MODAL DE BORRADOR
+     ========================================== -->
+
+@if (mostrarModalBorrador) {
+
+  <div
+    class="modal-overlay"
+    (click)="!guardandoBorrador && seguirCompletando()"
+  >
+
+    <div class="success-modal draft-modal" (click)="$event.stopPropagation()">
+
+      <!-- 1. GUARDANDO -->
+      @if (guardandoBorrador) {
+
+        <div class="draft-spinner"></div>
+
+        <div class="success-content">
+          <h2>Guardando borrador...</h2>
+          <p>Estamos guardando tu información y documentos.</p>
+        </div>
+
+      }
+
+      <!-- 2. ERROR -->
+      @else if (errorBorrador) {
+
+        <div class="success-icon error-icon">!</div>
+
+        <div class="success-content">
+          <h2>No se pudo guardar</h2>
+          <p>{{ mensajeBorrador }}</p>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn secondary" (click)="seguirCompletando()">
+            Cerrar
+          </button>
+          <button type="button" class="success-button" (click)="guardarBorrador()">
+            Reintentar
+          </button>
+        </div>
+
+      }
+
+      <!-- 3. GUARDADO -->
+      @else {
+
+        <div class="success-icon draft-icon">✓</div>
+
+        <div class="success-content">
+
+          <span class="modal-badge">Guardado en el paso {{ currentStep }} de 5</span>
+
+          <h2>¡Borrador guardado!</h2>
+
+          <p>{{ mensajeBorrador }}</p>
+
+          <p class="success-description">
+            Puedes salir tranquilo. Cuando vuelvas a esta página,
+            recuperaremos tu información y documentos, y continuarás
+            en el paso {{ currentStep }}.
+          </p>
+
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn secondary" (click)="salirYContinuarDespues()">
+            Salir y continuar después
+          </button>
+          <button type="button" class="success-button" (click)="seguirCompletando()">
+            Seguir completando
+          </button>
+        </div>
+
+      }
 
     </div>
 
