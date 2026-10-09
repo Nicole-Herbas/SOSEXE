@@ -1,0 +1,7 @@
+target
+.idea
+*.iml
+application-local.properties
+uploads
+.git
+.gitignore
