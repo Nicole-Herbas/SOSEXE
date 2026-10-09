@@ -639,6 +639,190 @@ voluntariado: {
     },
   },
 
+
+  perfilVoluntario: {
+
+    // ── Wizard stepper ────────────────────────────────────────────────────
+    pasos: {
+      datosPersonales: 'Datos personales',
+      habilidades: 'Habilidades',
+      disponibilidad: 'Disponibilidad',
+    },
+
+    // ── Paso 1: Datos personales ──────────────────────────────────────────
+    paso1: {
+      titulo:
+        'Crea tu perfil de voluntario',
+
+      subtitulo:
+        'Cuéntanos quién eres para conectarte con las oportunidades adecuadas.',
+
+      nombreLabel:
+        'NOMBRE COMPLETO',
+
+      nombrePlaceholder:
+        'Ej. María González Quispe',
+
+      telefonoLabel:
+        'TELÉFONO / CELULAR',
+
+      telefonoPlaceholder:
+        '+591 7XX XXX XXX',
+
+      telefonoError:
+        'El teléfono es obligatorio.',
+
+      correoLabel:
+        'CORREO ELECTRÓNICO',
+
+      correoPlaceholder:
+        'tu@correo.com',
+
+      departamentoLabel:
+        'DEPARTAMENTO',
+
+      departamentoPlaceholder:
+        'Selecciona un departamento',
+
+      departamentoError:
+        'Selecciona un departamento.',
+
+      ciudadLabel:
+        'CIUDAD / MUNICIPIO',
+
+      ciudadPlaceholder:
+        'Ej. Cochabamba',
+
+      ciudadError:
+        'La ciudad es obligatoria.',
+
+      continuar:
+        'Continuar →',
+    },
+
+    // ── Paso 2: Habilidades ───────────────────────────────────────────────
+    paso2: {
+      titulo:
+        'Crea tu perfil de voluntario',
+
+      subtitulo:
+        'Selecciona las habilidades que puedes aportar. Elige todas las que apliquen.',
+
+      ningunaSeleccionada:
+        'Ninguna habilidad seleccionada todavía.',
+
+      seleccionadas:
+        'habilidades seleccionadas.',
+
+      habilidadError:
+        'Selecciona al menos una habilidad.',
+
+      notaExperiencia:
+        'No te preocupes si no tienes experiencia previa — la mayoría de oportunidades no la requieren.',
+
+      anterior:
+        '← Anterior',
+
+      continuar:
+        'Continuar →',
+    },
+
+    // ── Paso 3: Disponibilidad ────────────────────────────────────────────
+    paso3: {
+      titulo:
+        'Crea tu perfil de voluntario',
+
+      subtitulo:
+        'Indica cuándo puedes participar para mostrarte oportunidades compatibles.',
+
+      ningunaSeleccionada:
+        'Ninguna opción seleccionada todavía.',
+
+      seleccionadas:
+        'opciones seleccionadas.',
+
+      disponibilidadError:
+        'Selecciona al menos una opción de disponibilidad.',
+
+      notaActualizar:
+        'Puedes actualizar tu disponibilidad en cualquier momento desde tu perfil.',
+
+      anterior:
+        '← Anterior',
+
+      crearPerfil:
+        'Crear perfil de voluntario',
+
+      actualizarPerfil:
+        'Guardar cambios',
+    },
+
+    // ── Chips de habilidades ──────────────────────────────────────────────
+    habilidades: [
+      'Primeros auxilios',
+      'Organización',
+      'Transporte',
+      'Comunicación',
+      'Apoyo comunitario',
+      'Rescate animal',
+      'Logística',
+    ] as const,
+
+    // ── Chips de disponibilidad ───────────────────────────────────────────
+    disponibilidades: [
+      'Días de semana',
+      'Fines de semana',
+      'Respuesta de emergencia',
+      'Mañana',
+      'Tarde',
+      'Noche',
+    ] as const,
+
+    // ── Mensajes de éxito y tarjeta ───────────────────────────────────────
+    exitoTitulo:
+      '¡Perfil creado correctamente, ',
+
+    exitoMensaje:
+      'Encontramos oportunidades para ti basadas en tu perfil y disponibilidad.',
+
+    editarPerfil:
+      'Editar perfil',
+
+    tarjetaTitulo:
+      'Tu perfil de voluntario',
+
+    tarjetaTelefono:
+      'Teléfono',
+
+    tarjetaCorreo:
+      'Correo',
+
+    tarjetaDepartamento:
+      'Departamento',
+
+    tarjetaCiudad:
+      'Ciudad',
+
+    tarjetaHabilidades:
+      'Habilidades',
+
+    tarjetaDisponibilidad:
+      'Disponibilidad',
+
+    // ── Errores ───────────────────────────────────────────────────────────
+    errorCrear:
+      'No se pudo crear el perfil. Intenta de nuevo.',
+
+    errorCargar:
+      'No se pudo cargar tu perfil.',
+
+    errorActualizar:
+      'No se pudo actualizar el perfil.',
+
+    perfilActualizado:
+      '¡Perfil actualizado correctamente!',
+  },
+
 },
 
 acercaDe: {
