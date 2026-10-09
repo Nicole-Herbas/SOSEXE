@@ -1,0 +1,330 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   SOS-40: Wizard — Crear / Editar perfil de voluntario
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+
+/* ── Stepper ──────────────────────────────────────────────────────────────── */
+
+.wizard-stepper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  margin-bottom: 2rem;
+}
+
+.wizard-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.wizard-step__circle {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  border: 2px solid #cbd5e1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: #94a3b8;
+  background: #fff;
+  transition: all 0.3s ease;
+}
+
+.wizard-step--active .wizard-step__circle {
+  border-color: #0d9488;
+  color: #0d9488;
+  background: #fff;
+}
+
+.wizard-step--completed .wizard-step__circle {
+  border-color: #0d9488;
+  background: #0d9488;
+  color: #fff;
+}
+
+.wizard-step__label {
+  font-size: 0.75rem;
+  color: #94a3b8;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.wizard-step--active .wizard-step__label,
+.wizard-step--completed .wizard-step__label {
+  color: #0d9488;
+}
+
+.wizard-step__line {
+  width: 4rem;
+  height: 2px;
+  background: #e2e8f0;
+  margin: 0 0.75rem;
+  margin-bottom: 1.5rem;
+  transition: background 0.3s ease;
+}
+
+.wizard-step__line--completed {
+  background: #0d9488;
+}
+
+
+/* ── Card container ───────────────────────────────────────────────────────── */
+
+.wizard-card {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 1rem;
+  padding: 2rem 2.5rem;
+  max-width: 640px;
+  margin: 0 auto;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.wizard-card__title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 0.25rem;
+}
+
+.wizard-card__subtitle {
+  font-size: 0.875rem;
+  color: #64748b;
+  margin: 0 0 1.5rem;
+}
+
+
+/* ── Form fields ──────────────────────────────────────────────────────────── */
+
+.wizard-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.wizard-field-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+}
+
+.wizard-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+.wizard-field--full {
+  width: 100%;
+}
+
+.wizard-field__label {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  color: #334155;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.wizard-field__input {
+  padding: 0.75rem 1rem;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 0.5rem;
+  font-size: 0.9375rem;
+  color: #0f172a;
+  background: #fff;
+  transition: border-color 0.2s ease;
+  outline: none;
+  font-family: inherit;
+}
+
+.wizard-field__input:focus {
+  border-color: #0d9488;
+}
+
+.wizard-field__input:read-only {
+  background: #f8fafc;
+  color: #64748b;
+  cursor: default;
+}
+
+.wizard-field__select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2364748b' d='M2 4l4 4 4-4'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  padding-right: 2.5rem;
+}
+
+.wizard-field__error {
+  font-size: 0.8125rem;
+  color: #ef4444;
+  margin-top: 0.125rem;
+}
+
+
+/* ── Chips ─────────────────────────────────────────────────────────────────── */
+
+.wizard-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.625rem;
+  margin: 0.75rem 0;
+}
+
+.wizard-chips__count {
+  font-size: 0.875rem;
+  color: #0d9488;
+  font-weight: 500;
+  margin: 0 0 0.5rem;
+}
+
+.wizard-chips__count--empty {
+  color: #94a3b8;
+}
+
+.wizard-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.5rem 1rem;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 2rem;
+  background: #fff;
+  color: #334155;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.wizard-chip:hover {
+  border-color: #0d9488;
+  color: #0d9488;
+}
+
+.wizard-chip--selected {
+  background: #0d9488;
+  border-color: #0d9488;
+  color: #fff;
+}
+
+.wizard-chip--selected:hover {
+  background: #0f766e;
+  border-color: #0f766e;
+  color: #fff;
+}
+
+.wizard-chip__check {
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+
+/* ── Nota informativa ─────────────────────────────────────────────────────── */
+
+.wizard-nota {
+  font-size: 0.8125rem;
+  color: #0d9488;
+  margin: 0.75rem 0 1.5rem;
+  font-style: italic;
+}
+
+
+/* ── Mensaje de error global ──────────────────────────────────────────────── */
+
+.wizard-mensaje-error {
+  font-size: 0.875rem;
+  color: #ef4444;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 0.5rem;
+  padding: 0.75rem 1rem;
+  margin: 0.75rem 0;
+}
+
+
+/* ── Actions ──────────────────────────────────────────────────────────────── */
+
+.wizard-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1.5rem;
+  gap: 1rem;
+}
+
+.wizard-actions--end {
+  justify-content: flex-end;
+}
+
+
+/* ── Buttons (reutilizados del proyecto) ──────────────────────────────────── */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+  font-family: inherit;
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn--primary {
+  background: #0d9488;
+  color: #fff;
+}
+
+.btn--primary:hover:not(:disabled) {
+  background: #0f766e;
+}
+
+.btn--outline {
+  background: #fff;
+  color: #334155;
+  border: 1.5px solid #e2e8f0;
+}
+
+.btn--outline:hover:not(:disabled) {
+  border-color: #94a3b8;
+  color: #0f172a;
+}
+
+
+/* ── Responsive ───────────────────────────────────────────────────────────── */
+
+@media (max-width: 640px) {
+
+  .wizard-card {
+    padding: 1.5rem 1.25rem;
+  }
+
+  .wizard-field-row {
+    grid-template-columns: 1fr;
+  }
+
+  .wizard-step__line {
+    width: 2rem;
+  }
+
+  .wizard-step__label {
+    font-size: 0.625rem;
+  }
+}

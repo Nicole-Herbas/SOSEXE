@@ -1,0 +1,129 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   SOS-40: Tarjeta de perfil de voluntario
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.tarjeta {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 1rem;
+  max-width: 640px;
+  margin: 0 auto;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.tarjeta__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.25rem 2rem;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.tarjeta__titulo {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0;
+}
+
+.tarjeta__editar {
+  background: none;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 0.5rem;
+  padding: 0.5rem 1rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #334155;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.tarjeta__editar:hover {
+  border-color: #0d9488;
+  color: #0d9488;
+}
+
+.tarjeta__body {
+  padding: 1.5rem 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.tarjeta__row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+}
+
+.tarjeta__campo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.tarjeta__campo--full {
+  width: 100%;
+}
+
+.tarjeta__label {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  color: #94a3b8;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.tarjeta__valor {
+  font-size: 0.9375rem;
+  color: #0f172a;
+  font-weight: 500;
+}
+
+.tarjeta__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+}
+
+.tarjeta__chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.375rem 0.875rem;
+  border-radius: 2rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+}
+
+.tarjeta__chip--teal {
+  background: #f0fdfa;
+  color: #0d9488;
+  border: 1px solid #99f6e4;
+}
+
+.tarjeta__chip--blue {
+  background: #eff6ff;
+  color: #2563eb;
+  border: 1px solid #bfdbfe;
+}
+
+
+/* ── Responsive ───────────────────────────────────────────────────────────── */
+
+@media (max-width: 640px) {
+
+  .tarjeta__header {
+    padding: 1rem 1.25rem;
+  }
+
+  .tarjeta__body {
+    padding: 1.25rem;
+  }
+
+  .tarjeta__row {
+    grid-template-columns: 1fr;
+  }
+}

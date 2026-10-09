@@ -1,0 +1,58 @@
+<div class="tarjeta">
+
+  <div class="tarjeta__header">
+    <h3 class="tarjeta__titulo">{{ textos.tarjetaTitulo }}</h3>
+    <button
+      class="tarjeta__editar"
+      type="button"
+      (click)="editar.emit()"
+    >
+      ✎ {{ textos.editarPerfil }}
+    </button>
+  </div>
+
+  <div class="tarjeta__body">
+
+    <div class="tarjeta__row">
+      <div class="tarjeta__campo">
+        <span class="tarjeta__label">{{ textos.tarjetaTelefono }}</span>
+        <span class="tarjeta__valor">{{ perfil.telefono }}</span>
+      </div>
+      <div class="tarjeta__campo">
+        <span class="tarjeta__label">{{ textos.tarjetaCorreo }}</span>
+        <span class="tarjeta__valor">{{ perfil.emailContacto }}</span>
+      </div>
+    </div>
+
+    <div class="tarjeta__row">
+      <div class="tarjeta__campo">
+        <span class="tarjeta__label">{{ textos.tarjetaDepartamento }}</span>
+        <span class="tarjeta__valor">{{ perfil.departamentoNombre }}</span>
+      </div>
+      <div class="tarjeta__campo">
+        <span class="tarjeta__label">{{ textos.tarjetaCiudad }}</span>
+        <span class="tarjeta__valor">{{ perfil.ciudad }}</span>
+      </div>
+    </div>
+
+    <div class="tarjeta__campo tarjeta__campo--full">
+      <span class="tarjeta__label">{{ textos.tarjetaHabilidades }}</span>
+      <div class="tarjeta__chips">
+        @for (hab of perfil.habilidades; track hab) {
+          <span class="tarjeta__chip tarjeta__chip--teal">{{ hab }}</span>
+        }
+      </div>
+    </div>
+
+    <div class="tarjeta__campo tarjeta__campo--full">
+      <span class="tarjeta__label">{{ textos.tarjetaDisponibilidad }}</span>
+      <div class="tarjeta__chips">
+        @for (disp of perfil.disponibilidad; track disp) {
+          <span class="tarjeta__chip tarjeta__chip--blue">{{ disp }}</span>
+        }
+      </div>
+    </div>
+
+  </div>
+
+</div>

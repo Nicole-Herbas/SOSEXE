@@ -227,6 +227,12 @@ public class SecurityConfig {
                         ).authenticated()
 
 
+
+                        // ── SOS-40: perfil de voluntario (autenticado) ──
+                        .requestMatchers(
+                                ApiRoutes.PERFIL_VOLUNTARIO + "/**"
+                        ).authenticated()
+
                         // Cualquier otro endpoint de API necesita autenticación
                         .requestMatchers(
                                 "/api/**"

@@ -12,14 +12,28 @@
 
     <p class="vol-hero__description">{{ textos.hero.descripcion }}</p>
 
-    <div class="vol-hero__actions">
-      <a routerLink="/login" class="btn btn--primary">
-        {{ textos.hero.serVoluntario }}
-      </a>
-      <a routerLink="/mapa" class="btn btn--outline">
-        {{ textos.hero.verMapa }}
-      </a>
-    </div>
+    <!-- Hero actions: varían según estado -->
+    @if (estado() === 'SIN_SESION') {
+      <div class="vol-hero__actions">
+        <a routerLink="/login" class="btn btn--primary">
+          {{ textos.hero.serVoluntario }}
+        </a>
+        <a routerLink="/mapa" class="btn btn--outline">
+          {{ textos.hero.verMapa }}
+        </a>
+      </div>
+    }
+
+    @if (estado() === 'SIN_PERFIL') {
+      <div class="vol-hero__actions">
+        <button class="btn btn--primary" (click)="iniciarCreacion()">
+          {{ textos.hero.serVoluntario }}
+        </button>
+        <a routerLink="/mapa" class="btn btn--outline">
+          {{ textos.hero.verMapa }}
+        </a>
+      </div>
+    }
 
     <div class="vol-hero__features">
       <span class="vol-hero__feature">{{ textos.hero.feat1 }}</span>
@@ -28,6 +42,66 @@
     </div>
 
   </section>
+
+
+  <!-- ===== MENSAJE DE ÉXITO ===== -->
+  @if (estado() === 'CON_PERFIL' && mensajeExito()) {
+    <section class="vol-exito">
+      <div class="vol-exito__card">
+        <span class="vol-exito__icon">✓</span>
+        <div class="vol-exito__content">
+          <p class="vol-exito__titulo">{{ mensajeExito() }}</p>
+          <p class="vol-exito__mensaje">{{ textos.perfilVoluntario.exitoMensaje }}</p>
+        </div>
+      </div>
+    </section>
+  }
+
+
+  <!-- ===== TARJETA DE PERFIL ===== -->
+  @if (featureToggles.voluntariado.mostrarPerfilVoluntario && estado() === 'CON_PERFIL' && perfil(); as p) {
+    <section class="vol-perfil-section">
+      <app-tarjeta-perfil
+        [perfil]="p"
+        (editar)="iniciarEdicion()"
+      />
+    </section>
+  }
+
+
+  <!-- ===== WIZARD CREAR PERFIL ===== -->
+  @if (featureToggles.voluntariado.mostrarPerfilVoluntario && estado() === 'CREANDO_PERFIL') {
+    <section class="vol-wizard-section">
+      <app-crear-perfil
+        [nombreUsuario]="nombreUsuario()"
+        [emailUsuario]="emailUsuario()"
+        (perfilCreado)="onPerfilCreado()"
+        (cancelar)="onCancelar()"
+      />
+    </section>
+  }
+
+
+  <!-- ===== WIZARD EDITAR PERFIL ===== -->
+  @if (featureToggles.voluntariado.mostrarPerfilVoluntario && estado() === 'EDITANDO_PERFIL' && perfil(); as p) {
+    <section class="vol-wizard-section">
+      <app-crear-perfil
+        [perfilExistente]="p"
+        [nombreUsuario]="nombreUsuario()"
+        [emailUsuario]="emailUsuario()"
+        (perfilCreado)="onPerfilCreado()"
+        (cancelar)="onCancelar()"
+      />
+    </section>
+  }
+
+
+  <!-- ===== CARGANDO ===== -->
+  @if (estado() === 'CARGANDO') {
+    <section class="vol-cargando">
+      <p>Cargando...</p>
+    </section>
+  }
 
 
   <!-- ===== OPORTUNIDADES DISPONIBLES ===== -->
