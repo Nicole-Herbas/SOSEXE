@@ -132,6 +132,13 @@ public class SecurityConfig {
                                 ApiRoutes.SOLICITUDES_CENTRO + "/**"
                         ).hasAuthority(Roles.ADMIN)
 
+                        // ── SOS-68: dashboard administrativo -> solo ADMIN ──
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                ApiRoutes.ADMIN_DASHBOARD
+                        ).hasAuthority(Roles.ADMIN)
+
+                
                         // Usuario autenticado
                         .requestMatchers(
                                 ApiRoutes.AUTH_ME
