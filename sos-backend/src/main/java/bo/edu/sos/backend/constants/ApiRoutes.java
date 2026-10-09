@@ -56,5 +56,8 @@ public final class ApiRoutes {
     public static final String SWAGGER_HTML   = "/swagger-ui.html";
     public static final String OPENAPI_DOCS   = "/v3/api-docs/**";
 
+    // ── Administración ───────────────────────────────────────────────────────
+    public static final String ADMIN_DASHBOARD = "/api/admin/dashboard";
+
     private ApiRoutes() {}
 }
