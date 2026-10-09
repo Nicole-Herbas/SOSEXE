@@ -84,6 +84,10 @@ export interface VoluntariadoToggles {
   /** true  → muestra el badge de cupos disponibles en cada tarjeta
    *  false → oculta los badges de cupos (útil si aún no hay datos reales) */
   mostrarCupos: boolean;
+
+  /** true  → habilita el flujo de crear/editar perfil de voluntario (SOS-40)
+   *  false → oculta el formulario de perfil y la tarjeta */
+  mostrarPerfilVoluntario: boolean;
 }
 
 // ---------------------------------------------------------------------------
@@ -146,6 +150,7 @@ export const FEATURE_TOGGLES: FeatureToggles = {
     mostrarSeccionOportunidades: true,
     mostrarSeccionComoFunciona:  true,
     mostrarCupos:                true,
+    mostrarPerfilVoluntario:     true,
   },
 
   acercaDe: {
