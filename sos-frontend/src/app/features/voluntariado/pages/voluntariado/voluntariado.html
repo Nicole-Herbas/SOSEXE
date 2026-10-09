@@ -13,7 +13,7 @@
     <p class="vol-hero__description">{{ textos.hero.descripcion }}</p>
 
     <!-- Hero actions: varían según estado -->
-    @if (estado === 'SIN_SESION') {
+    @if (estado() === 'SIN_SESION') {
       <div class="vol-hero__actions">
         <a routerLink="/login" class="btn btn--primary">
           {{ textos.hero.serVoluntario }}
@@ -24,7 +24,7 @@
       </div>
     }
 
-    @if (estado === 'SIN_PERFIL') {
+    @if (estado() === 'SIN_PERFIL') {
       <div class="vol-hero__actions">
         <button class="btn btn--primary" (click)="iniciarCreacion()">
           {{ textos.hero.serVoluntario }}
@@ -45,12 +45,12 @@
 
 
   <!-- ===== MENSAJE DE ÉXITO ===== -->
-  @if (estado === 'CON_PERFIL' && mensajeExito) {
+  @if (estado() === 'CON_PERFIL' && mensajeExito()) {
     <section class="vol-exito">
       <div class="vol-exito__card">
         <span class="vol-exito__icon">✓</span>
         <div class="vol-exito__content">
-          <p class="vol-exito__titulo">{{ mensajeExito }}</p>
+          <p class="vol-exito__titulo">{{ mensajeExito() }}</p>
           <p class="vol-exito__mensaje">{{ textos.perfilVoluntario.exitoMensaje }}</p>
         </div>
       </div>
@@ -59,10 +59,10 @@
 
 
   <!-- ===== TARJETA DE PERFIL ===== -->
-  @if (featureToggles.voluntariado.mostrarPerfilVoluntario && estado === 'CON_PERFIL' && perfil) {
+  @if (featureToggles.voluntariado.mostrarPerfilVoluntario && estado() === 'CON_PERFIL' && perfil(); as p) {
     <section class="vol-perfil-section">
       <app-tarjeta-perfil
-        [perfil]="perfil"
+        [perfil]="p"
         (editar)="iniciarEdicion()"
       />
     </section>
@@ -70,11 +70,11 @@
 
 
   <!-- ===== WIZARD CREAR PERFIL ===== -->
-  @if (featureToggles.voluntariado.mostrarPerfilVoluntario && estado === 'CREANDO_PERFIL') {
+  @if (featureToggles.voluntariado.mostrarPerfilVoluntario && estado() === 'CREANDO_PERFIL') {
     <section class="vol-wizard-section">
       <app-crear-perfil
-        [nombreUsuario]="nombreUsuario"
-        [emailUsuario]="emailUsuario"
+        [nombreUsuario]="nombreUsuario()"
+        [emailUsuario]="emailUsuario()"
         (perfilCreado)="onPerfilCreado()"
         (cancelar)="onCancelar()"
       />
@@ -83,12 +83,12 @@
 
 
   <!-- ===== WIZARD EDITAR PERFIL ===== -->
-  @if (featureToggles.voluntariado.mostrarPerfilVoluntario && estado === 'EDITANDO_PERFIL' && perfil) {
+  @if (featureToggles.voluntariado.mostrarPerfilVoluntario && estado() === 'EDITANDO_PERFIL' && perfil(); as p) {
     <section class="vol-wizard-section">
       <app-crear-perfil
-        [perfilExistente]="perfil"
-        [nombreUsuario]="nombreUsuario"
-        [emailUsuario]="emailUsuario"
+        [perfilExistente]="p"
+        [nombreUsuario]="nombreUsuario()"
+        [emailUsuario]="emailUsuario()"
         (perfilCreado)="onPerfilCreado()"
         (cancelar)="onCancelar()"
       />
@@ -97,7 +97,7 @@
 
 
   <!-- ===== CARGANDO ===== -->
-  @if (estado === 'CARGANDO') {
+  @if (estado() === 'CARGANDO') {
     <section class="vol-cargando">
       <p>Cargando...</p>
     </section>

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 
@@ -16,7 +16,7 @@ import { CrearPerfilComponent } from '../../components/crear-perfil/crear-perfil
 import { TarjetaPerfilComponent } from '../../components/tarjeta-perfil/tarjeta-perfil';
 
 
-type EstadoPagina =
+export type EstadoPagina =
   | 'CARGANDO'
   | 'SIN_SESION'
   | 'SIN_PERFIL'
@@ -44,31 +44,34 @@ export class Voluntariado implements OnInit {
     voluntariado: { ...FEATURE_TOGGLES.voluntariado },
   };
 
-  estado: EstadoPagina = 'CARGANDO';
-  perfil: PerfilVoluntario | null = null;
-  nombreUsuario = '';
-  emailUsuario = '';
-  mensajeExito = '';
+  readonly estado = signal<EstadoPagina>('CARGANDO');
+  readonly perfil = signal<PerfilVoluntario | null>(null);
+  readonly nombreUsuario = signal<string>('');
+  readonly emailUsuario = signal<string>('');
+  readonly mensajeExito = signal<string>('');
 
 
   constructor(
     private authService: AuthService,
-    private perfilService: PerfilVoluntarioService
+    private perfilService: PerfilVoluntarioService,
+    private cdr: ChangeDetectorRef
   ) {}
 
 
   ngOnInit(): void {
 
     if (!this.authService.estaAutenticado()) {
-      this.estado = 'SIN_SESION';
+      this.estado.set('SIN_SESION');
       return;
     }
 
-    this.nombreUsuario =
-      this.authService.obtenerNombreUsuario();
+    this.nombreUsuario.set(
+      this.authService.obtenerNombreUsuario()
+    );
 
-    this.emailUsuario =
-      localStorage.getItem('usuario_email') ?? '';
+    this.emailUsuario.set(
+      localStorage.getItem('usuario_email') ?? ''
+    );
 
     this.verificarPerfil();
   }
@@ -76,7 +79,7 @@ export class Voluntariado implements OnInit {
 
   private verificarPerfil(): void {
 
-    this.estado = 'CARGANDO';
+    this.estado.set('CARGANDO');
 
     this.perfilService
       .existeMiPerfil()
@@ -87,13 +90,15 @@ export class Voluntariado implements OnInit {
           if (resp.data) {
             this.cargarPerfil();
           } else {
-            this.estado = 'SIN_PERFIL';
+            this.estado.set('SIN_PERFIL');
+            this.cdr.markForCheck();
           }
 
         },
 
         error: () => {
-          this.estado = 'SIN_PERFIL';
+          this.estado.set('SIN_PERFIL');
+          this.cdr.markForCheck();
         },
 
       });
@@ -107,12 +112,14 @@ export class Voluntariado implements OnInit {
       .subscribe({
 
         next: (resp) => {
-          this.perfil = resp.data;
-          this.estado = 'CON_PERFIL';
+          this.perfil.set(resp.data);
+          this.estado.set('CON_PERFIL');
+          this.cdr.markForCheck();
         },
 
         error: () => {
-          this.estado = 'SIN_PERFIL';
+          this.estado.set('SIN_PERFIL');
+          this.cdr.markForCheck();
         },
 
       });
@@ -120,29 +127,29 @@ export class Voluntariado implements OnInit {
 
 
   iniciarCreacion(): void {
-    this.mensajeExito = '';
-    this.estado = 'CREANDO_PERFIL';
+    this.mensajeExito.set('');
+    this.estado.set('CREANDO_PERFIL');
   }
 
 
   iniciarEdicion(): void {
-    this.mensajeExito = '';
-    this.estado = 'EDITANDO_PERFIL';
+    this.mensajeExito.set('');
+    this.estado.set('EDITANDO_PERFIL');
   }
 
 
   onPerfilCreado(): void {
-    this.mensajeExito = '';
+    this.mensajeExito.set('');
     this.cargarPerfilYMostrarExito();
   }
 
 
   onCancelar(): void {
 
-    if (this.perfil) {
-      this.estado = 'CON_PERFIL';
+    if (this.perfil()) {
+      this.estado.set('CON_PERFIL');
     } else {
-      this.estado = 'SIN_PERFIL';
+      this.estado.set('SIN_PERFIL');
     }
 
   }
@@ -156,18 +163,22 @@ export class Voluntariado implements OnInit {
 
         next: (resp) => {
 
-          this.perfil = resp.data;
-          this.estado = 'CON_PERFIL';
+          this.perfil.set(resp.data);
+          this.estado.set('CON_PERFIL');
 
-          this.mensajeExito = this.estado === 'CON_PERFIL'
+          const textoExito = this.estado() === 'CON_PERFIL'
             ? this.textos.perfilVoluntario.exitoTitulo
-              + this.nombreUsuario + '!'
+              + this.nombreUsuario() + '!'
             : '';
+
+          this.mensajeExito.set(textoExito);
+          this.cdr.markForCheck();
 
         },
 
         error: () => {
-          this.estado = 'SIN_PERFIL';
+          this.estado.set('SIN_PERFIL');
+          this.cdr.markForCheck();
         },
 
       });

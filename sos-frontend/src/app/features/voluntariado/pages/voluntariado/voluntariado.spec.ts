@@ -61,7 +61,7 @@ describe('Voluntariado', () => {
 
 
   it('debe mostrar el estado SIN_SESION cuando el usuario no está autenticado', () => {
-    expect(component.estado).toBe('SIN_SESION');
+    expect(component.estado()).toBe('SIN_SESION');
   });
 
 

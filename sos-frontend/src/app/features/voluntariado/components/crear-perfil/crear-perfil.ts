@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 
@@ -59,7 +59,8 @@ export class CrearPerfilComponent implements OnInit {
 
   constructor(
     private fb: FormBuilder,
-    private perfilService: PerfilVoluntarioService
+    private perfilService: PerfilVoluntarioService,
+    private cdr: ChangeDetectorRef
   ) {}
 
 
@@ -223,12 +224,14 @@ export class CrearPerfilComponent implements OnInit {
 
           next: () => {
             this.cargando = false;
+            this.cdr.markForCheck();
             this.perfilCreado.emit();
           },
 
           error: () => {
             this.cargando = false;
             this.mensajeError = this.textos.errorActualizar;
+            this.cdr.markForCheck();
           },
 
         });
@@ -241,12 +244,14 @@ export class CrearPerfilComponent implements OnInit {
 
           next: () => {
             this.cargando = false;
+            this.cdr.markForCheck();
             this.perfilCreado.emit();
           },
 
           error: () => {
             this.cargando = false;
             this.mensajeError = this.textos.errorCrear;
+            this.cdr.markForCheck();
           },
 
         });
