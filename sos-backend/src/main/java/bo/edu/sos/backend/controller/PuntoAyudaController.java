@@ -71,4 +71,17 @@ public class PuntoAyudaController {
         return ResponseEntity.ok(
                 ApiResponse.ok("Punto de ayuda eliminado", null));
     }
+
+        @PatchMapping("/{id}/estado")
+    public ResponseEntity<ApiResponse<PuntoAyudaDTO>> cambiarEstado(
+            @PathVariable Long id,
+            @RequestParam String estado) {
+
+        return ResponseEntity.ok(
+                ApiResponse.ok(
+                        "Estado de punto de ayuda actualizado",
+                        puntoAyudaService.cambiarEstado(id, estado)
+                )
+        );
+    }
 }
