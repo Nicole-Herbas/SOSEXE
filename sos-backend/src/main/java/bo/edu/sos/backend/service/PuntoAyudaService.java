@@ -1,5 +1,6 @@
 package bo.edu.sos.backend.service;
 
+import bo.edu.sos.backend.exception.BadRequestException;
 import bo.edu.sos.backend.constants.EstadoVerificacion;
 import bo.edu.sos.backend.dto.PuntoAyudaDTO;
 import bo.edu.sos.backend.entity.Departamento;
@@ -224,6 +225,36 @@ public class PuntoAyudaService {
         );
     }
 
+    @Transactional
+    public PuntoAyudaDTO cambiarEstado(
+            Long id,
+            String nuevoEstado) {
+
+        if (!EstadoVerificacion.esValido(nuevoEstado)) {
+            throw new BadRequestException(
+                    "Estado de verificación inválido: " + nuevoEstado
+                            + ". Valores permitidos: "
+                            + EstadoVerificacion.VALORES);
+        }
+
+        PuntoAyuda punto = puntoAyudaRepository
+                .findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Punto de ayuda", id));
+
+        punto.setEstadoVerificacion(nuevoEstado);
+
+        PuntoAyuda actualizado = puntoAyudaRepository.save(punto);
+
+        LogHelper.info(
+                PuntoAyudaService.class,
+                "Estado de punto de ayuda actualizado. id={}, estado={}",
+                id,
+                nuevoEstado
+        );
+
+        return convertirADTO(actualizado);
+    }
 
     private void copiarDTOaEntidad(
             PuntoAyudaDTO dto,
