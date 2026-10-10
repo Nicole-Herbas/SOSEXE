@@ -21,6 +21,7 @@ export const APP_TEXTOS = {
     cantidadNotificaciones: '1',
 
     iniciarSesion: 'Iniciar sesión',
+    preferencias: 'Preferencias',
     quieroAyudar: '♥ Quiero ayudar',
   },
 
@@ -901,6 +902,26 @@ registro: {
 
   errorGeneral:
     'Ocurrió un error al crear la cuenta. Intenta de nuevo.',
+},
+
+preferencias: {
+  titulo: 'Preferencias de cuenta',
+  seccionSms: 'Alertas SMS por región',
+  descripcionSms:
+    'Recibe notificaciones inmediatas por mensaje de texto ante emergencias y desastres naturales en tu región.',
+  labelTelefono: 'Número de teléfono',
+  placeholderTelefono: '+591 XXXXXXXX',
+  labelRegion: 'Departamento / Región',
+  placeholderRegion: 'Selecciona tu departamento',
+  labelConsentimiento:
+    'Acepto voluntariamente recibir alertas de emergencia por SMS de SOS.exe',
+  botonSuscribir: 'Suscribirme a alertas SMS',
+  confirmacion: '✅ Te suscribiste correctamente a las alertas SMS.',
+  errorGenerico: 'Ocurrió un error al guardar tu suscripción. Intenta de nuevo.',
+  errorTelefono: 'Ingresa un número de teléfono válido (7 a 15 dígitos).',
+  errorRegion: 'Debes seleccionar un departamento.',
+  cargandoDepartamentos: 'Cargando departamentos...',
+  cargandoEstado: 'Cargando información de suscripción...',
 },
 
 } as const;
