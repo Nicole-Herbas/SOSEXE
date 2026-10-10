@@ -110,4 +110,27 @@ public class SuscripcionSmsController {
                 ApiResponse.ok(existe)
         );
     }
+
+
+    /**
+     * Cancela la suscripción SMS del usuario autenticado (SOS-64).
+     *
+     * DELETE /api/suscripcion-sms/me
+     */
+    @DeleteMapping("/me")
+    public ResponseEntity<ApiResponse<Void>> cancelarMiSuscripcion(
+            Authentication authentication) {
+
+        LogHelper.debug(
+                SuscripcionSmsController.class,
+                "Peticion DELETE suscripcion-sms/me recibida. usuario={}",
+                authentication.getName()
+        );
+
+        suscripcionService.cancelar(authentication.getName());
+
+        return ResponseEntity.ok(
+                ApiResponse.ok("Suscripción SMS cancelada exitosamente", null)
+        );
+    }
 }
