@@ -233,6 +233,11 @@ public class SecurityConfig {
                                 ApiRoutes.PERFIL_VOLUNTARIO + "/**"
                         ).authenticated()
 
+                        // ── SOS-63: suscripción SMS (autenticado) ──
+                        .requestMatchers(
+                                ApiRoutes.SUSCRIPCION_SMS + "/**"
+                        ).authenticated()
+
                         // Cualquier otro endpoint de API necesita autenticación
                         .requestMatchers(
                                 "/api/**"
