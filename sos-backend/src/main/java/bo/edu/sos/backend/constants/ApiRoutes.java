@@ -54,6 +54,9 @@ public final class ApiRoutes {
     // ── Perfil de voluntario (SOS-40) ─────────────────────────────────────────
     public static final String PERFIL_VOLUNTARIO = "/api/perfil-voluntario";
 
+    // ── Suscripción SMS (SOS-63) ───────────────────────────────────────────────
+    public static final String SUSCRIPCION_SMS   = "/api/suscripcion-sms";
+
     // ── Swagger / OpenAPI ─────────────────────────────────────────────────────
     public static final String SWAGGER_UI     = "/swagger-ui/**";
     public static final String SWAGGER_HTML   = "/swagger-ui.html";
