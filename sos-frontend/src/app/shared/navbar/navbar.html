@@ -1,4 +1,4 @@
-﻿<nav class="navbar">
+<nav class="navbar">
 
   <div class="navbar-brand">
 
@@ -111,6 +111,15 @@
       <span class="navbar-username">
         {{ nombreUsuario }}
       </span>
+
+      <a
+        class="navbar-preferencias"
+        routerLink="/preferencias"
+        routerLinkActive="active"
+        title="Preferencias"
+      >
+        ⚙ {{ textos.preferencias }}
+      </a>
 
       <button
         class="navbar-logout"

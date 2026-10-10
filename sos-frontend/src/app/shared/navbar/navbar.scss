@@ -1,4 +1,4 @@
-﻿.navbar {
+.navbar {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -147,6 +147,28 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.navbar-preferencias {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  background: none;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  color: #374151;
+  font-size: 0.8rem;
+  font-weight: 500;
+  padding: 0.3rem 0.7rem;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s, border-color 0.2s;
+
+  &:hover, &.active {
+    background: #e6f4f1;
+    color: #1a7a6e;
+    border-color: #1a7a6e;
+  }
 }
 
 .navbar-logout {
