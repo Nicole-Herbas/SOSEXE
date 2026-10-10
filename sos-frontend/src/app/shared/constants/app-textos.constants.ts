@@ -922,6 +922,15 @@ preferencias: {
   errorRegion: 'Debes seleccionar un departamento.',
   cargandoDepartamentos: 'Cargando departamentos...',
   cargandoEstado: 'Cargando información de suscripción...',
+  suscripcionActiva: 'Tu suscripción SMS está activa',
+  botonCancelar: 'Cancelar suscripción SMS',
+  confirmacionCancelacion: '❌ Suscripción cancelada. Ya no recibirás alertas SMS.',
+  advertenciaCancelacion: 'Al cancelar, dejarás de recibir alertas SMS de emergencia en tu región.',
+  modalConfirmarTitulo: '¿Confirmas la cancelación de alertas SMS?',
+  modalConfirmarBoton: 'Sí, cancelar suscripción',
+  modalCancelarBoton: 'Mantener suscripción',
+  estadoActivo: 'Activa',
+  estadoInactivo: 'Inactiva',
 },
 
 } as const;
