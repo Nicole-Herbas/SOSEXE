@@ -43,86 +43,161 @@
           </div>
         }
 
-        <form [formGroup]="formulario" (ngSubmit)="guardar()" class="sms-form">
+        <!-- Vista cuando hay suscripción activa (SOS-64) -->
+        @if (tieneSuscripcionActiva) {
 
-          <!-- Campo Teléfono -->
-          <div class="form-group" [class.has-error]="telefonoInvalido">
-            <label for="telefono-sms" class="form-label">
-              {{ textos.labelTelefono }} <span class="required">*</span>
-            </label>
-            <div class="input-wrapper">
-              <span class="input-prefix">📞</span>
-              <input
-                id="telefono-sms"
-                type="tel"
-                formControlName="telefono"
-                class="form-control"
-                [placeholder]="textos.placeholderTelefono"
-                autocomplete="tel"
-              />
+          <div class="suscripcion-activa-card">
+
+            <div class="activa-card-top">
+              <div class="activa-badge">
+                <span class="dot-indicator"></span>
+                <span>{{ textos.suscripcionActiva }}</span>
+              </div>
+              <span class="estado-tag">{{ textos.estadoActivo }}</span>
             </div>
-            @if (telefonoInvalido) {
-              <small class="error-text">{{ textos.errorTelefono }}</small>
-            }
-          </div>
 
-          <!-- Campo Región / Departamento -->
-          <div class="form-group" [class.has-error]="departamentoInvalido">
-            <label for="departamento-sms" class="form-label">
-              {{ textos.labelRegion }} <span class="required">*</span>
-            </label>
-            <div class="input-wrapper">
-              <span class="input-prefix">📍</span>
-              <select
-                id="departamento-sms"
-                formControlName="departamentoId"
-                class="form-control select-control"
-              >
-                <option [ngValue]="null" disabled selected>
-                  {{ textos.placeholderRegion }}
-                </option>
-                @for (dpto of departamentos; track dpto.id) {
-                  <option [ngValue]="dpto.id">{{ dpto.nombre }}</option>
-                }
-              </select>
+            <div class="activa-datos">
+              <div class="dato-item">
+                <span class="dato-label">{{ textos.labelTelefono }}</span>
+                <span class="dato-valor">📞 {{ suscripcionActual()?.telefono }}</span>
+              </div>
+
+              <div class="dato-item">
+                <span class="dato-label">{{ textos.labelRegion }}</span>
+                <span class="dato-valor">📍 {{ suscripcionActual()?.departamentoNombre }}</span>
+              </div>
             </div>
-            @if (departamentoInvalido) {
-              <small class="error-text">{{ textos.errorRegion }}</small>
+
+            <!-- Diálogo de confirmación de cancelación -->
+            @if (confirmandoCancelacion()) {
+              <div class="confirmacion-box">
+                <h3 class="confirmacion-titulo">{{ textos.modalConfirmarTitulo }}</h3>
+                <p class="confirmacion-advertencia">{{ textos.advertenciaCancelacion }}</p>
+
+                <div class="confirmacion-actions">
+                  <button
+                    type="button"
+                    class="btn-danger-confirm"
+                    (click)="confirmarCancelacion()"
+                    [disabled]="cancelando()"
+                  >
+                    @if (cancelando()) {
+                      <span class="btn-spinner"></span>
+                      <span>Cancelando...</span>
+                    } @else {
+                      <span>{{ textos.modalConfirmarBoton }}</span>
+                    }
+                  </button>
+
+                  <button
+                    type="button"
+                    class="btn-secondary"
+                    (click)="descartarCancelacion()"
+                    [disabled]="cancelando()"
+                  >
+                    {{ textos.modalCancelarBoton }}
+                  </button>
+                </div>
+              </div>
+            } @else {
+              <div class="activa-actions">
+                <button
+                  type="button"
+                  class="btn-cancelar-suscripcion"
+                  (click)="solicitarCancelacion()"
+                >
+                  {{ textos.botonCancelar }}
+                </button>
+              </div>
             }
+
           </div>
 
-          <!-- Consentimiento explícito -->
-          <div class="consentimiento-group" [class.has-error]="consentimientoInvalido">
-            <label class="checkbox-container">
-              <input
-                type="checkbox"
-                formControlName="consentimiento"
-                id="consentimiento-sms"
-              />
-              <span class="checkbox-checkmark"></span>
-              <span class="checkbox-label">
-                {{ textos.labelConsentimiento }}
-              </span>
-            </label>
-          </div>
+        } @else {
 
-          <!-- Botón de acción -->
-          <div class="form-actions">
-            <button
-              type="submit"
-              class="btn-submit"
-              [disabled]="formulario.invalid || guardando()"
-            >
-              @if (guardando()) {
-                <span class="btn-spinner"></span>
-                <span>Guardando...</span>
-              } @else {
-                <span>{{ textos.botonSuscribir }}</span>
+          <!-- Formulario de suscripción o reactivación (SOS-63) -->
+          <form [formGroup]="formulario" (ngSubmit)="guardar()" class="sms-form">
+
+            <!-- Campo Teléfono -->
+            <div class="form-group" [class.has-error]="telefonoInvalido">
+              <label for="telefono-sms" class="form-label">
+                {{ textos.labelTelefono }} <span class="required">*</span>
+              </label>
+              <div class="input-wrapper">
+                <span class="input-prefix">📞</span>
+                <input
+                  id="telefono-sms"
+                  type="tel"
+                  formControlName="telefono"
+                  class="form-control"
+                  [placeholder]="textos.placeholderTelefono"
+                  autocomplete="tel"
+                />
+              </div>
+              @if (telefonoInvalido) {
+                <small class="error-text">{{ textos.errorTelefono }}</small>
               }
-            </button>
-          </div>
+            </div>
 
-        </form>
+            <!-- Campo Región / Departamento -->
+            <div class="form-group" [class.has-error]="departamentoInvalido">
+              <label for="departamento-sms" class="form-label">
+                {{ textos.labelRegion }} <span class="required">*</span>
+              </label>
+              <div class="input-wrapper">
+                <span class="input-prefix">📍</span>
+                <select
+                  id="departamento-sms"
+                  formControlName="departamentoId"
+                  class="form-control select-control"
+                >
+                  <option [ngValue]="null" disabled selected>
+                    {{ textos.placeholderRegion }}
+                  </option>
+                  @for (dpto of departamentos; track dpto.id) {
+                    <option [ngValue]="dpto.id">{{ dpto.nombre }}</option>
+                  }
+                </select>
+              </div>
+              @if (departamentoInvalido) {
+                <small class="error-text">{{ textos.errorRegion }}</small>
+              }
+            </div>
+
+            <!-- Consentimiento explícito -->
+            <div class="consentimiento-group" [class.has-error]="consentimientoInvalido">
+              <label class="checkbox-container">
+                <input
+                  type="checkbox"
+                  formControlName="consentimiento"
+                  id="consentimiento-sms"
+                />
+                <span class="checkbox-checkmark"></span>
+                <span class="checkbox-label">
+                  {{ textos.labelConsentimiento }}
+                </span>
+              </label>
+            </div>
+
+            <!-- Botón de acción -->
+            <div class="form-actions">
+              <button
+                type="submit"
+                class="btn-submit"
+                [disabled]="formulario.invalid || guardando()"
+              >
+                @if (guardando()) {
+                  <span class="btn-spinner"></span>
+                  <span>Guardando...</span>
+                } @else {
+                  <span>{{ textos.botonSuscribir }}</span>
+                }
+              </button>
+            </div>
+
+          </form>
+
+        }
 
       </section>
 

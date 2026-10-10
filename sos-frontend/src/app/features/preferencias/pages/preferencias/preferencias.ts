@@ -41,6 +41,9 @@ export class PreferenciasComponent implements OnInit {
 
   cargando = signal<boolean>(true);
   guardando = signal<boolean>(false);
+  cancelando = signal<boolean>(false);
+  confirmandoCancelacion = signal<boolean>(false);
+
   mensajeExito = signal<string | null>(null);
   mensajeError = signal<string | null>(null);
   suscripcionActual = signal<SuscripcionSms | null>(null);
@@ -80,7 +83,7 @@ export class PreferenciasComponent implements OnInit {
         }
       },
       error: () => {
-        // No tiene suscripción o error al cargar, permitimos suscripción nueva
+        // No tiene suscripción previa, permitimos suscripción nueva
         this.cargando.set(false);
       }
     });
@@ -115,6 +118,42 @@ export class PreferenciasComponent implements OnInit {
         this.mensajeError.set(err?.error?.mensaje || this.textos.errorGenerico);
       }
     });
+  }
+
+  solicitarCancelacion(): void {
+    this.confirmandoCancelacion.set(true);
+    this.mensajeError.set(null);
+  }
+
+  descartarCancelacion(): void {
+    this.confirmandoCancelacion.set(false);
+  }
+
+  confirmarCancelacion(): void {
+    this.cancelando.set(true);
+    this.mensajeExito.set(null);
+    this.mensajeError.set(null);
+
+    this.suscripcionService.cancelar().subscribe({
+      next: () => {
+        this.cancelando.set(false);
+        this.confirmandoCancelacion.set(false);
+        this.mensajeExito.set(this.textos.confirmacionCancelacion);
+        // Desactiva el registro actual y asegura que el checkbox esté desmarcado
+        this.suscripcionActual.update(actual => actual ? { ...actual, activa: false } : null);
+        this.formulario.patchValue({ consentimiento: false });
+      },
+      error: (err) => {
+        this.cancelando.set(false);
+        this.confirmandoCancelacion.set(false);
+        this.mensajeError.set(err?.error?.mensaje || this.textos.errorGenerico);
+      }
+    });
+  }
+
+  get tieneSuscripcionActiva(): boolean {
+    const sub = this.suscripcionActual();
+    return !!(sub && sub.activa);
   }
 
   get telefonoInvalido(): boolean {
