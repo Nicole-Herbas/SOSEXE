@@ -196,6 +196,64 @@ public class SuscripcionSmsService {
     }
 
 
+    /**
+     * Cancela la suscripción a alertas SMS del usuario desactivando el registro (SOS-64).
+     * No elimina el registro de la base de datos para preservar el historial.
+     *
+     * @param emailUsuario email del usuario autenticado
+     * @throws ResourceNotFoundException  si el usuario no tiene suscripción registrada
+     * @throws DuplicateResourceException si la suscripción ya se encuentra cancelada
+     */
+    @Transactional
+    public void cancelar(String emailUsuario) {
+
+        LogHelper.debug(
+                SuscripcionSmsService.class,
+                "Inicio de cancelación de suscripción SMS. usuario={}",
+                emailUsuario
+        );
+
+        Usuario usuario =
+                usuarioRepository.findByEmail(emailUsuario)
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "No existe un usuario con email: "
+                                                + emailUsuario
+                                )
+                        );
+
+        SuscripcionSms suscripcion =
+                suscripcionRepository
+                        .findByUsuarioId(usuario.getId())
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "El usuario no tiene una suscripción SMS registrada"
+                                )
+                        );
+
+        if (Boolean.FALSE.equals(suscripcion.getActiva())) {
+            LogHelper.warn(
+                    SuscripcionSmsService.class,
+                    "Intento de cancelar una suscripción SMS ya inactiva. usuarioId={}",
+                    usuario.getId()
+            );
+            throw new DuplicateResourceException(
+                    SuscripcionSmsConstants.ERROR_SUSCRIPCION_YA_CANCELADA
+            );
+        }
+
+        suscripcion.setActiva(false);
+        suscripcionRepository.save(suscripcion);
+
+        LogHelper.info(
+                SuscripcionSmsService.class,
+                "Suscripción SMS cancelada exitosamente. usuarioId={}, suscripcionId={}",
+                usuario.getId(),
+                suscripcion.getId()
+        );
+    }
+
+
     // ── Helpers privados ────────────────────────────────────────────────────────
 
     private SuscripcionSmsDTO convertirADTO(SuscripcionSms suscripcion) {
