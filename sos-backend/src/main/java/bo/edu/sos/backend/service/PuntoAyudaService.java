@@ -54,7 +54,12 @@ public class PuntoAyudaService {
                 puntoAyudaRepository
                         .findAll()
                         .stream()
-                        .map(this::convertirADTO)
+                        .filter(punto ->
+                                EstadoVerificacion.VERIFICADO.equals(
+                                        punto.getEstadoVerificacion()
+                                )
+                        )
+                        .map(this::convertirADTOPublico)
                         .toList();
 
 
@@ -91,7 +96,20 @@ public class PuntoAyudaService {
         );
 
 
-        return convertirADTO(
+        if (
+                !EstadoVerificacion.VERIFICADO.equals(
+                        punto.getEstadoVerificacion()
+                )
+        ) {
+
+            throw new ResourceNotFoundException(
+                    "Punto de ayuda",
+                    id
+            );
+        }
+
+
+        return convertirADTOPublico(
                 punto
         );
     }
@@ -107,7 +125,12 @@ public class PuntoAyudaService {
                                 departamentoId
                         )
                         .stream()
-                        .map(this::convertirADTO)
+                        .filter(punto ->
+                                EstadoVerificacion.VERIFICADO.equals(
+                                        punto.getEstadoVerificacion()
+                                )
+                        )
+                        .map(this::convertirADTOPublico)
                         .toList();
 
 
@@ -411,6 +434,24 @@ public class PuntoAyudaService {
                     new HashSet<>()
             );
         }
+    }
+
+    // ==========================================
+    // CONVERSIÓN PARA CONSULTAS PÚBLICAS
+    // ==========================================
+
+    private PuntoAyudaDTO convertirADTOPublico(
+            PuntoAyuda punto) {
+
+        PuntoAyudaDTO dto =
+                convertirADTO(punto);
+
+        dto.setNombreContacto(null);
+        dto.setTelefonoContacto(null);
+        dto.setCorreoContacto(null);
+        dto.setCreadorId(null);
+
+        return dto;
     }
 
 

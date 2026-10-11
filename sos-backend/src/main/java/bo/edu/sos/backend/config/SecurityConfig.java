@@ -122,7 +122,7 @@ public class SecurityConfig {
                                 ApiRoutes.MAPA + "/**",
                                 ApiRoutes.DEPARTAMENTOS,
                                 ApiRoutes.DEPARTAMENTOS + "/**",
-                                "/api/necesidades",
+                                ApiRoutes.NECESIDADES
                         ).permitAll()
 
                         // ── SOS-41: solicitudes de registro de centro ──

@@ -1,6 +1,7 @@
 package bo.edu.sos.backend.controller;
 
 import bo.edu.sos.backend.dto.ApiResponse;
+import bo.edu.sos.backend.constants.ApiRoutes;
 import bo.edu.sos.backend.repository.NecesidadRepository;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
@@ -11,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/necesidades")
+@RequestMapping(ApiRoutes.NECESIDADES)
 public class NecesidadController {
 
     private final NecesidadRepository necesidadRepository;

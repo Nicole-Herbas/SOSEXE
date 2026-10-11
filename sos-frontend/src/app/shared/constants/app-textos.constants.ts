@@ -827,71 +827,138 @@ voluntariado: {
 
   registrarPunto: {
     etiqueta: 'SOS.EXE · REGISTRO CIUDADANO',
-
     titulo: 'Registrar un punto de ayuda',
-
-    descripcion:
-      'Comparte la información de un lugar que puede ayudar a la comunidad.',
+    descripcion: 'Comparte la información de un lugar que puede ayudar a la comunidad.',
+    descripcionFormulario:
+      'Completa la información del lugar que estás registrando. Tu punto será revisado antes de aparecer en el mapa público.',
 
     secciones: {
-      informacion: '1. Información del punto',
-      ubicacion: '2. Ubicación',
-      necesidades: '3. Necesidades',
-      contacto: '4. Información de contacto'
+      informacion: 'Información del punto',
+      ubicacion: 'Ubicación',
+      necesidades: 'Necesidades / Servicios',
+      contacto: 'Contacto'
     },
 
     campos: {
-      nombre: 'Nombre del punto',
       tipo: 'Tipo de punto',
-      seleccionarTipo: 'Selecciona una opción',
+      tipoAyuda: 'Selecciona cómo ayuda este lugar a la comunidad.',
+      nombre: 'Nombre del punto',
+      nombrePlaceholder: 'Ej. Punto solidario Cochabamba',
       descripcion: 'Descripción',
+      descripcionPlaceholder: '¿Qué ayuda ofrece este punto o qué necesita recibir?',
       departamento: 'Departamento',
       seleccionarDepartamento: 'Selecciona un departamento',
-      ciudad: 'Ciudad',
-      direccion: 'Dirección exacta',
-      mapa: 'Haz clic en el mapa para indicar la ubicación.',
-      necesidades: 'Selecciona qué tipo de ayuda necesita este punto.',
-      nombreContacto: 'Nombre del responsable',
-      telefono: 'Teléfono de contacto',
-      correo: 'Correo electrónico (opcional)'
+      ciudad: 'Ciudad o municipio',
+      ciudadPlaceholder: 'Ej. Cochabamba',
+      direccion: 'Dirección referencial',
+      direccionPlaceholder: 'Ej. Av. 6 de Agosto, entre calles...',
+      mapa: 'Selecciona la ubicación exacta haciendo clic en el mapa.',
+      mapaAria: 'Mapa interactivo para seleccionar la ubicación del punto de ayuda',
+      mapaInstruccion: 'Haz clic sobre el mapa para fijar el punto.',
+      usarMiUbicacion: 'Usar mi ubicación',
+      ubicacionSeleccionada: 'Ubicación seleccionada',
+      latitud: 'Latitud',
+      longitud: 'Longitud',
+      necesidades: 'Marca los artículos o servicios relacionados con el punto.',
+      cargandoCatalogos: 'Cargando necesidades y departamentos...',
+      contactoAyuda: 'Estos datos serán utilizados para coordinar la revisión del punto.',
+      nombreContacto: 'Nombre de contacto',
+      contactoPlaceholder: 'Ej. Juan Pérez',
+      telefono: 'Teléfono / WhatsApp',
+      telefonoPlaceholder: 'Ej. +59171234567',
+      correo: 'Correo electrónico (opcional)',
+      correoPlaceholder: 'Ej. contacto@ejemplo.com',
+      informacionAdicional: 'Información adicional (opcional)',
+      informacionAdicionalPlaceholder: 'Horarios, indicaciones de acceso, restricciones, etc.',
+      informacionAdicionalAyuda: 'Se guardará junto con la descripción (máximo 500 caracteres entre ambas).',
+      prefijoInformacionAdicional: 'Información adicional'
     },
 
     tipos: [
       {
         valor: 'PUNTO_DONACION',
-        nombre: 'Punto de donación'
+        nombre: 'Punto de donación',
+        detalle: 'Recibir donaciones',
+        icono: 'pin'
       },
       {
-        valor: 'REFUGIO',
-        nombre: 'Refugio'
+        valor: 'PUNTO_ENTREGA',
+        nombre: 'Punto de entrega de ayuda',
+        detalle: 'Distribuir ayuda',
+        icono: 'entrega'
       },
       {
-        valor: 'CENTRO_APOYO',
-        nombre: 'Centro de apoyo'
+        valor: 'OTRO',
+        nombre: 'Otro punto de ayuda',
+        detalle: 'Apoyo comunitario',
+        icono: 'otro'
       }
     ],
 
+    avisoTitulo: 'Revisión antes de publicar.',
     aviso:
-      'Tu punto quedará pendiente de verificación. El registro no garantiza su aprobación.',
+      'Tu punto quedará pendiente de verificación. No aparecerá en el mapa público hasta ser aprobado.',
 
     botones: {
       registrar: 'Registrar punto de ayuda',
       registrando: 'Registrando...',
-      volver: 'Volver a Acerca de'
+      volver: 'Volver a Acerca de',
+      misPuntos: 'Mis puntos de ayuda',
+      verMisPuntos: 'Ver mis puntos',
+      nuevoPunto: 'Registrar nuevo punto',
+      registrarOtro: 'Registrar otro punto',
+      primerPunto: 'Registrar mi primer punto',
+      reintentar: 'Reintentar',
+      ocultarDetalles: 'Ocultar detalles',
+      verDetalles: 'Ver detalles'
     },
 
     exito: {
-      titulo: '¡Punto registrado correctamente!',
+      tituloCabecera: 'Registro recibido',
+      subtitulo: 'Tu solicitud está en proceso de verificación.',
+      titulo: '¡Tu punto fue registrado!',
+      antesNombre: 'Hemos recibido la información de',
+      despuesNombre: 'correctamente. Será revisada por el equipo de SOS.EXE.',
+      estadoActual: 'Estado actual',
       estado: 'Pendiente de verificación',
-      descripcion:
-        'Recibimos la información de tu punto de ayuda. El equipo de SOS.EXE deberá revisarla antes de considerarlo verificado.'
+      descripcion: 'Tu punto estará visible una vez sea aprobado por un administrador.'
+    },
+
+    estados: {
+      PENDIENTE: 'Pendiente',
+      VERIFICADO: 'Verificado',
+      RECHAZADO: 'Rechazado'
+    },
+
+    misPuntos: {
+      titulo: 'Mis puntos de ayuda',
+      descripcion: 'Estos son los puntos que has registrado y su estado actual.',
+      cargando: 'Cargando tus puntos de ayuda...',
+      vacioTitulo: 'Todavía no registraste puntos de ayuda',
+      vacioDescripcion: 'Cuando registres uno, podrás revisar aquí su estado de verificación.',
+      sinNecesidades: 'Sin necesidades indicadas',
+      direccion: 'Dirección:',
+      descripcionEtiqueta: 'Descripción:',
+      estado: 'Estado:',
+      contacto: 'Contacto:',
+      telefono: 'Teléfono:',
+      correo: 'Correo:'
+    },
+
+    etiquetas: {
+      tipoDesconocido: 'Otro punto de ayuda'
     },
 
     errores: {
-      departamentos: 'No se pudieron cargar los departamentos.',
-      necesidades: 'No se pudieron cargar las necesidades.',
+      departamentos: 'No hay departamentos disponibles para registrar el punto.',
+      necesidades: 'No hay necesidades disponibles para registrar el punto.',
+      catalogos: 'No se pudieron cargar los catálogos. Vuelve a intentarlo.',
       datos: 'Revisa los datos ingresados.',
-      registro: 'No se pudo registrar el punto. Inténtalo nuevamente.'
+      registro: 'No se pudo registrar el punto. Inténtalo nuevamente.',
+      formulario: 'Completa los campos obligatorios y selecciona una ubicación.',
+      misPuntos: 'No pudimos cargar tus puntos. Inténtalo nuevamente.',
+      geolocalizacionNoDisponible: 'Tu navegador no permite obtener la ubicación.',
+      geolocalizacionDenegada: 'No se pudo obtener tu ubicación. Selecciona un punto en el mapa.'
     }
   },
 

@@ -1,5 +1,6 @@
 package bo.edu.sos.backend.dto;
 
+import bo.edu.sos.backend.constants.TiposPuntoAyuda;
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Email;
@@ -24,7 +25,10 @@ public class RegistrarPuntoAyudaDTO {
     private String nombre;
 
     @NotBlank(message = "Selecciona el tipo de punto")
-    @Size(max = 40)
+    @Pattern(
+            regexp = TiposPuntoAyuda.REGEX_CIUDADANO,
+            message = "Selecciona un punto de donación, entrega u otro punto de ayuda"
+    )
     private String tipo;
 
     @NotBlank(message = "La descripción es obligatoria")
