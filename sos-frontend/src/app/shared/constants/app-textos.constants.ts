@@ -825,10 +825,86 @@ voluntariado: {
 
 },
 
-acercaDe: {
-  mensaje:
-    'acerca-de works!',
-},
+  registrarPunto: {
+    etiqueta: 'SOS.EXE · REGISTRO CIUDADANO',
+
+    titulo: 'Registrar un punto de ayuda',
+
+    descripcion:
+      'Comparte la información de un lugar que puede ayudar a la comunidad.',
+
+    secciones: {
+      informacion: '1. Información del punto',
+      ubicacion: '2. Ubicación',
+      necesidades: '3. Necesidades',
+      contacto: '4. Información de contacto'
+    },
+
+    campos: {
+      nombre: 'Nombre del punto',
+      tipo: 'Tipo de punto',
+      seleccionarTipo: 'Selecciona una opción',
+      descripcion: 'Descripción',
+      departamento: 'Departamento',
+      seleccionarDepartamento: 'Selecciona un departamento',
+      ciudad: 'Ciudad',
+      direccion: 'Dirección exacta',
+      mapa: 'Haz clic en el mapa para indicar la ubicación.',
+      necesidades: 'Selecciona qué tipo de ayuda necesita este punto.',
+      nombreContacto: 'Nombre del responsable',
+      telefono: 'Teléfono de contacto',
+      correo: 'Correo electrónico (opcional)'
+    },
+
+    tipos: [
+      {
+        valor: 'PUNTO_DONACION',
+        nombre: 'Punto de donación'
+      },
+      {
+        valor: 'REFUGIO',
+        nombre: 'Refugio'
+      },
+      {
+        valor: 'CENTRO_APOYO',
+        nombre: 'Centro de apoyo'
+      }
+    ],
+
+    aviso:
+      'Tu punto quedará pendiente de verificación. El registro no garantiza su aprobación.',
+
+    botones: {
+      registrar: 'Registrar punto de ayuda',
+      registrando: 'Registrando...',
+      volver: 'Volver a Acerca de'
+    },
+
+    exito: {
+      titulo: '¡Punto registrado correctamente!',
+      estado: 'Pendiente de verificación',
+      descripcion:
+        'Recibimos la información de tu punto de ayuda. El equipo de SOS.EXE deberá revisarla antes de considerarlo verificado.'
+    },
+
+    errores: {
+      departamentos: 'No se pudieron cargar los departamentos.',
+      necesidades: 'No se pudieron cargar las necesidades.',
+      datos: 'Revisa los datos ingresados.',
+      registro: 'No se pudo registrar el punto. Inténtalo nuevamente.'
+    }
+  },
+
+  acercaDe: {
+    mensaje: 'acerca-de works!',
+
+    registrarPunto: {
+      titulo: 'Puntos de ayuda',
+      descripcion:
+        'Registra un lugar donde se puedan recibir donaciones o brindar ayuda a la comunidad.',
+      boton: 'Registrar punto de ayuda →'
+    }
+  },
 
 registro: {
   logo: 'Tu cuenta SOS.exe',

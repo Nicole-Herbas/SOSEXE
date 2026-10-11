@@ -7,6 +7,8 @@ import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import bo.edu.sos.backend.dto.RegistrarPuntoAyudaDTO;
+import org.springframework.security.core.Authentication;
 
 import java.util.List;
 
@@ -18,6 +20,19 @@ public class PuntoAyudaController {
 
     public PuntoAyudaController(PuntoAyudaService puntoAyudaService) {
         this.puntoAyudaService = puntoAyudaService;
+    }
+
+    @GetMapping("/mios")
+    public ResponseEntity<ApiResponse<List<PuntoAyudaDTO>>> listarMios(
+            Authentication authentication) {
+
+        return ResponseEntity.ok(
+                ApiResponse.ok(
+                        puntoAyudaService.listarMisPuntos(
+                                authentication.getName()
+                        )
+                )
+        );
     }
 
     @GetMapping
@@ -44,12 +59,17 @@ public class PuntoAyudaController {
 
     @PostMapping
     public ResponseEntity<ApiResponse<PuntoAyudaDTO>> crear(
-            @Valid @RequestBody PuntoAyudaDTO puntoAyudaDTO) {
+            @Valid @RequestBody RegistrarPuntoAyudaDTO dto,
+            Authentication authentication) {
+
+        PuntoAyudaDTO creado = puntoAyudaService.registrarComoCiudadano(
+                dto,
+                authentication.getName()
+        );
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(ApiResponse.created(
-                        puntoAyudaService.guardar(puntoAyudaDTO)));
+                .body(ApiResponse.created(creado));
     }
 
     @PutMapping("/{id}")

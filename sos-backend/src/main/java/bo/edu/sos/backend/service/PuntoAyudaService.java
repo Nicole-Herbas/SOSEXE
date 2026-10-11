@@ -20,6 +20,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import bo.edu.sos.backend.dto.RegistrarPuntoAyudaDTO;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
+
 
 @Service
 public class PuntoAyudaService {
@@ -116,6 +120,94 @@ public class PuntoAyudaService {
 
 
         return puntos;
+    }
+
+    @Transactional(readOnly = true)
+    public List<PuntoAyudaDTO> listarMisPuntos(String emailAutenticado) {
+
+        Usuario usuario = usuarioRepository.findByEmail(emailAutenticado)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.UNAUTHORIZED,
+                        "Usuario autenticado no encontrado"
+                ));
+
+        return puntoAyudaRepository
+                .findByCreadorIdOrderByFechaCreacionDesc(usuario.getId())
+                .stream()
+                .map(this::convertirADTO)
+                .toList();
+    }
+
+    @Transactional
+    public PuntoAyudaDTO registrarComoCiudadano(
+            RegistrarPuntoAyudaDTO dto,
+            String emailAutenticado) {
+
+        Usuario creador = usuarioRepository.findByEmail(emailAutenticado)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.UNAUTHORIZED,
+                        "Usuario autenticado no encontrado"
+                ));
+
+        Departamento departamento = departamentoRepository
+                .findById(dto.getDepartamentoId())
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.BAD_REQUEST,
+                        "El departamento seleccionado no existe"
+                ));
+
+        Set<Long> idsSolicitados = new HashSet<>(dto.getNecesidadIds());
+
+        if (idsSolicitados.size() != dto.getNecesidadIds().size()) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "No se permiten necesidades duplicadas"
+            );
+        }
+
+        Set<Necesidad> necesidades = new HashSet<>(
+                necesidadRepository.findAllById(idsSolicitados)
+        );
+
+        if (necesidades.size() != idsSolicitados.size()) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Una o más necesidades no existen"
+            );
+        }
+
+        PuntoAyuda punto = new PuntoAyuda();
+
+        punto.setNombre(dto.getNombre().trim());
+        punto.setTipo(dto.getTipo().trim());
+        punto.setDescripcion(dto.getDescripcion().trim());
+        punto.setDireccion(dto.getDireccion().trim());
+        punto.setCiudad(dto.getCiudad().trim());
+
+        punto.setDepartamento(departamento);
+        punto.setLatitud(dto.getLatitud());
+        punto.setLongitud(dto.getLongitud());
+
+        punto.setNombreContacto(dto.getNombreContacto().trim());
+        punto.setTelefonoContacto(dto.getTelefonoContacto().trim());
+        punto.setCorreoContacto(
+                dto.getCorreoContacto() == null
+                        || dto.getCorreoContacto().isBlank()
+                        ? null
+                        : dto.getCorreoContacto().trim()
+        );
+
+        // La identidad proviene del JWT, nunca del formulario.
+        punto.setCreador(creador);
+
+        // Todos los registros ciudadanos esperan revisión.
+        punto.setEstadoVerificacion(EstadoVerificacion.PENDIENTE);
+
+        punto.setNecesidades(necesidades);
+
+        PuntoAyuda guardado = puntoAyudaRepository.save(punto);
+
+        return convertirADTO(guardado);
     }
 
 
@@ -352,6 +444,10 @@ public class PuntoAyudaService {
         dto.setCiudad(
                 punto.getCiudad()
         );
+
+        dto.setNombreContacto(punto.getNombreContacto());
+        dto.setTelefonoContacto(punto.getTelefonoContacto());
+        dto.setCorreoContacto(punto.getCorreoContacto());
 
         dto.setLatitud(
                 punto.getLatitud()
