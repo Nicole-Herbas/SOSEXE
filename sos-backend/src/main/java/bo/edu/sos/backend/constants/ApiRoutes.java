@@ -23,7 +23,7 @@ public final class ApiRoutes {
 
     // ── Departamentos (catálogo) ─────────────────────────────────────────────
     public static final String DEPARTAMENTOS  = "/api/departamentos";
-
+    public static final String NECESIDADES    = "/api/necesidades";
     // ── Noticias ─────────────────────────────────────────────────────────────
     public static final String NOTICIAS           = "/api/noticias";
     public static final String NOTICIAS_PUBLICAS  = NOTICIAS + "/publicas";

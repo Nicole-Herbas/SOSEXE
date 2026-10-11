@@ -10,6 +10,8 @@ import { RegistrarCentroComponent } from './features/acerca-de/pages/registrar-c
 import { LoginComponent } from './features/auth/pages/login/login';
 import { RegistroComponent } from './features/auth/pages/registro/registro';
 import { adminGuard } from './admin-guard';
+import { RegistrarPuntoComponent } from './features/puntos-ayuda/pages/registrar-punto/registrar-punto';
+import { registroPuntoGuard } from './features/auth/guards/registro-punto.guard';
 
 export const routes: Routes = [
   {
@@ -44,6 +46,11 @@ export const routes: Routes = [
   {
     path: 'acerca-de/registrar-centro',
     component: RegistrarCentroComponent
+  },
+  {
+    path: 'registrar-punto',
+    component: RegistrarPuntoComponent,
+    canActivate: [registroPuntoGuard]
   },
   {
     path: 'centros',

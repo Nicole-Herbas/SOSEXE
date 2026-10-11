@@ -44,6 +44,9 @@ import {
   templateUrl: './mapa.html',
   styleUrl: './mapa.scss'
 })
+
+
+
 export class Mapa implements OnInit {
 
   private mapaService =

@@ -104,6 +104,12 @@ public class SecurityConfig {
                         "/error"
                 ).permitAll()
 
+                                // Los puntos del usuario son privados
+                                .requestMatchers(
+                                        HttpMethod.GET,
+                                        ApiRoutes.PUNTOS_AYUDA + "/mios"
+                                ).authenticated()
+
 
                         // Datos públicos de lectura
                         .requestMatchers(
@@ -115,7 +121,8 @@ public class SecurityConfig {
                                 ApiRoutes.VOLUNTARIADOS + "/**",
                                 ApiRoutes.MAPA + "/**",
                                 ApiRoutes.DEPARTAMENTOS,
-                                ApiRoutes.DEPARTAMENTOS + "/**"
+                                ApiRoutes.DEPARTAMENTOS + "/**",
+                                ApiRoutes.NECESIDADES
                         ).permitAll()
 
                         // ── SOS-41: solicitudes de registro de centro ──
@@ -142,7 +149,8 @@ public class SecurityConfig {
                         .requestMatchers(
                                 HttpMethod.POST,
                                 ApiRoutes.DONACIONES,
-                                ApiRoutes.POSTULACIONES
+                                ApiRoutes.POSTULACIONES,
+                                ApiRoutes.PUNTOS_AYUDA
                         ).authenticated()
 
 
