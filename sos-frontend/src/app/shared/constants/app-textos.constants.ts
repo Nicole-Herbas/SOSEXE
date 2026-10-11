@@ -836,6 +836,8 @@ voluntariado: {
       informacion: 'Información del punto',
       ubicacion: 'Ubicación',
       necesidades: 'Necesidades / Servicios',
+      necesidadesDonacion: 'Necesidades prioritarias',
+      necesidadesEmergencia: 'Necesidades urgentes',
       contacto: 'Contacto'
     },
 
@@ -844,8 +846,12 @@ voluntariado: {
       tipoAyuda: 'Selecciona cómo ayuda este lugar a la comunidad.',
       nombre: 'Nombre del punto',
       nombrePlaceholder: 'Ej. Punto solidario Cochabamba',
+      nombreEmergencia: 'Título de la emergencia',
+      nombreEmergenciaPlaceholder: 'Ej. Incendio forestal en Tarija',
       descripcion: 'Descripción',
       descripcionPlaceholder: '¿Qué ayuda ofrece este punto o qué necesita recibir?',
+      descripcionEmergencia: 'Descripción de la situación',
+      descripcionEmergenciaPlaceholder: 'Describe qué está ocurriendo y las zonas afectadas...',
       departamento: 'Departamento',
       seleccionarDepartamento: 'Selecciona un departamento',
       ciudad: 'Ciudad o municipio',
@@ -860,6 +866,23 @@ voluntariado: {
       latitud: 'Latitud',
       longitud: 'Longitud',
       necesidades: 'Marca los artículos o servicios relacionados con el punto.',
+      necesidadesDonacion: 'Selecciona los artículos más urgentes para este lugar.',
+      necesidadesEmergencia: 'Selecciona los recursos urgentes para atender la emergencia.',
+      donacionesAceptadas: 'Donaciones que acepta',
+      donacionesAceptadasAyuda: 'Selecciona qué artículos se pueden entregar en este punto.',
+      horarioAtencion: 'Días y horario de atención',
+      horarioPlaceholder: 'Ej. Lun-Vie, 09:00–17:00',
+      claseEmergencia: 'Tipo de emergencia',
+      seleccionarClaseEmergencia: 'Selecciona la emergencia',
+      fechaEmergencia: 'Fecha y hora aproximada de inicio',
+      estadoEmergencia: 'Estado informado',
+      estadoEmergenciaInicial: 'Activa (pendiente de verificación)',
+      caracteresGuardados: 'caracteres en la descripción guardada',
+      prefijoHorario: 'Horario',
+      prefijoDonacionesAceptadas: 'Donaciones aceptadas',
+      prefijoTipoEmergencia: 'Tipo de emergencia',
+      prefijoFechaEmergencia: 'Inicio reportado',
+      prefijoEstadoEmergencia: 'Estado',
       cargandoCatalogos: 'Cargando necesidades y departamentos...',
       contactoAyuda: 'Estos datos serán utilizados para coordinar la revisión del punto.',
       nombreContacto: 'Nombre de contacto',
@@ -869,8 +892,8 @@ voluntariado: {
       correo: 'Correo electrónico (opcional)',
       correoPlaceholder: 'Ej. contacto@ejemplo.com',
       informacionAdicional: 'Información adicional (opcional)',
-      informacionAdicionalPlaceholder: 'Horarios, indicaciones de acceso, restricciones, etc.',
-      informacionAdicionalAyuda: 'Se guardará junto con la descripción (máximo 500 caracteres entre ambas).',
+      informacionAdicionalPlaceholder: 'Indicaciones de acceso, restricciones, observaciones...',
+      informacionAdicionalAyuda: 'Los datos del punto se guardarán juntos en la descripción (máximo 500 caracteres en total).',
       prefijoInformacionAdicional: 'Información adicional'
     },
 
@@ -879,20 +902,23 @@ voluntariado: {
         valor: 'PUNTO_DONACION',
         nombre: 'Punto de donación',
         detalle: 'Recibir donaciones',
-        icono: 'pin'
+        icono: 'donacion'
       },
       {
-        valor: 'PUNTO_ENTREGA',
-        nombre: 'Punto de entrega de ayuda',
-        detalle: 'Distribuir ayuda',
-        icono: 'entrega'
-      },
-      {
-        valor: 'OTRO',
-        nombre: 'Otro punto de ayuda',
-        detalle: 'Apoyo comunitario',
-        icono: 'otro'
+        valor: 'EMERGENCIA',
+        nombre: 'Punto de emergencia',
+        detalle: 'Reportar una emergencia',
+        icono: 'emergencia'
       }
+    ],
+
+    clasesEmergencia: [
+      { valor: 'INCENDIO', nombre: 'Incendio forestal o urbano' },
+      { valor: 'INUNDACION', nombre: 'Inundación' },
+      { valor: 'DESLIZAMIENTO', nombre: 'Deslizamiento' },
+      { valor: 'SEQUIA', nombre: 'Sequía' },
+      { valor: 'TERREMOTO', nombre: 'Terremoto' },
+      { valor: 'OTRA', nombre: 'Otra emergencia' }
     ],
 
     avisoTitulo: 'Revisión antes de publicar.',
@@ -946,7 +972,7 @@ voluntariado: {
     },
 
     etiquetas: {
-      tipoDesconocido: 'Otro punto de ayuda'
+      tipoDesconocido: 'Tipo de punto no disponible'
     },
 
     errores: {

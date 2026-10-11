@@ -173,6 +173,19 @@ class PuntoAyudaSecurityTest {
 
     @Test
     @WithMockUser(username = "usuario@ejemplo.com", authorities = Roles.USER)
+    void registrarPuntoEntregaYOtroDebeRetornar422() throws Exception {
+        for (String tipo : List.of("PUNTO_ENTREGA", "OTRO")) {
+            mockMvc.perform(
+                    post(ApiRoutes.PUNTOS_AYUDA)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(solicitudValida(tipo))
+            ).andExpect(status().isUnprocessableEntity());
+        }
+        verifyNoInteractions(puntoAyudaService);
+    }
+
+    @Test
+    @WithMockUser(username = "usuario@ejemplo.com", authorities = Roles.USER)
     void usuarioAutenticadoDebeRegistrarPuntoCon201() throws Exception {
 
         PuntoAyudaDTO creado = new PuntoAyudaDTO();
@@ -199,6 +212,26 @@ class PuntoAyudaSecurityTest {
                 any(RegistrarPuntoAyudaDTO.class),
                 eq("usuario@ejemplo.com")
         );
+    }
+
+    @Test
+    @WithMockUser(username = "usuario@ejemplo.com", authorities = Roles.USER)
+    void usuarioDebeRegistrarEmergenciaCon201() throws Exception {
+        PuntoAyudaDTO creado = new PuntoAyudaDTO();
+        creado.setId(9L);
+        creado.setTipo("EMERGENCIA");
+        creado.setEstadoVerificacion(EstadoVerificacion.PENDIENTE);
+        when(puntoAyudaService.registrarComoCiudadano(
+                any(RegistrarPuntoAyudaDTO.class), eq("usuario@ejemplo.com")
+        )).thenReturn(creado);
+
+        mockMvc.perform(post(ApiRoutes.PUNTOS_AYUDA)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(solicitudValida("EMERGENCIA")))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.data.tipo").value("EMERGENCIA"))
+                .andExpect(jsonPath("$.data.estadoVerificacion")
+                        .value(EstadoVerificacion.PENDIENTE));
     }
 
     @Test

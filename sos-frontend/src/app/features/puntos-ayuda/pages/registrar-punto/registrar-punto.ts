@@ -49,6 +49,9 @@ export class RegistrarPuntoComponent implements OnInit {
   readonly textos = APP_TEXTOS.registrarPunto;
   readonly tipos = APP_TEXTOS.registrarPunto.tipos;
   readonly estados = ESTADO_VERIFICACION_PUNTO;
+  readonly tipoDonacion = 'PUNTO_DONACION' as const;
+  readonly tipoEmergencia = 'EMERGENCIA' as const;
+  readonly clasesEmergencia = APP_TEXTOS.registrarPunto.clasesEmergencia;
 
 
   // ==========================================
@@ -60,6 +63,7 @@ export class RegistrarPuntoComponent implements OnInit {
   departamentos: ItemCatalogo[] = [];
   necesidades: ItemCatalogo[] = [];
   necesidadIds: number[] = [];
+  donacionesAceptadasIds: number[] = [];
 
   cargandoCatalogos = true;
   enviando = false;
@@ -92,7 +96,10 @@ export class RegistrarPuntoComponent implements OnInit {
       nombreContacto: '',
       telefonoContacto: '',
       correoContacto: '',
-      informacionAdicional: ''
+      informacionAdicional: '',
+      horarioAtencion: '',
+      claseEmergencia: '',
+      fechaEmergencia: ''
     };
   }
 
@@ -176,6 +183,15 @@ export class RegistrarPuntoComponent implements OnInit {
   }
 
 
+  alternarDonacionAceptada(id: number, seleccionada: boolean): void {
+    if (!this.necesidades.some(necesidad => necesidad.id === id)) return;
+    if (seleccionada && !this.donacionesAceptadasIds.includes(id)) {
+      this.donacionesAceptadasIds = [...this.donacionesAceptadasIds, id];
+    } else if (!seleccionada) {
+      this.donacionesAceptadasIds = this.donacionesAceptadasIds.filter(valor => valor !== id);
+    }
+  }
+
   // ==========================================
   // VALIDACIÓN
   // ==========================================
@@ -194,6 +210,15 @@ export class RegistrarPuntoComponent implements OnInit {
       datos.nombre.trim().length <= 150 &&
       datos.descripcion.trim().length > 0 &&
       descripcion.length <= 500 &&
+      (datos.tipo === this.tipoDonacion
+        ? datos.horarioAtencion.trim().length > 0 &&
+          datos.horarioAtencion.trim().length <= 100 &&
+          this.donacionesAceptadasIds.length > 0 &&
+          this.donacionesAceptadasIds.every(id => this.necesidades.some(item => item.id === id))
+        : datos.tipo === this.tipoEmergencia &&
+          this.clasesEmergencia.some(item => item.valor === datos.claseEmergencia) &&
+          /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(datos.fechaEmergencia) &&
+          !Number.isNaN(new Date(datos.fechaEmergencia).getTime())) &&
       datos.direccion.trim().length > 0 &&
       datos.direccion.trim().length <= 250 &&
       datos.ciudad.trim().length > 0 &&
@@ -214,15 +239,34 @@ export class RegistrarPuntoComponent implements OnInit {
   }
 
 
+  // Datos complementarios se almacenan en la descripción EXISTENTE para no modificar MySQL.
+  // Cuando se agreguen columnas propias en otra historia, se podrán migrar por separado.
   private construirDescripcion(): string {
-
-    const descripcion = this.modelo.descripcion.trim();
-    const adicional = this.modelo.informacionAdicional.trim();
-
-    return adicional
-      ? `${descripcion}\n\n${this.textos.campos.prefijoInformacionAdicional}: ${adicional}`
-      : descripcion;
+    const datos = this.modelo;
+    const partes = [datos.descripcion.trim()];
+    if (datos.tipo === this.tipoDonacion) {
+      const aceptadas = this.necesidades
+        .filter(item => this.donacionesAceptadasIds.includes(item.id))
+        .map(item => item.nombre).join(', ');
+      partes.push(`${this.textos.campos.prefijoHorario}: ${datos.horarioAtencion.trim()}`);
+      partes.push(`${this.textos.campos.prefijoDonacionesAceptadas}: ${aceptadas}`);
+    } else if (datos.tipo === this.tipoEmergencia) {
+      const clase = this.clasesEmergencia.find(item => item.valor === datos.claseEmergencia)?.nombre
+        ?? datos.claseEmergencia;
+      partes.push(`${this.textos.campos.prefijoTipoEmergencia}: ${clase}`);
+      partes.push(`${this.textos.campos.prefijoFechaEmergencia}: ${datos.fechaEmergencia.replace('T', ' ')}`);
+      partes.push(`${this.textos.campos.prefijoEstadoEmergencia}: ${this.textos.campos.estadoEmergenciaInicial}`);
+    }
+    if (datos.informacionAdicional.trim()) {
+      partes.push(`${this.textos.campos.prefijoInformacionAdicional}: ${datos.informacionAdicional.trim()}`);
+    }
+    return partes.join('\n');
   }
+
+  get caracteresDescripcion(): number {
+    return this.construirDescripcion().length;
+  }
+
 
 
   private construirSolicitud(): RegistroPuntoSolicitud {
@@ -334,6 +378,7 @@ export class RegistrarPuntoComponent implements OnInit {
   registrarOtro(): void {
     this.modelo = this.nuevoModelo();
     this.necesidadIds = [];
+    this.donacionesAceptadasIds = [];
     this.registroCreado = null;
     this.puntoSeleccionado = null;
     this.error = '';

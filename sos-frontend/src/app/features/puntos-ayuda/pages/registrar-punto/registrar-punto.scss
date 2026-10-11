@@ -227,7 +227,7 @@
 
 .tipos-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12px;
   margin-bottom: 25px;
 }
@@ -268,9 +268,14 @@
 }
 
 .tipo-icono {
-  font-size: 25px;
-  line-height: 1;
-  margin-bottom: 13px;
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  margin-bottom: 12px;
+  border-radius: 11px;
+  color: #008b88;
+  background: #e8f6f5;
 }
 
 .tipo-tarjeta strong {
@@ -293,6 +298,18 @@
   font-size: 13px;
   font-weight: 800;
 }
+
+// Secciones específicas de donación y emergencia
+.tipo-icono svg { width: 26px; height: 26px; }
+.tipo-tarjeta:nth-child(2) .tipo-icono { color: #bd453e; background: #fff0ed; }
+.subseccion-titulo { margin: 22px 0 7px; font-size: 13px; color: #13334b; }
+.contador-descripcion { display: block; margin-top: 6px; font-size: 11px; color: #687f90; }
+.contador-descripcion.excedido { color: #bc253b; font-weight: 700; }
+.estado-emergencia { display: flex; align-items: center; gap: 7px; margin: 10px 0 0; font-size: 12px; color: #9b462d; }
+.estado-emergencia svg { width: 17px; height: 17px; }
+.punto-icono svg { width: 21px; height: 21px; }
+.estado-vacio svg { width: 26px; height: 26px; }
+.aviso-icono svg, .estado-reloj svg { width: 20px; height: 20px; }
 
 // ==========================================
 // MAPA INTERACTIVO

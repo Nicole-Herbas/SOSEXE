@@ -73,10 +73,17 @@
                          [(ngModel)]="modelo.tipo" required>
 
                   <span class="tipo-icono" aria-hidden="true">
-                    @switch (tipo.icono) {
-                      @case ('pin') { 📍 }
-                      @case ('entrega') { 📦 }
-                      @default { ✦ }
+                    @if (tipo.valor === tipoDonacion) {
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 21s-7-5-7-12a7 7 0 0 1 14 0c0 7-7 12-7 12Z"/>
+                        <path d="M9.5 9.5c0-2 2.5-2.6 3.5-.8 1-1.8 3.5-1.2 3.5.8 0 1.5-3.5 3.8-3.5 3.8S9.5 11 9.5 9.5Z"/>
+                      </svg>
+                    } @else {
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="m12 2 9 16H3L12 2Z"/>
+                        <path d="M12 8v5"/>
+                        <path d="M12 16h.01"/>
+                      </svg>
                     }
                   </span>
 
@@ -92,18 +99,50 @@
             </div>
 
             <div class="campo">
-              <label for="nombre">{{ textos.campos.nombre }} <span class="obligatorio" aria-hidden="true">*</span></label>
+              <label for="nombre">{{ modelo.tipo === tipoEmergencia ? textos.campos.nombreEmergencia : textos.campos.nombre }} <span class="obligatorio" aria-hidden="true">*</span></label>
               <input id="nombre" name="nombre" type="text"
                      [(ngModel)]="modelo.nombre" required maxlength="150"
-                     [placeholder]="textos.campos.nombrePlaceholder">
+                     [placeholder]="modelo.tipo === tipoEmergencia ? textos.campos.nombreEmergenciaPlaceholder : textos.campos.nombrePlaceholder">
             </div>
 
             <div class="campo">
-              <label for="descripcion">{{ textos.campos.descripcion }} <span class="obligatorio" aria-hidden="true">*</span></label>
+              <label for="descripcion">{{ modelo.tipo === tipoEmergencia ? textos.campos.descripcionEmergencia : textos.campos.descripcion }} <span class="obligatorio" aria-hidden="true">*</span></label>
               <textarea id="descripcion" name="descripcion" rows="3"
                         [(ngModel)]="modelo.descripcion" required maxlength="500"
-                        [placeholder]="textos.campos.descripcionPlaceholder"></textarea>
+                        [placeholder]="modelo.tipo === tipoEmergencia ? textos.campos.descripcionEmergenciaPlaceholder : textos.campos.descripcionPlaceholder"></textarea>
             </div>
+
+            @if (modelo.tipo === tipoDonacion) {
+              <div class="campo">
+                <label for="horarioAtencion">{{ textos.campos.horarioAtencion }} <span class="obligatorio" aria-hidden="true">*</span></label>
+                <input id="horarioAtencion" name="horarioAtencion" type="text"
+                       [(ngModel)]="modelo.horarioAtencion" required maxlength="100"
+                       [placeholder]="textos.campos.horarioPlaceholder">
+              </div>
+            }
+
+            @if (modelo.tipo === tipoEmergencia) {
+              <div class="campo">
+                <label for="claseEmergencia">{{ textos.campos.claseEmergencia }} <span class="obligatorio" aria-hidden="true">*</span></label>
+                <select id="claseEmergencia" name="claseEmergencia" [(ngModel)]="modelo.claseEmergencia" required>
+                  <option value="">{{ textos.campos.seleccionarClaseEmergencia }}</option>
+                  @for (clase of clasesEmergencia; track clase.valor) {
+                    <option [value]="clase.valor">{{ clase.nombre }}</option>
+                  }
+                </select>
+              </div>
+              <div class="campo">
+                <label for="fechaEmergencia">{{ textos.campos.fechaEmergencia }} <span class="obligatorio" aria-hidden="true">*</span></label>
+                <input id="fechaEmergencia" name="fechaEmergencia" type="datetime-local"
+                       [(ngModel)]="modelo.fechaEmergencia" required>
+              </div>
+              <p class="estado-emergencia">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                  <circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>
+                </svg>
+                {{ textos.campos.estadoEmergencia }}: <strong>{{ textos.campos.estadoEmergenciaInicial }}</strong>
+              </p>
+            }
 
           </section>
 
@@ -175,8 +214,8 @@
 
           <section class="bloque">
 
-            <h2>{{ textos.secciones.necesidades }} <span class="obligatorio" aria-hidden="true">*</span></h2>
-            <p class="ayuda-campo">{{ textos.campos.necesidades }}</p>
+            <h2>{{ modelo.tipo === tipoEmergencia ? textos.secciones.necesidadesEmergencia : textos.secciones.necesidadesDonacion }} <span class="obligatorio" aria-hidden="true">*</span></h2>
+            <p class="ayuda-campo">{{ modelo.tipo === tipoEmergencia ? textos.campos.necesidadesEmergencia : textos.campos.necesidadesDonacion }}</p>
 
             <div class="necesidades-grid">
               @for (necesidad of necesidades; track necesidad.id) {
@@ -189,6 +228,20 @@
                 </label>
               }
             </div>
+
+            @if (modelo.tipo === tipoDonacion) {
+              <h3 class="subseccion-titulo">{{ textos.campos.donacionesAceptadas }} <span class="obligatorio" aria-hidden="true">*</span></h3>
+              <p class="ayuda-campo">{{ textos.campos.donacionesAceptadasAyuda }}</p>
+              <div class="necesidades-grid">
+                @for (necesidad of necesidades; track necesidad.id) {
+                  <label class="necesidad" [class.activa]="donacionesAceptadasIds.includes(necesidad.id)">
+                    <input type="checkbox" [checked]="donacionesAceptadasIds.includes(necesidad.id)"
+                           (change)="alternarDonacionAceptada(necesidad.id, $any($event.target).checked)">
+                    <span>{{ necesidad.nombre }}</span>
+                  </label>
+                }
+              </div>
+            }
 
             @if (cargandoCatalogos) {
               <p class="ayuda-campo">{{ textos.campos.cargandoCatalogos }}</p>
@@ -231,13 +284,16 @@
                         [(ngModel)]="modelo.informacionAdicional"
                         [placeholder]="textos.campos.informacionAdicionalPlaceholder"></textarea>
               <small class="ayuda-campo">{{ textos.campos.informacionAdicionalAyuda }}</small>
+              <small class="contador-descripcion" [class.excedido]="caracteresDescripcion > 500">
+                {{ caracteresDescripcion }} / 500 {{ textos.campos.caracteresGuardados }}
+              </small>
             </div>
 
           </section>
 
 
           <div class="aviso">
-            <span class="aviso-icono" aria-hidden="true">◷</span>
+            <span class="aviso-icono" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span>
             <p>
               <strong>{{ textos.avisoTitulo }}</strong>
               {{ textos.aviso }}
@@ -276,7 +332,7 @@
       </p>
 
       <div class="confirmacion-estado">
-        <span class="estado-reloj" aria-hidden="true">◷</span>
+        <span class="estado-reloj" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span>
         <div>
           <small>{{ textos.exito.estadoActual }}</small>
           <strong>{{ textos.exito.estado }}</strong>
@@ -312,7 +368,7 @@
         </button>
       } @else if (misPuntos.length === 0) {
         <div class="estado-vacio">
-          <span aria-hidden="true">📍</span>
+           <span aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-5-7-12a7 7 0 0 1 14 0c0 7-7 12-7 12Z"/><circle cx="12" cy="9" r="2"/></svg></span>
           <h2>{{ textos.misPuntos.vacioTitulo }}</h2>
           <p>{{ textos.misPuntos.vacioDescripcion }}</p>
           <button class="btn btn-primario" type="button" (click)="registrarOtro()">
@@ -323,7 +379,13 @@
         <div class="puntos-lista">
           @for (punto of misPuntos; track punto.id) {
             <article class="punto-tarjeta">
-              <div class="punto-icono" aria-hidden="true">📍</div>
+               <div class="punto-icono" aria-hidden="true">
+                 @if (punto.tipo === tipoEmergencia) {
+                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m12 2 9 16H3L12 2Z"/><path d="M12 8v5M12 16h.01"/></svg>
+                 } @else {
+                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 21s-7-5-7-12a7 7 0 0 1 14 0c0 7-7 12-7 12Z"/><circle cx="12" cy="9" r="2"/></svg>
+                 }
+               </div>
               <div class="punto-contenido">
                 <div class="punto-encabezado">
                   <h2>{{ punto.nombre }}</h2>

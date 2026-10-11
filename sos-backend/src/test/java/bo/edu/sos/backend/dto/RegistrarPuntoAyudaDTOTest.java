@@ -42,8 +42,7 @@ class RegistrarPuntoAyudaDTOTest {
 
         for (String tipo : List.of(
                 TiposPuntoAyuda.PUNTO_DONACION,
-                TiposPuntoAyuda.PUNTO_ENTREGA,
-                TiposPuntoAyuda.OTRO
+                TiposPuntoAyuda.EMERGENCIA
         )) {
             RegistrarPuntoAyudaDTO dto = solicitudValida();
             dto.setTipo(tipo);
@@ -59,7 +58,7 @@ class RegistrarPuntoAyudaDTOTest {
     @Test
     void debeRechazarCentroYRefugio() {
 
-        for (String tipo : List.of("CENTRO_APOYO", "REFUGIO")) {
+        for (String tipo : List.of("CENTRO_APOYO", "REFUGIO", "PUNTO_ENTREGA", "OTRO")) {
             RegistrarPuntoAyudaDTO dto = solicitudValida();
             dto.setTipo(tipo);
 
