@@ -14,11 +14,10 @@ import org.springframework.web.bind.annotation.*;
 /**
  * Controlador REST para la suscripción a alertas SMS (SOS-63).
  *
- * Todos los endpoints requieren autenticación JWT.
- * La ruta base se define en ApiRoutes.SUSCRIPCION_SMS.
+ * Ambos prefijos se conservan para mantener compatibilidad con consumidores
+ * existentes. Los endpoints requieren autenticación JWT.
  */
 @RestController
-@RequestMapping(ApiRoutes.SUSCRIPCION_SMS)
 public class SuscripcionSmsController {
 
     private final SuscripcionSmsService suscripcionService;
@@ -28,7 +27,6 @@ public class SuscripcionSmsController {
         this.suscripcionService = suscripcionService;
     }
 
-
     /**
      * Crea o actualiza la suscripción SMS del usuario autenticado.
      *
@@ -37,7 +35,7 @@ public class SuscripcionSmsController {
      *
      * POST /api/suscripcion-sms
      */
-    @PostMapping
+    @PostMapping(ApiRoutes.SUSCRIPCION_SMS)
     public ResponseEntity<ApiResponse<SuscripcionSmsDTO>> suscribir(
             @Valid @RequestBody SuscripcionSmsDTO dto,
             Authentication authentication) {
@@ -59,13 +57,31 @@ public class SuscripcionSmsController {
                 .body(ApiResponse.created(resultado));
     }
 
+    /**
+     * Mantiene el contrato anterior de SOS-69 para el prefijo plural.
+     */
+    @PostMapping(ApiRoutes.SUSCRIPCIONES_SMS)
+    public ResponseEntity<ApiResponse<SuscripcionSmsDTO>> suscribirCompatibilidad(
+            @Valid @RequestBody SuscripcionSmsDTO dto,
+            Authentication authentication) {
+
+        SuscripcionSmsDTO resultado =
+                suscripcionService.suscribir(authentication.getName(), dto);
+
+        return ResponseEntity.ok(
+                ApiResponse.ok("Suscripción SMS registrada", resultado)
+        );
+    }
 
     /**
      * Obtiene la suscripción SMS del usuario autenticado.
      *
-     * GET /api/suscripcion-sms/me
+     * GET /api/suscripcion-sms/me o /api/suscripciones-sms/mia
      */
-    @GetMapping("/me")
+    @GetMapping({
+            ApiRoutes.SUSCRIPCION_SMS + "/me",
+            ApiRoutes.SUSCRIPCIONES_SMS + "/mia"
+    })
     public ResponseEntity<ApiResponse<SuscripcionSmsDTO>> obtenerMiSuscripcion(
             Authentication authentication) {
 
@@ -85,13 +101,10 @@ public class SuscripcionSmsController {
         );
     }
 
-
     /**
-     * Verifica si el usuario autenticado tiene alguna suscripción registrada.
-     *
-     * GET /api/suscripcion-sms/me/existe
+     * Verifica si el usuario autenticado tiene una suscripción registrada.
      */
-    @GetMapping("/me/existe")
+    @GetMapping(ApiRoutes.SUSCRIPCION_SMS + "/me/existe")
     public ResponseEntity<ApiResponse<Boolean>> existeMiSuscripcion(
             Authentication authentication) {
 
@@ -102,12 +115,29 @@ public class SuscripcionSmsController {
         );
 
         boolean existe =
-                suscripcionService.existeSuscripcion(
-                        authentication.getName()
-                );
+                suscripcionService.existeSuscripcion(authentication.getName());
+
+        return ResponseEntity.ok(ApiResponse.ok(existe));
+    }
+
+    /**
+     * Permite al usuario autenticado activar o desactivar su suscripción.
+     */
+    @PatchMapping({
+            ApiRoutes.SUSCRIPCION_SMS + "/estado",
+            ApiRoutes.SUSCRIPCIONES_SMS + "/estado"
+    })
+    public ResponseEntity<ApiResponse<SuscripcionSmsDTO>> cambiarEstado(
+            @RequestParam boolean activa,
+            Authentication authentication) {
+
+        SuscripcionSmsDTO actualizada = suscripcionService.cambiarEstado(
+                activa,
+                authentication.getName()
+        );
 
         return ResponseEntity.ok(
-                ApiResponse.ok(existe)
+                ApiResponse.ok("Estado de suscripción actualizado", actualizada)
         );
     }
 }

@@ -36,6 +36,10 @@ public class PuntoAyudaDTO {
     @Size(max = 100, message = "La ciudad no puede superar los 100 caracteres")
     private String ciudad;
 
+    private String nombreContacto;
+    private String telefonoContacto;
+    private String correoContacto;
+
     @NotNull(message = "El departamento es obligatorio")
     private Long departamentoId;
 

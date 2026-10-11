@@ -8,4 +8,6 @@ import java.util.List;
 public interface CentroRepository extends JpaRepository<Centro, Long> {
 
     List<Centro> findByEstadoVerificacion(String estadoVerificacion);
+
+    long countByEstadoVerificacion(String estadoVerificacion);
 }

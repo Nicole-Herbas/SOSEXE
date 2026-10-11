@@ -18,6 +18,7 @@ import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import bo.edu.sos.backend.constants.EstadoVerificacion;
 
 
 @Service
@@ -72,6 +73,12 @@ public class MapaService {
 
         puntoAyudaRepository
                 .findAll()
+                .stream()
+                .filter(punto ->
+                        EstadoVerificacion.VERIFICADO.equals(
+                                punto.getEstadoVerificacion()
+                        )
+                )
                 .forEach(punto ->
                         puntos.add(
                                 convertirPuntoAyuda(
@@ -191,6 +198,19 @@ public class MapaService {
                                                         id
                                                 )
                                         );
+
+
+                        if (
+                                !EstadoVerificacion.VERIFICADO.equals(
+                                        punto.getEstadoVerificacion()
+                                )
+                        ) {
+
+                            throw new ResourceNotFoundException(
+                                    "Punto de ayuda",
+                                    id
+                            );
+                        }
 
 
                         yield convertirPuntoAyuda(

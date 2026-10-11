@@ -1,0 +1,16 @@
+<div class="mapa-contenedor">
+  <div
+    #mapa
+    class="mapa"
+    role="application"
+    [attr.aria-label]="etiquetaMapa">
+  </div>
+
+  <button
+    class="btn-ubicacion"
+    type="button"
+    (click)="usarMiUbicacion()">
+    <span aria-hidden="true">◎</span>
+    {{ textoUbicacion }}
+  </button>
+</div>

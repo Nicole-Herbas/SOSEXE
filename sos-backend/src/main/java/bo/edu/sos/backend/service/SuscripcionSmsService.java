@@ -5,7 +5,7 @@ import bo.edu.sos.backend.dto.SuscripcionSmsDTO;
 import bo.edu.sos.backend.entity.Departamento;
 import bo.edu.sos.backend.entity.SuscripcionSms;
 import bo.edu.sos.backend.entity.Usuario;
-import bo.edu.sos.backend.exception.DuplicateResourceException;
+import bo.edu.sos.backend.exception.BadRequestException;
 import bo.edu.sos.backend.exception.ResourceNotFoundException;
 import bo.edu.sos.backend.helper.LogHelper;
 import bo.edu.sos.backend.repository.DepartamentoRepository;
@@ -15,10 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Servicio de negocio para la suscripción a alertas SMS (SOS-63).
- *
- * Gestiona la creación, consulta y existencia de suscripciones.
- * El método de cancelación se implementa en SOS-64.
+ * Servicio de negocio para la suscripción a alertas SMS.
  */
 @Service
 public class SuscripcionSmsService {
@@ -27,32 +24,34 @@ public class SuscripcionSmsService {
     private final UsuarioRepository usuarioRepository;
     private final DepartamentoRepository departamentoRepository;
 
-
     public SuscripcionSmsService(
             SuscripcionSmsRepository suscripcionRepository,
             UsuarioRepository usuarioRepository,
             DepartamentoRepository departamentoRepository) {
 
-        this.suscripcionRepository  = suscripcionRepository;
-        this.usuarioRepository      = usuarioRepository;
+        this.suscripcionRepository = suscripcionRepository;
+        this.usuarioRepository = usuarioRepository;
         this.departamentoRepository = departamentoRepository;
     }
 
-
     /**
-     * Suscribe al usuario a alertas SMS con el teléfono y departamento indicados.
-     *
-     * Si el usuario ya tiene un registro (activo o cancelado), se actualiza y reactiva.
-     * Si no tiene registro, se crea uno nuevo con activa = true.
-     *
-     * @param emailUsuario email del usuario autenticado
-     * @param dto          datos de la suscripción (teléfono + departamentoId)
-     * @return DTO con los datos guardados
+     * Crea o actualiza y activa la suscripción del usuario autenticado.
      */
     @Transactional
     public SuscripcionSmsDTO suscribir(
             String emailUsuario,
             SuscripcionSmsDTO dto) {
+
+        if (dto == null || dto.getTelefono() == null || dto.getTelefono().isBlank()) {
+            throw new BadRequestException(
+                    SuscripcionSmsConstants.ERROR_TELEFONO_REQUERIDO
+            );
+        }
+        if (dto.getDepartamentoId() == null) {
+            throw new BadRequestException(
+                    SuscripcionSmsConstants.ERROR_DEPARTAMENTO_REQUERIDO
+            );
+        }
 
         LogHelper.debug(
                 SuscripcionSmsService.class,
@@ -60,57 +59,24 @@ public class SuscripcionSmsService {
                 emailUsuario
         );
 
-        Usuario usuario =
-                usuarioRepository.findByEmail(emailUsuario)
-                        .orElseThrow(() ->
-                                new ResourceNotFoundException(
-                                        "No existe un usuario con email: "
-                                                + emailUsuario
-                                )
-                        );
+        Usuario usuario = obtenerUsuario(emailUsuario);
+        Departamento departamento = departamentoRepository
+                .findById(dto.getDepartamentoId())
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Departamento",
+                        dto.getDepartamentoId()
+                ));
 
-        Departamento departamento =
-                departamentoRepository
-                        .findById(dto.getDepartamentoId())
-                        .orElseThrow(() ->
-                                new ResourceNotFoundException(
-                                        "Departamento",
-                                        dto.getDepartamentoId()
-                                )
-                        );
+        SuscripcionSms suscripcion = suscripcionRepository
+                .findByUsuarioId(usuario.getId())
+                .orElseGet(SuscripcionSms::new);
 
-        SuscripcionSms suscripcion =
-                suscripcionRepository
-                        .findByUsuarioId(usuario.getId())
-                        .orElse(null);
-
-        if (suscripcion == null) {
-            // Primera suscripción del usuario
-            suscripcion = new SuscripcionSms();
-            suscripcion.setUsuario(usuario);
-
-            LogHelper.info(
-                    SuscripcionSmsService.class,
-                    "Nueva suscripción SMS. usuarioId={}, departamentoId={}",
-                    usuario.getId(),
-                    departamento.getId()
-            );
-        } else {
-            // Ya existe; se actualiza y reactiva
-            LogHelper.info(
-                    SuscripcionSmsService.class,
-                    "Suscripción SMS existente actualizada. usuarioId={}, activaAntes={}",
-                    usuario.getId(),
-                    suscripcion.getActiva()
-            );
-        }
-
+        suscripcion.setUsuario(usuario);
         suscripcion.setTelefono(dto.getTelefono());
         suscripcion.setDepartamento(departamento);
         suscripcion.setActiva(true);
 
         SuscripcionSms guardada = suscripcionRepository.save(suscripcion);
-
         LogHelper.info(
                 SuscripcionSmsService.class,
                 "Suscripción SMS guardada. id={}, usuarioId={}, activa={}",
@@ -122,34 +88,20 @@ public class SuscripcionSmsService {
         return convertirADTO(guardada);
     }
 
-
     /**
-     * Obtiene la suscripción SMS activa o inactiva del usuario.
-     *
-     * @param emailUsuario email del usuario autenticado
-     * @return DTO de la suscripción
-     * @throws ResourceNotFoundException si el usuario no tiene ninguna suscripción
+     * Mantiene la firma previa de SOS-69 para los consumidores del servicio.
      */
+    @Transactional
+    public SuscripcionSmsDTO suscribir(
+            SuscripcionSmsDTO dto,
+            String emailUsuario) {
+        return suscribir(emailUsuario, dto);
+    }
+
     @Transactional(readOnly = true)
     public SuscripcionSmsDTO obtenerSuscripcion(String emailUsuario) {
-
-        Usuario usuario =
-                usuarioRepository.findByEmail(emailUsuario)
-                        .orElseThrow(() ->
-                                new ResourceNotFoundException(
-                                        "No existe un usuario con email: "
-                                                + emailUsuario
-                                )
-                        );
-
-        SuscripcionSms suscripcion =
-                suscripcionRepository
-                        .findByUsuarioId(usuario.getId())
-                        .orElseThrow(() ->
-                                new ResourceNotFoundException(
-                                        "El usuario no tiene una suscripción SMS registrada"
-                                )
-                        );
+        Usuario usuario = obtenerUsuario(emailUsuario);
+        SuscripcionSms suscripcion = buscarSuscripcion(usuario);
 
         LogHelper.debug(
                 SuscripcionSmsService.class,
@@ -162,28 +114,18 @@ public class SuscripcionSmsService {
         return convertirADTO(suscripcion);
     }
 
-
     /**
-     * Verifica si el usuario tiene alguna suscripción SMS registrada (activa o no).
-     *
-     * @param emailUsuario email del usuario autenticado
-     * @return true si existe registro, false en caso contrario
+     * Alias de compatibilidad para la ruta /mia de SOS-69.
      */
     @Transactional(readOnly = true)
+    public SuscripcionSmsDTO obtenerMia(String emailUsuario) {
+        return obtenerSuscripcion(emailUsuario);
+    }
+
+    @Transactional(readOnly = true)
     public boolean existeSuscripcion(String emailUsuario) {
-
-        Usuario usuario =
-                usuarioRepository.findByEmail(emailUsuario)
-                        .orElseThrow(() ->
-                                new ResourceNotFoundException(
-                                        "No existe un usuario con email: "
-                                                + emailUsuario
-                                )
-                        );
-
-        boolean existe = suscripcionRepository.existsByUsuarioId(
-                usuario.getId()
-        );
+        Usuario usuario = obtenerUsuario(emailUsuario);
+        boolean existe = suscripcionRepository.existsByUsuarioId(usuario.getId());
 
         LogHelper.debug(
                 SuscripcionSmsService.class,
@@ -195,17 +137,52 @@ public class SuscripcionSmsService {
         return existe;
     }
 
+    @Transactional
+    public SuscripcionSmsDTO cambiarEstado(
+            boolean activa,
+            String emailUsuario) {
 
-    // ── Helpers privados ────────────────────────────────────────────────────────
+        Usuario usuario = obtenerUsuario(emailUsuario);
+        SuscripcionSms suscripcion = buscarSuscripcion(usuario);
+        suscripcion.setActiva(activa);
+
+        SuscripcionSms actualizada = suscripcionRepository.save(suscripcion);
+        LogHelper.info(
+                SuscripcionSmsService.class,
+                "Estado de suscripción SMS actualizado. suscripcionId={}, activa={}",
+                actualizada.getId(),
+                actualizada.getActiva()
+        );
+
+        return convertirADTO(actualizada);
+    }
+
+    private Usuario obtenerUsuario(String emailUsuario) {
+        return usuarioRepository.findByEmail(emailUsuario)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "No existe un usuario con email: " + emailUsuario
+                ));
+    }
+
+    private SuscripcionSms buscarSuscripcion(Usuario usuario) {
+        return suscripcionRepository.findByUsuarioId(usuario.getId())
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "El usuario no tiene una suscripción SMS registrada"
+                ));
+    }
 
     private SuscripcionSmsDTO convertirADTO(SuscripcionSms suscripcion) {
-
         SuscripcionSmsDTO dto = new SuscripcionSmsDTO();
 
+        dto.setId(suscripcion.getId());
         dto.setTelefono(suscripcion.getTelefono());
         dto.setActiva(suscripcion.getActiva());
         dto.setConsentimientoFecha(suscripcion.getConsentimientoFecha());
 
+        if (suscripcion.getUsuario() != null) {
+            dto.setUsuarioId(suscripcion.getUsuario().getId());
+            dto.setUsuarioNombre(suscripcion.getUsuario().getNombre());
+        }
         if (suscripcion.getDepartamento() != null) {
             dto.setDepartamentoId(suscripcion.getDepartamento().getId());
             dto.setDepartamentoNombre(suscripcion.getDepartamento().getNombre());
