@@ -1,0 +1,435 @@
+<section class="registro-contenedor">
+
+  <!-- ==========================================
+       ENCABEZADO
+       ========================================== -->
+
+  <div class="registro-header">
+    <div>
+      <a class="volver" routerLink="/acerca-de">
+        <span aria-hidden="true">←</span> {{ textos.botones.volver }}
+      </a>
+
+      <p class="etiqueta">{{ textos.etiqueta }}</p>
+
+      @if (vista === 'formulario') {
+        <h1>{{ textos.titulo }}</h1>
+        <p class="subtitulo">{{ textos.descripcionFormulario }}</p>
+      } @else if (vista === 'confirmacion') {
+        <h1>{{ textos.exito.tituloCabecera }}</h1>
+        <p class="subtitulo">{{ textos.exito.subtitulo }}</p>
+      } @else {
+        <h1>{{ textos.misPuntos.titulo }}</h1>
+        <p class="subtitulo">{{ textos.misPuntos.descripcion }}</p>
+      }
+    </div>
+
+    @if (vista === 'formulario') {
+      <button class="btn btn-secundario cabecera-accion" type="button"
+              (click)="verMisPuntos()">
+        {{ textos.botones.misPuntos }} <span aria-hidden="true">→</span>
+      </button>
+    } @else if (vista === 'mios') {
+      <button class="btn btn-primario cabecera-accion" type="button"
+              (click)="registrarOtro()">
+        <span aria-hidden="true">+</span> {{ textos.botones.nuevoPunto }}
+      </button>
+    }
+  </div>
+
+
+  <!-- ==========================================
+       FORMULARIO DE REGISTRO
+       ========================================== -->
+
+  @if (vista === 'formulario') {
+
+    @if (error) {
+      <p class="mensaje-error" role="alert">{{ error }}</p>
+    }
+
+    <form #formulario="ngForm" (ngSubmit)="registrar()">
+
+      <div class="formulario-grid">
+
+        <!-- ======================================
+             COLUMNA IZQUIERDA
+             ====================================== -->
+
+        <div class="columna-formulario">
+
+          <section class="bloque">
+
+            <h2>{{ textos.campos.tipo }} <span class="obligatorio" aria-hidden="true">*</span></h2>
+            <p class="ayuda-campo">{{ textos.campos.tipoAyuda }}</p>
+
+            <div class="tipos-grid">
+
+              @for (tipo of tipos; track tipo.valor) {
+                <label class="tipo-tarjeta"
+                       [class.seleccionado]="modelo.tipo === tipo.valor">
+
+                  <input type="radio" name="tipo" [value]="tipo.valor"
+                         [(ngModel)]="modelo.tipo" required>
+
+                  <span class="tipo-icono" aria-hidden="true">
+                    @if (tipo.valor === tipoDonacion) {
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 21s-7-5-7-12a7 7 0 0 1 14 0c0 7-7 12-7 12Z"/>
+                        <path d="M9.5 9.5c0-2 2.5-2.6 3.5-.8 1-1.8 3.5-1.2 3.5.8 0 1.5-3.5 3.8-3.5 3.8S9.5 11 9.5 9.5Z"/>
+                      </svg>
+                    } @else {
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="m12 2 9 16H3L12 2Z"/>
+                        <path d="M12 8v5"/>
+                        <path d="M12 16h.01"/>
+                      </svg>
+                    }
+                  </span>
+
+                  <strong>{{ tipo.nombre }}</strong>
+                  <small>{{ tipo.detalle }}</small>
+
+                  @if (modelo.tipo === tipo.valor) {
+                    <span class="tipo-check" aria-hidden="true">✓</span>
+                  }
+                </label>
+              }
+
+            </div>
+
+            <div class="campo">
+              <label for="nombre">{{ modelo.tipo === tipoEmergencia ? textos.campos.nombreEmergencia : textos.campos.nombre }} <span class="obligatorio" aria-hidden="true">*</span></label>
+              <input id="nombre" name="nombre" type="text"
+                     [(ngModel)]="modelo.nombre" required maxlength="150"
+                     [placeholder]="modelo.tipo === tipoEmergencia ? textos.campos.nombreEmergenciaPlaceholder : textos.campos.nombrePlaceholder">
+            </div>
+
+            <div class="campo">
+              <label for="descripcion">{{ modelo.tipo === tipoEmergencia ? textos.campos.descripcionEmergencia : textos.campos.descripcion }} <span class="obligatorio" aria-hidden="true">*</span></label>
+              <textarea id="descripcion" name="descripcion" rows="3"
+                        [(ngModel)]="modelo.descripcion" required maxlength="500"
+                        [placeholder]="modelo.tipo === tipoEmergencia ? textos.campos.descripcionEmergenciaPlaceholder : textos.campos.descripcionPlaceholder"></textarea>
+            </div>
+
+            @if (modelo.tipo === tipoDonacion) {
+              <div class="campo">
+                <label for="horarioAtencion">{{ textos.campos.horarioAtencion }} <span class="obligatorio" aria-hidden="true">*</span></label>
+                <input id="horarioAtencion" name="horarioAtencion" type="text"
+                       [(ngModel)]="modelo.horarioAtencion" required maxlength="100"
+                       [placeholder]="textos.campos.horarioPlaceholder">
+              </div>
+            }
+
+            @if (modelo.tipo === tipoEmergencia) {
+              <div class="campo">
+                <label for="claseEmergencia">{{ textos.campos.claseEmergencia }} <span class="obligatorio" aria-hidden="true">*</span></label>
+                <select id="claseEmergencia" name="claseEmergencia" [(ngModel)]="modelo.claseEmergencia" required>
+                  <option value="">{{ textos.campos.seleccionarClaseEmergencia }}</option>
+                  @for (clase of clasesEmergencia; track clase.valor) {
+                    <option [value]="clase.valor">{{ clase.nombre }}</option>
+                  }
+                </select>
+              </div>
+              <div class="campo">
+                <label for="fechaEmergencia">{{ textos.campos.fechaEmergencia }} <span class="obligatorio" aria-hidden="true">*</span></label>
+                <input id="fechaEmergencia" name="fechaEmergencia" type="datetime-local"
+                       [(ngModel)]="modelo.fechaEmergencia" required>
+              </div>
+              <p class="estado-emergencia">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                  <circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>
+                </svg>
+                {{ textos.campos.estadoEmergencia }}: <strong>{{ textos.campos.estadoEmergenciaInicial }}</strong>
+              </p>
+            }
+
+          </section>
+
+
+          <section class="bloque bloque-ubicacion">
+
+            <h2>{{ textos.secciones.ubicacion }} <span class="obligatorio" aria-hidden="true">*</span></h2>
+            <p class="ayuda-campo">{{ textos.campos.mapa }}</p>
+
+            <app-mapa-registro
+              [latitud]="modelo.latitud"
+              [longitud]="modelo.longitud"
+              [textoUbicacion]="textos.campos.usarMiUbicacion"
+              [etiquetaMapa]="textos.campos.mapaAria"
+              (ubicacionSeleccionada)="seleccionarUbicacion($event)"
+              (errorUbicacion)="indicarErrorUbicacion($event)">
+            </app-mapa-registro>
+
+            @if (modelo.latitud !== null && modelo.longitud !== null) {
+              <p class="coordenadas">
+                <span aria-hidden="true">✓</span>
+                {{ textos.campos.ubicacionSeleccionada }} ·
+                {{ textos.campos.latitud }}: {{ modelo.latitud }} ·
+                {{ textos.campos.longitud }}: {{ modelo.longitud }}
+              </p>
+            } @else {
+              <p class="mapa-instruccion">{{ textos.campos.mapaInstruccion }}</p>
+            }
+
+            @if (errorUbicacion) {
+              <p class="mensaje-error" role="alert">{{ errorUbicacion }}</p>
+            }
+
+            <div class="campo">
+              <label for="departamento">{{ textos.campos.departamento }} <span class="obligatorio" aria-hidden="true">*</span></label>
+              <select id="departamento" name="departamento"
+                      [(ngModel)]="modelo.departamentoId" required>
+                <option [ngValue]="0">{{ textos.campos.seleccionarDepartamento }}</option>
+                @for (departamento of departamentos; track departamento.id) {
+                  <option [ngValue]="departamento.id">{{ departamento.nombre }}</option>
+                }
+              </select>
+            </div>
+
+            <div class="campo">
+              <label for="ciudad">{{ textos.campos.ciudad }} <span class="obligatorio" aria-hidden="true">*</span></label>
+              <input id="ciudad" name="ciudad" type="text"
+                     [(ngModel)]="modelo.ciudad" required maxlength="100"
+                     [placeholder]="textos.campos.ciudadPlaceholder">
+            </div>
+
+            <div class="campo">
+              <label for="direccion">{{ textos.campos.direccion }} <span class="obligatorio" aria-hidden="true">*</span></label>
+              <input id="direccion" name="direccion" type="text"
+                     [(ngModel)]="modelo.direccion" required maxlength="250"
+                     [placeholder]="textos.campos.direccionPlaceholder">
+            </div>
+
+          </section>
+
+        </div>
+
+
+        <!-- ======================================
+             COLUMNA DERECHA
+             ====================================== -->
+
+        <div class="columna-formulario">
+
+          <section class="bloque">
+
+            <h2>{{ modelo.tipo === tipoEmergencia ? textos.secciones.necesidadesEmergencia : textos.secciones.necesidadesDonacion }} <span class="obligatorio" aria-hidden="true">*</span></h2>
+            <p class="ayuda-campo">{{ modelo.tipo === tipoEmergencia ? textos.campos.necesidadesEmergencia : textos.campos.necesidadesDonacion }}</p>
+
+            <div class="necesidades-grid">
+              @for (necesidad of necesidades; track necesidad.id) {
+                <label class="necesidad"
+                       [class.activa]="necesidadIds.includes(necesidad.id)">
+                  <input type="checkbox"
+                         [checked]="necesidadIds.includes(necesidad.id)"
+                         (change)="alternarNecesidad(necesidad.id, $any($event.target).checked)">
+                  <span>{{ necesidad.nombre }}</span>
+                </label>
+              }
+            </div>
+
+            @if (modelo.tipo === tipoDonacion) {
+              <h3 class="subseccion-titulo">{{ textos.campos.donacionesAceptadas }} <span class="obligatorio" aria-hidden="true">*</span></h3>
+              <p class="ayuda-campo">{{ textos.campos.donacionesAceptadasAyuda }}</p>
+              <div class="necesidades-grid">
+                @for (necesidad of necesidades; track necesidad.id) {
+                  <label class="necesidad" [class.activa]="donacionesAceptadasIds.includes(necesidad.id)">
+                    <input type="checkbox" [checked]="donacionesAceptadasIds.includes(necesidad.id)"
+                           (change)="alternarDonacionAceptada(necesidad.id, $any($event.target).checked)">
+                    <span>{{ necesidad.nombre }}</span>
+                  </label>
+                }
+              </div>
+            }
+
+            @if (cargandoCatalogos) {
+              <p class="ayuda-campo">{{ textos.campos.cargandoCatalogos }}</p>
+            }
+
+          </section>
+
+
+          <section class="bloque">
+
+            <h2>{{ textos.secciones.contacto }} <span class="obligatorio" aria-hidden="true">*</span></h2>
+            <p class="ayuda-campo">{{ textos.campos.contactoAyuda }}</p>
+
+            <div class="campo">
+              <label for="nombreContacto">{{ textos.campos.nombreContacto }} <span class="obligatorio" aria-hidden="true">*</span></label>
+              <input id="nombreContacto" name="nombreContacto" type="text"
+                     [(ngModel)]="modelo.nombreContacto" required maxlength="150"
+                     [placeholder]="textos.campos.contactoPlaceholder">
+            </div>
+
+            <div class="campo">
+              <label for="telefonoContacto">{{ textos.campos.telefono }} <span class="obligatorio" aria-hidden="true">*</span></label>
+              <input id="telefonoContacto" name="telefonoContacto" type="tel"
+                     [(ngModel)]="modelo.telefonoContacto" required
+                     pattern="\+?[0-9]{7,15}" maxlength="16"
+                     [placeholder]="textos.campos.telefonoPlaceholder">
+            </div>
+
+            <div class="campo">
+              <label for="correoContacto">{{ textos.campos.correo }}</label>
+              <input id="correoContacto" name="correoContacto" type="email"
+                     [(ngModel)]="modelo.correoContacto" maxlength="150"
+                     [placeholder]="textos.campos.correoPlaceholder">
+            </div>
+
+            <div class="campo">
+              <label for="informacionAdicional">{{ textos.campos.informacionAdicional }}</label>
+              <textarea id="informacionAdicional" name="informacionAdicional"
+                        rows="3" maxlength="180"
+                        [(ngModel)]="modelo.informacionAdicional"
+                        [placeholder]="textos.campos.informacionAdicionalPlaceholder"></textarea>
+              <small class="ayuda-campo">{{ textos.campos.informacionAdicionalAyuda }}</small>
+              <small class="contador-descripcion" [class.excedido]="caracteresDescripcion > 500">
+                {{ caracteresDescripcion }} / 500 {{ textos.campos.caracteresGuardados }}
+              </small>
+            </div>
+
+          </section>
+
+
+          <div class="aviso">
+            <span class="aviso-icono" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span>
+            <p>
+              <strong>{{ textos.avisoTitulo }}</strong>
+              {{ textos.aviso }}
+            </p>
+          </div>
+
+          <button class="btn btn-primario btn-enviar" type="submit"
+                  [disabled]="!formularioValido || !formulario.valid || enviando">
+            {{ enviando ? textos.botones.registrando : textos.botones.registrar }}
+            <span aria-hidden="true">→</span>
+          </button>
+
+        </div>
+
+      </div>
+
+    </form>
+
+  }
+
+
+  <!-- ==========================================
+       CONFIRMACIÓN
+       ========================================== -->
+
+  @if (vista === 'confirmacion') {
+    <section class="confirmacion">
+
+      <div class="icono-exito" aria-hidden="true">✓</div>
+      <h2>{{ textos.exito.titulo }}</h2>
+
+      <p class="confirmacion-texto">
+        {{ textos.exito.antesNombre }}
+        <strong>{{ registroCreado?.nombre }}</strong>
+        {{ textos.exito.despuesNombre }}
+      </p>
+
+      <div class="confirmacion-estado">
+        <span class="estado-reloj" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span>
+        <div>
+          <small>{{ textos.exito.estadoActual }}</small>
+          <strong>{{ textos.exito.estado }}</strong>
+          <p>{{ textos.exito.descripcion }}</p>
+        </div>
+      </div>
+
+      <button class="btn btn-primario" type="button" (click)="verMisPuntos()">
+        {{ textos.botones.verMisPuntos }}
+      </button>
+
+      <button class="btn btn-secundario" type="button" (click)="registrarOtro()">
+        {{ textos.botones.registrarOtro }}
+      </button>
+
+    </section>
+  }
+
+
+  <!-- ==========================================
+       MIS PUNTOS DE AYUDA
+       ========================================== -->
+
+  @if (vista === 'mios') {
+    <section class="mis-puntos">
+
+      @if (cargandoMisPuntos) {
+        <p class="cargando">{{ textos.misPuntos.cargando }}</p>
+      } @else if (errorMisPuntos) {
+        <p class="mensaje-error" role="alert">{{ errorMisPuntos }}</p>
+        <button class="btn btn-secundario" type="button" (click)="verMisPuntos()">
+          {{ textos.botones.reintentar }}
+        </button>
+      } @else if (misPuntos.length === 0) {
+        <div class="estado-vacio">
+           <span aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-5-7-12a7 7 0 0 1 14 0c0 7-7 12-7 12Z"/><circle cx="12" cy="9" r="2"/></svg></span>
+          <h2>{{ textos.misPuntos.vacioTitulo }}</h2>
+          <p>{{ textos.misPuntos.vacioDescripcion }}</p>
+          <button class="btn btn-primario" type="button" (click)="registrarOtro()">
+            {{ textos.botones.primerPunto }}
+          </button>
+        </div>
+      } @else {
+        <div class="puntos-lista">
+          @for (punto of misPuntos; track punto.id) {
+            <article class="punto-tarjeta">
+               <div class="punto-icono" aria-hidden="true">
+                 @if (punto.tipo === tipoEmergencia) {
+                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m12 2 9 16H3L12 2Z"/><path d="M12 8v5M12 16h.01"/></svg>
+                 } @else {
+                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 21s-7-5-7-12a7 7 0 0 1 14 0c0 7-7 12-7 12Z"/><circle cx="12" cy="9" r="2"/></svg>
+                 }
+               </div>
+              <div class="punto-contenido">
+                <div class="punto-encabezado">
+                  <h2>{{ punto.nombre }}</h2>
+                  <span class="estado-etiqueta"
+                        [class.pendiente]="punto.estadoVerificacion === estados.PENDIENTE"
+                        [class.verificado]="punto.estadoVerificacion === estados.VERIFICADO"
+                        [class.rechazado]="punto.estadoVerificacion === estados.RECHAZADO">
+                    {{ etiquetaEstado(punto.estadoVerificacion) }}
+                  </span>
+                </div>
+
+                <p class="punto-tipo">{{ etiquetaTipo(punto.tipo) }}</p>
+                <p class="punto-localidad">
+                  {{ punto.ciudad }} · {{ punto.departamentoNombre }}
+                </p>
+                <p class="punto-necesidades">
+                  {{ punto.necesidadNombres?.join(', ') || textos.misPuntos.sinNecesidades }}
+                </p>
+
+                <button type="button" class="ver-detalles"
+                        (click)="verDetalle(punto)"
+                        [attr.aria-expanded]="puntoSeleccionado?.id === punto.id">
+                  {{ puntoSeleccionado?.id === punto.id ? textos.botones.ocultarDetalles : textos.botones.verDetalles }}
+                  <span aria-hidden="true">→</span>
+                </button>
+
+                @if (puntoSeleccionado?.id === punto.id) {
+                  <div class="detalle-punto">
+                    <p><strong>{{ textos.misPuntos.direccion }}</strong> {{ punto.direccion }}</p>
+                    <p><strong>{{ textos.misPuntos.descripcionEtiqueta }}</strong> {{ punto.descripcion }}</p>
+                    <p><strong>{{ textos.misPuntos.estado }}</strong> {{ etiquetaEstado(punto.estadoVerificacion) }}</p>
+                    <p><strong>{{ textos.misPuntos.contacto }}</strong> {{ punto.nombreContacto }}</p>
+                    <p><strong>{{ textos.misPuntos.telefono }}</strong> {{ punto.telefonoContacto }}</p>
+                    @if (punto.correoContacto) {
+                      <p><strong>{{ textos.misPuntos.correo }}</strong> {{ punto.correoContacto }}</p>
+                    }
+                  </div>
+                }
+              </div>
+            </article>
+          }
+        </div>
+      }
+    </section>
+  }
+
+</section>

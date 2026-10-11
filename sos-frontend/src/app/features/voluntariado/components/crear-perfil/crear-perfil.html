@@ -1,0 +1,260 @@
+<!-- ===== STEPPER ===== -->
+<div class="wizard-stepper">
+
+  <div class="wizard-step"
+       [class.wizard-step--completed]="pasoActual > 1"
+       [class.wizard-step--active]="pasoActual === 1">
+    <span class="wizard-step__circle">
+      {{ pasoActual > 1 ? '✓' : '1' }}
+    </span>
+    <span class="wizard-step__label">{{ textos.pasos.datosPersonales }}</span>
+  </div>
+
+  <div class="wizard-step__line"
+       [class.wizard-step__line--completed]="pasoActual > 1">
+  </div>
+
+  <div class="wizard-step"
+       [class.wizard-step--completed]="pasoActual > 2"
+       [class.wizard-step--active]="pasoActual === 2">
+    <span class="wizard-step__circle">
+      {{ pasoActual > 2 ? '✓' : '2' }}
+    </span>
+    <span class="wizard-step__label">{{ textos.pasos.habilidades }}</span>
+  </div>
+
+  <div class="wizard-step__line"
+       [class.wizard-step__line--completed]="pasoActual > 2">
+  </div>
+
+  <div class="wizard-step"
+       [class.wizard-step--active]="pasoActual === 3">
+    <span class="wizard-step__circle">3</span>
+    <span class="wizard-step__label">{{ textos.pasos.disponibilidad }}</span>
+  </div>
+
+</div>
+
+
+<!-- ===== CARD CONTAINER ===== -->
+<div class="wizard-card">
+
+  <!-- ── PASO 1: Datos personales ── -->
+  @if (pasoActual === 1) {
+
+    <h2 class="wizard-card__title">{{ textos.paso1.titulo }}</h2>
+    <p class="wizard-card__subtitle">{{ textos.paso1.subtitulo }}</p>
+
+    <form [formGroup]="datosForm" class="wizard-form">
+
+      <!-- Nombre completo (read-only) -->
+      <div class="wizard-field wizard-field--full">
+        <label class="wizard-field__label">{{ textos.paso1.nombreLabel }}</label>
+        <input
+          type="text"
+          class="wizard-field__input"
+          [value]="nombreUsuario"
+          [placeholder]="textos.paso1.nombrePlaceholder"
+          readonly
+        />
+      </div>
+
+      <!-- Teléfono y Correo -->
+      <div class="wizard-field-row">
+
+        <div class="wizard-field">
+          <label class="wizard-field__label">{{ textos.paso1.telefonoLabel }}</label>
+          <input
+            type="text"
+            class="wizard-field__input"
+            formControlName="telefono"
+            [placeholder]="textos.paso1.telefonoPlaceholder"
+          />
+          @if (datosForm.get('telefono')?.touched && datosForm.get('telefono')?.invalid) {
+            <span class="wizard-field__error">{{ textos.paso1.telefonoError }}</span>
+          }
+        </div>
+
+        <div class="wizard-field">
+          <label class="wizard-field__label">{{ textos.paso1.correoLabel }}</label>
+          <input
+            type="email"
+            class="wizard-field__input"
+            formControlName="emailContacto"
+            [placeholder]="textos.paso1.correoPlaceholder"
+          />
+        </div>
+
+      </div>
+
+      <!-- Departamento y Ciudad -->
+      <div class="wizard-field-row">
+
+        <div class="wizard-field">
+          <label class="wizard-field__label">{{ textos.paso1.departamentoLabel }}</label>
+          <select
+            class="wizard-field__input wizard-field__select"
+            formControlName="departamentoId"
+          >
+            <option [ngValue]="null" disabled>{{ textos.paso1.departamentoPlaceholder }}</option>
+            @for (dep of departamentos; track dep.id) {
+              <option [ngValue]="dep.id">{{ dep.nombre }}</option>
+            }
+          </select>
+          @if (datosForm.get('departamentoId')?.touched && datosForm.get('departamentoId')?.invalid) {
+            <span class="wizard-field__error">{{ textos.paso1.departamentoError }}</span>
+          }
+        </div>
+
+        <div class="wizard-field">
+          <label class="wizard-field__label">{{ textos.paso1.ciudadLabel }}</label>
+          <input
+            type="text"
+            class="wizard-field__input"
+            formControlName="ciudad"
+            [placeholder]="textos.paso1.ciudadPlaceholder"
+          />
+          @if (datosForm.get('ciudad')?.touched && datosForm.get('ciudad')?.invalid) {
+            <span class="wizard-field__error">{{ textos.paso1.ciudadError }}</span>
+          }
+        </div>
+
+      </div>
+
+    </form>
+
+    <div class="wizard-actions wizard-actions--end">
+      <button
+        class="btn btn--primary"
+        type="button"
+        (click)="siguientePaso()"
+      >
+        {{ textos.paso1.continuar }}
+      </button>
+    </div>
+
+  }
+
+
+  <!-- ── PASO 2: Habilidades ── -->
+  @if (pasoActual === 2) {
+
+    <h2 class="wizard-card__title">{{ textos.paso2.titulo }}</h2>
+    <p class="wizard-card__subtitle">{{ textos.paso2.subtitulo }}</p>
+
+    <p class="wizard-chips__count"
+       [class.wizard-chips__count--empty]="habilidadesSeleccionadas.length === 0">
+      @if (habilidadesSeleccionadas.length === 0) {
+        {{ textos.paso2.ningunaSeleccionada }}
+      } @else {
+        {{ habilidadesSeleccionadas.length }} {{ textos.paso2.seleccionadas }}
+      }
+    </p>
+
+    <div class="wizard-chips">
+      @for (hab of textos.habilidades; track hab) {
+        <button
+          type="button"
+          class="wizard-chip"
+          [class.wizard-chip--selected]="esHabilidadSeleccionada(hab)"
+          (click)="toggleHabilidad(hab)"
+        >
+          @if (esHabilidadSeleccionada(hab)) {
+            <span class="wizard-chip__check">✓</span>
+          }
+          {{ hab }}
+        </button>
+      }
+    </div>
+
+    @if (errorHabilidades) {
+      <p class="wizard-field__error">{{ errorHabilidades }}</p>
+    }
+
+    <p class="wizard-nota">{{ textos.paso2.notaExperiencia }}</p>
+
+    <div class="wizard-actions">
+      <button
+        class="btn btn--outline"
+        type="button"
+        (click)="pasoAnterior()"
+      >
+        {{ textos.paso2.anterior }}
+      </button>
+
+      <button
+        class="btn btn--primary"
+        type="button"
+        (click)="siguientePaso()"
+      >
+        {{ textos.paso2.continuar }}
+      </button>
+    </div>
+
+  }
+
+
+  <!-- ── PASO 3: Disponibilidad ── -->
+  @if (pasoActual === 3) {
+
+    <h2 class="wizard-card__title">{{ textos.paso3.titulo }}</h2>
+    <p class="wizard-card__subtitle">{{ textos.paso3.subtitulo }}</p>
+
+    <p class="wizard-chips__count"
+       [class.wizard-chips__count--empty]="disponibilidadSeleccionada.length === 0">
+      @if (disponibilidadSeleccionada.length === 0) {
+        {{ textos.paso3.ningunaSeleccionada }}
+      } @else {
+        {{ disponibilidadSeleccionada.length }} {{ textos.paso3.seleccionadas }}
+      }
+    </p>
+
+    <div class="wizard-chips">
+      @for (disp of textos.disponibilidades; track disp) {
+        <button
+          type="button"
+          class="wizard-chip"
+          [class.wizard-chip--selected]="esDisponibilidadSeleccionada(disp)"
+          (click)="toggleDisponibilidad(disp)"
+        >
+          @if (esDisponibilidadSeleccionada(disp)) {
+            <span class="wizard-chip__check">✓</span>
+          }
+          {{ disp }}
+        </button>
+      }
+    </div>
+
+    @if (errorDisponibilidad) {
+      <p class="wizard-field__error">{{ errorDisponibilidad }}</p>
+    }
+
+    <p class="wizard-nota">{{ textos.paso3.notaActualizar }}</p>
+
+    @if (mensajeError) {
+      <p class="wizard-mensaje-error">{{ mensajeError }}</p>
+    }
+
+    <div class="wizard-actions">
+      <button
+        class="btn btn--outline"
+        type="button"
+        (click)="pasoAnterior()"
+        [disabled]="cargando"
+      >
+        {{ textos.paso3.anterior }}
+      </button>
+
+      <button
+        class="btn btn--primary"
+        type="button"
+        (click)="onSubmit()"
+        [disabled]="cargando"
+      >
+        {{ esEdicion ? textos.paso3.actualizarPerfil : textos.paso3.crearPerfil }}
+      </button>
+    </div>
+
+  }
+
+</div>

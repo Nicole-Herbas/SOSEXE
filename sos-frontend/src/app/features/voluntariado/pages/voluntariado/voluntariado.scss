@@ -456,3 +456,80 @@ $font-display: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, s
     gap: 24px;
   }
 }
+
+
+/* ================================================================
+   SOS-40: Secciones de perfil de voluntario
+   ================================================================ */
+
+/* ── Mensaje de éxito ── */
+
+.vol-exito {
+  max-width: 640px;
+  margin: 0 auto 2rem;
+  padding: 0 1.5rem;
+}
+
+.vol-exito__card {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: $radius-md;
+  padding: 1.25rem 1.5rem;
+}
+
+.vol-exito__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  background: #22c55e;
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.875rem;
+  flex-shrink: 0;
+  margin-top: 0.125rem;
+}
+
+.vol-exito__content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.vol-exito__titulo {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #166534;
+  margin: 0;
+}
+
+.vol-exito__mensaje {
+  font-size: 0.875rem;
+  color: #15803d;
+  margin: 0;
+}
+
+
+/* ── Sección perfil / wizard ── */
+
+.vol-perfil-section,
+.vol-wizard-section {
+  max-width: 720px;
+  margin: 0 auto 3rem;
+  padding: 0 1.5rem;
+}
+
+
+/* ── Cargando ── */
+
+.vol-cargando {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: $color-muted;
+  font-size: 0.9375rem;
+}
