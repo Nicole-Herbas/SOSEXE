@@ -1,0 +1,740 @@
+:host {
+  display: block;
+  min-height: calc(100vh - 80px);
+  background: #ffffff;
+}
+
+
+.mis-postulaciones {
+  width: min(1180px, calc(100% - 40px));
+  margin: 0 auto;
+  padding: 64px 0 80px;
+}
+
+
+/* =========================================================
+   HERO
+   ========================================================= */
+
+.hero {
+  max-width: 780px;
+  margin-bottom: 42px;
+}
+
+
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+
+  padding: 8px 14px;
+
+  border-radius: 999px;
+
+  background: #e9f7f5;
+  border: 1px solid #bfe8e2;
+
+  color: #0d8177;
+
+  font-size: 0.82rem;
+  font-weight: 700;
+
+  margin-bottom: 18px;
+}
+
+
+.hero-badge span {
+  font-size: 0.7rem;
+}
+
+
+.hero h1 {
+  margin: 0 0 14px;
+
+  color: #102a3a;
+
+  font-size: clamp(2.2rem, 5vw, 3.5rem);
+  line-height: 1.05;
+
+  font-weight: 800;
+
+  letter-spacing: -0.04em;
+}
+
+
+.hero p {
+  margin: 0;
+
+  max-width: 720px;
+
+  color: #64748b;
+
+  font-size: 1.05rem;
+  line-height: 1.7;
+}
+
+
+/* =========================================================
+   ESTADÍSTICAS
+   ========================================================= */
+
+.estadisticas {
+  display: grid;
+
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
+
+  gap: 16px;
+
+  margin-bottom: 58px;
+}
+
+
+.estadistica {
+  display: flex;
+  align-items: center;
+
+  gap: 14px;
+
+  padding: 20px;
+
+  background: #ffffff;
+
+  border: 1px solid #e5edf0;
+
+  border-radius: 18px;
+
+  box-shadow:
+    0 8px 24px rgba(16, 42, 58, 0.05);
+}
+
+
+.estadistica-icono {
+  width: 44px;
+  height: 44px;
+
+  flex-shrink: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 13px;
+
+  background: #e8f6f4;
+
+  color: #0d8b81;
+
+  font-size: 1.15rem;
+}
+
+
+.estadistica-icono.pendiente {
+  background: #fff7df;
+  color: #c78a17;
+}
+
+
+.estadistica-icono.aprobado {
+  background: #e8f7ed;
+  color: #27884d;
+}
+
+
+.estadistica-icono.rechazado {
+  background: #fff0ef;
+  color: #d6534d;
+}
+
+
+.estadistica strong {
+  display: block;
+
+  color: #102a3a;
+
+  font-size: 1.45rem;
+  line-height: 1.1;
+}
+
+
+.estadistica span {
+  display: block;
+
+  margin-top: 4px;
+
+  color: #718096;
+
+  font-size: 0.78rem;
+}
+
+
+/* =========================================================
+   CONTENIDO
+   ========================================================= */
+
+.contenido {
+  width: 100%;
+}
+
+
+.titulo-seccion {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+
+  margin-bottom: 24px;
+
+  padding-bottom: 20px;
+
+  border-bottom: 1px solid #e8eef0;
+}
+
+
+.eyebrow {
+  display: block;
+
+  margin-bottom: 6px;
+
+  color: #0d8b81;
+
+  font-size: 0.75rem;
+  font-weight: 800;
+
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+
+.titulo-seccion h2 {
+  margin: 0;
+
+  color: #102a3a;
+
+  font-size: 1.7rem;
+  line-height: 1.2;
+}
+
+
+.titulo-seccion p {
+  margin: 7px 0 0;
+
+  color: #718096;
+
+  font-size: 0.92rem;
+}
+
+
+/* =========================================================
+   LISTA
+   ========================================================= */
+
+.lista-postulaciones {
+  display: grid;
+
+  gap: 18px;
+}
+
+
+/* =========================================================
+   TARJETA
+   ========================================================= */
+
+.postulacion-card {
+  overflow: hidden;
+
+  background: #ffffff;
+
+  border: 1px solid #e2eaed;
+
+  border-radius: 20px;
+
+  box-shadow:
+    0 10px 28px rgba(16, 42, 58, 0.055);
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
+}
+
+
+.postulacion-card:hover {
+  transform: translateY(-2px);
+
+  border-color: #b9ddd9;
+
+  box-shadow:
+    0 14px 32px rgba(16, 42, 58, 0.08);
+}
+
+
+.card-cabecera {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 20px 22px 0;
+}
+
+
+.oportunidad-icono {
+  width: 46px;
+  height: 46px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 14px;
+
+  background: #e8f6f4;
+
+  color: #0d8b81;
+
+  font-size: 1.2rem;
+}
+
+
+.estado {
+  display: inline-flex;
+  align-items: center;
+
+  gap: 7px;
+
+  padding: 7px 11px;
+
+  border-radius: 999px;
+
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+
+.estado-punto {
+  width: 7px;
+  height: 7px;
+
+  border-radius: 50%;
+
+  background: currentColor;
+}
+
+
+.estado-pendiente {
+  color: #a96d00;
+  background: #fff7df;
+}
+
+
+.estado-aprobado {
+  color: #247a43;
+  background: #e9f7ed;
+}
+
+
+.estado-rechazado {
+  color: #c2413b;
+  background: #fff0ef;
+}
+
+
+.estado-desconocido {
+  color: #64748b;
+  background: #f1f5f9;
+}
+
+
+/* =========================================================
+   CONTENIDO DE TARJETA
+   ========================================================= */
+
+.card-contenido {
+  padding: 20px 22px 22px;
+}
+
+
+.card-label {
+  display: block;
+
+  margin-bottom: 5px;
+
+  color: #82909a;
+
+  font-size: 0.72rem;
+  font-weight: 700;
+
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+
+.card-contenido h3 {
+  margin: 0;
+
+  color: #102a3a;
+
+  font-size: 1.25rem;
+  line-height: 1.35;
+
+  font-weight: 750;
+}
+
+
+.datos-postulacion {
+  display: grid;
+
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+
+  gap: 14px;
+
+  margin-top: 22px;
+}
+
+
+.dato {
+  display: flex;
+  align-items: flex-start;
+
+  gap: 10px;
+
+  padding: 14px;
+
+  background: #f8fafb;
+
+  border-radius: 13px;
+}
+
+
+.dato-icono {
+  font-size: 1rem;
+
+  line-height: 1.4;
+}
+
+
+.dato-label {
+  display: block;
+
+  margin-bottom: 3px;
+
+  color: #87939b;
+
+  font-size: 0.7rem;
+}
+
+
+.dato strong {
+  display: block;
+
+  color: #314451;
+
+  font-size: 0.85rem;
+
+  font-weight: 650;
+}
+
+
+.comentario {
+  margin-top: 16px;
+
+  padding: 14px 16px;
+
+  border-left: 3px solid #0d8b81;
+
+  background: #f4faf9;
+
+  border-radius: 0 12px 12px 0;
+}
+
+
+.comentario-label {
+  display: block;
+
+  margin-bottom: 5px;
+
+  color: #0d8177;
+
+  font-size: 0.72rem;
+  font-weight: 750;
+}
+
+
+.comentario p {
+  margin: 0;
+
+  color: #52636d;
+
+  font-size: 0.85rem;
+  line-height: 1.55;
+}
+
+
+/* =========================================================
+   PIE DE TARJETA
+   ========================================================= */
+
+.card-pie {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 16px;
+
+  padding: 15px 22px;
+
+  border-top: 1px solid #edf1f2;
+
+  background: #fcfdfd;
+
+  color: #78858e;
+
+  font-size: 0.78rem;
+}
+
+
+.card-pie strong {
+  font-size: 0.8rem;
+}
+
+
+/* =========================================================
+   ESTADOS DE PÁGINA
+   ========================================================= */
+
+.estado-pagina {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  min-height: 330px;
+
+  padding: 40px;
+
+  text-align: center;
+
+  background: #ffffff;
+
+  border: 1px dashed #d8e4e7;
+
+  border-radius: 20px;
+}
+
+
+.estado-icono {
+  width: 58px;
+  height: 58px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  margin-bottom: 18px;
+
+  border-radius: 18px;
+
+  background: #e9f7f5;
+
+  color: #0d8177;
+
+  font-size: 1.4rem;
+  font-weight: 800;
+}
+
+
+.estado-pagina h3 {
+  margin: 0 0 7px;
+
+  color: #102a3a;
+
+  font-size: 1.15rem;
+}
+
+
+.estado-pagina p {
+  max-width: 480px;
+
+  margin: 0;
+
+  color: #718096;
+
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+
+.estado-pagina.error .estado-icono {
+  background: #fff0ef;
+  color: #c2413b;
+}
+
+
+.spinner {
+  width: 38px;
+  height: 38px;
+
+  margin-bottom: 20px;
+
+  border: 3px solid #dcefed;
+  border-top-color: #0d8b81;
+
+  border-radius: 50%;
+
+  animation: girar 0.8s linear infinite;
+}
+
+
+@keyframes girar {
+
+  to {
+    transform: rotate(360deg);
+  }
+
+}
+
+
+/* =========================================================
+   BOTONES
+   ========================================================= */
+
+.btn-principal {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 8px;
+
+  margin-top: 22px;
+
+  padding: 11px 20px;
+
+  border: none;
+  border-radius: 999px;
+
+  background: #0d8b81;
+
+  color: #ffffff;
+
+  font-family: inherit;
+
+  font-size: 0.88rem;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+
+
+.btn-principal:hover {
+  background: #096e66;
+
+  transform: translateY(-1px);
+}
+
+
+.btn-principal span {
+  font-size: 1rem;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 950px) {
+
+  .estadisticas {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
+}
+
+
+@media (max-width: 700px) {
+
+  .mis-postulaciones {
+    width: min(100% - 28px, 600px);
+
+    padding-top: 40px;
+    padding-bottom: 60px;
+  }
+
+
+  .hero h1 {
+    font-size: 2.25rem;
+  }
+
+
+  .hero p {
+    font-size: 0.95rem;
+  }
+
+
+  .estadisticas {
+    grid-template-columns: 1fr;
+
+    margin-bottom: 42px;
+  }
+
+
+  .titulo-seccion {
+    align-items: flex-start;
+  }
+
+
+  .datos-postulacion {
+    grid-template-columns: 1fr;
+  }
+
+
+  .card-cabecera {
+    padding: 18px 18px 0;
+  }
+
+
+  .card-contenido {
+    padding: 18px;
+  }
+
+
+  .card-pie {
+    padding: 14px 18px;
+  }
+
+}
+
+
+@media (max-width: 480px) {
+
+  .hero-badge {
+    font-size: 0.75rem;
+  }
+
+
+  .hero h1 {
+    font-size: 2rem;
+  }
+
+
+  .card-cabecera {
+    align-items: flex-start;
+
+    gap: 12px;
+  }
+
+
+  .estado {
+    white-space: nowrap;
+  }
+
+
+  .card-contenido h3 {
+    font-size: 1.1rem;
+  }
+
+}
