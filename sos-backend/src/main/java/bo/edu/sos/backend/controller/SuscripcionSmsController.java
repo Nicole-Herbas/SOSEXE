@@ -12,32 +12,21 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 /**
- * Controlador REST para la suscripción a alertas SMS (SOS-63).
- *
- * Todos los endpoints requieren autenticación JWT.
- * La ruta base se define en ApiRoutes.SUSCRIPCION_SMS.
+ * Endpoints autenticados para administrar la suscripción a alertas SMS.
  */
 @RestController
-@RequestMapping(ApiRoutes.SUSCRIPCION_SMS)
 public class SuscripcionSmsController {
 
     private final SuscripcionSmsService suscripcionService;
-
 
     public SuscripcionSmsController(SuscripcionSmsService suscripcionService) {
         this.suscripcionService = suscripcionService;
     }
 
-
     /**
-     * Crea o actualiza la suscripción SMS del usuario autenticado.
-     *
-     * Si el usuario ya tenía una suscripción (activa o cancelada), se actualiza
-     * y reactiva. Si es la primera vez, se crea.
-     *
-     * POST /api/suscripcion-sms
+     * Crea o actualiza y reactiva la suscripción del usuario autenticado.
      */
-    @PostMapping
+    @PostMapping(ApiRoutes.SUSCRIPCION_SMS)
     public ResponseEntity<ApiResponse<SuscripcionSmsDTO>> suscribir(
             @Valid @RequestBody SuscripcionSmsDTO dto,
             Authentication authentication) {
@@ -49,81 +38,81 @@ public class SuscripcionSmsController {
         );
 
         SuscripcionSmsDTO resultado =
-                suscripcionService.suscribir(
-                        authentication.getName(),
-                        dto
-                );
+                suscripcionService.suscribir(authentication.getName(), dto);
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(ApiResponse.created(resultado));
     }
 
+    /**
+     * Mantiene el prefijo plural publicado por SOS-69.
+     */
+    @PostMapping(ApiRoutes.SUSCRIPCIONES_SMS)
+    public ResponseEntity<ApiResponse<SuscripcionSmsDTO>> suscribirCompatibilidad(
+            @Valid @RequestBody SuscripcionSmsDTO dto,
+            Authentication authentication) {
+
+        SuscripcionSmsDTO resultado =
+                suscripcionService.suscribir(authentication.getName(), dto);
+
+        return ResponseEntity.ok(
+                ApiResponse.ok("Suscripción SMS registrada", resultado)
+        );
+    }
 
     /**
-     * Obtiene la suscripción SMS del usuario autenticado.
-     *
-     * GET /api/suscripcion-sms/me
+     * Obtiene los datos de la suscripción del usuario autenticado.
      */
-    @GetMapping("/me")
+    @GetMapping({
+            ApiRoutes.SUSCRIPCION_SMS + "/me",
+            ApiRoutes.SUSCRIPCIONES_SMS + "/mia"
+    })
     public ResponseEntity<ApiResponse<SuscripcionSmsDTO>> obtenerMiSuscripcion(
             Authentication authentication) {
 
         LogHelper.debug(
                 SuscripcionSmsController.class,
-                "Peticion GET suscripcion-sms/me recibida. usuario={}",
+                "Peticion GET de suscripcion SMS recibida. usuario={}",
                 authentication.getName()
         );
 
-        SuscripcionSmsDTO dto =
-                suscripcionService.obtenerSuscripcion(
-                        authentication.getName()
-                );
-
         return ResponseEntity.ok(
-                ApiResponse.ok(dto)
+                ApiResponse.ok(
+                        suscripcionService.obtenerSuscripcion(authentication.getName())
+                )
         );
     }
 
-
     /**
-     * Verifica si el usuario autenticado tiene alguna suscripción registrada.
-     *
-     * GET /api/suscripcion-sms/me/existe
+     * Indica si el usuario autenticado tiene una suscripción registrada.
      */
-    @GetMapping("/me/existe")
+    @GetMapping({
+            ApiRoutes.SUSCRIPCION_SMS + "/me/existe",
+            ApiRoutes.SUSCRIPCIONES_SMS + "/me/existe"
+    })
     public ResponseEntity<ApiResponse<Boolean>> existeMiSuscripcion(
             Authentication authentication) {
 
-        LogHelper.debug(
-                SuscripcionSmsController.class,
-                "Peticion GET suscripcion-sms/me/existe recibida. usuario={}",
-                authentication.getName()
-        );
-
         boolean existe =
-                suscripcionService.existeSuscripcion(
-                        authentication.getName()
-                );
+                suscripcionService.existeSuscripcion(authentication.getName());
 
-        return ResponseEntity.ok(
-                ApiResponse.ok(existe)
-        );
+        return ResponseEntity.ok(ApiResponse.ok(existe));
     }
 
-
     /**
-     * Cancela la suscripción SMS del usuario autenticado (SOS-64).
-     *
-     * DELETE /api/suscripcion-sms/me
+     * Cancela sin borrar el registro, para conservar el historial de consentimiento.
      */
-    @DeleteMapping("/me")
+    @DeleteMapping({
+            ApiRoutes.SUSCRIPCION_SMS + "/me",
+            ApiRoutes.SUSCRIPCIONES_SMS + "/mia"
+    })
     public ResponseEntity<ApiResponse<Void>> cancelarMiSuscripcion(
             Authentication authentication) {
 
         LogHelper.debug(
                 SuscripcionSmsController.class,
-                "Peticion DELETE suscripcion-sms/me recibida. usuario={}",
+                "Peticion DELETE de suscripcion SMS recibida. usuario={}",
                 authentication.getName()
         );
 
@@ -131,6 +120,27 @@ public class SuscripcionSmsController {
 
         return ResponseEntity.ok(
                 ApiResponse.ok("Suscripción SMS cancelada exitosamente", null)
+        );
+    }
+
+    /**
+     * Mantiene el endpoint de cambio de estado publicado por SOS-69.
+     */
+    @PatchMapping({
+            ApiRoutes.SUSCRIPCION_SMS + "/estado",
+            ApiRoutes.SUSCRIPCIONES_SMS + "/estado"
+    })
+    public ResponseEntity<ApiResponse<SuscripcionSmsDTO>> cambiarEstado(
+            @RequestParam boolean activa,
+            Authentication authentication) {
+
+        SuscripcionSmsDTO actualizada = suscripcionService.cambiarEstado(
+                activa,
+                authentication.getName()
+        );
+
+        return ResponseEntity.ok(
+                ApiResponse.ok("Estado de suscripción actualizado", actualizada)
         );
     }
 }

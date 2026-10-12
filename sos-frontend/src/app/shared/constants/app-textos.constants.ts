@@ -826,10 +826,179 @@ voluntariado: {
 
 },
 
-acercaDe: {
-  mensaje:
-    'acerca-de works!',
-},
+  registrarPunto: {
+    etiqueta: 'SOS.EXE · REGISTRO CIUDADANO',
+    titulo: 'Registrar un punto de ayuda',
+    descripcion: 'Comparte la información de un lugar que puede ayudar a la comunidad.',
+    descripcionFormulario:
+      'Completa la información del lugar que estás registrando. Tu punto será revisado antes de aparecer en el mapa público.',
+
+    secciones: {
+      informacion: 'Información del punto',
+      ubicacion: 'Ubicación',
+      necesidades: 'Necesidades / Servicios',
+      necesidadesDonacion: 'Necesidades prioritarias',
+      necesidadesEmergencia: 'Necesidades urgentes',
+      contacto: 'Contacto'
+    },
+
+    campos: {
+      tipo: 'Tipo de punto',
+      tipoAyuda: 'Selecciona cómo ayuda este lugar a la comunidad.',
+      nombre: 'Nombre del punto',
+      nombrePlaceholder: 'Ej. Punto solidario Cochabamba',
+      nombreEmergencia: 'Título de la emergencia',
+      nombreEmergenciaPlaceholder: 'Ej. Incendio forestal en Tarija',
+      descripcion: 'Descripción',
+      descripcionPlaceholder: '¿Qué ayuda ofrece este punto o qué necesita recibir?',
+      descripcionEmergencia: 'Descripción de la situación',
+      descripcionEmergenciaPlaceholder: 'Describe qué está ocurriendo y las zonas afectadas...',
+      departamento: 'Departamento',
+      seleccionarDepartamento: 'Selecciona un departamento',
+      ciudad: 'Ciudad o municipio',
+      ciudadPlaceholder: 'Ej. Cochabamba',
+      direccion: 'Dirección referencial',
+      direccionPlaceholder: 'Ej. Av. 6 de Agosto, entre calles...',
+      mapa: 'Selecciona la ubicación exacta haciendo clic en el mapa.',
+      mapaAria: 'Mapa interactivo para seleccionar la ubicación del punto de ayuda',
+      mapaInstruccion: 'Haz clic sobre el mapa para fijar el punto.',
+      usarMiUbicacion: 'Usar mi ubicación',
+      ubicacionSeleccionada: 'Ubicación seleccionada',
+      latitud: 'Latitud',
+      longitud: 'Longitud',
+      necesidades: 'Marca los artículos o servicios relacionados con el punto.',
+      necesidadesDonacion: 'Selecciona los artículos más urgentes para este lugar.',
+      necesidadesEmergencia: 'Selecciona los recursos urgentes para atender la emergencia.',
+      donacionesAceptadas: 'Donaciones que acepta',
+      donacionesAceptadasAyuda: 'Selecciona qué artículos se pueden entregar en este punto.',
+      horarioAtencion: 'Días y horario de atención',
+      horarioPlaceholder: 'Ej. Lun-Vie, 09:00–17:00',
+      claseEmergencia: 'Tipo de emergencia',
+      seleccionarClaseEmergencia: 'Selecciona la emergencia',
+      fechaEmergencia: 'Fecha y hora aproximada de inicio',
+      estadoEmergencia: 'Estado informado',
+      estadoEmergenciaInicial: 'Activa (pendiente de verificación)',
+      caracteresGuardados: 'caracteres en la descripción guardada',
+      prefijoHorario: 'Horario',
+      prefijoDonacionesAceptadas: 'Donaciones aceptadas',
+      prefijoTipoEmergencia: 'Tipo de emergencia',
+      prefijoFechaEmergencia: 'Inicio reportado',
+      prefijoEstadoEmergencia: 'Estado',
+      cargandoCatalogos: 'Cargando necesidades y departamentos...',
+      contactoAyuda: 'Estos datos serán utilizados para coordinar la revisión del punto.',
+      nombreContacto: 'Nombre de contacto',
+      contactoPlaceholder: 'Ej. Juan Pérez',
+      telefono: 'Teléfono / WhatsApp',
+      telefonoPlaceholder: 'Ej. +59171234567',
+      correo: 'Correo electrónico (opcional)',
+      correoPlaceholder: 'Ej. contacto@ejemplo.com',
+      informacionAdicional: 'Información adicional (opcional)',
+      informacionAdicionalPlaceholder: 'Indicaciones de acceso, restricciones, observaciones...',
+      informacionAdicionalAyuda: 'Los datos del punto se guardarán juntos en la descripción (máximo 500 caracteres en total).',
+      prefijoInformacionAdicional: 'Información adicional'
+    },
+
+    tipos: [
+      {
+        valor: 'PUNTO_DONACION',
+        nombre: 'Punto de donación',
+        detalle: 'Recibir donaciones',
+        icono: 'donacion'
+      },
+      {
+        valor: 'EMERGENCIA',
+        nombre: 'Punto de emergencia',
+        detalle: 'Reportar una emergencia',
+        icono: 'emergencia'
+      }
+    ],
+
+    clasesEmergencia: [
+      { valor: 'INCENDIO', nombre: 'Incendio forestal o urbano' },
+      { valor: 'INUNDACION', nombre: 'Inundación' },
+      { valor: 'DESLIZAMIENTO', nombre: 'Deslizamiento' },
+      { valor: 'SEQUIA', nombre: 'Sequía' },
+      { valor: 'TERREMOTO', nombre: 'Terremoto' },
+      { valor: 'OTRA', nombre: 'Otra emergencia' }
+    ],
+
+    avisoTitulo: 'Revisión antes de publicar.',
+    aviso:
+      'Tu punto quedará pendiente de verificación. No aparecerá en el mapa público hasta ser aprobado.',
+
+    botones: {
+      registrar: 'Registrar punto de ayuda',
+      registrando: 'Registrando...',
+      volver: 'Volver a Acerca de',
+      misPuntos: 'Mis puntos de ayuda',
+      verMisPuntos: 'Ver mis puntos',
+      nuevoPunto: 'Registrar nuevo punto',
+      registrarOtro: 'Registrar otro punto',
+      primerPunto: 'Registrar mi primer punto',
+      reintentar: 'Reintentar',
+      ocultarDetalles: 'Ocultar detalles',
+      verDetalles: 'Ver detalles'
+    },
+
+    exito: {
+      tituloCabecera: 'Registro recibido',
+      subtitulo: 'Tu solicitud está en proceso de verificación.',
+      titulo: '¡Tu punto fue registrado!',
+      antesNombre: 'Hemos recibido la información de',
+      despuesNombre: 'correctamente. Será revisada por el equipo de SOS.EXE.',
+      estadoActual: 'Estado actual',
+      estado: 'Pendiente de verificación',
+      descripcion: 'Tu punto estará visible una vez sea aprobado por un administrador.'
+    },
+
+    estados: {
+      PENDIENTE: 'Pendiente',
+      VERIFICADO: 'Verificado',
+      RECHAZADO: 'Rechazado'
+    },
+
+    misPuntos: {
+      titulo: 'Mis puntos de ayuda',
+      descripcion: 'Estos son los puntos que has registrado y su estado actual.',
+      cargando: 'Cargando tus puntos de ayuda...',
+      vacioTitulo: 'Todavía no registraste puntos de ayuda',
+      vacioDescripcion: 'Cuando registres uno, podrás revisar aquí su estado de verificación.',
+      sinNecesidades: 'Sin necesidades indicadas',
+      direccion: 'Dirección:',
+      descripcionEtiqueta: 'Descripción:',
+      estado: 'Estado:',
+      contacto: 'Contacto:',
+      telefono: 'Teléfono:',
+      correo: 'Correo:'
+    },
+
+    etiquetas: {
+      tipoDesconocido: 'Tipo de punto no disponible'
+    },
+
+    errores: {
+      departamentos: 'No hay departamentos disponibles para registrar el punto.',
+      necesidades: 'No hay necesidades disponibles para registrar el punto.',
+      catalogos: 'No se pudieron cargar los catálogos. Vuelve a intentarlo.',
+      datos: 'Revisa los datos ingresados.',
+      registro: 'No se pudo registrar el punto. Inténtalo nuevamente.',
+      formulario: 'Completa los campos obligatorios y selecciona una ubicación.',
+      misPuntos: 'No pudimos cargar tus puntos. Inténtalo nuevamente.',
+      geolocalizacionNoDisponible: 'Tu navegador no permite obtener la ubicación.',
+      geolocalizacionDenegada: 'No se pudo obtener tu ubicación. Selecciona un punto en el mapa.'
+    }
+  },
+
+  acercaDe: {
+    mensaje: 'acerca-de works!',
+
+    registrarPunto: {
+      titulo: 'Puntos de ayuda',
+      descripcion:
+        'Registra un lugar donde se puedan recibir donaciones o brindar ayuda a la comunidad.',
+      boton: 'Registrar punto de ayuda →'
+    }
+  },
 
 registro: {
   logo: 'Tu cuenta SOS.exe',
@@ -921,6 +1090,8 @@ preferencias: {
   errorTelefono: 'Ingresa un número de teléfono válido (7 a 15 dígitos).',
   errorRegion: 'Debes seleccionar un departamento.',
   cargandoDepartamentos: 'Cargando departamentos...',
+  errorCargaDepartamentos:
+    'No se pudieron cargar los departamentos. Intenta recargar la página.',
   cargandoEstado: 'Cargando información de suscripción...',
   suscripcionActiva: 'Tu suscripción SMS está activa',
   botonCancelar: 'Cancelar suscripción SMS',

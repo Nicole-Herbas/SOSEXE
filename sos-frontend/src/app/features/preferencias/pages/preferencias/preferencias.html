@@ -1,7 +1,5 @@
 <div class="preferencias-container">
-
   <div class="preferencias-card">
-
     <header class="preferencias-header">
       <div class="preferencias-badge">
         <span class="badge-icon">⚙</span>
@@ -16,9 +14,7 @@
         <p>{{ textos.cargandoEstado }}</p>
       </div>
     } @else {
-
       <section class="sms-section">
-
         <div class="sms-header">
           <div class="sms-icon-wrapper">
             <span class="sms-icon">📱</span>
@@ -43,11 +39,15 @@
           </div>
         }
 
-        <!-- Vista cuando hay suscripción activa (SOS-64) -->
+        @if (errorDepartamentos()) {
+          <div class="alert alert-error" role="alert">
+            <span class="alert-icon">⚠</span>
+            <span>{{ errorDepartamentos() }}</span>
+          </div>
+        }
+
         @if (tieneSuscripcionActiva) {
-
           <div class="suscripcion-activa-card">
-
             <div class="activa-card-top">
               <div class="activa-badge">
                 <span class="dot-indicator"></span>
@@ -61,14 +61,12 @@
                 <span class="dato-label">{{ textos.labelTelefono }}</span>
                 <span class="dato-valor">📞 {{ suscripcionActual()?.telefono }}</span>
               </div>
-
               <div class="dato-item">
                 <span class="dato-label">{{ textos.labelRegion }}</span>
                 <span class="dato-valor">📍 {{ suscripcionActual()?.departamentoNombre }}</span>
               </div>
             </div>
 
-            <!-- Diálogo de confirmación de cancelación -->
             @if (confirmandoCancelacion()) {
               <div class="confirmacion-box">
                 <h3 class="confirmacion-titulo">{{ textos.modalConfirmarTitulo }}</h3>
@@ -88,7 +86,6 @@
                       <span>{{ textos.modalConfirmarBoton }}</span>
                     }
                   </button>
-
                   <button
                     type="button"
                     class="btn-secondary"
@@ -110,15 +107,9 @@
                 </button>
               </div>
             }
-
           </div>
-
         } @else {
-
-          <!-- Formulario de suscripción o reactivación (SOS-63) -->
           <form [formGroup]="formulario" (ngSubmit)="guardar()" class="sms-form">
-
-            <!-- Campo Teléfono -->
             <div class="form-group" [class.has-error]="telefonoInvalido">
               <label for="telefono-sms" class="form-label">
                 {{ textos.labelTelefono }} <span class="required">*</span>
@@ -139,7 +130,6 @@
               }
             </div>
 
-            <!-- Campo Región / Departamento -->
             <div class="form-group" [class.has-error]="departamentoInvalido">
               <label for="departamento-sms" class="form-label">
                 {{ textos.labelRegion }} <span class="required">*</span>
@@ -151,8 +141,12 @@
                   formControlName="departamentoId"
                   class="form-control select-control"
                 >
-                  <option [ngValue]="null" disabled selected>
-                    {{ textos.placeholderRegion }}
+                  <option [ngValue]="null" disabled>
+                    @if (cargandoDepartamentos()) {
+                      {{ textos.cargandoDepartamentos }}
+                    } @else {
+                      {{ textos.placeholderRegion }}
+                    }
                   </option>
                   @for (dpto of departamentos; track dpto.id) {
                     <option [ngValue]="dpto.id">{{ dpto.nombre }}</option>
@@ -164,7 +158,6 @@
               }
             </div>
 
-            <!-- Consentimiento explícito -->
             <div class="consentimiento-group" [class.has-error]="consentimientoInvalido">
               <label class="checkbox-container">
                 <input
@@ -173,18 +166,15 @@
                   id="consentimiento-sms"
                 />
                 <span class="checkbox-checkmark"></span>
-                <span class="checkbox-label">
-                  {{ textos.labelConsentimiento }}
-                </span>
+                <span class="checkbox-label">{{ textos.labelConsentimiento }}</span>
               </label>
             </div>
 
-            <!-- Botón de acción -->
             <div class="form-actions">
               <button
                 type="submit"
                 class="btn-submit"
-                [disabled]="formulario.invalid || guardando()"
+                [disabled]="formulario.invalid || guardando() || cargandoDepartamentos() || !!errorDepartamentos()"
               >
                 @if (guardando()) {
                   <span class="btn-spinner"></span>
@@ -194,15 +184,9 @@
                 }
               </button>
             </div>
-
           </form>
-
         }
-
       </section>
-
     }
-
   </div>
-
 </div>

@@ -104,6 +104,12 @@ public class SecurityConfig {
                         "/error"
                 ).permitAll()
 
+                                // Los puntos del usuario son privados
+                                .requestMatchers(
+                                        HttpMethod.GET,
+                                        ApiRoutes.PUNTOS_AYUDA + "/mios"
+                                ).authenticated()
+
 
                         // Datos públicos de lectura
                         .requestMatchers(
@@ -115,7 +121,8 @@ public class SecurityConfig {
                                 ApiRoutes.VOLUNTARIADOS + "/**",
                                 ApiRoutes.MAPA + "/**",
                                 ApiRoutes.DEPARTAMENTOS,
-                                ApiRoutes.DEPARTAMENTOS + "/**"
+                                ApiRoutes.DEPARTAMENTOS + "/**",
+                                ApiRoutes.NECESIDADES
                         ).permitAll()
 
                         // ── SOS-41: solicitudes de registro de centro ──
@@ -132,6 +139,13 @@ public class SecurityConfig {
                                 ApiRoutes.SOLICITUDES_CENTRO + "/**"
                         ).hasAuthority(Roles.ADMIN)
 
+                        // ── SOS-68: dashboard administrativo -> solo ADMIN ──
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                ApiRoutes.ADMIN_DASHBOARD
+                        ).hasAuthority(Roles.ADMIN)
+
+
                         // Usuario autenticado
                         .requestMatchers(
                                 ApiRoutes.AUTH_ME
@@ -142,7 +156,8 @@ public class SecurityConfig {
                         .requestMatchers(
                                 HttpMethod.POST,
                                 ApiRoutes.DONACIONES,
-                                ApiRoutes.POSTULACIONES
+                                ApiRoutes.POSTULACIONES,
+                                ApiRoutes.PUNTOS_AYUDA
                         ).authenticated()
 
 
@@ -233,9 +248,10 @@ public class SecurityConfig {
                                 ApiRoutes.PERFIL_VOLUNTARIO + "/**"
                         ).authenticated()
 
-                        // ── SOS-63: suscripción SMS (autenticado) ──
+                        // ── Suscripciones SMS (autenticado) ──
                         .requestMatchers(
-                                ApiRoutes.SUSCRIPCION_SMS + "/**"
+                                ApiRoutes.SUSCRIPCION_SMS + "/**",
+                                ApiRoutes.SUSCRIPCIONES_SMS + "/**"
                         ).authenticated()
 
                         // Cualquier otro endpoint de API necesita autenticación

@@ -1,10 +1,17 @@
+import { HttpClient } from '@angular/common/http';
 import { Component, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  FormBuilder,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators
+} from '@angular/forms';
 
 import { SuscripcionSmsService } from '../../services/suscripcion-sms.service';
 import { SuscripcionSms } from '../../models/suscripcion-sms.model';
 import { APP_TEXTOS } from '../../../../shared/constants/app-textos.constants';
+import { ApiResponse } from '../../../../shared/models/api-response';
 
 interface Departamento {
   id: number;
@@ -20,26 +27,17 @@ interface Departamento {
 })
 export class PreferenciasComponent implements OnInit {
 
-  private fb = inject(FormBuilder);
-  private suscripcionService = inject(SuscripcionSmsService);
+  private readonly fb = inject(FormBuilder);
+  private readonly http = inject(HttpClient);
+  private readonly suscripcionService = inject(SuscripcionSmsService);
 
   readonly textos = APP_TEXTOS.preferencias;
-
-  readonly departamentos: Departamento[] = [
-    { id: 1, nombre: 'Chuquisaca' },
-    { id: 2, nombre: 'La Paz' },
-    { id: 3, nombre: 'Cochabamba' },
-    { id: 4, nombre: 'Oruro' },
-    { id: 5, nombre: 'Potosí' },
-    { id: 6, nombre: 'Tarija' },
-    { id: 7, nombre: 'Santa Cruz' },
-    { id: 8, nombre: 'Beni' },
-    { id: 9, nombre: 'Pando' }
-  ];
-
+  departamentos: Departamento[] = [];
   formulario!: FormGroup;
 
   cargando = signal<boolean>(true);
+  cargandoDepartamentos = signal<boolean>(true);
+  errorDepartamentos = signal<string | null>(null);
   guardando = signal<boolean>(false);
   cancelando = signal<boolean>(false);
   confirmandoCancelacion = signal<boolean>(false);
@@ -50,6 +48,7 @@ export class PreferenciasComponent implements OnInit {
 
   ngOnInit(): void {
     this.inicializarFormulario();
+    this.cargarDepartamentos();
     this.cargarSuscripcion();
   }
 
@@ -62,9 +61,29 @@ export class PreferenciasComponent implements OnInit {
           Validators.pattern(/^\+?[0-9]{7,15}$/)
         ]
       ],
-      departamentoId: [null, [Validators.required]],
-      // Consentimiento explícito: sin marcar por defecto y requerido para enviar
+      departamentoId: [{ value: null, disabled: true }, [Validators.required]],
       consentimiento: [false, [Validators.requiredTrue]]
+    });
+  }
+
+  private cargarDepartamentos(): void {
+    this.http.get<ApiResponse<Departamento[]>>('/api/departamentos').subscribe({
+      next: (respuesta) => {
+        this.departamentos = respuesta.data ?? [];
+        this.cargandoDepartamentos.set(false);
+
+        if (this.departamentos.length === 0) {
+          this.errorDepartamentos.set(this.textos.errorCargaDepartamentos);
+          return;
+        }
+
+        this.formulario.get('departamentoId')?.enable();
+      },
+      error: (error: unknown) => {
+        console.error('Error al cargar departamentos:', error);
+        this.cargandoDepartamentos.set(false);
+        this.errorDepartamentos.set(this.textos.errorCargaDepartamentos);
+      }
     });
   }
 
@@ -82,15 +101,17 @@ export class PreferenciasComponent implements OnInit {
           });
         }
       },
-      error: () => {
-        // No tiene suscripción previa, permitimos suscripción nueva
+      error: (error) => {
         this.cargando.set(false);
+        if (error.status !== 404) {
+          this.mensajeError.set(error?.error?.mensaje || this.textos.errorGenerico);
+        }
       }
     });
   }
 
   guardar(): void {
-    if (this.formulario.invalid) {
+    if (this.formulario.invalid || this.departamentos.length === 0) {
       this.formulario.markAllAsTouched();
       return;
     }
@@ -113,9 +134,9 @@ export class PreferenciasComponent implements OnInit {
           this.suscripcionActual.set(res.data);
         }
       },
-      error: (err) => {
+      error: (error) => {
         this.guardando.set(false);
-        this.mensajeError.set(err?.error?.mensaje || this.textos.errorGenerico);
+        this.mensajeError.set(error?.error?.mensaje || this.textos.errorGenerico);
       }
     });
   }
@@ -139,21 +160,20 @@ export class PreferenciasComponent implements OnInit {
         this.cancelando.set(false);
         this.confirmandoCancelacion.set(false);
         this.mensajeExito.set(this.textos.confirmacionCancelacion);
-        // Desactiva el registro actual y asegura que el checkbox esté desmarcado
-        this.suscripcionActual.update(actual => actual ? { ...actual, activa: false } : null);
+        this.suscripcionActual.update(actual =>
+          actual ? { ...actual, activa: false } : null
+        );
         this.formulario.patchValue({ consentimiento: false });
       },
-      error: (err) => {
+      error: (error) => {
         this.cancelando.set(false);
-        this.confirmandoCancelacion.set(false);
-        this.mensajeError.set(err?.error?.mensaje || this.textos.errorGenerico);
+        this.mensajeError.set(error?.error?.mensaje || this.textos.errorGenerico);
       }
     });
   }
 
   get tieneSuscripcionActiva(): boolean {
-    const sub = this.suscripcionActual();
-    return !!(sub && sub.activa);
+    return !!this.suscripcionActual()?.activa;
   }
 
   get telefonoInvalido(): boolean {

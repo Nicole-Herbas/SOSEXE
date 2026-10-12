@@ -34,7 +34,6 @@ export class SuscripcionSmsService {
       `${this.apiUrl}/me/existe`
     );
   }
-
   cancelar(): Observable<ApiResponse<void>> {
     return this.http.delete<ApiResponse<void>>(
       `${this.apiUrl}/me`
