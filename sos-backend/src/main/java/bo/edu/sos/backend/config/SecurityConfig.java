@@ -19,7 +19,8 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import java.util.List;
 import bo.edu.sos.backend.helper.LogHelper;
-
+import org.springframework.beans.factory.annotation.Value;
+import java.util.Arrays;
 
 @Configuration
 @EnableWebSecurity
@@ -42,11 +43,16 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
     @Bean
-        public CorsConfigurationSource corsConfigurationSource() {
+    public CorsConfigurationSource corsConfigurationSource(
+            @Value("${CORS_ALLOWED_ORIGINS:http://localhost:4200}")
+            String origins) {
+
         CorsConfiguration configuration = new CorsConfiguration();
 
         configuration.setAllowedOrigins(
-                List.of("http://localhost:4200")
+                Arrays.stream(origins.split(","))
+                        .map(String::trim)
+                        .toList()
         );
 
         configuration.setAllowedMethods(
