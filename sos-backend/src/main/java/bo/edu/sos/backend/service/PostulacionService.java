@@ -84,7 +84,7 @@ public class PostulacionService {
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "Voluntariado", voluntariadoId));
 
-        boolean esAdmin = "ADMIN".equals(usuario.getRol().getNombre());
+        boolean esAdmin = Roles.ADMIN.equals(usuario.getRol().getNombre());
         boolean esResponsable = voluntariado.getCentro().getResponsable() != null
                 && voluntariado.getCentro().getResponsable().getId()
                         .equals(usuario.getId());
@@ -145,7 +145,7 @@ public class PostulacionService {
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "No existe un usuario con email: " + emailAutenticado));
 
-        boolean esAdmin = "ADMIN".equals(usuario.getRol().getNombre());
+        boolean esAdmin = Roles.ADMIN.equals(usuario.getRol().getNombre());
         boolean esResponsable = postulacion.getVoluntariado()
                 .getCentro().getResponsable() != null
                 && postulacion.getVoluntariado().getCentro()
