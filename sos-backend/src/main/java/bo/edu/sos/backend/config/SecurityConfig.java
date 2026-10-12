@@ -105,6 +105,13 @@ public class SecurityConfig {
                 ).permitAll()
 
 
+                        // ── SOS-65 E2: listado administrativo de puntos — solo ADMIN ──
+                        // IMPORTANTE: va antes del GET público de puntos.
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                ApiRoutes.PUNTOS_AYUDA + "/admin"
+                        ).hasAuthority(Roles.ADMIN)
+
                         // Datos públicos de lectura
                         .requestMatchers(
                                 HttpMethod.GET,
@@ -187,6 +194,13 @@ public class SecurityConfig {
                                 ApiRoutes.CENTROS + "/**",
                                 ApiRoutes.NOTICIAS + "/**",
                                 ApiRoutes.ALERTAS + "/**",
+                                ApiRoutes.PUNTOS_AYUDA + "/**"
+                        ).hasAuthority(Roles.ADMIN)
+
+
+                        // ── SOS-65 E1: cambiar estado de punto de ayuda — solo ADMIN ──
+                        .requestMatchers(
+                                HttpMethod.PATCH,
                                 ApiRoutes.PUNTOS_AYUDA + "/**"
                         ).hasAuthority(Roles.ADMIN)
 

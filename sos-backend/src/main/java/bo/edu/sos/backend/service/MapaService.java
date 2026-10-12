@@ -1,6 +1,7 @@
 package bo.edu.sos.backend.service;
 
 import bo.edu.sos.backend.constants.MapaConstants;
+import bo.edu.sos.backend.constants.EstadoVerificacion;
 import bo.edu.sos.backend.dto.PuntoMapaDTO;
 import bo.edu.sos.backend.entity.Centro;
 import bo.edu.sos.backend.entity.Necesidad;
@@ -10,6 +11,7 @@ import bo.edu.sos.backend.exception.ResourceNotFoundException;
 import bo.edu.sos.backend.helper.LogHelper;
 import bo.edu.sos.backend.repository.CentroRepository;
 import bo.edu.sos.backend.repository.PuntoAyudaRepository;
+
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -70,8 +72,10 @@ public class MapaService {
                 );
 
 
-        puntoAyudaRepository
-                .findAll()
+                puntoAyudaRepository
+                .findByEstadoVerificacion(
+                        EstadoVerificacion.VERIFICADO
+                )
                 .forEach(punto ->
                         puntos.add(
                                 convertirPuntoAyuda(

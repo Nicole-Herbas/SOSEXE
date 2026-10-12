@@ -1,12 +1,12 @@
 package bo.edu.sos.backend.service;
 
-import bo.edu.sos.backend.exception.BadRequestException;
 import bo.edu.sos.backend.constants.EstadoVerificacion;
 import bo.edu.sos.backend.dto.PuntoAyudaDTO;
 import bo.edu.sos.backend.entity.Departamento;
 import bo.edu.sos.backend.entity.Necesidad;
 import bo.edu.sos.backend.entity.PuntoAyuda;
 import bo.edu.sos.backend.entity.Usuario;
+import bo.edu.sos.backend.exception.BadRequestException;
 import bo.edu.sos.backend.exception.ResourceNotFoundException;
 import bo.edu.sos.backend.helper.LogHelper;
 import bo.edu.sos.backend.repository.DepartamentoRepository;
@@ -45,7 +45,31 @@ public class PuntoAyudaService {
 
 
     @Transactional(readOnly = true)
-    public List<PuntoAyudaDTO> listarTodos() {
+    public List<PuntoAyudaDTO> listarPublicos() {
+
+        List<PuntoAyudaDTO> puntos =
+                puntoAyudaRepository
+                        .findByEstadoVerificacion(
+                                EstadoVerificacion.VERIFICADO
+                        )
+                        .stream()
+                        .map(this::convertirADTO)
+                        .toList();
+
+
+        LogHelper.debug(
+                PuntoAyudaService.class,
+                "Listado público de puntos de ayuda obtenido. cantidad={}",
+                puntos.size()
+        );
+
+
+        return puntos;
+    }
+
+
+    @Transactional(readOnly = true)
+    public List<PuntoAyudaDTO> listarTodosAdmin() {
 
         List<PuntoAyudaDTO> puntos =
                 puntoAyudaRepository
@@ -57,7 +81,7 @@ public class PuntoAyudaService {
 
         LogHelper.debug(
                 PuntoAyudaService.class,
-                "Listado de puntos de ayuda obtenido. cantidad={}",
+                "Listado administrativo de puntos de ayuda obtenido. cantidad={}",
                 puntos.size()
         );
 
@@ -104,6 +128,11 @@ public class PuntoAyudaService {
                                 departamentoId
                         )
                         .stream()
+                        .filter(punto ->
+                                EstadoVerificacion.VERIFICADO.equals(
+                                        punto.getEstadoVerificacion()
+                                )
+                        )
                         .map(this::convertirADTO)
                         .toList();
 
@@ -201,31 +230,6 @@ public class PuntoAyudaService {
 
 
     @Transactional
-    public void eliminar(
-            Long id) {
-
-        if (!puntoAyudaRepository.existsById(id)) {
-
-            throw new ResourceNotFoundException(
-                    "Punto de ayuda",
-                    id
-            );
-        }
-
-
-        puntoAyudaRepository.deleteById(
-                id
-        );
-
-
-        LogHelper.info(
-                PuntoAyudaService.class,
-                "Punto de ayuda eliminado correctamente. id={}",
-                id
-        );
-    }
-
-    @Transactional
     public PuntoAyudaDTO cambiarEstado(
             Long id,
             String nuevoEstado) {
@@ -255,6 +259,33 @@ public class PuntoAyudaService {
 
         return convertirADTO(actualizado);
     }
+
+
+    @Transactional
+    public void eliminar(
+            Long id) {
+
+        if (!puntoAyudaRepository.existsById(id)) {
+
+            throw new ResourceNotFoundException(
+                    "Punto de ayuda",
+                    id
+            );
+        }
+
+
+        puntoAyudaRepository.deleteById(
+                id
+        );
+
+
+        LogHelper.info(
+                PuntoAyudaService.class,
+                "Punto de ayuda eliminado correctamente. id={}",
+                id
+        );
+    }
+
 
     private void copiarDTOaEntidad(
             PuntoAyudaDTO dto,

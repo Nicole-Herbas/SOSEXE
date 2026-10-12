@@ -87,13 +87,13 @@ class MapaServiceTest {
         punto.setDepartamento(laPaz);
         punto.setLatitud(new BigDecimal("-16.5100000"));
         punto.setLongitud(new BigDecimal("-68.1600000"));
-        punto.setEstadoVerificacion("PENDIENTE");
+        punto.setEstadoVerificacion("VERIFICADO");
         punto.setCreador(creador);
         punto.setNecesidades(Set.of(agua));
 
         when(centroRepository.findAll())
                 .thenReturn(List.of(centro));
-        when(puntoAyudaRepository.findAll())
+        when(puntoAyudaRepository.findByEstadoVerificacion("VERIFICADO"))
                 .thenReturn(List.of(punto));
 
 
@@ -119,7 +119,7 @@ class MapaServiceTest {
         assertEquals("Punto Donación El Alto", dtoPunto.getNombre());
         assertEquals("PUNTO_DONACION", dtoPunto.getTipo());
         assertEquals("La Paz", dtoPunto.getDepartamentoNombre());
-        assertEquals("PENDIENTE", dtoPunto.getEstadoVerificacion());
+        assertEquals("VERIFICADO", dtoPunto.getEstadoVerificacion());
     }
 
     @Test
@@ -151,7 +151,7 @@ class MapaServiceTest {
         when(centroRepository.findAll())
                 .thenReturn(List.of());
 
-        when(puntoAyudaRepository.findAll())
+        when(puntoAyudaRepository.findByEstadoVerificacion("VERIFICADO"))
                 .thenReturn(List.of(refugio));
 
         List<PuntoMapaDTO> resultado =
@@ -167,6 +167,7 @@ class MapaServiceTest {
         assertEquals("REFUGIO", resultado.get(0).getTipo());
         assertTrue(resultado.get(0).getNecesidades().contains("Agua"));
     }
+
     @Test
     void listarPuntosMapaDebeBuscarIgnorandoTildesYMayusculas() {
 
@@ -188,9 +189,6 @@ class MapaServiceTest {
         when(centroRepository.findAll())
                 .thenReturn(List.of(centro));
 
-        when(puntoAyudaRepository.findAll())
-                .thenReturn(List.of());
-
         List<PuntoMapaDTO> resultado =
                 mapaService.listarPuntosMapa(
                         null,
@@ -202,6 +200,7 @@ class MapaServiceTest {
         assertEquals(1, resultado.size());
         assertEquals("Centro San José", resultado.get(0).getNombre());
     }
+
     @Test
     void buscarDetalleDebeRetornarCentroOPuntoSegunOrigen() {
 
@@ -253,6 +252,7 @@ class MapaServiceTest {
         assertEquals("PUNTO_AYUDA", detallePunto.getOrigen());
         assertEquals("Refugio Esperanza", detallePunto.getNombre());
     }
+
     @Test
     void buscarDetalleDebeRechazarOrigenInvalido() {
 

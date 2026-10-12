@@ -21,9 +21,15 @@ public class PuntoAyudaController {
     }
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<PuntoAyudaDTO>>> listarTodos() {
+    public ResponseEntity<ApiResponse<List<PuntoAyudaDTO>>> listarPublicos() {
         return ResponseEntity.ok(
-                ApiResponse.ok(puntoAyudaService.listarTodos()));
+                ApiResponse.ok(puntoAyudaService.listarPublicos()));
+    }
+
+    @GetMapping("/admin")
+    public ResponseEntity<ApiResponse<List<PuntoAyudaDTO>>> listarTodosAdmin() {
+        return ResponseEntity.ok(
+                ApiResponse.ok(puntoAyudaService.listarTodosAdmin()));
     }
 
     @GetMapping("/{id}")
@@ -62,17 +68,7 @@ public class PuntoAyudaController {
                         puntoAyudaService.actualizar(id, puntoAyudaDTO)));
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse<Void>> eliminar(
-            @PathVariable Long id) {
-
-        puntoAyudaService.eliminar(id);
-
-        return ResponseEntity.ok(
-                ApiResponse.ok("Punto de ayuda eliminado", null));
-    }
-
-        @PatchMapping("/{id}/estado")
+    @PatchMapping("/{id}/estado")
     public ResponseEntity<ApiResponse<PuntoAyudaDTO>> cambiarEstado(
             @PathVariable Long id,
             @RequestParam String estado) {
@@ -83,5 +79,15 @@ public class PuntoAyudaController {
                         puntoAyudaService.cambiarEstado(id, estado)
                 )
         );
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ApiResponse<Void>> eliminar(
+            @PathVariable Long id) {
+
+        puntoAyudaService.eliminar(id);
+
+        return ResponseEntity.ok(
+                ApiResponse.ok("Punto de ayuda eliminado", null));
     }
 }
