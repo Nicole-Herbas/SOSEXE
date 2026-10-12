@@ -3,6 +3,7 @@ package bo.edu.sos.backend.service;
 import bo.edu.sos.backend.dto.VoluntariadoDTO;
 import bo.edu.sos.backend.entity.Centro;
 import bo.edu.sos.backend.entity.Departamento;
+import bo.edu.sos.backend.entity.Necesidad;
 import bo.edu.sos.backend.entity.Usuario;
 import bo.edu.sos.backend.entity.Voluntariado;
 import bo.edu.sos.backend.repository.CentroRepository;
@@ -13,6 +14,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -95,6 +98,55 @@ class VoluntariadoServiceTest {
         verifyNoMoreInteractions(voluntariadoRepository);
     }
 
+    @ParameterizedTest
+    @ValueSource(ints = {1, 3})
+    void listarTodosIncluyeIdYNombreDeCadaNecesidadDelCentro(int cantidad) {
+        Voluntariado publicado = crearPublicado();
+        for (long id = cantidad; id >= 1; id--) {
+            Necesidad necesidad = new Necesidad();
+            necesidad.setId(id);
+            necesidad.setNombre("Necesidad " + id);
+            publicado.getCentro().getNecesidades().add(necesidad);
+        }
+        when(voluntariadoRepository.findByEstado("PUBLICADO"))
+                .thenReturn(List.of(publicado));
+
+        var necesidades = voluntariadoService.listarTodos().get(0).getCentroNecesidades();
+
+        assertEquals(cantidad, necesidades.size());
+        for (int indice = 0; indice < cantidad; indice++) {
+            assertEquals(indice + 1L, necesidades.get(indice).getId());
+            assertEquals("Necesidad " + (indice + 1), necesidades.get(indice).getNombre());
+        }
+    }
+
+    @Test
+    void listarTodosDevuelveColeccionVaciaParaCentroSinNecesidades() {
+        when(voluntariadoRepository.findByEstado("PUBLICADO"))
+                .thenReturn(List.of(crearPublicado()));
+
+        assertEquals(List.of(), voluntariadoService.listarTodos().get(0).getCentroNecesidades());
+    }
+
+    @Test
+    void listarTodosMantieneLasNecesidadesAsociadasACadaCentro() {
+        Voluntariado primero = crearPublicado();
+        Necesidad necesidad = new Necesidad();
+        necesidad.setId(7L);
+        necesidad.setNombre("Apoyo educativo");
+        primero.getCentro().getNecesidades().add(necesidad);
+        Voluntariado segundo = crearPublicado();
+        segundo.setId(5L);
+        segundo.getCentro().setId(6L);
+        when(voluntariadoRepository.findByEstado("PUBLICADO"))
+                .thenReturn(List.of(primero, segundo));
+
+        var resultado = voluntariadoService.listarTodos();
+
+        assertEquals(7L, resultado.get(0).getCentroNecesidades().get(0).getId());
+        assertTrue(resultado.get(1).getCentroNecesidades().isEmpty());
+    }
+
     @Test
     void listarTodosToleraCentroNulo() {
         Voluntariado publicado = crearPublicado();
@@ -109,6 +161,7 @@ class VoluntariadoServiceTest {
                 () -> assertNull(dto.getCentroNombre()),
                 () -> assertNull(dto.getCentroCiudad()),
                 () -> assertNull(dto.getCentroDepartamento()),
+                () -> assertEquals(List.of(), dto.getCentroNecesidades()),
                 () -> assertEquals(publicado.getTitulo(), dto.getTitulo())
         );
     }

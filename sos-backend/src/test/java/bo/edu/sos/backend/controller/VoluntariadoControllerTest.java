@@ -1,5 +1,7 @@
 package bo.edu.sos.backend.controller;
 
+import bo.edu.sos.backend.entity.Centro;
+import bo.edu.sos.backend.entity.Necesidad;
 import bo.edu.sos.backend.entity.Voluntariado;
 import bo.edu.sos.backend.repository.CentroRepository;
 import bo.edu.sos.backend.repository.UsuarioRepository;
@@ -36,7 +38,39 @@ class VoluntariadoControllerTest {
         mvc.perform(get("/api/voluntariados"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.data[0].centroNecesidades").isEmpty())
                 .andExpect(jsonPath("$.data[0].fechaInicio").value("2026-10-15T09:00:00"))
                 .andExpect(jsonPath("$.data[0].fechaFin").value("2026-10-15T16:00:00"));
+    }
+
+    @Test
+    void listarPublicadosSerializaNecesidadesConIdYNombreYArrayVacioCuandoNoHay() throws Exception {
+        Necesidad necesidad = new Necesidad();
+        necesidad.setId(7L);
+        necesidad.setNombre("Apoyo educativo");
+        necesidad.setDescripcion("Detalle interno que no forma parte del resumen");
+        Centro centro = new Centro();
+        centro.getNecesidades().add(necesidad);
+        Voluntariado conNecesidades = new Voluntariado();
+        conNecesidades.setCentro(centro);
+        Voluntariado sinNecesidades = new Voluntariado();
+        sinNecesidades.setCentro(new Centro());
+
+        VoluntariadoRepository repository = mock(VoluntariadoRepository.class);
+        when(repository.findByEstado("PUBLICADO"))
+                .thenReturn(List.of(conNecesidades, sinNecesidades));
+        VoluntariadoService service = new VoluntariadoService(
+                repository, mock(CentroRepository.class), mock(UsuarioRepository.class)
+        );
+        MockMvc mvc = MockMvcBuilders.standaloneSetup(new VoluntariadoController(service)).build();
+
+        mvc.perform(get("/api/voluntariados"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data[0].centroNecesidades.length()").value(1))
+                .andExpect(jsonPath("$.data[0].centroNecesidades[0].id").value(7))
+                .andExpect(jsonPath("$.data[0].centroNecesidades[0].nombre").value("Apoyo educativo"))
+                .andExpect(jsonPath("$.data[0].centroNecesidades[0].descripcion").doesNotExist())
+                .andExpect(jsonPath("$.data[1].centroNecesidades").isArray())
+                .andExpect(jsonPath("$.data[1].centroNecesidades").isEmpty());
     }
 }

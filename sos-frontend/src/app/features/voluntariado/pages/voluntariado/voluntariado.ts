@@ -1,5 +1,6 @@
-import { ChangeDetectorRef, Component, OnInit, signal } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 
 import {
@@ -30,6 +31,7 @@ export type EstadoPagina =
 @Component({
   imports: [
     CommonModule,
+    FormsModule,
     RouterLink,
     CrearPerfilComponent,
     TarjetaPerfilComponent,
@@ -55,6 +57,46 @@ export class Voluntariado implements OnInit {
   readonly oportunidades = signal<OportunidadVoluntariado[]>([]);
   readonly cargandoOportunidades = signal(false);
   readonly errorOportunidades = signal(false);
+
+  readonly ciudadSeleccionada = signal('');
+  readonly tipoAyudaSeleccionado = signal<number | null>(null);
+
+  readonly ciudadesDisponibles = computed(() => {
+    const ciudades = new Map<string, string>();
+    for (const oportunidad of this.oportunidades()) {
+      const nombre = this.limpiarEspacios(oportunidad.centroCiudad);
+      const valor = this.normalizarCiudad(nombre);
+      if (valor && !ciudades.has(valor)) {
+        ciudades.set(valor, nombre);
+      }
+    }
+    return Array.from(ciudades, ([valor, nombre]) => ({ valor, nombre }))
+      .sort((a, b) => a.nombre.localeCompare(b.nombre, 'es', { sensitivity: 'base' }));
+  });
+
+  readonly tiposAyudaDisponibles = computed(() => {
+    const tipos = new Map<number, string>();
+    for (const oportunidad of this.oportunidades()) {
+      for (const necesidad of oportunidad.centroNecesidades ?? []) {
+        const nombre = this.limpiarEspacios(necesidad?.nombre);
+        if (necesidad?.id != null && nombre && !tipos.has(necesidad.id)) {
+          tipos.set(necesidad.id, nombre);
+        }
+      }
+    }
+    return Array.from(tipos, ([id, nombre]) => ({ id, nombre }))
+      .sort((a, b) => a.nombre.localeCompare(b.nombre, 'es', { sensitivity: 'base' }));
+  });
+
+  readonly oportunidadesFiltradas = computed(() => {
+    const ciudad = this.normalizarCiudad(this.ciudadSeleccionada());
+    const tipoAyuda = this.tipoAyudaSeleccionado();
+    return this.oportunidades().filter((oportunidad) =>
+      (!ciudad || this.normalizarCiudad(oportunidad.centroCiudad) === ciudad)
+      && (tipoAyuda === null || (oportunidad.centroNecesidades ?? [])
+        .some((necesidad) => necesidad?.id === tipoAyuda)),
+    );
+  });
 
   private readonly formatoFecha = new Intl.DateTimeFormat('es-BO', {
     day: 'numeric',
@@ -111,6 +153,22 @@ export class Voluntariado implements OnInit {
         this.cargandoOportunidades.set(false);
       },
     });
+  }
+
+  restablecerFiltros(): void {
+    this.ciudadSeleccionada.set('');
+    this.tipoAyudaSeleccionado.set(null);
+  }
+
+  private limpiarEspacios(texto: string | null | undefined): string {
+    return (texto ?? '').trim().replace(/\s+/g, ' ');
+  }
+
+  private normalizarCiudad(ciudad: string | null): string {
+    return this.limpiarEspacios(ciudad)
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLocaleLowerCase('es');
   }
 
   formatearUbicacion(oportunidad: OportunidadVoluntariado): string {

@@ -38,6 +38,7 @@ describe('VoluntariadoService', () => {
         centroNombre: 'Centro comunitario',
         centroCiudad: 'El Alto',
         centroDepartamento: 'La Paz',
+        centroNecesidades: [{ id: 7, nombre: 'Apoyo educativo' }, { id: 9, nombre: 'Logística' }],
       }],
     };
     let recibida: ApiResponse<OportunidadVoluntariado[]> | undefined;
