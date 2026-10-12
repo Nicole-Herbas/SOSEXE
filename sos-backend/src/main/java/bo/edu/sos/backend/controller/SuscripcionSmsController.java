@@ -12,28 +12,19 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 /**
- * Controlador REST para la suscripción a alertas SMS (SOS-63).
- *
- * Ambos prefijos se conservan para mantener compatibilidad con consumidores
- * existentes. Los endpoints requieren autenticación JWT.
+ * Endpoints autenticados para administrar la suscripción a alertas SMS.
  */
 @RestController
 public class SuscripcionSmsController {
 
     private final SuscripcionSmsService suscripcionService;
 
-
     public SuscripcionSmsController(SuscripcionSmsService suscripcionService) {
         this.suscripcionService = suscripcionService;
     }
 
     /**
-     * Crea o actualiza la suscripción SMS del usuario autenticado.
-     *
-     * Si el usuario ya tenía una suscripción (activa o cancelada), se actualiza
-     * y reactiva. Si es la primera vez, se crea.
-     *
-     * POST /api/suscripcion-sms
+     * Crea o actualiza y reactiva la suscripción del usuario autenticado.
      */
     @PostMapping(ApiRoutes.SUSCRIPCION_SMS)
     public ResponseEntity<ApiResponse<SuscripcionSmsDTO>> suscribir(
@@ -47,10 +38,7 @@ public class SuscripcionSmsController {
         );
 
         SuscripcionSmsDTO resultado =
-                suscripcionService.suscribir(
-                        authentication.getName(),
-                        dto
-                );
+                suscripcionService.suscribir(authentication.getName(), dto);
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
@@ -58,7 +46,7 @@ public class SuscripcionSmsController {
     }
 
     /**
-     * Mantiene el contrato anterior de SOS-69 para el prefijo plural.
+     * Mantiene el prefijo plural publicado por SOS-69.
      */
     @PostMapping(ApiRoutes.SUSCRIPCIONES_SMS)
     public ResponseEntity<ApiResponse<SuscripcionSmsDTO>> suscribirCompatibilidad(
@@ -74,9 +62,7 @@ public class SuscripcionSmsController {
     }
 
     /**
-     * Obtiene la suscripción SMS del usuario autenticado.
-     *
-     * GET /api/suscripcion-sms/me o /api/suscripciones-sms/mia
+     * Obtiene los datos de la suscripción del usuario autenticado.
      */
     @GetMapping({
             ApiRoutes.SUSCRIPCION_SMS + "/me",
@@ -87,32 +73,26 @@ public class SuscripcionSmsController {
 
         LogHelper.debug(
                 SuscripcionSmsController.class,
-                "Peticion GET suscripcion-sms/me recibida. usuario={}",
+                "Peticion GET de suscripcion SMS recibida. usuario={}",
                 authentication.getName()
         );
 
-        SuscripcionSmsDTO dto =
-                suscripcionService.obtenerSuscripcion(
-                        authentication.getName()
-                );
-
         return ResponseEntity.ok(
-                ApiResponse.ok(dto)
+                ApiResponse.ok(
+                        suscripcionService.obtenerSuscripcion(authentication.getName())
+                )
         );
     }
 
     /**
-     * Verifica si el usuario autenticado tiene una suscripción registrada.
+     * Indica si el usuario autenticado tiene una suscripción registrada.
      */
-    @GetMapping(ApiRoutes.SUSCRIPCION_SMS + "/me/existe")
+    @GetMapping({
+            ApiRoutes.SUSCRIPCION_SMS + "/me/existe",
+            ApiRoutes.SUSCRIPCIONES_SMS + "/me/existe"
+    })
     public ResponseEntity<ApiResponse<Boolean>> existeMiSuscripcion(
             Authentication authentication) {
-
-        LogHelper.debug(
-                SuscripcionSmsController.class,
-                "Peticion GET suscripcion-sms/me/existe recibida. usuario={}",
-                authentication.getName()
-        );
 
         boolean existe =
                 suscripcionService.existeSuscripcion(authentication.getName());
@@ -121,7 +101,30 @@ public class SuscripcionSmsController {
     }
 
     /**
-     * Permite al usuario autenticado activar o desactivar su suscripción.
+     * Cancela sin borrar el registro, para conservar el historial de consentimiento.
+     */
+    @DeleteMapping({
+            ApiRoutes.SUSCRIPCION_SMS + "/me",
+            ApiRoutes.SUSCRIPCIONES_SMS + "/mia"
+    })
+    public ResponseEntity<ApiResponse<Void>> cancelarMiSuscripcion(
+            Authentication authentication) {
+
+        LogHelper.debug(
+                SuscripcionSmsController.class,
+                "Peticion DELETE de suscripcion SMS recibida. usuario={}",
+                authentication.getName()
+        );
+
+        suscripcionService.cancelar(authentication.getName());
+
+        return ResponseEntity.ok(
+                ApiResponse.ok("Suscripción SMS cancelada exitosamente", null)
+        );
+    }
+
+    /**
+     * Mantiene el endpoint de cambio de estado publicado por SOS-69.
      */
     @PatchMapping({
             ApiRoutes.SUSCRIPCION_SMS + "/estado",

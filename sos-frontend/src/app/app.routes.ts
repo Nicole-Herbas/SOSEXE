@@ -55,11 +55,6 @@ export const routes: Routes = [
     canActivate: [registroPuntoGuard]
   },
   {
-    path: 'registrar-punto',
-    component: RegistrarPuntoComponent,
-    canActivate: [registroPuntoGuard]
-  },
-  {
     path: 'centros',
     component: ListaCentros
   },

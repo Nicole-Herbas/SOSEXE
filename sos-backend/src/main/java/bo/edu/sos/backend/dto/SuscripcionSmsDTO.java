@@ -12,10 +12,7 @@ import lombok.Setter;
 import java.time.LocalDateTime;
 
 /**
- * DTO de transferencia para la suscripción a alertas SMS (SOS-63).
- *
- * Los campos de respuesta e identificación se rellenan en el servidor y no se
- * usan al guardar una suscripción.
+ * DTO para crear y consultar suscripciones SMS.
  */
 @Getter
 @Setter
@@ -27,7 +24,6 @@ public class SuscripcionSmsDTO {
     private Long usuarioId;
     private String usuarioNombre;
 
-    /** ID del departamento seleccionado. */
     @NotNull(message = SuscripcionSmsConstants.ERROR_DEPARTAMENTO_REQUERIDO)
     private Long departamentoId;
 
@@ -35,13 +31,12 @@ public class SuscripcionSmsDTO {
 
     @NotBlank(message = SuscripcionSmsConstants.ERROR_TELEFONO_REQUERIDO)
     @Pattern(
-            regexp  = SuscripcionSmsConstants.REGEX_TELEFONO,
+            regexp = SuscripcionSmsConstants.REGEX_TELEFONO,
             message = SuscripcionSmsConstants.ERROR_TELEFONO_FORMATO
     )
     @Size(max = 20, message = "El teléfono no puede superar los 20 caracteres")
     private String telefono;
 
     private Boolean activa;
-
     private LocalDateTime consentimientoFecha;
 }

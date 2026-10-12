@@ -1,8 +1,10 @@
 package bo.edu.sos.backend.service;
 
 import bo.edu.sos.backend.dto.SuscripcionSmsDTO;
+import bo.edu.sos.backend.entity.SuscripcionSms;
 import bo.edu.sos.backend.entity.Usuario;
 import bo.edu.sos.backend.exception.BadRequestException;
+import bo.edu.sos.backend.exception.DuplicateResourceException;
 import bo.edu.sos.backend.exception.ResourceNotFoundException;
 import bo.edu.sos.backend.repository.DepartamentoRepository;
 import bo.edu.sos.backend.repository.SuscripcionSmsRepository;
@@ -16,7 +18,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
@@ -77,5 +81,44 @@ class SuscripcionSmsServiceTest {
 
         assertThrows(ResourceNotFoundException.class,
                 () -> suscripcionSmsService.obtenerMia("user@sos.org"));
+    }
+
+    @Test
+    void cancelar_desactivaLaSuscripcionSinEliminarla() {
+        Usuario usuario = mock(Usuario.class);
+        when(usuario.getId()).thenReturn(10L);
+        when(usuarioRepository.findByEmail("user@sos.org"))
+                .thenReturn(Optional.of(usuario));
+
+        SuscripcionSms suscripcion = mock(SuscripcionSms.class);
+        when(suscripcion.getActiva()).thenReturn(true);
+        when(suscripcion.getId()).thenReturn(30L);
+        when(suscripcionSmsRepository.findByUsuarioId(10L))
+                .thenReturn(Optional.of(suscripcion));
+
+        assertDoesNotThrow(() -> suscripcionSmsService.cancelar("user@sos.org"));
+
+        verify(suscripcion).setActiva(false);
+        verify(suscripcionSmsRepository).save(suscripcion);
+    }
+
+    @Test
+    void cancelar_rechazaUnaSuscripcionYaInactiva() {
+        Usuario usuario = mock(Usuario.class);
+        when(usuario.getId()).thenReturn(10L);
+        when(usuarioRepository.findByEmail("user@sos.org"))
+                .thenReturn(Optional.of(usuario));
+
+        SuscripcionSms suscripcion = mock(SuscripcionSms.class);
+        when(suscripcion.getActiva()).thenReturn(false);
+        when(suscripcionSmsRepository.findByUsuarioId(10L))
+                .thenReturn(Optional.of(suscripcion));
+
+        assertThrows(
+                DuplicateResourceException.class,
+                () -> suscripcionSmsService.cancelar("user@sos.org")
+        );
+
+        verifyNoInteractions(departamentoRepository);
     }
 }

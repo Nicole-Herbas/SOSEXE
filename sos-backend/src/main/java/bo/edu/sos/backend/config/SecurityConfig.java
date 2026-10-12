@@ -145,7 +145,7 @@ public class SecurityConfig {
                                 ApiRoutes.ADMIN_DASHBOARD
                         ).hasAuthority(Roles.ADMIN)
 
-                
+
                         // Usuario autenticado
                         .requestMatchers(
                                 ApiRoutes.AUTH_ME
@@ -248,6 +248,11 @@ public class SecurityConfig {
                                 ApiRoutes.PERFIL_VOLUNTARIO + "/**"
                         ).authenticated()
 
+                        // ── Suscripciones SMS (autenticado) ──
+                        .requestMatchers(
+                                ApiRoutes.SUSCRIPCION_SMS + "/**",
+                                ApiRoutes.SUSCRIPCIONES_SMS + "/**"
+                        ).authenticated()
 
                         // Cualquier otro endpoint de API necesita autenticación
                         .requestMatchers(

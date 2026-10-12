@@ -6,6 +6,7 @@ import bo.edu.sos.backend.entity.Departamento;
 import bo.edu.sos.backend.entity.SuscripcionSms;
 import bo.edu.sos.backend.entity.Usuario;
 import bo.edu.sos.backend.exception.BadRequestException;
+import bo.edu.sos.backend.exception.DuplicateResourceException;
 import bo.edu.sos.backend.exception.ResourceNotFoundException;
 import bo.edu.sos.backend.helper.LogHelper;
 import bo.edu.sos.backend.repository.DepartamentoRepository;
@@ -15,7 +16,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Servicio de negocio para la suscripción a alertas SMS.
+ * Servicio de negocio para crear, consultar, cambiar el estado y cancelar
+ * suscripciones a alertas SMS.
  */
 @Service
 public class SuscripcionSmsService {
@@ -42,16 +44,7 @@ public class SuscripcionSmsService {
             String emailUsuario,
             SuscripcionSmsDTO dto) {
 
-        if (dto == null || dto.getTelefono() == null || dto.getTelefono().isBlank()) {
-            throw new BadRequestException(
-                    SuscripcionSmsConstants.ERROR_TELEFONO_REQUERIDO
-            );
-        }
-        if (dto.getDepartamentoId() == null) {
-            throw new BadRequestException(
-                    SuscripcionSmsConstants.ERROR_DEPARTAMENTO_REQUERIDO
-            );
-        }
+        validarDatosSuscripcion(dto);
 
         LogHelper.debug(
                 SuscripcionSmsService.class,
@@ -72,7 +65,7 @@ public class SuscripcionSmsService {
                 .orElseGet(SuscripcionSms::new);
 
         suscripcion.setUsuario(usuario);
-        suscripcion.setTelefono(dto.getTelefono());
+        suscripcion.setTelefono(dto.getTelefono().trim());
         suscripcion.setDepartamento(departamento);
         suscripcion.setActiva(true);
 
@@ -89,7 +82,7 @@ public class SuscripcionSmsService {
     }
 
     /**
-     * Mantiene la firma previa de SOS-69 para los consumidores del servicio.
+     * Conserva la firma antigua usada por SOS-69.
      */
     @Transactional
     public SuscripcionSmsDTO suscribir(
@@ -125,7 +118,8 @@ public class SuscripcionSmsService {
     @Transactional(readOnly = true)
     public boolean existeSuscripcion(String emailUsuario) {
         Usuario usuario = obtenerUsuario(emailUsuario);
-        boolean existe = suscripcionRepository.existsByUsuarioId(usuario.getId());
+        boolean existe =
+                suscripcionRepository.existsByUsuarioId(usuario.getId());
 
         LogHelper.debug(
                 SuscripcionSmsService.class,
@@ -137,6 +131,9 @@ public class SuscripcionSmsService {
         return existe;
     }
 
+    /**
+     * Cambia el estado a través de la API de compatibilidad SOS-69.
+     */
     @Transactional
     public SuscripcionSmsDTO cambiarEstado(
             boolean activa,
@@ -157,6 +154,64 @@ public class SuscripcionSmsService {
         return convertirADTO(actualizada);
     }
 
+    /**
+     * Cancela la suscripción desactivando el registro para conservar el
+     * historial de consentimiento.
+     */
+    @Transactional
+    public void cancelar(String emailUsuario) {
+        LogHelper.debug(
+                SuscripcionSmsService.class,
+                "Inicio de cancelación de suscripción SMS. usuario={}",
+                emailUsuario
+        );
+
+        Usuario usuario = obtenerUsuario(emailUsuario);
+        SuscripcionSms suscripcion = buscarSuscripcion(usuario);
+
+        if (Boolean.FALSE.equals(suscripcion.getActiva())) {
+            LogHelper.warn(
+                    SuscripcionSmsService.class,
+                    "Intento de cancelar una suscripción SMS ya inactiva. usuarioId={}",
+                    usuario.getId()
+            );
+            throw new DuplicateResourceException(
+                    SuscripcionSmsConstants.ERROR_SUSCRIPCION_YA_CANCELADA
+            );
+        }
+
+        suscripcion.setActiva(false);
+        suscripcionRepository.save(suscripcion);
+
+        LogHelper.info(
+                SuscripcionSmsService.class,
+                "Suscripción SMS cancelada exitosamente. usuarioId={}, suscripcionId={}",
+                usuario.getId(),
+                suscripcion.getId()
+        );
+    }
+
+    private void validarDatosSuscripcion(SuscripcionSmsDTO dto) {
+        if (dto == null || dto.getTelefono() == null
+                || dto.getTelefono().isBlank()) {
+            throw new BadRequestException(
+                    SuscripcionSmsConstants.ERROR_TELEFONO_REQUERIDO
+            );
+        }
+        if (!java.util.regex.Pattern.matches(
+                SuscripcionSmsConstants.REGEX_TELEFONO,
+                dto.getTelefono().trim())) {
+            throw new BadRequestException(
+                    SuscripcionSmsConstants.ERROR_TELEFONO_FORMATO
+            );
+        }
+        if (dto.getDepartamentoId() == null) {
+            throw new BadRequestException(
+                    SuscripcionSmsConstants.ERROR_DEPARTAMENTO_REQUERIDO
+            );
+        }
+    }
+
     private Usuario obtenerUsuario(String emailUsuario) {
         return usuarioRepository.findByEmail(emailUsuario)
                 .orElseThrow(() -> new ResourceNotFoundException(
@@ -173,7 +228,6 @@ public class SuscripcionSmsService {
 
     private SuscripcionSmsDTO convertirADTO(SuscripcionSms suscripcion) {
         SuscripcionSmsDTO dto = new SuscripcionSmsDTO();
-
         dto.setId(suscripcion.getId());
         dto.setTelefono(suscripcion.getTelefono());
         dto.setActiva(suscripcion.getActiva());
