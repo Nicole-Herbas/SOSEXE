@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -45,4 +46,6 @@ public class VoluntariadoDTO {
     private String centroCiudad;
 
     private String centroDepartamento;
+
+    private List<NecesidadDTO> centroNecesidades = List.of();
 }
