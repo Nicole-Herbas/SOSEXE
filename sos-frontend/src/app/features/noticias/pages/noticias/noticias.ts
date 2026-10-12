@@ -69,6 +69,11 @@ export class Noticias implements OnInit {
     this.filtroActivo.set(categoria);
   }
 
+  tieneDetalle(noticia: Noticia): boolean {
+    return !noticia.esExterna && typeof noticia.id === 'number' &&
+      Number.isSafeInteger(noticia.id) && noticia.id > 0;
+  }
+
   formatearFecha(fecha: string | null): string {
     if (!fecha) {
       return '';

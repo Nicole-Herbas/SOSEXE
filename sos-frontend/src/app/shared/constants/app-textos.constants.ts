@@ -463,6 +463,22 @@ noticias: {
   leerNoticia:
     'Leer noticia →',
 
+  leerDetalleEtiqueta: 'Leer noticia:',
+  leerExternaEtiqueta: 'Leer noticia en el medio de origen (se abre en otra pestaña):',
+
+  detalle: {
+    titulo: 'Detalle de noticia',
+    volverListado: '← Volver a noticias',
+    fechaPublicacion: 'Fecha de publicación:',
+    fuente: 'Fuente:',
+    noInformado: 'No informado',
+    cargando: 'Cargando noticia...',
+    noEncontrada: 'La noticia no existe o no está publicada.',
+    idInvalido: 'El identificador de la noticia no es válido.',
+    errorCarga: 'No se pudo cargar la noticia. Comprueba tu conexión e intenta de nuevo.',
+    reintentar: 'Intentar de nuevo',
+  },
+
   reintentar:
     'Intentar de nuevo',
 
