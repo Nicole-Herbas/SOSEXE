@@ -11,6 +11,8 @@ import { APP_TEXTOS } from '../../../../shared/constants/app-textos.constants';
 import { AuthService } from '../../../auth/services/auth.service';
 import { PerfilVoluntarioService } from '../../services/perfil-voluntario.service';
 import { PerfilVoluntario } from '../../models/perfil-voluntario';
+import { OportunidadVoluntariado } from '../../models/oportunidad-voluntariado';
+import { VoluntariadoService } from '../../services/voluntariado.service';
 
 import { CrearPerfilComponent } from '../../components/crear-perfil/crear-perfil';
 import { TarjetaPerfilComponent } from '../../components/tarjeta-perfil/tarjeta-perfil';
@@ -50,15 +52,33 @@ export class Voluntariado implements OnInit {
   readonly emailUsuario = signal<string>('');
   readonly mensajeExito = signal<string>('');
 
+  readonly oportunidades = signal<OportunidadVoluntariado[]>([]);
+  readonly cargandoOportunidades = signal(false);
+  readonly errorOportunidades = signal(false);
+
+  private readonly formatoFecha = new Intl.DateTimeFormat('es-BO', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    hourCycle: 'h23',
+  });
+
 
   constructor(
     private authService: AuthService,
     private perfilService: PerfilVoluntarioService,
+    private voluntariadoService: VoluntariadoService,
     private cdr: ChangeDetectorRef
   ) {}
 
 
   ngOnInit(): void {
+
+    if (this.featureToggles.voluntariado.mostrarSeccionOportunidades) {
+      this.cargarOportunidades();
+    }
 
     if (!this.authService.estaAutenticado()) {
       this.estado.set('SIN_SESION');
@@ -74,6 +94,36 @@ export class Voluntariado implements OnInit {
     );
 
     this.verificarPerfil();
+  }
+
+
+  private cargarOportunidades(): void {
+    this.cargandoOportunidades.set(true);
+    this.errorOportunidades.set(false);
+
+    this.voluntariadoService.listarTodos().subscribe({
+      next: (respuesta) => {
+        this.oportunidades.set(respuesta.data);
+        this.cargandoOportunidades.set(false);
+      },
+      error: () => {
+        this.errorOportunidades.set(true);
+        this.cargandoOportunidades.set(false);
+      },
+    });
+  }
+
+  formatearUbicacion(oportunidad: OportunidadVoluntariado): string {
+    return [oportunidad.centroCiudad, oportunidad.centroDepartamento]
+      .filter(Boolean)
+      .join(', ') || this.textos.oportunidades.ubicacionNoDisponible;
+  }
+
+  formatearFecha(fecha: string): string {
+    const fechaParseada = new Date(fecha);
+    return Number.isNaN(fechaParseada.getTime())
+      ? this.textos.oportunidades.fechaNoDisponible
+      : this.formatoFecha.format(fechaParseada);
   }
 
 

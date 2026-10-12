@@ -42,7 +42,7 @@ public class VoluntariadoService {
 
         List<VoluntariadoDTO> voluntariados =
                 voluntariadoRepository
-                        .findAll()
+                        .findByEstado("PUBLICADO")
                         .stream()
                         .map(this::convertirADTO)
                         .toList();
@@ -447,6 +447,22 @@ public class VoluntariadoService {
                             .getCentro()
                             .getNombre()
             );
+
+            dto.setCentroCiudad(
+                    voluntariado
+                            .getCentro()
+                            .getCiudad()
+            );
+
+            if (voluntariado.getCentro().getDepartamento() != null) {
+
+                dto.setCentroDepartamento(
+                        voluntariado
+                                .getCentro()
+                                .getDepartamento()
+                                .getNombre()
+                );
+            }
         }
 
 

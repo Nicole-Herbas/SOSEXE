@@ -41,4 +41,8 @@ public class VoluntariadoDTO {
     private Long creadoPorId;
 
     private String centroNombre;
+
+    private String centroCiudad;
+
+    private String centroDepartamento;
 }
