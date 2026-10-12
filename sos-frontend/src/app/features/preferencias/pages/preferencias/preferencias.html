@@ -1,0 +1,133 @@
+<div class="preferencias-container">
+
+  <div class="preferencias-card">
+
+    <header class="preferencias-header">
+      <div class="preferencias-badge">
+        <span class="badge-icon">⚙</span>
+        <span>Configuración</span>
+      </div>
+      <h1 class="preferencias-title">{{ textos.titulo }}</h1>
+    </header>
+
+    @if (cargando()) {
+      <div class="preferencias-loading">
+        <div class="spinner"></div>
+        <p>{{ textos.cargandoEstado }}</p>
+      </div>
+    } @else {
+
+      <section class="sms-section">
+
+        <div class="sms-header">
+          <div class="sms-icon-wrapper">
+            <span class="sms-icon">📱</span>
+          </div>
+          <div>
+            <h2 class="sms-title">{{ textos.seccionSms }}</h2>
+            <p class="sms-description">{{ textos.descripcionSms }}</p>
+          </div>
+        </div>
+
+        @if (mensajeExito()) {
+          <div class="alert alert-success" role="alert">
+            <span class="alert-icon">✓</span>
+            <span>{{ mensajeExito() }}</span>
+          </div>
+        }
+
+        @if (mensajeError()) {
+          <div class="alert alert-error" role="alert">
+            <span class="alert-icon">⚠</span>
+            <span>{{ mensajeError() }}</span>
+          </div>
+        }
+
+        <form [formGroup]="formulario" (ngSubmit)="guardar()" class="sms-form">
+
+          <!-- Campo Teléfono -->
+          <div class="form-group" [class.has-error]="telefonoInvalido">
+            <label for="telefono-sms" class="form-label">
+              {{ textos.labelTelefono }} <span class="required">*</span>
+            </label>
+            <div class="input-wrapper">
+              <span class="input-prefix">📞</span>
+              <input
+                id="telefono-sms"
+                type="tel"
+                formControlName="telefono"
+                class="form-control"
+                [placeholder]="textos.placeholderTelefono"
+                autocomplete="tel"
+              />
+            </div>
+            @if (telefonoInvalido) {
+              <small class="error-text">{{ textos.errorTelefono }}</small>
+            }
+          </div>
+
+          <!-- Campo Región / Departamento -->
+          <div class="form-group" [class.has-error]="departamentoInvalido">
+            <label for="departamento-sms" class="form-label">
+              {{ textos.labelRegion }} <span class="required">*</span>
+            </label>
+            <div class="input-wrapper">
+              <span class="input-prefix">📍</span>
+              <select
+                id="departamento-sms"
+                formControlName="departamentoId"
+                class="form-control select-control"
+              >
+                <option [ngValue]="null" disabled selected>
+                  {{ textos.placeholderRegion }}
+                </option>
+                @for (dpto of departamentos; track dpto.id) {
+                  <option [ngValue]="dpto.id">{{ dpto.nombre }}</option>
+                }
+              </select>
+            </div>
+            @if (departamentoInvalido) {
+              <small class="error-text">{{ textos.errorRegion }}</small>
+            }
+          </div>
+
+          <!-- Consentimiento explícito -->
+          <div class="consentimiento-group" [class.has-error]="consentimientoInvalido">
+            <label class="checkbox-container">
+              <input
+                type="checkbox"
+                formControlName="consentimiento"
+                id="consentimiento-sms"
+              />
+              <span class="checkbox-checkmark"></span>
+              <span class="checkbox-label">
+                {{ textos.labelConsentimiento }}
+              </span>
+            </label>
+          </div>
+
+          <!-- Botón de acción -->
+          <div class="form-actions">
+            <button
+              type="submit"
+              class="btn-submit"
+              [disabled]="formulario.invalid || guardando()"
+            >
+              @if (guardando()) {
+                <span class="btn-spinner"></span>
+                <span>Guardando...</span>
+              } @else {
+                <span>{{ textos.botonSuscribir }}</span>
+              }
+            </button>
+          </div>
+
+        </form>
+
+      </section>
+
+    }
+
+  </div>
+
+</div>
