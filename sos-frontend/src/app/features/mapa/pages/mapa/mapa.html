@@ -174,19 +174,12 @@
           </span>
 
 
-          @if (estaVerificado(puntoSeleccionado()!)) {
-
-          <span class="tag-verificado">
-              {{ textos.verificado }}
-            </span>
-
-          } @else {
-
-          <span class="tag-verificado pendiente">
-              {{ textos.verificacionPendiente }}
-            </span>
-
-          }
+          <span class="tag-verificado"
+            [class.pendiente]="verificacionDetalle().clase === 'pendiente'"
+            [class.rechazado]="verificacionDetalle().clase === 'rechazado'"
+            [class.desconocido]="verificacionDetalle().clase === 'desconocido'">
+            {{ verificacionDetalle().etiqueta }}
+          </span>
 
         </div>
 
@@ -201,10 +194,10 @@
         </p>
 
 
-        @if (puntoSeleccionado()!.descripcion) {
+        @if (descripcionDetalle().descripcion) {
 
         <p class="descripcion">
-          {{ puntoSeleccionado()!.descripcion }}
+          {{ descripcionDetalle().descripcion }}
         </p>
 
         }
@@ -215,8 +208,6 @@
         </div>
 
 
-        @if (puntoSeleccionado()!.direccion) {
-
         <div class="detalle-dato">
 
             <span>
@@ -224,13 +215,15 @@
             </span>
 
           <p>
-            {{ puntoSeleccionado()!.direccion }}
+            {{ puntoSeleccionado()!.direccion || detalleEtiquetas.noInformado }}
           </p>
 
         </div>
 
-        }
-
+        <div class="detalle-dato detalle-horario">
+          <span>{{ detalleEtiquetas.horarioEtiqueta }}</span>
+          <p>{{ descripcionDetalle().horario || detalleEtiquetas.noInformado }}</p>
+        </div>
 
         @if (
         puntoSeleccionado()!.telefono
@@ -238,7 +231,7 @@
         puntoSeleccionado()!.email
         ) {
 
-        <div class="detalle-dato">
+        <div class="detalle-dato detalle-contacto">
 
             <span>
               {{ detalleEtiquetas.contactoEtiqueta }}
@@ -264,8 +257,12 @@
 
         </div>
 
+        } @else {
+          <div class="detalle-dato detalle-contacto">
+            <span>{{ detalleEtiquetas.contactoEtiqueta }}</span>
+            <p>{{ detalleEtiquetas.noInformado }}</p>
+          </div>
         }
-
 
         @if (puntoSeleccionado()!.necesidades?.length) {
 
@@ -290,8 +287,17 @@
 
         </div>
 
+        } @else {
+          <div class="detalle-dato">
+            <span>{{ detalleEtiquetas.necesidadesEtiqueta }}</span>
+            <p>{{ detalleEtiquetas.noInformado }}</p>
+          </div>
         }
 
+        <div class="detalle-dato detalle-donaciones">
+          <span>{{ detalleEtiquetas.donacionesEtiqueta }}</span>
+          <p>{{ descripcionDetalle().donacionesAceptadas || detalleEtiquetas.noInformado }}</p>
+        </div>
 
         @if (puntoSeleccionado()!.fechaActualizacion) {
 
@@ -440,23 +446,9 @@ puntoSeleccionado()
         </span>
 
 
-      @if (
-      estaVerificado(
-      puntoSeleccionado()!
-      )
-      ) {
-
-      <span class="modal-verificado">
-            ✓ {{ textos.verificado }}
-          </span>
-
-      } @else {
-
-      <span class="modal-pendiente">
-            {{ textos.verificacionPendiente }}
-          </span>
-
-      }
+      <span [class]="'modal-' + verificacionDetalle().clase">
+        {{ verificacionDetalle().etiqueta }}
+      </span>
 
     </div>
 
@@ -474,19 +466,15 @@ puntoSeleccionado()
 
 
     @if (
-    puntoSeleccionado()!.descripcion
+    descripcionDetalle().descripcion
     ) {
 
     <p class="detalle-modal-descripcion">
-      {{ puntoSeleccionado()!.descripcion }}
+      {{ descripcionDetalle().descripcion }}
     </p>
 
     }
 
-
-    @if (
-    puntoSeleccionado()!.direccion
-    ) {
 
     <section class="modal-bloque">
 
@@ -495,13 +483,15 @@ puntoSeleccionado()
           </span>
 
       <p>
-        {{ puntoSeleccionado()!.direccion }}
+        {{ puntoSeleccionado()!.direccion || detalleEtiquetas.noInformado }}
       </p>
 
     </section>
 
-    }
-
+    <section class="modal-bloque detalle-horario">
+      <span class="modal-label">{{ detalleEtiquetas.horarioEtiqueta }}</span>
+      <p>{{ descripcionDetalle().horario || detalleEtiquetas.noInformado }}</p>
+    </section>
 
     @if (
     puntoSeleccionado()!.telefono
@@ -509,7 +499,7 @@ puntoSeleccionado()
     puntoSeleccionado()!.email
     ) {
 
-    <section class="modal-bloque">
+    <section class="modal-bloque detalle-contacto">
 
           <span class="modal-label">
             {{ detalleEtiquetas.contactoEtiqueta }}
@@ -548,8 +538,12 @@ puntoSeleccionado()
 
     </section>
 
+    } @else {
+      <section class="modal-bloque detalle-contacto">
+        <span class="modal-label">{{ detalleEtiquetas.contactoEtiqueta }}</span>
+        <p>{{ detalleEtiquetas.noInformado }}</p>
+      </section>
     }
-
 
     @if (
     puntoSeleccionado()!
@@ -586,8 +580,17 @@ puntoSeleccionado()
 
     </section>
 
+    } @else {
+      <section class="modal-bloque">
+        <span class="modal-label">{{ detalleEtiquetas.necesidadesEtiqueta }}</span>
+        <p>{{ detalleEtiquetas.noInformado }}</p>
+      </section>
     }
 
+    <section class="modal-bloque detalle-donaciones">
+      <span class="modal-label">{{ detalleEtiquetas.donacionesEtiqueta }}</span>
+      <p>{{ descripcionDetalle().donacionesAceptadas || detalleEtiquetas.noInformado }}</p>
+    </section>
 
     @if (
     puntoSeleccionado()!
