@@ -19,8 +19,17 @@ public class DashboardDTO {
     private long solicitudesCentroPendientes;
 
     private long totalUsuarios;
+
     private long totalPuntosAyuda;
+    private long puntosAyudaPendientes;
+    private long puntosAyudaVerificados;
+
     private long totalVoluntariados;
+    private long voluntariadosPublicados;
+    private long voluntariadosBorrador;
+
     private long totalPostulaciones;
+    private long postulacionesPendientes;
+
     private long totalDonaciones;
 }

@@ -1,5 +1,6 @@
 package bo.edu.sos.backend.service;
 
+import bo.edu.sos.backend.constants.EstadoPostulacion;
 import bo.edu.sos.backend.constants.EstadoVerificacion;
 import bo.edu.sos.backend.dto.DashboardDTO;
 import bo.edu.sos.backend.repository.CentroRepository;
@@ -46,8 +47,7 @@ public class DashboardService {
 
         DashboardDTO dto = new DashboardDTO();
 
-        dto.setTotalCentros(
-                centroRepository.count());
+        dto.setTotalCentros(centroRepository.count());
         dto.setCentrosPendientes(
                 centroRepository.countByEstadoVerificacion(
                         EstadoVerificacion.PENDIENTE));
@@ -62,9 +62,26 @@ public class DashboardService {
                         EstadoVerificacion.PENDIENTE));
 
         dto.setTotalUsuarios(usuarioRepository.count());
+
         dto.setTotalPuntosAyuda(puntoAyudaRepository.count());
+        dto.setPuntosAyudaPendientes(
+                puntoAyudaRepository.countByEstadoVerificacion(
+                        EstadoVerificacion.PENDIENTE));
+        dto.setPuntosAyudaVerificados(
+                puntoAyudaRepository.countByEstadoVerificacion(
+                        EstadoVerificacion.VERIFICADO));
+
         dto.setTotalVoluntariados(voluntariadoRepository.count());
+        dto.setVoluntariadosPublicados(
+                voluntariadoRepository.countByEstado("PUBLICADO"));
+        dto.setVoluntariadosBorrador(
+                voluntariadoRepository.countByEstado("BORRADOR"));
+
         dto.setTotalPostulaciones(postulacionRepository.count());
+        dto.setPostulacionesPendientes(
+                postulacionRepository.countByEstado(
+                        EstadoPostulacion.PENDIENTE));
+
         dto.setTotalDonaciones(donacionRepository.count());
 
         return dto;

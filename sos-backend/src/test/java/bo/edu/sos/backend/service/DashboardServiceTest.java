@@ -1,5 +1,6 @@
 package bo.edu.sos.backend.service;
 
+import bo.edu.sos.backend.constants.EstadoPostulacion;
 import bo.edu.sos.backend.constants.EstadoVerificacion;
 import bo.edu.sos.backend.dto.DashboardDTO;
 import bo.edu.sos.backend.repository.CentroRepository;
@@ -59,9 +60,21 @@ class DashboardServiceTest {
                 EstadoVerificacion.PENDIENTE)).thenReturn(1L);
 
         when(usuarioRepository.count()).thenReturn(10L);
+
         when(puntoAyudaRepository.count()).thenReturn(6L);
-        when(voluntariadoRepository.count()).thenReturn(3L);
+        when(puntoAyudaRepository.countByEstadoVerificacion(
+                EstadoVerificacion.PENDIENTE)).thenReturn(3L);
+        when(puntoAyudaRepository.countByEstadoVerificacion(
+                EstadoVerificacion.VERIFICADO)).thenReturn(3L);
+
+        when(voluntariadoRepository.count()).thenReturn(4L);
+        when(voluntariadoRepository.countByEstado("PUBLICADO")).thenReturn(3L);
+        when(voluntariadoRepository.countByEstado("BORRADOR")).thenReturn(1L);
+
         when(postulacionRepository.count()).thenReturn(7L);
+        when(postulacionRepository.countByEstado(
+                EstadoPostulacion.PENDIENTE)).thenReturn(4L);
+
         when(donacionRepository.count()).thenReturn(8L);
 
         DashboardDTO resultado = dashboardService.obtenerResumen();
@@ -73,8 +86,13 @@ class DashboardServiceTest {
         assertEquals(1L, resultado.getSolicitudesCentroPendientes());
         assertEquals(10L, resultado.getTotalUsuarios());
         assertEquals(6L, resultado.getTotalPuntosAyuda());
-        assertEquals(3L, resultado.getTotalVoluntariados());
+        assertEquals(3L, resultado.getPuntosAyudaPendientes());
+        assertEquals(3L, resultado.getPuntosAyudaVerificados());
+        assertEquals(4L, resultado.getTotalVoluntariados());
+        assertEquals(3L, resultado.getVoluntariadosPublicados());
+        assertEquals(1L, resultado.getVoluntariadosBorrador());
         assertEquals(7L, resultado.getTotalPostulaciones());
+        assertEquals(4L, resultado.getPostulacionesPendientes());
         assertEquals(8L, resultado.getTotalDonaciones());
     }
 }

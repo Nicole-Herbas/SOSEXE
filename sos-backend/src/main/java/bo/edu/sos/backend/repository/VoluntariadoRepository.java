@@ -10,4 +10,6 @@ public interface VoluntariadoRepository extends JpaRepository<Voluntariado, Long
     List<Voluntariado> findByCentroId(Long centroId);
 
     List<Voluntariado> findByEstado(String estado);
+
+    long countByEstado(String estado);
 }
