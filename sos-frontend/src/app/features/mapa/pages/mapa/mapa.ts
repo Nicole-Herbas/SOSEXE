@@ -34,6 +34,7 @@ import {
 import {
   PuntoMapa
 } from '../../models/punto-mapa.model';
+import { extraerDescripcionDetalle } from '../../utils/descripcion-detalle';
 
 
 @Component({
@@ -118,6 +119,23 @@ export class Mapa implements OnInit {
     signal<PuntoMapa | null>(
       null
     );
+
+  readonly descripcionDetalle = computed(() =>
+    extraerDescripcionDetalle(this.puntoSeleccionado()?.descripcion),
+  );
+
+  readonly verificacionDetalle = computed(() => {
+    switch (this.puntoSeleccionado()?.estadoVerificacion) {
+      case 'VERIFICADO':
+        return { clase: 'verificado', etiqueta: this.textos.verificado };
+      case 'PENDIENTE':
+        return { clase: 'pendiente', etiqueta: this.textos.verificacionPendiente };
+      case 'RECHAZADO':
+        return { clase: 'rechazado', etiqueta: this.detalleEtiquetas.verificacionRechazada };
+      default:
+        return { clase: 'desconocido', etiqueta: this.detalleEtiquetas.noInformado };
+    }
+  });
 
   cargandoDetalle =
     signal(false);

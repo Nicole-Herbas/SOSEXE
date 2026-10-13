@@ -30,6 +30,8 @@ import {
 import {
   PuntoMapa
 } from '../../models/punto-mapa.model';
+import { By } from '@angular/platform-browser';
+import { APP_TEXTOS } from '../../../../shared/constants/app-textos.constants';
 
 
 @Component({
@@ -1038,6 +1040,143 @@ describe('Mapa', () => {
     }
   );
 
+  describe('detalle completo SOS-36', () => {
+    function cargarDetalle(punto: PuntoMapa): void {
+      fixture.detectChanges();
+      httpTesting.expectOne('/api/mapa/puntos').flush({
+        success: true, message: 'OK', data: [punto], timestamp: '',
+      });
+      responderDetalle(punto);
+      component.abrirModalDetalle();
+      fixture.detectChanges();
+    }
+
+    function vistas(): HTMLElement[] {
+      return [
+        fixture.nativeElement.querySelector('.detalle-card'),
+        fixture.nativeElement.querySelector('.detalle-modal'),
+      ];
+    }
+
+    it('comparte horario, donaciones y descripción restante entre panel y modal', () => {
+      const descripcion = 'Colecta comunitaria\nHorario: Lun-Vie 09:00–17:00\nDonaciones aceptadas: Agua, Ropa\nTraer bolsas';
+      cargarDetalle({ ...PUNTO_REFUGIO_MOCK, descripcion, direccion: 'Av. Principal 123' });
+
+      for (const vista of vistas()) {
+        expect(vista.querySelector('.detalle-horario p')?.textContent).toContain('Lun-Vie 09:00–17:00');
+        expect(vista.querySelector('.detalle-donaciones p')?.textContent).toContain('Agua, Ropa');
+        const texto = vista.querySelector('.descripcion, .detalle-modal-descripcion')?.textContent ?? '';
+        expect(texto).toContain('Colecta comunitaria');
+        expect(texto).toContain('Traer bolsas');
+        expect(texto).not.toContain('Horario:');
+        expect(texto).not.toContain('Donaciones aceptadas:');
+        expect(vista.textContent).toContain('Av. Principal 123');
+      }
+      // La extracción es exclusivamente de presentación.
+      expect(component.puntoSeleccionado()?.descripcion).toBe(descripcion);
+      expect(component.puntos()[0].descripcion).toBe(descripcion);
+      httpTesting.expectNone(() => true);
+    });
+
+    it.each([undefined, '', 'Texto antiguo sin datos complementarios'])('muestra No informado sin inferir donaciones de las necesidades: %s', (descripcion) => {
+      cargarDetalle({ ...PUNTO_MOCK, descripcion });
+
+      for (const vista of vistas()) {
+        expect(vista.querySelector('.detalle-horario p')?.textContent?.trim()).toBe(APP_TEXTOS.mapa.detalle.noInformado);
+        expect(vista.querySelector('.detalle-donaciones p')?.textContent?.trim()).toBe(APP_TEXTOS.mapa.detalle.noInformado);
+        expect(vista.textContent).toContain('Agua');
+        expect(vista.textContent).toContain('Alimentos');
+        if (descripcion) expect(vista.textContent).toContain(descripcion);
+      }
+    });
+
+    it('conserva teléfono y correo públicos de los centros en ambas vistas', () => {
+      cargarDetalle({ ...PUNTO_MOCK, telefono: '71234567', email: 'centro@example.org' });
+
+      for (const vista of vistas()) {
+        const contacto = vista.querySelector('.detalle-contacto');
+        expect(contacto?.textContent).toContain('71234567');
+        expect(contacto?.querySelector('a')?.getAttribute('href')).toBe('mailto:centro@example.org');
+      }
+    });
+
+    it('no muestra campos personales de registro aunque lleguen como propiedades adicionales', () => {
+      cargarDetalle({
+        ...PUNTO_REFUGIO_MOCK,
+        nombreContacto: 'Contacto privado', telefonoContacto: '79999999', correoContacto: 'privado@example.org',
+      } as PuntoMapa);
+
+      for (const vista of vistas()) {
+        expect(vista.querySelector('.detalle-contacto p')?.textContent?.trim()).toBe(APP_TEXTOS.mapa.detalle.noInformado);
+        expect(vista.textContent).not.toContain('Contacto privado');
+        expect(vista.textContent).not.toContain('79999999');
+        expect(vista.textContent).not.toContain('privado@example.org');
+      }
+    });
+
+    it('muestra las secciones sin datos como No informado', () => {
+      cargarDetalle({ ...PUNTO_MOCK, direccion: undefined, necesidades: [] });
+
+      for (const vista of vistas()) {
+        for (const etiqueta of [
+          APP_TEXTOS.mapa.detalle.direccionEtiqueta, APP_TEXTOS.mapa.detalle.contactoEtiqueta,
+          APP_TEXTOS.mapa.detalle.necesidadesEtiqueta,
+        ]) {
+          const bloque = Array.from(vista.querySelectorAll('.detalle-dato, .modal-bloque'))
+            .find((elemento) => elemento.querySelector('span')?.textContent?.trim() === etiqueta);
+          expect(bloque?.querySelector('p')?.textContent?.trim()).toBe(APP_TEXTOS.mapa.detalle.noInformado);
+        }
+      }
+    });
+
+    it.each([
+      ['VERIFICADO', 'verificado', APP_TEXTOS.mapa.verificado],
+      ['PENDIENTE', 'pendiente', APP_TEXTOS.mapa.verificacionPendiente],
+      ['RECHAZADO', 'rechazado', APP_TEXTOS.mapa.detalle.verificacionRechazada],
+      ['ESTADO_DESCONOCIDO', 'desconocido', APP_TEXTOS.mapa.detalle.noInformado],
+    ])('distingue el estado %s con igual etiqueta en panel y modal', (estado, clase, etiqueta) => {
+      cargarDetalle({ ...PUNTO_MOCK, estadoVerificacion: estado });
+
+      const lateral = fixture.nativeElement.querySelector('.detalle-card .tag-verificado') as HTMLElement;
+      const modal = fixture.nativeElement.querySelector(`.detalle-modal .modal-${clase}`) as HTMLElement;
+      expect(lateral.textContent?.trim()).toBe(etiqueta);
+      expect(modal.textContent?.trim()).toBe(etiqueta);
+      if (clase !== 'verificado') expect(lateral.classList.contains(clase)).toBe(true);
+      if (estado === 'RECHAZADO') {
+        expect(lateral.classList.contains('pendiente')).toBe(false);
+        expect(fixture.nativeElement.querySelector('.detalle-modal .modal-pendiente')).toBeNull();
+      }
+    });
+
+    it('recalcula los campos complementarios al cambiar de punto sin reutilizar datos anteriores', () => {
+      cargarDetalle({ ...PUNTO_MOCK, descripcion: 'Horario: 09:00–16:00\nDonaciones aceptadas: Agua' });
+
+      component.seleccionarPunto(PUNTO_REFUGIO_MOCK);
+      responderDetalle(PUNTO_REFUGIO_MOCK);
+
+      for (const vista of vistas()) {
+        expect(vista.querySelector('.detalle-horario p')?.textContent?.trim()).toBe(APP_TEXTOS.mapa.detalle.noInformado);
+        expect(vista.querySelector('.detalle-donaciones p')?.textContent?.trim()).toBe(APP_TEXTOS.mapa.detalle.noInformado);
+      }
+    });
+
+    it('conserva búsqueda, filtros y selección al mostrar el detalle complementario', () => {
+      cargarDetalle({ ...PUNTO_MOCK, descripcion: 'Horario: 09:00–16:00\nDonaciones aceptadas: Ropa' });
+      component.seleccionarFiltroTipo('REFUGIO');
+      const input: HTMLInputElement = fixture.nativeElement.querySelector('.bloque-busqueda input');
+      input.value = 'otra ciudad';
+      input.dispatchEvent(new Event('input'));
+      fixture.detectChanges();
+
+      expect(component.puntosFiltrados()).toEqual([]);
+      expect(component.puntoSeleccionado()?.id).toBe(PUNTO_MOCK.id);
+      expect(component.mostrarModalDetalle()).toBe(true);
+      expect(fixture.nativeElement.querySelector('.detalle-card .detalle-horario p').textContent).toContain('09:00–16:00');
+      const mapa = fixture.debugElement.query(By.directive(MapaLeafletStub)).componentInstance as MapaLeafletStub;
+      expect(mapa.puntos).toEqual([]);
+      httpTesting.expectNone(() => true);
+    });
+  });
 });
 
 

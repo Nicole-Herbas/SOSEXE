@@ -650,7 +650,9 @@
 
 
 .modal-verificado,
-.modal-pendiente {
+.modal-pendiente,
+.modal-rechazado,
+.modal-desconocido {
   display: inline-flex;
   align-items: center;
 
@@ -674,6 +676,26 @@
   background: #fff4e5;
 
   color: #a45a00;
+}
+
+.tag-verificado.rechazado,
+.modal-rechazado {
+  background: #fdecea;
+  color: #a12622;
+}
+
+.tag-verificado.desconocido,
+.modal-desconocido {
+  background: #edf0f2;
+  color: #475569;
+}
+
+.detalle-card .descripcion,
+.detalle-modal-descripcion,
+.detalle-horario p,
+.detalle-donaciones p {
+  white-space: pre-line;
+  overflow-wrap: anywhere;
 }
 
 

@@ -283,7 +283,13 @@ mapa: {
       'Elige un punto del mapa o de la lista para consultar su información.',
 
     horarioEtiqueta:
-      'HORARIO O ESTADO',
+      'HORARIO',
+
+    noInformado:
+      'No informado',
+
+    verificacionRechazada:
+      'Verificación rechazada',
 
     contactoEtiqueta:
       'CONTACTO',
@@ -304,7 +310,7 @@ mapa: {
       'Reportar información incorrecta',
 
     informacionVerificada:
-      'Información comprobada pendiente de revisión',
+      'Consulta el estado de verificación de este punto.',
     emailEtiqueta:
       'CORREO',
 
