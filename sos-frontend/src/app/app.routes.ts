@@ -38,6 +38,11 @@ export const routes: Routes = [
     component: Voluntariado
   },
   {
+    path: 'voluntariado/:id',
+    loadComponent: () => import('./features/voluntariado/pages/detalle-oportunidad/detalle-oportunidad')
+      .then(m => m.DetalleOportunidad)
+  },
+  {
     path: 'noticias',
     component: Noticias
   },

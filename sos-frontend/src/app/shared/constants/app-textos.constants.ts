@@ -550,6 +550,27 @@ voluntariado: {
 
 
   oportunidades: {
+    verDetalle: 'Ver detalle',
+    verDetalleEtiqueta: 'Ver detalle de',
+
+    detalle: {
+      titulo: 'Detalle de oportunidad',
+      descripcion: 'Descripción',
+      habilidades: 'Habilidades requeridas',
+      inicio: 'Inicio',
+      fin: 'Finalización',
+      centro: 'Centro responsable',
+      ciudad: 'Ciudad',
+      departamento: 'Departamento',
+      noInformado: 'No informado',
+      volver: 'Volver a oportunidades',
+      cargando: 'Cargando detalle de la oportunidad...',
+      noEncontrada: 'La oportunidad no existe o no está publicada.',
+      idInvalido: 'El identificador de la oportunidad no es válido.',
+      errorCarga: 'No se pudo cargar la oportunidad. Comprueba tu conexión e intenta de nuevo.',
+      reintentar: 'Reintentar',
+    },
+
     titulo:
       'Oportunidades disponibles',
 

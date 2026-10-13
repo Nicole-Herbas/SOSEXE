@@ -425,6 +425,17 @@ $font-display: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, s
   }
 }
 
+.vol-card__detalle {
+  box-sizing: border-box;
+  text-align: center;
+  text-decoration: none;
+
+  &:focus-visible {
+    outline: 3px solid $color-teal-dark;
+    outline-offset: 4px;
+  }
+}
+
 .vol-card__btn--red {
   background: $color-red;
 

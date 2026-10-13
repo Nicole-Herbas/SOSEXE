@@ -20,6 +20,34 @@ describe('VoluntariadoService', () => {
 
   afterEach(() => httpTesting.verify());
 
+  it('consulta el detalle publicado por ID y conserva el contrato ApiResponse', () => {
+    const respuesta: ApiResponse<OportunidadVoluntariado> = {
+      success: true, message: 'OK', timestamp: '',
+      data: {
+        id: 7, titulo: 'Organizar donaciones', descripcion: 'Descripción completa',
+        fechaInicio: '2026-10-15T09:00:00', fechaFin: '2026-10-15T16:00:00',
+        habilidadesRequeridas: 'Organización', estado: 'PUBLICADO',
+        centroId: 2, creadoPorId: null, centroNombre: 'Centro comunitario',
+        centroCiudad: 'El Alto', centroDepartamento: 'La Paz', centroNecesidades: [],
+      },
+    };
+    let recibida: ApiResponse<OportunidadVoluntariado> | undefined;
+    service.obtenerPublicadaPorId(7).subscribe(resultado => recibida = resultado);
+    const request = httpTesting.expectOne('/api/voluntariados/publicos/7');
+    expect(request.request.method).toBe('GET');
+    request.flush(respuesta);
+    expect(recibida).toEqual(respuesta);
+    httpTesting.expectNone('/api/voluntariados/7');
+  });
+
+  it('propaga el 404 del detalle público sin recurrir al endpoint antiguo', () => {
+    let recibido: HttpErrorResponse | undefined;
+    service.obtenerPublicadaPorId(7).subscribe({ error: error => recibido = error });
+    httpTesting.expectOne('/api/voluntariados/publicos/7').flush({}, { status: 404, statusText: 'Not Found' });
+    expect(recibido?.status).toBe(404);
+    httpTesting.expectNone('/api/voluntariados/7');
+  });
+
   it('consulta GET /api/voluntariados y conserva el contenedor y los datos del DTO', () => {
     const respuesta: ApiResponse<OportunidadVoluntariado[]> = {
       success: true,

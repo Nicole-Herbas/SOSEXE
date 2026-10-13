@@ -185,6 +185,22 @@ describe('Voluntariado', () => {
     expect(tarjetas[1].textContent).toContain('Comedor comunitario');
   });
 
+  it('enlaza cada tarjeta con su ID real y conserva los enlaces al combinar filtros', () => {
+    cargarOportunidades(OPORTUNIDADES_FILTROS);
+    const enlaces = () => Array.from(fixture.nativeElement.querySelectorAll('.vol-card__detalle') as NodeListOf<HTMLAnchorElement>);
+    expect(enlaces().map(enlace => enlace.getAttribute('href'))).toEqual([
+      '/voluntariado/7', '/voluntariado/8', '/voluntariado/9', '/voluntariado/10',
+    ]);
+    expect(enlaces()[0].textContent?.trim()).toBe(APP_TEXTOS.voluntariado.oportunidades.verDetalle);
+    expect(enlaces()[0].getAttribute('aria-label')).toContain(OPORTUNIDAD.titulo);
+
+    component.ciudadSeleccionada.set('el alto');
+    component.tipoAyudaSeleccionado.set(7);
+    fixture.detectChanges();
+    expect(enlaces().map(enlace => enlace.getAttribute('href'))).toEqual(['/voluntariado/7']);
+    httpTesting.expectNone(() => true);
+  });
+
   it('debe mostrar carga mientras espera la respuesta sin mostrar una lista vacía', () => {
     fixture.detectChanges();
     expect(component.cargandoOportunidades()).toBe(true);
