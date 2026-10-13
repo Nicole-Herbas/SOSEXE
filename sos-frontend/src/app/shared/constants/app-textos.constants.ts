@@ -241,9 +241,9 @@ mapa: {
   descripcion:
     'Encuentra centros, refugios, puntos de donación y emergencias. Filtra también por los artículos que necesitas entregar.',
 
-  buscarEtiqueta: 'Buscar por ciudad o nombre',
+  buscarEtiqueta: 'Buscar por nombre, ciudad o departamento',
 
-  buscarPlaceholder: 'Ej.: Cochabamba o San José',
+  buscarPlaceholder: 'Ej.: San José, El Alto o La Paz',
 
   necesidadesEtiqueta: '¿Qué deseas donar o encontrar?',
 
@@ -254,7 +254,7 @@ mapa: {
   verificacionPendiente: 'Verificación pendiente',
 
   sinResultados:
-    'No se encontraron puntos con los filtros seleccionados.',
+    'No se encontraron puntos que coincidan con la búsqueda y los filtros seleccionados.',
 
   cargando: 'Cargando puntos del mapa…',
 

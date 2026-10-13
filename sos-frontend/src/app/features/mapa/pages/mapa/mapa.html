@@ -34,9 +34,12 @@
   @if (featureToggles.mapa.mostrarLista) {
     <aside class="columna-izquierda">
       <div class="bloque-busqueda">
-        <label>{{ textos.buscarEtiqueta }}</label>
+        <label for="mapa-busqueda">{{ textos.buscarEtiqueta }}</label>
         <input
-          type="text"
+          id="mapa-busqueda"
+          type="search"
+          aria-controls="mapa-resultados"
+          [value]="busqueda()"
           [placeholder]="textos.buscarPlaceholder"
           (input)="actualizarBusqueda($event)"
         />
@@ -68,12 +71,12 @@
         <div class="separador"></div>
       }
 
-      <div class="resultados-header">
+      <div class="resultados-header" role="status" aria-live="polite" aria-atomic="true" [attr.aria-busy]="cargando()">
         <h3>{{ textos.resultadosTitulo }}</h3>
         <span class="cantidad-resultados">{{ puntosFiltrados().length }}</span>
       </div>
 
-      <div class="lista-resultados">
+      <div id="mapa-resultados" class="lista-resultados">
         @if (cargando()) {
           <p class="mensaje-estado">{{ textos.cargando }}</p>
         } @else if (error()) {

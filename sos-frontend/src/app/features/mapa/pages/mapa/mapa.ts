@@ -197,9 +197,7 @@ export class Mapa implements OnInit {
 
 
     const busqueda =
-      this.busqueda()
-        .toLowerCase()
-        .trim();
+      this.normalizarTextoBusqueda(this.busqueda());
 
 
     if (busqueda) {
@@ -207,22 +205,9 @@ export class Mapa implements OnInit {
       resultado =
         resultado.filter(
           p =>
-
-            p.nombre
-              .toLowerCase()
-              .includes(busqueda)
-
-            ||
-
-            p.ciudad
-              ?.toLowerCase()
-              .includes(busqueda)
-
-            ||
-
-            p.departamentoNombre
-              ?.toLowerCase()
-              .includes(busqueda)
+            this.normalizarTextoBusqueda(p.nombre).includes(busqueda)
+            || this.normalizarTextoBusqueda(p.ciudad).includes(busqueda)
+            || this.normalizarTextoBusqueda(p.departamentoNombre).includes(busqueda)
         );
 
     }
@@ -637,6 +622,15 @@ export class Mapa implements OnInit {
   // ==========================================
   // BÚSQUEDA
   // ==========================================
+
+  private normalizarTextoBusqueda(texto: string | null | undefined): string {
+    return (texto ?? '')
+      .normalize('NFD')
+      .replace(/\p{M}/gu, '')
+      .replace(/\s+/g, ' ')
+      .trim()
+      .toLocaleLowerCase('es');
+  }
 
   actualizarBusqueda(
     evento: Event
