@@ -1,0 +1,68 @@
+<main class="detalle-oportunidad" [attr.aria-busy]="cargando()">
+  <a class="detalle-oportunidad__volver" routerLink="/voluntariado">← {{ textos.volver }}</a>
+
+  @if (cargando()) {
+    <h1>{{ textos.titulo }}</h1>
+    <p role="status">{{ textos.cargando }}</p>
+  } @else if (error(); as errorActual) {
+    <h1>{{ textos.titulo }}</h1>
+    <p role="alert">{{ textos[errorActual] }}</p>
+    @if (errorActual === 'errorCarga') {
+      <button class="detalle-oportunidad__reintentar" type="button" (click)="reintentar()">
+        {{ textos.reintentar }}
+      </button>
+    }
+  } @else if (oportunidad(); as detalle) {
+    <article class="detalle-oportunidad__contenido">
+      <h1>{{ datoInformado(detalle.titulo) }}</h1>
+      <dl class="detalle-oportunidad__datos">
+        <div>
+          <dt>{{ textos.centro }}</dt>
+          <dd>{{ datoInformado(detalle.centroNombre) }}</dd>
+        </div>
+        <div>
+          <dt>{{ textos.ciudad }}</dt>
+          <dd>{{ datoInformado(detalle.centroCiudad) }}</dd>
+        </div>
+        <div>
+          <dt>{{ textos.departamento }}</dt>
+          <dd>{{ datoInformado(detalle.centroDepartamento) }}</dd>
+        </div>
+        <div>
+          <dt>{{ textos.inicio }}</dt>
+          <dd>
+            @if (formatearFecha(detalle.fechaInicio); as inicio) {
+              <time [attr.datetime]="detalle.fechaInicio">{{ inicio }}</time>
+            } @else { {{ textos.noInformado }} }
+          </dd>
+        </div>
+        <div>
+          <dt>{{ textos.fin }}</dt>
+          <dd>
+            @if (formatearFecha(detalle.fechaFin); as fin) {
+              <time [attr.datetime]="detalle.fechaFin">{{ fin }}</time>
+            } @else { {{ textos.noInformado }} }
+          </dd>
+        </div>
+      </dl>
+      <section aria-labelledby="oportunidad-descripcion">
+        <h2 id="oportunidad-descripcion">{{ textos.descripcion }}</h2>
+        <p class="detalle-oportunidad__texto">{{ datoInformado(detalle.descripcion) }}</p>
+      </section>
+      <section aria-labelledby="oportunidad-habilidades">
+        <h2 id="oportunidad-habilidades">{{ textos.habilidades }}</h2>
+        <p class="detalle-oportunidad__texto">{{ datoInformado(detalle.habilidadesRequeridas) }}</p>
+      </section>
+      @if (detalle.estado === 'PUBLICADO') {
+        <button class="detalle-oportunidad__postular" type="button"
+          [disabled]="mostrarPostulacion()" [attr.aria-expanded]="mostrarPostulacion()"
+          aria-controls="formulario-postulacion" (click)="mostrarPostulacion.set(true)">
+          {{ textosPostulacion.abrir }}
+        </button>
+        @if (mostrarPostulacion()) {
+          <app-formulario-postulacion id="formulario-postulacion" [oportunidad]="detalle" />
+        }
+      }
+    </article>
+  }
+</main>

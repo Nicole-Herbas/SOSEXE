@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.authentication.BadCredentialsException;
 
 import java.util.List;
 
@@ -19,6 +20,12 @@ public class PostulacionController {
 
     public PostulacionController(PostulacionService postulacionService) {
         this.postulacionService = postulacionService;
+    }
+
+    // Limitado a este controlador: no cambia las respuestas de otros módulos.
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<ApiResponse<Void>> sesionInvalida(BadCredentialsException ex) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ApiResponse.error(ex.getMessage()));
     }
 
     @GetMapping("/voluntariado/{voluntariadoId}")

@@ -550,11 +550,104 @@ voluntariado: {
 
 
   oportunidades: {
+    postulacion: {
+      titulo: 'Postularme a esta oportunidad',
+      abrir: 'Postularme',
+      habilidades: 'Tus habilidades registradas',
+      noInformado: 'No informado',
+      disponibilidad: 'Disponibilidad para esta actividad',
+      disponibilidadAyuda: 'Obligatoria. Máximo 255 caracteres.',
+      disponibilidadRequerida: 'Indica tu disponibilidad.',
+      disponibilidadLarga: 'La disponibilidad no puede superar los 255 caracteres.',
+      sugerencia: 'Disponibilidad registrada en tu perfil',
+      usarSugerencia: 'Usar esta sugerencia',
+      comentario: 'Comentario adicional (opcional)',
+      comentarioAyuda: 'Máximo 500 caracteres.',
+      comentarioLargo: 'El comentario no puede superar los 500 caracteres.',
+      enviar: 'Enviar postulación',
+      enviando: 'Enviando postulación...',
+      cargando: 'Consultando tu perfil y tus postulaciones...',
+      sinSesion: 'Inicia sesión para postularte a esta oportunidad.',
+      sesionVencida: 'Tu sesión no es válida o ha vencido. Inicia sesión para continuar.',
+      iniciarSesion: 'Iniciar sesión',
+      sinPerfil: 'Necesitas registrar tu perfil de voluntario antes de postularte.',
+      crearPerfil: 'Crear perfil voluntario',
+      duplicada: 'Ya existe una postulación tuya para esta oportunidad, incluso si fue rechazada.',
+      exito: 'Tu postulación se registró correctamente.',
+      estadoLabel: 'Estado de la postulación',
+      pendiente: 'PENDIENTE',
+      noDisponible: 'La oportunidad ya no está publicada o ha finalizado. No se pudo registrar la postulación.',
+      noEncontrada: 'La oportunidad ya no existe o no está disponible.',
+      validacionServidor: 'Revisa la disponibilidad y el comentario antes de volver a enviar.',
+      errorConexion: 'No se pudo confirmar la postulación. Comprueba tu conexión y vuelve a intentarlo.',
+      errorCarga: 'No se pudo consultar tu perfil o tus postulaciones. Intenta de nuevo.',
+      respuestaInesperada: 'No se pudo confirmar el registro. Consulta tus postulaciones antes de volver a enviar.',
+      reintentar: 'Reintentar consulta',
+    },
+
+    verDetalle: 'Ver detalle',
+    verDetalleEtiqueta: 'Ver detalle de',
+
+    detalle: {
+      titulo: 'Detalle de oportunidad',
+      descripcion: 'Descripción',
+      habilidades: 'Habilidades requeridas',
+      inicio: 'Inicio',
+      fin: 'Finalización',
+      centro: 'Centro responsable',
+      ciudad: 'Ciudad',
+      departamento: 'Departamento',
+      noInformado: 'No informado',
+      volver: 'Volver a oportunidades',
+      cargando: 'Cargando detalle de la oportunidad...',
+      noEncontrada: 'La oportunidad no existe o no está publicada.',
+      idInvalido: 'El identificador de la oportunidad no es válido.',
+      errorCarga: 'No se pudo cargar la oportunidad. Comprueba tu conexión e intenta de nuevo.',
+      reintentar: 'Reintentar',
+    },
+
     titulo:
       'Oportunidades disponibles',
 
     subtitulo:
       'Crea tu perfil para ver recomendaciones personalizadas, o explora todas las oportunidades directamente.',
+
+    cargando:
+      'Cargando oportunidades de voluntariado...',
+
+    errorCarga:
+      'No se pudieron cargar las oportunidades de voluntariado. Intenta de nuevo más tarde.',
+
+    sinOportunidades:
+      'No hay oportunidades de voluntariado publicadas por el momento.',
+
+    filtros: {
+      ciudadLabel: 'Ciudad',
+      todasCiudades: 'Todas las ciudades',
+      tipoAyudaLabel: 'Tipo de ayuda',
+      todosTiposAyuda: 'Todos los tipos de ayuda',
+      restablecer: 'Restablecer filtros',
+      resultadosLabel: 'Resultados encontrados',
+      sinResultados: 'No hay oportunidades que coincidan con los filtros seleccionados.',
+    },
+
+    centroLabel:
+      'Centro responsable',
+
+    inicioLabel:
+      'Inicio',
+
+    finLabel:
+      'Finalización',
+
+    centroNoDisponible:
+      'Centro no disponible',
+
+    ubicacionNoDisponible:
+      'Ubicación no disponible',
+
+    fechaNoDisponible:
+      'Fecha no disponible',
 
     cuposLabel:
       'Cupos disponibles',

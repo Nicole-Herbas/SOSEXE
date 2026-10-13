@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpContext } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 import { PerfilVoluntario } from '../models/perfil-voluntario';
@@ -26,10 +26,11 @@ export class PerfilVoluntarioService {
   }
 
 
-  obtenerMiPerfil(): Observable<ApiResponse<PerfilVoluntario>> {
+  obtenerMiPerfil(context?: HttpContext): Observable<ApiResponse<PerfilVoluntario>> {
 
     return this.http.get<ApiResponse<PerfilVoluntario>>(
-      `${this.apiUrl}/me`
+      `${this.apiUrl}/me`,
+      { context }
     );
   }
 

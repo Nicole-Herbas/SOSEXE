@@ -1,0 +1,47 @@
+:host { display: block; }
+
+.postulacion {
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid #e2e8f0;
+  overflow-wrap: anywhere;
+
+  h2 { font-size: 1.25rem; }
+  h3 { font-size: 1rem; }
+  p { line-height: 1.6; }
+  label { display: block; font-weight: 700; margin-top: 20px; }
+  textarea {
+    display: block;
+    box-sizing: border-box;
+    width: 100%;
+    min-height: 100px;
+    padding: 12px;
+    border: 1px solid #64748b;
+    border-radius: 8px;
+    font: inherit;
+    resize: vertical;
+  }
+  a { color: #05635f; }
+  button {
+    padding: 12px 20px;
+    border: 0;
+    border-radius: 12px;
+    background: #087f7b;
+    color: #fff;
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+    &:disabled { opacity: .6; cursor: default; }
+  }
+  a:focus-visible, button:focus-visible, textarea:focus-visible {
+    outline: 3px solid #05635f;
+    outline-offset: 3px;
+  }
+}
+
+.postulacion__actividad { font-weight: 600; }
+.postulacion__habilidades { padding-left: 24px; line-height: 1.7; }
+.postulacion__sugerencia { color: #475569; }
+.postulacion__sugerir { margin-bottom: 12px; }
+.postulacion__error { color: #b42318; }
+.postulacion__exito { padding: 16px; border-radius: 12px; background: #e5f4f2; }

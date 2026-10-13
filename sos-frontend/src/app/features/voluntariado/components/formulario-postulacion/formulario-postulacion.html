@@ -1,0 +1,68 @@
+<section class="postulacion" aria-labelledby="postulacion-titulo"
+  [attr.aria-busy]="estado() === 'CARGANDO' || enviando()">
+  <h2 id="postulacion-titulo">{{ textos.titulo }}</h2>
+  <p class="postulacion__actividad">{{ oportunidad.titulo }}</p>
+
+  @switch (estado()) {
+    @case ('CARGANDO') { <p role="status">{{ textos.cargando }}</p> }
+    @case ('SIN_SESION') {
+      <p role="status">{{ mensajeError() || textos.sinSesion }}</p>
+      <a routerLink="/login" [queryParams]="{ returnUrl: returnUrl }">{{ textos.iniciarSesion }}</a>
+    }
+    @case ('SIN_PERFIL') {
+      <p role="status">{{ textos.sinPerfil }}</p>
+      <a routerLink="/voluntariado">{{ textos.crearPerfil }}</a>
+    }
+    @case ('DUPLICADA') { <p role="status">{{ textos.duplicada }}</p> }
+    @case ('EXITO') {
+      <div class="postulacion__exito" role="status">
+        <p>{{ textos.exito }}</p>
+        <p>{{ textos.estadoLabel }}: <strong>{{ textos.pendiente }}</strong></p>
+      </div>
+    }
+    @case ('ERROR_CARGA') {
+      <p role="alert">{{ mensajeError() }}</p>
+      <button type="button" (click)="cargarDatos()">{{ textos.reintentar }}</button>
+    }
+    @case ('NO_DISPONIBLE') { <p role="alert">{{ mensajeError() }}</p> }
+    @case ('LISTO') {
+      <h3>{{ textos.habilidades }}</h3>
+      <ul class="postulacion__habilidades">
+        @for (habilidad of perfil()?.habilidades ?? []; track $index) { <li>{{ habilidad }}</li> }
+        @empty { <li>{{ textos.noInformado }}</li> }
+      </ul>
+      <form [formGroup]="formulario" (ngSubmit)="enviar()">
+        <label for="postulacion-disponibilidad">{{ textos.disponibilidad }}</label>
+        <p id="postulacion-disponibilidad-ayuda">{{ textos.disponibilidadAyuda }}</p>
+        @if (sugerencia()) {
+          <p class="postulacion__sugerencia">{{ textos.sugerencia }}: {{ sugerencia() }}</p>
+          @if (puedeUsarSugerencia()) {
+            <button type="button" class="postulacion__sugerir" (click)="usarSugerencia()">{{ textos.usarSugerencia }}</button>
+          }
+        }
+        <textarea id="postulacion-disponibilidad" formControlName="disponibilidad" required maxlength="255"
+          aria-describedby="postulacion-disponibilidad-ayuda postulacion-disponibilidad-error"
+          [attr.aria-invalid]="formulario.controls.disponibilidad.touched && formulario.controls.disponibilidad.invalid"></textarea>
+        <p id="postulacion-disponibilidad-error" class="postulacion__error">
+          @if (formulario.controls.disponibilidad.touched) {
+            @if (formulario.controls.disponibilidad.hasError('required')) { {{ textos.disponibilidadRequerida }} }
+            @else if (formulario.controls.disponibilidad.hasError('maxlength')) { {{ textos.disponibilidadLarga }} }
+          }
+        </p>
+        <label for="postulacion-comentario">{{ textos.comentario }}</label>
+        <p id="postulacion-comentario-ayuda">{{ textos.comentarioAyuda }}</p>
+        <textarea id="postulacion-comentario" formControlName="comentario" maxlength="500"
+          aria-describedby="postulacion-comentario-ayuda postulacion-comentario-error"
+          [attr.aria-invalid]="formulario.controls.comentario.touched && formulario.controls.comentario.invalid"></textarea>
+        <p id="postulacion-comentario-error" class="postulacion__error">
+          @if (formulario.controls.comentario.touched && formulario.controls.comentario.hasError('maxlength')) {
+            {{ textos.comentarioLargo }}
+          }
+        </p>
+        @if (mensajeError()) { <p class="postulacion__error" role="alert">{{ mensajeError() }}</p> }
+        @if (enviando()) { <p role="status">{{ textos.enviando }}</p> }
+        <button type="submit" [disabled]="enviando()">{{ textos.enviar }}</button>
+      </form>
+    }
+  }
+</section>
