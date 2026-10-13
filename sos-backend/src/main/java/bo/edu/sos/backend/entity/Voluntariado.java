@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.time.LocalDateTime;
 
@@ -24,9 +26,12 @@ public class Voluntariado {
     @Column(nullable = false, length = 1000)
     private String descripcion;
 
+    // DATETIME representa una hora local, sin conversiones mediante java.sql.Timestamp.
+    @JdbcTypeCode(SqlTypes.LOCAL_DATE_TIME)
     @Column(name = "fecha_inicio", nullable = false)
     private LocalDateTime fechaInicio;
 
+    @JdbcTypeCode(SqlTypes.LOCAL_DATE_TIME)
     @Column(name = "fecha_fin", nullable = false)
     private LocalDateTime fechaFin;
 

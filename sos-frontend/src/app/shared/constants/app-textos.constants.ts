@@ -556,6 +556,33 @@ voluntariado: {
     subtitulo:
       'Crea tu perfil para ver recomendaciones personalizadas, o explora todas las oportunidades directamente.',
 
+    cargando:
+      'Cargando oportunidades de voluntariado...',
+
+    errorCarga:
+      'No se pudieron cargar las oportunidades de voluntariado. Intenta de nuevo más tarde.',
+
+    sinOportunidades:
+      'No hay oportunidades de voluntariado publicadas por el momento.',
+
+    centroLabel:
+      'Centro responsable',
+
+    inicioLabel:
+      'Inicio',
+
+    finLabel:
+      'Finalización',
+
+    centroNoDisponible:
+      'Centro no disponible',
+
+    ubicacionNoDisponible:
+      'Ubicación no disponible',
+
+    fechaNoDisponible:
+      'Fecha no disponible',
+
     cuposLabel:
       'Cupos disponibles',
 
