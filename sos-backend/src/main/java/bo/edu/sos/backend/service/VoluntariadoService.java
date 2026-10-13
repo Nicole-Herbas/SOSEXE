@@ -63,6 +63,26 @@ public class VoluntariadoService {
 
 
     @Transactional(readOnly = true)
+    public VoluntariadoDTO buscarPublicadaPorId(Long id) {
+        Voluntariado voluntariado = voluntariadoRepository.findById(id)
+                .filter(oportunidad -> "PUBLICADO".equals(oportunidad.getEstado()))
+                .orElseThrow(() -> new ResourceNotFoundException("Voluntariado", id));
+
+        VoluntariadoDTO dto = convertirADTO(voluntariado);
+        // El detalle ciudadano no necesita identificar al usuario que creó la oportunidad.
+        dto.setCreadoPorId(null);
+
+        LogHelper.debug(
+                VoluntariadoService.class,
+                "Detalle público de voluntariado consultado. id={}",
+                id
+        );
+
+        return dto;
+    }
+
+
+    @Transactional(readOnly = true)
     public VoluntariadoDTO buscarPorId(
             Long id) {
 

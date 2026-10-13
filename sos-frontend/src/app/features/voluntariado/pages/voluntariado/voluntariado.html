@@ -170,6 +170,11 @@
                   <strong>{{ textos.oportunidades.finLabel }}:</strong>
                   <time [attr.datetime]="oportunidad.fechaFin">{{ formatearFecha(oportunidad.fechaFin) }}</time>
                 </p>
+                <a class="vol-card__btn vol-card__btn--teal vol-card__detalle"
+                  [routerLink]="['/voluntariado', oportunidad.id]"
+                  [attr.aria-label]="textos.oportunidades.verDetalleEtiqueta + ' ' + oportunidad.titulo">
+                  {{ textos.oportunidades.verDetalle }}
+                </a>
               </div>
             </div>
           </article>
