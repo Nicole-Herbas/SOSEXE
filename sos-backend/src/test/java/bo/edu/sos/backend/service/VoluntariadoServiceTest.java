@@ -6,6 +6,7 @@ import bo.edu.sos.backend.entity.Departamento;
 import bo.edu.sos.backend.entity.Necesidad;
 import bo.edu.sos.backend.entity.Usuario;
 import bo.edu.sos.backend.entity.Voluntariado;
+import bo.edu.sos.backend.exception.ResourceNotFoundException;
 import bo.edu.sos.backend.repository.CentroRepository;
 import bo.edu.sos.backend.repository.UsuarioRepository;
 import bo.edu.sos.backend.repository.VoluntariadoRepository;
@@ -15,10 +16,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -180,6 +183,88 @@ class VoluntariadoServiceTest {
                 () -> assertEquals("El Alto", dto.getCentroCiudad()),
                 () -> assertNull(dto.getCentroDepartamento())
         );
+    }
+
+    @Test
+    void buscarPublicadaPorIdConservaDescripcionHabilidadesHorarioYCentroSinIdentificarCreador() {
+        Voluntariado publicada = crearPublicado();
+        String descripcion = "Descripción completa.\n\n" + "Detalle de la actividad. ".repeat(30);
+        publicada.setDescripcion(descripcion);
+        publicada.setFechaInicio(LocalDateTime.of(2026, 10, 15, 9, 0));
+        publicada.setFechaFin(LocalDateTime.of(2026, 10, 15, 16, 0));
+        Necesidad necesidad = new Necesidad();
+        necesidad.setId(7L);
+        necesidad.setNombre("Apoyo educativo");
+        publicada.getCentro().getNecesidades().add(necesidad);
+        when(voluntariadoRepository.findById(1L)).thenReturn(Optional.of(publicada));
+
+        VoluntariadoDTO dto = voluntariadoService.buscarPublicadaPorId(1L);
+
+        assertAll(
+                () -> assertEquals(publicada.getId(), dto.getId()),
+                () -> assertEquals(publicada.getTitulo(), dto.getTitulo()),
+                () -> assertEquals(descripcion, dto.getDescripcion()),
+                () -> assertEquals(publicada.getHabilidadesRequeridas(), dto.getHabilidadesRequeridas()),
+                () -> assertEquals(publicada.getFechaInicio(), dto.getFechaInicio()),
+                () -> assertEquals(publicada.getFechaFin(), dto.getFechaFin()),
+                () -> assertEquals(2L, dto.getCentroId()),
+                () -> assertEquals("Centro de apoyo", dto.getCentroNombre()),
+                () -> assertEquals("El Alto", dto.getCentroCiudad()),
+                () -> assertEquals("La Paz", dto.getCentroDepartamento()),
+                () -> assertEquals(7L, dto.getCentroNecesidades().get(0).getId()),
+                () -> assertEquals("PUBLICADO", dto.getEstado()),
+                () -> assertNull(dto.getCreadoPorId()),
+                () -> assertEquals(4L, publicada.getCreadoPor().getId())
+        );
+        verify(voluntariadoRepository).findById(1L);
+        verifyNoMoreInteractions(voluntariadoRepository);
+        verifyNoInteractions(centroRepository, usuarioRepository);
+    }
+
+    @Test
+    void buscarPublicadaPorIdMantieneHabilidadesNulas() {
+        Voluntariado publicada = crearPublicado();
+        publicada.setHabilidadesRequeridas(null);
+        when(voluntariadoRepository.findById(1L)).thenReturn(Optional.of(publicada));
+
+        assertNull(voluntariadoService.buscarPublicadaPorId(1L).getHabilidadesRequeridas());
+        verifyNoInteractions(usuarioRepository);
+    }
+
+    @Test
+    void buscarPublicadaPorIdInexistenteLanzaRecursoNoEncontrado() {
+        when(voluntariadoRepository.findById(99L)).thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class,
+                () -> voluntariadoService.buscarPublicadaPorId(99L));
+    }
+
+    @ParameterizedTest
+    @NullSource
+    @ValueSource(strings = {"BORRADOR", "CERRADO", "FINALIZADO", "CANCELADO", "RECHAZADO", "publicado", "PUBLICADO "})
+    void buscarPublicadaPorIdRechazaCualquierEstadoDistintoDePublicado(String estado) {
+        Voluntariado oportunidad = crearPublicado();
+        oportunidad.setEstado(estado);
+        when(voluntariadoRepository.findById(1L)).thenReturn(Optional.of(oportunidad));
+
+        assertThrows(ResourceNotFoundException.class,
+                () -> voluntariadoService.buscarPublicadaPorId(1L));
+    }
+
+    @Test
+    void consultasAntiguasMantienenEstadoEIdentificadorDelCreador() {
+        Voluntariado borrador = crearPublicado();
+        borrador.setEstado("BORRADOR");
+        when(voluntariadoRepository.findById(1L)).thenReturn(Optional.of(borrador));
+        when(voluntariadoRepository.findByCentroId(2L)).thenReturn(List.of(borrador));
+
+        VoluntariadoDTO porId = voluntariadoService.buscarPorId(1L);
+        VoluntariadoDTO porCentro = voluntariadoService.buscarPorCentro(2L).get(0);
+
+        assertEquals("BORRADOR", porId.getEstado());
+        assertEquals(4L, porId.getCreadoPorId());
+        assertEquals("BORRADOR", porCentro.getEstado());
+        assertEquals(4L, porCentro.getCreadoPorId());
     }
 
     private Voluntariado crearPublicado() {

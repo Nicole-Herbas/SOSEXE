@@ -12,4 +12,10 @@ public interface PostulacionRepository extends JpaRepository<Postulacion, Long> 
     List<Postulacion> findByUsuarioId(Long usuarioId);
 
     boolean existsByVoluntariadoIdAndUsuarioId(Long voluntariadoId, Long usuarioId);
+
+    List<Postulacion> findByVoluntariadoIdAndEstado(Long voluntariadoId, String estado);
+
+    List<Postulacion> findByUsuarioIdAndEstado(Long usuarioId, String estado);
+
+    long countByVoluntariadoIdAndEstado(Long voluntariadoId, String estado);
 }

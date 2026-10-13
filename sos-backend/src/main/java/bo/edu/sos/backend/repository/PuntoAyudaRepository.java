@@ -10,4 +10,6 @@ public interface PuntoAyudaRepository extends JpaRepository<PuntoAyuda, Long> {
     List<PuntoAyuda> findByDepartamentoId(Long departamentoId);
 
     List<PuntoAyuda> findByEstadoVerificacion(String estadoVerificacion);
+
+    List<PuntoAyuda> findByCreadorIdOrderByFechaCreacionDesc(Long creadorId);
 }

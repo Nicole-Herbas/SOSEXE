@@ -9,4 +9,5 @@ public interface SolicitudCentroRepository
         extends JpaRepository<SolicitudCentro, Long> {
 
     List<SolicitudCentro> findByEstado(String estado);
+        long countByEstado(String estado);
 }

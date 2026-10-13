@@ -9,7 +9,11 @@ import { AcercaDe } from './features/acerca-de/pages/acerca-de/acerca-de';
 import { RegistrarCentroComponent } from './features/acerca-de/pages/registrar-centro/registrar-centro';
 import { LoginComponent } from './features/auth/pages/login/login';
 import { RegistroComponent } from './features/auth/pages/registro/registro';
+import { PreferenciasComponent } from './features/preferencias/pages/preferencias/preferencias';
 import { adminGuard } from './admin-guard';
+import { authGuard } from './auth-guard';
+import { RegistrarPuntoComponent } from './features/puntos-ayuda/pages/registrar-punto/registrar-punto';
+import { registroPuntoGuard } from './features/auth/guards/registro-punto.guard';
 
 export const routes: Routes = [
   {
@@ -34,6 +38,11 @@ export const routes: Routes = [
     component: Voluntariado
   },
   {
+    path: 'voluntariado/:id',
+    loadComponent: () => import('./features/voluntariado/pages/detalle-oportunidad/detalle-oportunidad')
+      .then(m => m.DetalleOportunidad)
+  },
+  {
     path: 'noticias',
     component: Noticias
   },
@@ -46,6 +55,11 @@ export const routes: Routes = [
     component: RegistrarCentroComponent
   },
   {
+    path: 'registrar-punto',
+    component: RegistrarPuntoComponent,
+    canActivate: [registroPuntoGuard]
+  },
+  {
     path: 'centros',
     component: ListaCentros
   },
@@ -56,6 +70,11 @@ export const routes: Routes = [
   {
     path: 'registro',
     component: RegistroComponent
+  },
+  {
+    path: 'preferencias',
+    component: PreferenciasComponent,
+    canActivate: [authGuard]
   },
   {
     path: 'admin',

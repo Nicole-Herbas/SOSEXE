@@ -8,4 +8,6 @@ import java.util.Optional;
 public interface SuscripcionSmsRepository extends JpaRepository<SuscripcionSms, Long> {
 
     Optional<SuscripcionSms> findByUsuarioId(Long usuarioId);
+
+    boolean existsByUsuarioId(Long usuarioId);
 }
