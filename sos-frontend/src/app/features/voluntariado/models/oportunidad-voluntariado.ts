@@ -1,3 +1,8 @@
+export interface NecesidadCentro {
+  id: number;
+  nombre: string | null;
+}
+
 export interface OportunidadVoluntariado {
   id: number;
   titulo: string;
@@ -11,4 +16,5 @@ export interface OportunidadVoluntariado {
   centroNombre: string | null;
   centroCiudad: string | null;
   centroDepartamento: string | null;
+  centroNecesidades: (NecesidadCentro | null)[] | null;
 }

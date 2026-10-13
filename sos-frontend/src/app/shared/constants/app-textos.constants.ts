@@ -564,6 +564,16 @@ voluntariado: {
     sinOportunidades:
       'No hay oportunidades de voluntariado publicadas por el momento.',
 
+    filtros: {
+      ciudadLabel: 'Ciudad',
+      todasCiudades: 'Todas las ciudades',
+      tipoAyudaLabel: 'Tipo de ayuda',
+      todosTiposAyuda: 'Todos los tipos de ayuda',
+      restablecer: 'Restablecer filtros',
+      resultadosLabel: 'Resultados encontrados',
+      sinResultados: 'No hay oportunidades que coincidan con los filtros seleccionados.',
+    },
+
     centroLabel:
       'Centro responsable',
 
