@@ -14,4 +14,8 @@ export class VoluntariadoService {
   listarTodos(): Observable<ApiResponse<OportunidadVoluntariado[]>> {
     return this.http.get<ApiResponse<OportunidadVoluntariado[]>>(this.apiUrl);
   }
+
+  obtenerPublicadaPorId(id: number): Observable<ApiResponse<OportunidadVoluntariado>> {
+    return this.http.get<ApiResponse<OportunidadVoluntariado>>(`${this.apiUrl}/publicos/${id}`);
+  }
 }

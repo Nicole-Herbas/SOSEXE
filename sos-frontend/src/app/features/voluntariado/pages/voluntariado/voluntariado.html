@@ -122,8 +122,35 @@
         {{ textos.oportunidades.errorCarga }}
       </p>
     } @else {
+      <div class="vol-filtros">
+        <div class="vol-filtros__campo">
+          <label for="vol-ciudad">{{ textos.oportunidades.filtros.ciudadLabel }}</label>
+          <select id="vol-ciudad" [ngModel]="ciudadSeleccionada()" (ngModelChange)="ciudadSeleccionada.set($event)">
+            <option value="">{{ textos.oportunidades.filtros.todasCiudades }}</option>
+            @for (ciudad of ciudadesDisponibles(); track ciudad.valor) {
+              <option [value]="ciudad.valor">{{ ciudad.nombre }}</option>
+            }
+          </select>
+        </div>
+        <div class="vol-filtros__campo">
+          <label for="vol-tipo-ayuda">{{ textos.oportunidades.filtros.tipoAyudaLabel }}</label>
+          <select id="vol-tipo-ayuda" [ngModel]="tipoAyudaSeleccionado()" (ngModelChange)="tipoAyudaSeleccionado.set($event)">
+            <option [ngValue]="null">{{ textos.oportunidades.filtros.todosTiposAyuda }}</option>
+            @for (tipo of tiposAyudaDisponibles(); track tipo.id) {
+              <option [ngValue]="tipo.id">{{ tipo.nombre }}</option>
+            }
+          </select>
+        </div>
+        <button type="button" class="btn btn--outline" (click)="restablecerFiltros()"
+          [disabled]="!ciudadSeleccionada() && tipoAyudaSeleccionado() === null">
+          {{ textos.oportunidades.filtros.restablecer }}
+        </button>
+      </div>
+      <p class="vol-oportunidades__contador" role="status" aria-live="polite" aria-atomic="true">
+        {{ textos.oportunidades.filtros.resultadosLabel }}: {{ oportunidadesFiltradas().length }}
+      </p>
       <div class="vol-cards">
-        @for (oportunidad of oportunidades(); track oportunidad.id) {
+        @for (oportunidad of oportunidadesFiltradas(); track oportunidad.id) {
           <article class="vol-card">
             <div class="vol-card__top-bar vol-card__top-bar--teal"></div>
             <div class="vol-card__body">
@@ -143,12 +170,17 @@
                   <strong>{{ textos.oportunidades.finLabel }}:</strong>
                   <time [attr.datetime]="oportunidad.fechaFin">{{ formatearFecha(oportunidad.fechaFin) }}</time>
                 </p>
+                <a class="vol-card__btn vol-card__btn--teal vol-card__detalle"
+                  [routerLink]="['/voluntariado', oportunidad.id]"
+                  [attr.aria-label]="textos.oportunidades.verDetalleEtiqueta + ' ' + oportunidad.titulo">
+                  {{ textos.oportunidades.verDetalle }}
+                </a>
               </div>
             </div>
           </article>
         } @empty {
           <p class="vol-oportunidades__estado" role="status">
-            {{ textos.oportunidades.sinOportunidades }}
+            {{ oportunidades().length === 0 ? textos.oportunidades.sinOportunidades : textos.oportunidades.filtros.sinResultados }}
           </p>
         }
       </div>

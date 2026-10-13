@@ -27,7 +27,21 @@ const OPORTUNIDAD: OportunidadVoluntariado = {
   centroNombre: 'Centro comunitario',
   centroCiudad: 'El Alto',
   centroDepartamento: 'La Paz',
+  centroNecesidades: [{ id: 7, nombre: 'Apoyo educativo' }, { id: 9, nombre: 'Logística' }],
 };
+
+const OPORTUNIDADES_FILTROS: OportunidadVoluntariado[] = [
+  OPORTUNIDAD,
+  {
+    ...OPORTUNIDAD, id: 8, titulo: 'Distribuir alimentos', centroCiudad: 'La Paz',
+    centroNecesidades: [{ id: 9, nombre: 'Logística' }],
+  },
+  {
+    ...OPORTUNIDAD, id: 9, titulo: 'Apoyar en las tareas', centroCiudad: 'Santa Cruz',
+    centroNecesidades: [{ id: 7, nombre: 'Apoyo educativo' }],
+  },
+  { ...OPORTUNIDAD, id: 10, titulo: 'Organizar el centro', centroCiudad: 'La Paz', centroNecesidades: [] },
+];
 
 const PERFIL: PerfilVoluntario = {
   id: 1,
@@ -99,6 +113,22 @@ describe('Voluntariado', () => {
     return fixture.debugElement.query(By.directive(CrearPerfilComponent)).componentInstance;
   }
 
+  async function seleccionarOpcion(selector: string, nombre: string): Promise<void> {
+    const select: HTMLSelectElement = fixture.nativeElement.querySelector(selector);
+    const indice = Array.from(select.options).findIndex((opcion) => opcion.textContent?.trim() === nombre);
+    expect(indice).toBeGreaterThanOrEqual(0);
+    select.selectedIndex = indice;
+    select.dispatchEvent(new Event('change'));
+    fixture.detectChanges();
+    await fixture.whenStable();
+    fixture.detectChanges();
+  }
+
+  function titulosVisibles(): string[] {
+    return Array.from(fixture.nativeElement.querySelectorAll('.vol-card__title') as NodeListOf<HTMLElement>)
+      .map((titulo) => titulo.textContent!.trim());
+  }
+
   it('debe crear el componente', () => {
     expect(component).toBeTruthy();
   });
@@ -155,6 +185,22 @@ describe('Voluntariado', () => {
     expect(tarjetas[1].textContent).toContain('Comedor comunitario');
   });
 
+  it('enlaza cada tarjeta con su ID real y conserva los enlaces al combinar filtros', () => {
+    cargarOportunidades(OPORTUNIDADES_FILTROS);
+    const enlaces = () => Array.from(fixture.nativeElement.querySelectorAll('.vol-card__detalle') as NodeListOf<HTMLAnchorElement>);
+    expect(enlaces().map(enlace => enlace.getAttribute('href'))).toEqual([
+      '/voluntariado/7', '/voluntariado/8', '/voluntariado/9', '/voluntariado/10',
+    ]);
+    expect(enlaces()[0].textContent?.trim()).toBe(APP_TEXTOS.voluntariado.oportunidades.verDetalle);
+    expect(enlaces()[0].getAttribute('aria-label')).toContain(OPORTUNIDAD.titulo);
+
+    component.ciudadSeleccionada.set('el alto');
+    component.tipoAyudaSeleccionado.set(7);
+    fixture.detectChanges();
+    expect(enlaces().map(enlace => enlace.getAttribute('href'))).toEqual(['/voluntariado/7']);
+    httpTesting.expectNone(() => true);
+  });
+
   it('debe mostrar carga mientras espera la respuesta sin mostrar una lista vacía', () => {
     fixture.detectChanges();
     expect(component.cargandoOportunidades()).toBe(true);
@@ -168,7 +214,7 @@ describe('Voluntariado', () => {
     fixture.detectChanges();
     expect(component.cargandoOportunidades()).toBe(false);
     expect(seccion.getAttribute('aria-busy')).toBe('false');
-    expect(seccion.querySelector('[role="status"]')).toBeNull();
+    expect(seccion.querySelector('.vol-oportunidades__estado')).toBeNull();
     expect(seccion.querySelector('.vol-card')).not.toBeNull();
   });
 
@@ -188,7 +234,8 @@ describe('Voluntariado', () => {
     cargarOportunidades([]);
     expect(component.errorOportunidades()).toBe(false);
     expect(component.cargandoOportunidades()).toBe(false);
-    expect(fixture.nativeElement.querySelector('.vol-oportunidades [role="status"]')?.textContent).toContain(APP_TEXTOS.voluntariado.oportunidades.sinOportunidades);
+    expect(fixture.nativeElement.querySelector('.vol-oportunidades__estado')?.textContent).toContain(APP_TEXTOS.voluntariado.oportunidades.sinOportunidades);
+    expect(fixture.nativeElement.textContent).not.toContain(APP_TEXTOS.voluntariado.oportunidades.filtros.sinResultados);
     expect(fixture.nativeElement.querySelector('.vol-card')).toBeNull();
   });
 
@@ -345,5 +392,142 @@ describe('Voluntariado', () => {
 
     expect(fixture.nativeElement.querySelector('app-tarjeta-perfil')).toBeNull();
     expect(fixture.nativeElement.querySelector('.vol-card')).not.toBeNull();
+  });
+
+  it('filtra por ciudad desde un selector con etiqueta accesible', async () => {
+    cargarOportunidades(OPORTUNIDADES_FILTROS);
+
+    await seleccionarOpcion('#vol-ciudad', 'La Paz');
+
+    expect(component.ciudadSeleccionada()).toBe('la paz');
+    expect(titulosVisibles()).toEqual(['Distribuir alimentos', 'Organizar el centro']);
+    expect(fixture.nativeElement.querySelector('label[for="vol-ciudad"]').textContent)
+      .toContain(APP_TEXTOS.voluntariado.oportunidades.filtros.ciudadLabel);
+    expect(fixture.nativeElement.querySelector('.vol-oportunidades__contador').textContent)
+      .toContain(`${APP_TEXTOS.voluntariado.oportunidades.filtros.resultadosLabel}: 2`);
+  });
+
+  it('filtra por ID de tipo de ayuda e incluye oportunidades con múltiples necesidades', async () => {
+    cargarOportunidades(OPORTUNIDADES_FILTROS);
+
+    await seleccionarOpcion('#vol-tipo-ayuda', 'Logística');
+
+    expect(component.tipoAyudaSeleccionado()).toBe(9);
+    expect(titulosVisibles()).toEqual(['Clasificar donaciones', 'Distribuir alimentos']);
+    expect(fixture.nativeElement.querySelector('label[for="vol-tipo-ayuda"]').textContent)
+      .toContain(APP_TEXTOS.voluntariado.oportunidades.filtros.tipoAyudaLabel);
+  });
+
+  it('combina ciudad y tipo de ayuda mediante AND', async () => {
+    cargarOportunidades(OPORTUNIDADES_FILTROS);
+
+    await seleccionarOpcion('#vol-ciudad', 'La Paz');
+    await seleccionarOpcion('#vol-tipo-ayuda', 'Logística');
+
+    expect(titulosVisibles()).toEqual(['Distribuir alimentos']);
+    // Las opciones provienen del listado completo para permitir cualquier combinación.
+    expect(component.ciudadesDisponibles()).toHaveLength(3);
+    expect(component.tiposAyudaDisponibles()).toHaveLength(2);
+  });
+
+  it('distingue una combinación sin resultados de la ausencia de oportunidades publicadas', async () => {
+    cargarOportunidades(OPORTUNIDADES_FILTROS);
+
+    await seleccionarOpcion('#vol-ciudad', 'Santa Cruz');
+    await seleccionarOpcion('#vol-tipo-ayuda', 'Logística');
+
+    expect(titulosVisibles()).toEqual([]);
+    expect(fixture.nativeElement.querySelector('.vol-oportunidades__estado').textContent)
+      .toContain(APP_TEXTOS.voluntariado.oportunidades.filtros.sinResultados);
+    expect(fixture.nativeElement.textContent).not.toContain(APP_TEXTOS.voluntariado.oportunidades.sinOportunidades);
+    expect(fixture.nativeElement.querySelector('.vol-oportunidades__contador').textContent).toContain(': 0');
+  });
+
+  it('restablece ambos selectores y recupera todas las tarjetas', async () => {
+    cargarOportunidades(OPORTUNIDADES_FILTROS);
+    await seleccionarOpcion('#vol-ciudad', 'La Paz');
+    await seleccionarOpcion('#vol-tipo-ayuda', 'Logística');
+
+    fixture.nativeElement.querySelector('.vol-filtros button').click();
+    fixture.detectChanges();
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    expect(component.ciudadSeleccionada()).toBe('');
+    expect(component.tipoAyudaSeleccionado()).toBeNull();
+    expect(titulosVisibles()).toHaveLength(OPORTUNIDADES_FILTROS.length);
+    expect(fixture.nativeElement.querySelector('#vol-ciudad').selectedIndex).toBe(0);
+    expect(fixture.nativeElement.querySelector('#vol-tipo-ayuda').selectedIndex).toBe(0);
+    expect(fixture.nativeElement.querySelector('.vol-filtros button').disabled).toBe(true);
+  });
+
+  it('elimina duplicados y opciones vacías, y ordena ciudades y tipos alfabéticamente', () => {
+    cargarOportunidades([
+      { ...OPORTUNIDAD, centroCiudad: '  La   Paz  ', centroNecesidades: [
+        { id: 9, nombre: '  Logística  ' }, { id: 7, nombre: 'Apoyo educativo' },
+        { id: 11, nombre: '   ' }, { id: 12, nombre: null }, null,
+      ] },
+      { ...OPORTUNIDAD, id: 8, centroCiudad: 'LA PÁZ', centroNecesidades: [{ id: 9, nombre: 'Logística' }] },
+      { ...OPORTUNIDAD, id: 9, centroCiudad: 'El Alto', centroNecesidades: [] },
+      { ...OPORTUNIDAD, id: 10, centroCiudad: '  ', centroNecesidades: null },
+      { ...OPORTUNIDAD, id: 11, centroCiudad: null, centroNecesidades: [] },
+    ]);
+
+    expect(component.ciudadesDisponibles()).toEqual([
+      { valor: 'el alto', nombre: 'El Alto' }, { valor: 'la paz', nombre: 'La Paz' },
+    ]);
+    expect(component.tiposAyudaDisponibles()).toEqual([
+      { id: 7, nombre: 'Apoyo educativo' }, { id: 9, nombre: 'Logística' },
+    ]);
+    expect(fixture.nativeElement.querySelector('#vol-ciudad').options.length).toBe(3);
+    expect(fixture.nativeElement.querySelector('#vol-tipo-ayuda').options.length).toBe(3);
+    expect(titulosVisibles()).toHaveLength(5);
+    component.tipoAyudaSeleccionado.set(9);
+    expect(component.oportunidadesFiltradas().map((oportunidad) => oportunidad.id)).toEqual([7, 8]);
+  });
+
+  it.each(['santa cruz', '  SÁNTA   CRÚZ  ', 'Santa\tCruz'])('normaliza espacios, mayúsculas y tildes de ciudad: %s', (ciudad) => {
+    cargarOportunidades([
+      { ...OPORTUNIDAD, centroCiudad: ' Santa  Crúz ' },
+      { ...OPORTUNIDAD, id: 8, centroCiudad: 'SANTA CRUZ' },
+      { ...OPORTUNIDAD, id: 9, centroCiudad: 'santa cruz' },
+      { ...OPORTUNIDAD, id: 10, centroCiudad: 'La Paz' },
+    ]);
+
+    component.ciudadSeleccionada.set(ciudad);
+
+    expect(component.oportunidadesFiltradas().map((oportunidad) => oportunidad.id)).toEqual([7, 8, 9]);
+    expect(component.ciudadesDisponibles()).toHaveLength(2);
+  });
+
+  it('compara tipos por ID aunque dos necesidades tengan el mismo nombre', () => {
+    cargarOportunidades([
+      { ...OPORTUNIDAD, centroNecesidades: [{ id: 7, nombre: 'Apoyo educativo' }] },
+      { ...OPORTUNIDAD, id: 8, centroNecesidades: [{ id: 20, nombre: 'Apoyo educativo' }] },
+    ]);
+
+    component.tipoAyudaSeleccionado.set(20);
+
+    expect(component.tiposAyudaDisponibles()).toHaveLength(2);
+    expect(component.oportunidadesFiltradas().map((oportunidad) => oportunidad.id)).toEqual([8]);
+  });
+
+  it('cambia y restablece filtros sin nuevas peticiones HTTP ni modificar el listado original', async () => {
+    cargarOportunidades(OPORTUNIDADES_FILTROS);
+    const listadoOriginal = component.oportunidades();
+    const copiaOriginal = structuredClone(listadoOriginal);
+
+    await seleccionarOpcion('#vol-ciudad', 'La Paz');
+    httpTesting.expectNone(() => true);
+    await seleccionarOpcion('#vol-tipo-ayuda', 'Logística');
+    httpTesting.expectNone(() => true);
+    component.restablecerFiltros();
+    fixture.detectChanges();
+
+    expect(component.oportunidades()).toBe(listadoOriginal);
+    expect(component.oportunidades()).toEqual(copiaOriginal);
+    expect(component.oportunidadesFiltradas()).toEqual(listadoOriginal);
+    httpTesting.expectNone(() => true);
+    expect(perfilServiceMock.existeMiPerfil).not.toHaveBeenCalled();
   });
 });
