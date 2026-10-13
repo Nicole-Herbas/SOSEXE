@@ -203,6 +203,12 @@ public class SecurityConfig {
                                 ApiRoutes.VOLUNTARIADOS + "/**"
                         ).authenticated()
                                        
+                                                               // SOS-66: cambiar estado de voluntariado — admin o responsable
+                        .requestMatchers(
+                                HttpMethod.PATCH,
+                                ApiRoutes.VOLUNTARIADOS + "/**"
+                        ).authenticated()
+                        
                         .requestMatchers(
                                 HttpMethod.DELETE,
                                 ApiRoutes.CENTROS + "/**",
