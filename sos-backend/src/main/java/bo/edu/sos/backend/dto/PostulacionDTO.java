@@ -1,11 +1,11 @@
 package bo.edu.sos.backend.dto;
 
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.security.core.Authentication;
 
 import java.time.LocalDateTime;
 
@@ -25,6 +25,7 @@ public class PostulacionDTO {
 
     private String estado;
 
+    @NotBlank(message = "La disponibilidad es obligatoria")
     @Size(max = 255, message = "La disponibilidad no puede superar los 255 caracteres")
     private String disponibilidad;
 

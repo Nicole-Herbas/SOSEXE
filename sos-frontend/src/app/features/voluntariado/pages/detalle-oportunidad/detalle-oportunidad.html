@@ -53,6 +53,16 @@
         <h2 id="oportunidad-habilidades">{{ textos.habilidades }}</h2>
         <p class="detalle-oportunidad__texto">{{ datoInformado(detalle.habilidadesRequeridas) }}</p>
       </section>
+      @if (detalle.estado === 'PUBLICADO') {
+        <button class="detalle-oportunidad__postular" type="button"
+          [disabled]="mostrarPostulacion()" [attr.aria-expanded]="mostrarPostulacion()"
+          aria-controls="formulario-postulacion" (click)="mostrarPostulacion.set(true)">
+          {{ textosPostulacion.abrir }}
+        </button>
+        @if (mostrarPostulacion()) {
+          <app-formulario-postulacion id="formulario-postulacion" [oportunidad]="detalle" />
+        }
+      }
     </article>
   }
 </main>

@@ -38,7 +38,9 @@
 
 .detalle-oportunidad__texto { white-space: pre-wrap; line-height: 1.75; margin: 0; }
 
-.detalle-oportunidad__reintentar {
+.detalle-oportunidad__postular { margin-top: 32px; }
+
+.detalle-oportunidad__reintentar, .detalle-oportunidad__postular {
   padding: 12px 24px;
   border: 0;
   border-radius: 8px;
@@ -48,6 +50,7 @@
   cursor: pointer;
 
   &:hover { background: #115e59; }
+  &:disabled { opacity: .6; cursor: default; }
 }
 
 @media (max-width: 640px) {

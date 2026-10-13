@@ -3,13 +3,14 @@ import { HttpTestingController, provideHttpClientTesting } from '@angular/common
 import { TestBed } from '@angular/core/testing';
 import { NavigationEnd, provideRouter, Router } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
-import { filter, firstValueFrom } from 'rxjs';
+import { filter, firstValueFrom, of, throwError } from 'rxjs';
 
 import { routes } from '../../../../app.routes';
 import { APP_TEXTOS } from '../../../../shared/constants/app-textos.constants';
 import { ApiResponse } from '../../../../shared/models/api-response';
 import { authInterceptor } from '../../../auth/interceptors/auth.interceptor';
 import { AuthService } from '../../../auth/services/auth.service';
+import { LoginComponent } from '../../../auth/pages/login/login';
 import { OportunidadVoluntariado } from '../../models/oportunidad-voluntariado';
 import { PerfilVoluntarioService } from '../../services/perfil-voluntario.service';
 import { Voluntariado } from '../voluntariado/voluntariado';
@@ -40,11 +41,15 @@ describe('DetalleOportunidad (ruta pública)', () => {
   let harness: RouterTestingHarness;
   let httpTesting: HttpTestingController;
   let router: Router;
-  let perfilService: { existeMiPerfil: ReturnType<typeof vi.fn> };
+  let perfilService: {
+    existeMiPerfil: ReturnType<typeof vi.fn>;
+    obtenerMiPerfil: ReturnType<typeof vi.fn>;
+  };
   let authService: {
     estaAutenticado: ReturnType<typeof vi.fn>;
     obtenerNombreUsuario: ReturnType<typeof vi.fn>;
     refrescarToken: ReturnType<typeof vi.fn>;
+    login: ReturnType<typeof vi.fn>;
   };
 
   beforeEach(async () => {
@@ -53,8 +58,9 @@ describe('DetalleOportunidad (ruta pública)', () => {
       estaAutenticado: vi.fn(() => false),
       obtenerNombreUsuario: vi.fn(() => ''),
       refrescarToken: vi.fn(),
+      login: vi.fn(),
     };
-    perfilService = { existeMiPerfil: vi.fn() };
+    perfilService = { existeMiPerfil: vi.fn(), obtenerMiPerfil: vi.fn() };
     TestBed.configureTestingModule({
       providers: [
         provideRouter(routes),
@@ -69,7 +75,10 @@ describe('DetalleOportunidad (ruta pública)', () => {
     harness = await RouterTestingHarness.create();
   });
 
-  afterEach(() => httpTesting.verify());
+  afterEach(() => {
+    httpTesting.verify();
+    localStorage.removeItem('token');
+  });
 
   function elemento(): HTMLElement {
     return harness.routeNativeElement!;
@@ -234,5 +243,71 @@ describe('DetalleOportunidad (ruta pública)', () => {
     harness.detectChanges();
     expect(elemento().querySelector('.vol-card__title')?.textContent).toBe(OPORTUNIDAD.titulo);
     expect(perfilService.existeMiPerfil).not.toHaveBeenCalled();
+  });
+
+  it('abre la postulación sin perder el detalle y vuelve desde login usando returnUrl', async () => {
+    await abrir();
+    responder();
+    (elemento().querySelector('.detalle-oportunidad__postular') as HTMLButtonElement).click();
+    harness.detectChanges();
+    expect(elemento().querySelector('.detalle-oportunidad__texto')?.textContent).toBe(OPORTUNIDAD.descripcion);
+    expect(elemento().querySelector('.detalle-oportunidad__postular')?.hasAttribute('disabled')).toBe(true);
+    expect(perfilService.obtenerMiPerfil).not.toHaveBeenCalled();
+    await seguirEnlace(elemento().querySelector('app-formulario-postulacion a') as HTMLAnchorElement);
+    expect(router.parseUrl(router.url).queryParams['returnUrl']).toBe('/voluntariado/7');
+
+    authService.login.mockImplementation(() => {
+      authService.estaAutenticado.mockReturnValue(true);
+      return of({ token: 'token-prueba', rol: 'USER', nombre: 'Lucía', email: 'lucia@example.com', tipoToken: 'Bearer' });
+    });
+    const login = harness.routeDebugElement!.componentInstance as LoginComponent;
+    login.loginForm.setValue({ email: 'lucia@example.com', password: 'clave-prueba' });
+    const navegacion = firstValueFrom(router.events.pipe(filter(event => event instanceof NavigationEnd)));
+    login.onSubmit();
+    await navegacion;
+    harness.detectChanges();
+    responder();
+    expect(router.url).toBe('/voluntariado/7');
+    expect(elemento().querySelector('h1')?.textContent).toBe(OPORTUNIDAD.titulo);
+  });
+
+  it('carga perfil propio y bloquea Postularme si ya existe una postulación rechazada', async () => {
+    authService.estaAutenticado.mockReturnValue(true);
+    perfilService.obtenerMiPerfil.mockReturnValue(of(respuesta({ habilidades: ['Organización'], disponibilidad: ['Tarde'] })));
+    await abrir();
+    responder();
+    (elemento().querySelector('.detalle-oportunidad__postular') as HTMLButtonElement).click();
+    harness.detectChanges();
+    httpTesting.expectOne('/api/postulaciones/mias').flush(respuesta([{ voluntariadoId: 7, estado: 'RECHAZADO' }]));
+    harness.detectChanges();
+    expect(elemento().textContent).toContain(APP_TEXTOS.voluntariado.oportunidades.postulacion.duplicada);
+    expect(elemento().querySelector('.detalle-oportunidad__postular')?.hasAttribute('disabled')).toBe(true);
+    expect(elemento().querySelector('app-formulario-postulacion form')).toBeNull();
+    expect(perfilService.obtenerMiPerfil).toHaveBeenCalledOnce();
+  });
+
+  it('conserva el detalle y el retorno a login si vence la sesión al enviar', async () => {
+    authService.estaAutenticado.mockReturnValue(true);
+    perfilService.obtenerMiPerfil.mockReturnValue(of(respuesta({ habilidades: ['Organización'], disponibilidad: ['Tarde'] })));
+    authService.refrescarToken.mockReturnValue(throwError(() => ({ status: 401 })));
+    await abrir();
+    responder();
+    (elemento().querySelector('.detalle-oportunidad__postular') as HTMLButtonElement).click();
+    harness.detectChanges();
+    httpTesting.expectOne('/api/postulaciones/mias').flush(respuesta([]));
+    harness.detectChanges();
+    const textarea = elemento().querySelector('#postulacion-disponibilidad') as HTMLTextAreaElement;
+    textarea.value = 'Por la tarde';
+    textarea.dispatchEvent(new Event('input'));
+    (elemento().querySelector('app-formulario-postulacion form') as HTMLFormElement)
+      .dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+    httpTesting.expectOne('/api/postulaciones').flush({}, { status: 401, statusText: 'Unauthorized' });
+    harness.detectChanges();
+    expect(authService.refrescarToken).toHaveBeenCalledOnce();
+    expect(router.url).toBe('/voluntariado/7');
+    expect(elemento().querySelector('h1')?.textContent).toBe(OPORTUNIDAD.titulo);
+    expect(elemento().textContent).toContain(APP_TEXTOS.voluntariado.oportunidades.postulacion.sesionVencida);
+    await seguirEnlace(elemento().querySelector('app-formulario-postulacion a') as HTMLAnchorElement);
+    expect(router.parseUrl(router.url).queryParams['returnUrl']).toBe('/voluntariado/7');
   });
 });

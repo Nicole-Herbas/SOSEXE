@@ -7,13 +7,14 @@ import { catchError, map, Observable, of, startWith, Subject, switchMap } from '
 import { APP_TEXTOS } from '../../../../shared/constants/app-textos.constants';
 import { OportunidadVoluntariado } from '../../models/oportunidad-voluntariado';
 import { VoluntariadoService } from '../../services/voluntariado.service';
+import { FormularioPostulacion } from '../../components/formulario-postulacion/formulario-postulacion';
 
 type ErrorDetalle = 'idInvalido' | 'noEncontrada' | 'errorCarga';
 
 @Component({
   selector: 'app-detalle-oportunidad',
   standalone: true,
-  imports: [RouterLink],
+  imports: [RouterLink, FormularioPostulacion],
   templateUrl: './detalle-oportunidad.html',
   styleUrl: './detalle-oportunidad.scss',
 })
@@ -22,6 +23,8 @@ export class DetalleOportunidad {
   readonly oportunidad = signal<OportunidadVoluntariado | null>(null);
   readonly cargando = signal(true);
   readonly error = signal<ErrorDetalle | null>(null);
+  readonly textosPostulacion = APP_TEXTOS.voluntariado.oportunidades.postulacion;
+  readonly mostrarPostulacion = signal(false);
 
   private readonly route = inject(ActivatedRoute);
   private readonly service = inject(VoluntariadoService);
@@ -60,6 +63,7 @@ export class DetalleOportunidad {
   }
 
   private consultar(id: string | null): Observable<OportunidadVoluntariado | null> {
+    this.mostrarPostulacion.set(false);
     this.oportunidad.set(null);
     this.error.set(null);
     this.cargando.set(true);

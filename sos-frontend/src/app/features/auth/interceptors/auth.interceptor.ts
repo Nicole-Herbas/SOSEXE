@@ -2,6 +2,7 @@ import { isPlatformBrowser } from '@angular/common';
 
 import {
   HttpErrorResponse,
+  HttpContextToken,
   HttpInterceptorFn
 } from '@angular/common/http';
 
@@ -21,6 +22,8 @@ import {
 import { AuthService }
   from '../services/auth.service';
 
+// Permite a flujos con retorno propio mostrar el 401 después de intentar renovar la sesión.
+export const GESTIONAR_SESION_EN_COMPONENTE = new HttpContextToken<boolean>(() => false);
 
 export const authInterceptor: HttpInterceptorFn =
   (req, next) => {
@@ -81,6 +84,7 @@ export const authInterceptor: HttpInterceptorFn =
               );
             }
 
+            let sesionRenovada = false;
 
 
             return authService
@@ -90,6 +94,7 @@ export const authInterceptor: HttpInterceptorFn =
                 switchMap(
                   respuesta => {
 
+                    sesionRenovada = true;
 
                     localStorage.setItem(
                       'token',
@@ -120,19 +125,25 @@ export const authInterceptor: HttpInterceptorFn =
                 catchError(
                   refreshError => {
 
+                    // Un rechazo de negocio después de renovar sigue siendo 400/403/409/422,
+                    // no un fallo de sesión. Conserva el comportamiento previo de los otros flujos.
+                    if (req.context.get(GESTIONAR_SESION_EN_COMPONENTE)
+                        && sesionRenovada && refreshError.status !== 401) {
+                      return throwError(() => refreshError);
+                    }
 
                     localStorage.removeItem(
                       'token'
                     );
 
 
-                    router.navigate([
-                      '/login'
-                    ]);
+                    if (!req.context.get(GESTIONAR_SESION_EN_COMPONENTE)) {
+                      router.navigate(['/login']);
+                    }
 
 
                     return throwError(
-                      () => refreshError
+                      () => req.context.get(GESTIONAR_SESION_EN_COMPONENTE) ? error : refreshError
                     );
                   }
                 )
