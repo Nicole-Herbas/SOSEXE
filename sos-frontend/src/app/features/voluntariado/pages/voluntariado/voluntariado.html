@@ -106,88 +106,80 @@
 
   <!-- ===== OPORTUNIDADES DISPONIBLES ===== -->
   @if (featureToggles.voluntariado.mostrarSeccionOportunidades) {
-  <section class="vol-oportunidades">
+  <section class="vol-oportunidades" [attr.aria-busy]="cargandoOportunidades()">
 
     <div class="vol-oportunidades__header">
       <h2 class="vol-oportunidades__titulo">{{ textos.oportunidades.titulo }}</h2>
       <p class="vol-oportunidades__subtitulo">{{ textos.oportunidades.subtitulo }}</p>
     </div>
 
-    <div class="vol-cards">
-
-      <!-- Tarjeta 1: Refugios y albergues -->
-      <article class="vol-card">
-        <div class="vol-card__top-bar vol-card__top-bar--teal"></div>
-        <div class="vol-card__body">
-          <div class="vol-card__icon vol-card__icon--teal">🏠</div>
-          <h3 class="vol-card__title">{{ textos.oportunidades.refugios.titulo }}</h3>
-          <p class="vol-card__location">⌖ {{ textos.oportunidades.refugios.ubicacion }}</p>
-          <p class="vol-card__desc">{{ textos.oportunidades.refugios.descripcion }}</p>
-          <div class="vol-card__footer">
-            @if (featureToggles.voluntariado.mostrarCupos) {
-            <div class="vol-card__cupos">
-              <span class="vol-card__cupos-label">{{ textos.oportunidades.cuposLabel }}</span>
-              <span class="vol-card__cupos-badge vol-card__cupos-badge--teal">
-                {{ textos.oportunidades.refugios.cupos }}
-              </span>
-            </div>
+    @if (cargandoOportunidades()) {
+      <p class="vol-oportunidades__estado" role="status">
+        {{ textos.oportunidades.cargando }}
+      </p>
+    } @else if (errorOportunidades()) {
+      <p class="vol-oportunidades__estado vol-oportunidades__estado--error" role="alert">
+        {{ textos.oportunidades.errorCarga }}
+      </p>
+    } @else {
+      <div class="vol-filtros">
+        <div class="vol-filtros__campo">
+          <label for="vol-ciudad">{{ textos.oportunidades.filtros.ciudadLabel }}</label>
+          <select id="vol-ciudad" [ngModel]="ciudadSeleccionada()" (ngModelChange)="ciudadSeleccionada.set($event)">
+            <option value="">{{ textos.oportunidades.filtros.todasCiudades }}</option>
+            @for (ciudad of ciudadesDisponibles(); track ciudad.valor) {
+              <option [value]="ciudad.valor">{{ ciudad.nombre }}</option>
             }
-            <button class="vol-card__btn vol-card__btn--teal" type="button">
-              {{ textos.oportunidades.participar }}
-            </button>
-          </div>
+          </select>
         </div>
-      </article>
-
-      <!-- Tarjeta 2: Distribución de donaciones -->
-      <article class="vol-card">
-        <div class="vol-card__top-bar vol-card__top-bar--teal"></div>
-        <div class="vol-card__body">
-          <div class="vol-card__icon vol-card__icon--teal">🔒</div>
-          <h3 class="vol-card__title">{{ textos.oportunidades.distribucion.titulo }}</h3>
-          <p class="vol-card__location">⌖ {{ textos.oportunidades.distribucion.ubicacion }}</p>
-          <p class="vol-card__desc">{{ textos.oportunidades.distribucion.descripcion }}</p>
-          <div class="vol-card__footer">
-            @if (featureToggles.voluntariado.mostrarCupos) {
-            <div class="vol-card__cupos">
-              <span class="vol-card__cupos-label">{{ textos.oportunidades.cuposLabel }}</span>
-              <span class="vol-card__cupos-badge vol-card__cupos-badge--teal">
-                {{ textos.oportunidades.distribucion.cupos }}
-              </span>
-            </div>
+        <div class="vol-filtros__campo">
+          <label for="vol-tipo-ayuda">{{ textos.oportunidades.filtros.tipoAyudaLabel }}</label>
+          <select id="vol-tipo-ayuda" [ngModel]="tipoAyudaSeleccionado()" (ngModelChange)="tipoAyudaSeleccionado.set($event)">
+            <option [ngValue]="null">{{ textos.oportunidades.filtros.todosTiposAyuda }}</option>
+            @for (tipo of tiposAyudaDisponibles(); track tipo.id) {
+              <option [ngValue]="tipo.id">{{ tipo.nombre }}</option>
             }
-            <button class="vol-card__btn vol-card__btn--teal" type="button">
-              {{ textos.oportunidades.participar }}
-            </button>
-          </div>
+          </select>
         </div>
-      </article>
-
-      <!-- Tarjeta 3: Apoyo en emergencias -->
-      <article class="vol-card">
-        <div class="vol-card__top-bar vol-card__top-bar--red"></div>
-        <div class="vol-card__body">
-          <div class="vol-card__icon vol-card__icon--red">!</div>
-          <h3 class="vol-card__title">{{ textos.oportunidades.emergencias.titulo }}</h3>
-          <p class="vol-card__location">⌖ {{ textos.oportunidades.emergencias.ubicacion }}</p>
-          <p class="vol-card__desc">{{ textos.oportunidades.emergencias.descripcion }}</p>
-          <div class="vol-card__footer">
-            @if (featureToggles.voluntariado.mostrarCupos) {
-            <div class="vol-card__cupos">
-              <span class="vol-card__cupos-label">{{ textos.oportunidades.cuposLabel }}</span>
-              <span class="vol-card__cupos-badge vol-card__cupos-badge--red">
-                {{ textos.oportunidades.emergencias.cupos }}
-              </span>
+        <button type="button" class="btn btn--outline" (click)="restablecerFiltros()"
+          [disabled]="!ciudadSeleccionada() && tipoAyudaSeleccionado() === null">
+          {{ textos.oportunidades.filtros.restablecer }}
+        </button>
+      </div>
+      <p class="vol-oportunidades__contador" role="status" aria-live="polite" aria-atomic="true">
+        {{ textos.oportunidades.filtros.resultadosLabel }}: {{ oportunidadesFiltradas().length }}
+      </p>
+      <div class="vol-cards">
+        @for (oportunidad of oportunidadesFiltradas(); track oportunidad.id) {
+          <article class="vol-card">
+            <div class="vol-card__top-bar vol-card__top-bar--teal"></div>
+            <div class="vol-card__body">
+              <h3 class="vol-card__title">{{ oportunidad.titulo }}</h3>
+              <p class="vol-card__centro">
+                <strong>{{ textos.oportunidades.centroLabel }}:</strong>
+                {{ oportunidad.centroNombre || textos.oportunidades.centroNoDisponible }}
+              </p>
+              <p class="vol-card__location">⌖ {{ formatearUbicacion(oportunidad) }}</p>
+              <p class="vol-card__desc">{{ oportunidad.descripcion }}</p>
+              <div class="vol-card__footer">
+                <p class="vol-card__fecha">
+                  <strong>{{ textos.oportunidades.inicioLabel }}:</strong>
+                  <time [attr.datetime]="oportunidad.fechaInicio">{{ formatearFecha(oportunidad.fechaInicio) }}</time>
+                </p>
+                <p class="vol-card__fecha">
+                  <strong>{{ textos.oportunidades.finLabel }}:</strong>
+                  <time [attr.datetime]="oportunidad.fechaFin">{{ formatearFecha(oportunidad.fechaFin) }}</time>
+                </p>
+              </div>
             </div>
-            }
-            <button class="vol-card__btn vol-card__btn--red" type="button">
-              {{ textos.oportunidades.participar }}
-            </button>
-          </div>
-        </div>
-      </article>
-
-    </div>
+          </article>
+        } @empty {
+          <p class="vol-oportunidades__estado" role="status">
+            {{ oportunidades().length === 0 ? textos.oportunidades.sinOportunidades : textos.oportunidades.filtros.sinResultados }}
+          </p>
+        }
+      </div>
+    }
 
   </section>
   }
