@@ -132,6 +132,22 @@ public class NoticiaService {
 
 
     @Transactional(readOnly = true)
+    public NoticiaDTO buscarPublicadaPorId(Long id) {
+        Noticia noticia = noticiaRepository.findById(id)
+                .filter(n -> NoticiaConstants.ESTADO_PUBLICADO.equals(n.getEstado()))
+                .orElseThrow(() -> new ResourceNotFoundException("Noticia", id));
+
+        LogHelper.debug(
+                NoticiaService.class,
+                "Noticia publicada consultada correctamente. id={}",
+                id
+        );
+
+        return convertirADTO(noticia);
+    }
+
+
+    @Transactional(readOnly = true)
     public List<NoticiaDTO> buscarPorCategoria(
             String categoria) {
 

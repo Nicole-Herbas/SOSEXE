@@ -58,6 +58,30 @@ describe('Noticias', () => {
 
   afterEach(() => httpTesting.verify());
 
+  it('enlaza noticias internas destacadas y secundarias al detalle con etiquetas descriptivas', () => {
+    fixture.detectChanges();
+    httpTesting.expectOne('/api/noticias/publicas').flush({
+      success: true, message: 'OK', timestamp: '',
+      data: [1, 2, 3, 4].map((id) => ({
+        id, titulo: `Noticia interna ${id}`, contenido: 'Contenido', categoria: 'Comunidad',
+        imagenUrl: null, fuente: null, fechaPublicacion: null,
+        estado: 'PUBLICADO', esExterna: false,
+      })),
+    });
+    responderApiExterna(httpTesting);
+    fixture.detectChanges();
+
+    const enlaces = fixture.nativeElement.querySelectorAll(
+      '.noticia-tarjeta__enlace',
+    ) as NodeListOf<HTMLAnchorElement>;
+    expect(enlaces.length).toBe(4);
+    enlaces.forEach((enlace, indice) => {
+      expect(enlace.getAttribute('href')).toBe(`/noticias/${indice + 1}`);
+      expect(enlace.getAttribute('aria-label')).toContain(`Noticia interna ${indice + 1}`);
+      expect(enlace.getAttribute('target')).toBeNull();
+    });
+  });
+
   it('should create', () => {
     expect(component).toBeTruthy();
   });
@@ -143,6 +167,7 @@ describe('Noticias', () => {
 
     expect(fixture.nativeElement.querySelector('.noticias-destacadas').textContent)
       .toContain(component.textos.alertaTituloReferencia);
+    expect(fixture.nativeElement.querySelector('a[href="/noticias/alerta-referencia"]')).toBeNull();
   });
 
   it('debe ocultar filtros cuando el toggle de página está desactivado', () => {

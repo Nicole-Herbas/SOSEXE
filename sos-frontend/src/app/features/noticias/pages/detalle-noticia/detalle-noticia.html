@@ -1,0 +1,43 @@
+<main class="detalle-noticia" [attr.aria-busy]="cargando()">
+  <a class="detalle-noticia__volver" routerLink="/noticias">{{ textos.volverListado }}</a>
+
+  @if (cargando()) {
+    <h1>{{ textos.titulo }}</h1>
+    <p class="detalle-noticia__estado" role="status">{{ textos.cargando }}</p>
+  } @else if (error(); as fallo) {
+    <h1>{{ textos.titulo }}</h1>
+    <div class="detalle-noticia__estado" role="alert">
+      <p>{{ fallo === 'idInvalido' ? textos.idInvalido : fallo === 'noEncontrada' ? textos.noEncontrada : textos.errorCarga }}</p>
+      @if (fallo === 'conexion') {
+        <button type="button" (click)="reintentar()">{{ textos.reintentar }}</button>
+      }
+    </div>
+  } @else if (noticia(); as detalle) {
+    <article aria-labelledby="detalle-noticia-titulo">
+      <header>
+        <h1 id="detalle-noticia-titulo">{{ detalle.titulo }}</h1>
+        <dl class="detalle-noticia__meta">
+          <div>
+            <dt>{{ textos.fechaPublicacion }}</dt>
+            <dd>
+              @if (fechaFormateada(); as fecha) {
+                <time [attr.datetime]="detalle.fechaPublicacion">{{ fecha }}</time>
+              } @else {
+                {{ textos.noInformado }}
+              }
+            </dd>
+          </div>
+          <div>
+            <dt>{{ textos.fuente }}</dt>
+            <dd>{{ detalle.fuente?.trim() || textos.noInformado }}</dd>
+          </div>
+        </dl>
+      </header>
+      @if (imagenUrl(); as imagen) {
+        <img class="detalle-noticia__imagen" [src]="imagen" [alt]="detalle.titulo"
+          (error)="imagenFallida.set(true)" />
+      }
+      <div class="detalle-noticia__contenido">{{ detalle.contenido }}</div>
+    </article>
+  }
+</main>

@@ -12,6 +12,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -174,6 +177,66 @@ class NoticiaServiceTest {
         assertFalse(dto.isEsExterna(), "Las noticias propias deben tener esExterna=false");
     }
 
+
+    @Test
+    void buscarPublicadaPorIdConservaContenidoCompletoFechaYFuente() {
+        Noticia noticia = crearNoticiaConEstado(
+                7L, "Campaña solidaria", NoticiaConstants.CAT_COMUNIDAD,
+                NoticiaConstants.ESTADO_PUBLICADO);
+        String contenido = "Primer párrafo de la noticia.\n\n" + "Contenido completo. ".repeat(30);
+        LocalDateTime fecha = LocalDateTime.of(2026, 10, 12, 9, 30);
+        noticia.setContenido(contenido);
+        noticia.setFechaPublicacion(fecha);
+        noticia.setFuente("Defensa Civil Bolivia");
+        when(noticiaRepository.findById(7L)).thenReturn(Optional.of(noticia));
+
+        NoticiaDTO dto = noticiaService.buscarPublicadaPorId(7L);
+
+        assertAll(
+                () -> assertEquals(7L, dto.getId()),
+                () -> assertEquals(noticia.getTitulo(), dto.getTitulo()),
+                () -> assertEquals(contenido, dto.getContenido()),
+                () -> assertEquals(fecha, dto.getFechaPublicacion()),
+                () -> assertEquals("Defensa Civil Bolivia", dto.getFuente()),
+                () -> assertEquals(NoticiaConstants.ESTADO_PUBLICADO, dto.getEstado()),
+                () -> assertFalse(dto.isEsExterna())
+        );
+    }
+
+    @Test
+    void buscarPublicadaPorIdConservaFechaYFuenteNulas() {
+        Noticia noticia = crearNoticiaConEstado(
+                7L, "Campaña solidaria", NoticiaConstants.CAT_COMUNIDAD,
+                NoticiaConstants.ESTADO_PUBLICADO);
+        noticia.setFechaPublicacion(null);
+        noticia.setFuente(null);
+        when(noticiaRepository.findById(7L)).thenReturn(Optional.of(noticia));
+
+        NoticiaDTO dto = noticiaService.buscarPublicadaPorId(7L);
+
+        assertNull(dto.getFechaPublicacion());
+        assertNull(dto.getFuente());
+    }
+
+    @Test
+    void buscarPublicadaPorIdInexistenteLanzaRecursoNoEncontrado() {
+        when(noticiaRepository.findById(99L)).thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class,
+                () -> noticiaService.buscarPublicadaPorId(99L));
+    }
+
+    @ParameterizedTest
+    @NullSource
+    @ValueSource(strings = {"BORRADOR", "ARCHIVADO", "RECHAZADO", "publicado", "PUBLICADO "})
+    void buscarPublicadaPorIdRechazaTodoEstadoDistintoDePublicado(String estado) {
+        Noticia noticia = crearNoticiaConEstado(
+                7L, "Noticia no pública", NoticiaConstants.CAT_COMUNIDAD, estado);
+        when(noticiaRepository.findById(7L)).thenReturn(Optional.of(noticia));
+
+        assertThrows(ResourceNotFoundException.class,
+                () -> noticiaService.buscarPublicadaPorId(7L));
+    }
 
     // ─────────────────────────────────────────────────────────────────────────
     // Test 5: guardar establece estado BORRADOR por defecto

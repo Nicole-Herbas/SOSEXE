@@ -81,12 +81,18 @@
 							@if (noticia.resumen) {
 								<p>{{ resumenVistaPrevia(noticia.resumen) }}</p>
 							}
-							@if (noticia.url) {
+							@if (tieneDetalle(noticia)) {
+								<a class="noticia-tarjeta__enlace" [routerLink]="['/noticias', noticia.id]"
+									[attr.aria-label]="textos.leerDetalleEtiqueta + ' ' + noticia.titulo">
+									{{ textos.leerNoticia }}
+								</a>
+							} @else if (noticia.esExterna && noticia.url) {
 								<a
 									class="noticia-tarjeta__enlace"
 									[href]="noticia.url"
 									target="_blank"
 									rel="noopener noreferrer"
+									[attr.aria-label]="textos.leerExternaEtiqueta + ' ' + noticia.titulo"
 								>
 									{{ textos.leerNoticia }}
 								</a>
@@ -132,12 +138,18 @@
 								@if (noticia.resumen) {
 									<p>{{ resumenVistaPrevia(noticia.resumen) }}</p>
 								}
-								@if (noticia.url) {
+								@if (tieneDetalle(noticia)) {
+									<a class="noticia-tarjeta__enlace" [routerLink]="['/noticias', noticia.id]"
+										[attr.aria-label]="textos.leerDetalleEtiqueta + ' ' + noticia.titulo">
+										{{ textos.leerNoticia }}
+									</a>
+								} @else if (noticia.esExterna && noticia.url) {
 									<a
 										class="noticia-tarjeta__enlace"
 										[href]="noticia.url"
 										target="_blank"
 										rel="noopener noreferrer"
+										[attr.aria-label]="textos.leerExternaEtiqueta + ' ' + noticia.titulo"
 									>
 										{{ textos.leerNoticia }}
 									</a>
