@@ -24,6 +24,9 @@ public class Alerta {
     @Column(nullable = false, length = 1000)
     private String mensaje;
 
+    @Column(length = 250)
+    private String fuente;
+
     @Column(nullable = false, length = 30)
     private String severidad;
 

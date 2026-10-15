@@ -77,8 +77,14 @@ export const routes: Routes = [
     canActivate: [authGuard]
   },
   {
+    path: 'admin/alertas/crear',
+    loadComponent: () => import('./features/alertas/pages/crear-alerta/crear-alerta')
+      .then(m => m.CrearAlertaComponent),
+    canActivate: [adminGuard]
+  },
+  {
     path: 'admin',
-    component: ListaCentros,
+    loadComponent: () => import('./features/admin/pages/admin/admin').then(m => m.AdminComponent),
     canActivate: [adminGuard]
   }
 ];
