@@ -1,6 +1,9 @@
 import { Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
-
+import {
+  FeatureToggles,
+  FEATURE_TOGGLES,
+} from '../../../../shared/config/feature-toggles';
 import { APP_TEXTOS } from '../../../../shared/constants/app-textos.constants';
 
 
@@ -12,8 +15,10 @@ import { APP_TEXTOS } from '../../../../shared/constants/app-textos.constants';
 })
 export class AcercaDe {
 
+  readonly textos = APP_TEXTOS.acercaDe;
 
-  readonly textos =
-    APP_TEXTOS.acercaDe;
+  readonly featureToggles: Pick<FeatureToggles, 'acercaDe'> = {
+    acercaDe: { ...FEATURE_TOGGLES.acercaDe },
+  };
 
 }

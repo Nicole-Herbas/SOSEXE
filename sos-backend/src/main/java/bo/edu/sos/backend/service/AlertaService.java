@@ -1,6 +1,7 @@
 package bo.edu.sos.backend.service;
 
 import bo.edu.sos.backend.dto.AlertaDTO;
+import bo.edu.sos.backend.dto.CrearAlertaDTO;
 import bo.edu.sos.backend.entity.Alerta;
 import bo.edu.sos.backend.entity.Departamento;
 import bo.edu.sos.backend.entity.Usuario;
@@ -105,15 +106,19 @@ public class AlertaService {
 
     @Transactional
     public AlertaDTO guardar(
-            AlertaDTO dto) {
+            CrearAlertaDTO dto, String email) {
 
         Alerta alerta = new Alerta();
-
-
-        copiarDTOaEntidad(
-                dto,
-                alerta
-        );
+        alerta.setTitulo(dto.getTitulo().strip());
+        alerta.setMensaje(dto.getMensaje().strip());
+        alerta.setFuente(dto.getFuente().strip());
+        alerta.setSeveridad(dto.getSeveridad());
+        alerta.setFechaPublicacion(dto.getFechaPublicacion());
+        alerta.setFechaExpiracion(dto.getFechaExpiracion());
+        alerta.setDepartamento(departamentoRepository.findById(dto.getDepartamentoId())
+                .orElseThrow(() -> new ResourceNotFoundException("Departamento", dto.getDepartamentoId())));
+        alerta.setCreadoPor(usuarioRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario autenticado no encontrado")));
 
 
         alerta.setEstado(
@@ -218,6 +223,10 @@ public class AlertaService {
                 dto.getMensaje()
         );
 
+        if (dto.getFuente() != null) {
+            alerta.setFuente(dto.getFuente());
+        }
+
         alerta.setSeveridad(
                 dto.getSeveridad()
         );
@@ -291,6 +300,8 @@ public class AlertaService {
         dto.setMensaje(
                 alerta.getMensaje()
         );
+
+        dto.setFuente(alerta.getFuente());
 
         dto.setSeveridad(
                 alerta.getSeveridad()

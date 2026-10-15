@@ -87,7 +87,7 @@ class MapaServiceTest {
         punto.setDepartamento(laPaz);
         punto.setLatitud(new BigDecimal("-16.5100000"));
         punto.setLongitud(new BigDecimal("-68.1600000"));
-        punto.setEstadoVerificacion("PENDIENTE");
+        punto.setEstadoVerificacion("VERIFICADO");
         punto.setCreador(creador);
         punto.setNecesidades(Set.of(agua));
 
@@ -119,7 +119,7 @@ class MapaServiceTest {
         assertEquals("Punto Donación El Alto", dtoPunto.getNombre());
         assertEquals("PUNTO_DONACION", dtoPunto.getTipo());
         assertEquals("La Paz", dtoPunto.getDepartamentoNombre());
-        assertEquals("PENDIENTE", dtoPunto.getEstadoVerificacion());
+        assertEquals("VERIFICADO", dtoPunto.getEstadoVerificacion());
     }
 
     @Test
@@ -252,6 +252,51 @@ class MapaServiceTest {
 
         assertEquals("PUNTO_AYUDA", detallePunto.getOrigen());
         assertEquals("Refugio Esperanza", detallePunto.getNombre());
+    }
+
+    @Test
+    void listarPuntosMapaNoDebeMostrarPuntosPendientes() {
+
+        PuntoAyuda punto = new PuntoAyuda();
+
+        punto.setId(5L);
+        punto.setNombre("Punto pendiente");
+        punto.setEstadoVerificacion("PENDIENTE");
+
+        when(centroRepository.findAll())
+                .thenReturn(List.of());
+
+        when(puntoAyudaRepository.findAll())
+                .thenReturn(List.of(punto));
+
+
+        List<PuntoMapaDTO> resultado =
+                mapaService.listarPuntosMapa();
+
+
+        assertTrue(resultado.isEmpty());
+    }
+
+
+    @Test
+    void buscarDetalleNoDebeMostrarPuntoPendiente() {
+
+        PuntoAyuda punto = new PuntoAyuda();
+
+        punto.setId(5L);
+        punto.setEstadoVerificacion("PENDIENTE");
+
+        when(puntoAyudaRepository.findById(5L))
+                .thenReturn(java.util.Optional.of(punto));
+
+
+        assertThrows(
+                bo.edu.sos.backend.exception.ResourceNotFoundException.class,
+                () -> mapaService.buscarDetalle(
+                        "PUNTO_AYUDA",
+                        5L
+                )
+        );
     }
     @Test
     void buscarDetalleDebeRechazarOrigenInvalido() {

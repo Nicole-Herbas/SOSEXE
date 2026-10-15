@@ -99,6 +99,7 @@
 
 
   <!-- VERIFICACIÓN -->
+  @if (featureToggles.acercaDe.mostrarSeccionVerificacion) {
   <section class="verification-section">
 
     <div class="section-heading">
@@ -170,9 +171,11 @@
     </div>
 
   </section>
+  }
 
 
   <!-- VALORES -->
+  @if (featureToggles.acercaDe.mostrarSeccionValores) {
   <section class="values-section">
 
     <div class="section-heading">
@@ -187,7 +190,7 @@
     <div class="values-grid">
 
       <article class="value-card">
-        <div class="value-icon">⌕</div>
+        <div class="value-icon">⎕</div>
 
         <div>
           <h3>Transparencia</h3>
@@ -244,9 +247,11 @@
     </div>
 
   </section>
+  }
 
 
   <!-- ROLES -->
+  @if (featureToggles.acercaDe.mostrarSeccionRoles) {
   <section class="roles-section">
 
     <div class="section-heading">
@@ -298,6 +303,22 @@
 
       </article>
 
+      <!-- PUNTO DE AYUDA -->
+      <article class="role-card">
+
+        <div class="role-icon">📍</div>
+
+        <h3>{{ textos.registrarPunto.titulo }}</h3>
+
+        <p>
+          {{ textos.registrarPunto.descripcion }}
+        </p>
+
+        <button routerLink="/registrar-punto" type="button">
+          {{ textos.registrarPunto.boton }}
+        </button>
+
+      </article>
 
       <!-- VOLUNTARIO -->
       <article class="role-card">
@@ -311,7 +332,7 @@
           habilidades para apoyar a la comunidad.
         </p>
 
-        <button type="button">
+        <button routerLink="/voluntariado" type="button">
           Quiero ser voluntario →
         </button>
 
@@ -320,6 +341,7 @@
     </div>
 
   </section>
+  }
 
 
   <!-- CTA -->

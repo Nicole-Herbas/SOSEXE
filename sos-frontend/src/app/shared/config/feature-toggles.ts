@@ -70,12 +70,52 @@ export interface InicioToggles {
 }
 
 // ---------------------------------------------------------------------------
+// 🤝 Módulo: Voluntariado
+// ---------------------------------------------------------------------------
+export interface VoluntariadoToggles {
+  /** true  → muestra la sección "Oportunidades disponibles" con las tarjetas
+   *  false → oculta la sección completa */
+  mostrarSeccionOportunidades: boolean;
+
+  /** true  → muestra la sección "¿Cómo funciona?" con los 3 pasos
+   *  false → oculta la sección */
+  mostrarSeccionComoFunciona: boolean;
+
+  /** true  → muestra el badge de cupos disponibles en cada tarjeta
+   *  false → oculta los badges de cupos (útil si aún no hay datos reales) */
+  mostrarCupos: boolean;
+
+  /** true  → habilita el flujo de crear/editar perfil de voluntario (SOS-40)
+   *  false → oculta el formulario de perfil y la tarjeta */
+  mostrarPerfilVoluntario: boolean;
+}
+
+// ---------------------------------------------------------------------------
+// ℹ️  Módulo: Acerca de
+// ---------------------------------------------------------------------------
+export interface AcercaDeToggles {
+  /** true  → muestra la sección "¿Cómo verificamos los centros?" con los 4 pasos
+   *  false → oculta la sección de verificación */
+  mostrarSeccionVerificacion: boolean;
+
+  /** true  → muestra la sección "Nuestros valores" con las 4 tarjetas
+   *  false → oculta la sección de valores */
+  mostrarSeccionValores: boolean;
+
+  /** true  → muestra la sección "Una plataforma para ayudar" con los 3 roles
+   *  false → oculta la sección de roles */
+  mostrarSeccionRoles: boolean;
+}
+
+// ---------------------------------------------------------------------------
 // 📦 Interfaz raíz — agregar aquí nuevos módulos en el futuro
 // ---------------------------------------------------------------------------
 export interface FeatureToggles {
   mapa: MapaToggles;
   noticias: NoticiasToggles;
   inicio: InicioToggles;
+  voluntariado: VoluntariadoToggles;
+  acercaDe: AcercaDeToggles;
   // donaciones: DonacionesToggles;
 }
 
@@ -104,6 +144,19 @@ export const FEATURE_TOGGLES: FeatureToggles = {
     mostrarFiltrosNoticias: true,
     mostrarNoticiasExternas: true,
     mostrarNoticiasPropias: true,
+  },
+
+  voluntariado: {
+    mostrarSeccionOportunidades: true,
+    mostrarSeccionComoFunciona:  true,
+    mostrarCupos:                true,
+    mostrarPerfilVoluntario:     true,
+  },
+
+  acercaDe: {
+    mostrarSeccionVerificacion: true,
+    mostrarSeccionValores:      true,
+    mostrarSeccionRoles:        true,
   },
 
 };

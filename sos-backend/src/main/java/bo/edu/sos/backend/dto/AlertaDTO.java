@@ -24,6 +24,9 @@ public class AlertaDTO {
     @Size(max = 1000, message = "El mensaje no puede superar los 1000 caracteres")
     private String mensaje;
 
+    @Size(max = 250, message = "La fuente no puede superar los 250 caracteres")
+    private String fuente;
+
     @NotBlank(message = "La severidad es obligatoria")
     @Size(max = 30, message = "La severidad no puede superar los 30 caracteres")
     private String severidad;

@@ -1,3 +1,225 @@
-<p>
-  {{ textos.mensaje }}
-</p>
+<main class="voluntariado-page">
+
+  <!-- ===== HERO ===== -->
+  <section class="vol-hero">
+
+    <div class="vol-hero__badge">
+      <span class="vol-hero__badge-dot"></span>
+      {{ textos.hero.badge }}
+    </div>
+
+    <h1 class="vol-hero__title">{{ textos.hero.titulo }}</h1>
+
+    <p class="vol-hero__description">{{ textos.hero.descripcion }}</p>
+
+    <!-- Hero actions: varían según estado -->
+    @if (estado() === 'SIN_SESION') {
+      <div class="vol-hero__actions">
+        <a routerLink="/login" class="btn btn--primary">
+          {{ textos.hero.serVoluntario }}
+        </a>
+        <a routerLink="/mapa" class="btn btn--outline">
+          {{ textos.hero.verMapa }}
+        </a>
+      </div>
+    }
+
+    @if (estado() === 'SIN_PERFIL') {
+      <div class="vol-hero__actions">
+        <button class="btn btn--primary" (click)="iniciarCreacion()">
+          {{ textos.hero.serVoluntario }}
+        </button>
+        <a routerLink="/mapa" class="btn btn--outline">
+          {{ textos.hero.verMapa }}
+        </a>
+      </div>
+    }
+
+    <div class="vol-hero__features">
+      <span class="vol-hero__feature">{{ textos.hero.feat1 }}</span>
+      <span class="vol-hero__feature">{{ textos.hero.feat2 }}</span>
+      <span class="vol-hero__feature">{{ textos.hero.feat3 }}</span>
+    </div>
+
+  </section>
+
+
+  <!-- ===== MENSAJE DE ÉXITO ===== -->
+  @if (estado() === 'CON_PERFIL' && mensajeExito()) {
+    <section class="vol-exito">
+      <div class="vol-exito__card">
+        <span class="vol-exito__icon">✓</span>
+        <div class="vol-exito__content">
+          <p class="vol-exito__titulo">{{ mensajeExito() }}</p>
+          <p class="vol-exito__mensaje">{{ textos.perfilVoluntario.exitoMensaje }}</p>
+        </div>
+      </div>
+    </section>
+  }
+
+
+  <!-- ===== TARJETA DE PERFIL ===== -->
+  @if (featureToggles.voluntariado.mostrarPerfilVoluntario && estado() === 'CON_PERFIL' && perfil(); as p) {
+    <section class="vol-perfil-section">
+      <app-tarjeta-perfil
+        [perfil]="p"
+        (editar)="iniciarEdicion()"
+      />
+    </section>
+  }
+
+
+  <!-- ===== WIZARD CREAR PERFIL ===== -->
+  @if (featureToggles.voluntariado.mostrarPerfilVoluntario && estado() === 'CREANDO_PERFIL') {
+    <section class="vol-wizard-section">
+      <app-crear-perfil
+        [nombreUsuario]="nombreUsuario()"
+        [emailUsuario]="emailUsuario()"
+        (perfilCreado)="onPerfilCreado()"
+        (cancelar)="onCancelar()"
+      />
+    </section>
+  }
+
+
+  <!-- ===== WIZARD EDITAR PERFIL ===== -->
+  @if (featureToggles.voluntariado.mostrarPerfilVoluntario && estado() === 'EDITANDO_PERFIL' && perfil(); as p) {
+    <section class="vol-wizard-section">
+      <app-crear-perfil
+        [perfilExistente]="p"
+        [nombreUsuario]="nombreUsuario()"
+        [emailUsuario]="emailUsuario()"
+        (perfilCreado)="onPerfilCreado()"
+        (cancelar)="onCancelar()"
+      />
+    </section>
+  }
+
+
+  <!-- ===== CARGANDO ===== -->
+  @if (estado() === 'CARGANDO') {
+    <section class="vol-cargando">
+      <p>Cargando...</p>
+    </section>
+  }
+
+
+  <!-- ===== OPORTUNIDADES DISPONIBLES ===== -->
+  @if (featureToggles.voluntariado.mostrarSeccionOportunidades) {
+  <section class="vol-oportunidades" [attr.aria-busy]="cargandoOportunidades()">
+
+    <div class="vol-oportunidades__header">
+      <h2 class="vol-oportunidades__titulo">{{ textos.oportunidades.titulo }}</h2>
+      <p class="vol-oportunidades__subtitulo">{{ textos.oportunidades.subtitulo }}</p>
+    </div>
+
+    @if (cargandoOportunidades()) {
+      <p class="vol-oportunidades__estado" role="status">
+        {{ textos.oportunidades.cargando }}
+      </p>
+    } @else if (errorOportunidades()) {
+      <p class="vol-oportunidades__estado vol-oportunidades__estado--error" role="alert">
+        {{ textos.oportunidades.errorCarga }}
+      </p>
+    } @else {
+      <div class="vol-filtros">
+        <div class="vol-filtros__campo">
+          <label for="vol-ciudad">{{ textos.oportunidades.filtros.ciudadLabel }}</label>
+          <select id="vol-ciudad" [ngModel]="ciudadSeleccionada()" (ngModelChange)="ciudadSeleccionada.set($event)">
+            <option value="">{{ textos.oportunidades.filtros.todasCiudades }}</option>
+            @for (ciudad of ciudadesDisponibles(); track ciudad.valor) {
+              <option [value]="ciudad.valor">{{ ciudad.nombre }}</option>
+            }
+          </select>
+        </div>
+        <div class="vol-filtros__campo">
+          <label for="vol-tipo-ayuda">{{ textos.oportunidades.filtros.tipoAyudaLabel }}</label>
+          <select id="vol-tipo-ayuda" [ngModel]="tipoAyudaSeleccionado()" (ngModelChange)="tipoAyudaSeleccionado.set($event)">
+            <option [ngValue]="null">{{ textos.oportunidades.filtros.todosTiposAyuda }}</option>
+            @for (tipo of tiposAyudaDisponibles(); track tipo.id) {
+              <option [ngValue]="tipo.id">{{ tipo.nombre }}</option>
+            }
+          </select>
+        </div>
+        <button type="button" class="btn btn--outline" (click)="restablecerFiltros()"
+          [disabled]="!ciudadSeleccionada() && tipoAyudaSeleccionado() === null">
+          {{ textos.oportunidades.filtros.restablecer }}
+        </button>
+      </div>
+      <p class="vol-oportunidades__contador" role="status" aria-live="polite" aria-atomic="true">
+        {{ textos.oportunidades.filtros.resultadosLabel }}: {{ oportunidadesFiltradas().length }}
+      </p>
+      <div class="vol-cards">
+        @for (oportunidad of oportunidadesFiltradas(); track oportunidad.id) {
+          <article class="vol-card">
+            <div class="vol-card__top-bar vol-card__top-bar--teal"></div>
+            <div class="vol-card__body">
+              <h3 class="vol-card__title">{{ oportunidad.titulo }}</h3>
+              <p class="vol-card__centro">
+                <strong>{{ textos.oportunidades.centroLabel }}:</strong>
+                {{ oportunidad.centroNombre || textos.oportunidades.centroNoDisponible }}
+              </p>
+              <p class="vol-card__location">⌖ {{ formatearUbicacion(oportunidad) }}</p>
+              <p class="vol-card__desc">{{ oportunidad.descripcion }}</p>
+              <div class="vol-card__footer">
+                <p class="vol-card__fecha">
+                  <strong>{{ textos.oportunidades.inicioLabel }}:</strong>
+                  <time [attr.datetime]="oportunidad.fechaInicio">{{ formatearFecha(oportunidad.fechaInicio) }}</time>
+                </p>
+                <p class="vol-card__fecha">
+                  <strong>{{ textos.oportunidades.finLabel }}:</strong>
+                  <time [attr.datetime]="oportunidad.fechaFin">{{ formatearFecha(oportunidad.fechaFin) }}</time>
+                </p>
+                <a class="vol-card__btn vol-card__btn--teal vol-card__detalle"
+                  [routerLink]="['/voluntariado', oportunidad.id]"
+                  [attr.aria-label]="textos.oportunidades.verDetalleEtiqueta + ' ' + oportunidad.titulo">
+                  {{ textos.oportunidades.verDetalle }}
+                </a>
+              </div>
+            </div>
+          </article>
+        } @empty {
+          <p class="vol-oportunidades__estado" role="status">
+            {{ oportunidades().length === 0 ? textos.oportunidades.sinOportunidades : textos.oportunidades.filtros.sinResultados }}
+          </p>
+        }
+      </div>
+    }
+
+  </section>
+  }
+
+
+  <!-- ===== CÓMO FUNCIONA ===== -->
+  @if (featureToggles.voluntariado.mostrarSeccionComoFunciona) {
+  <section class="vol-como">
+
+    <h2 class="vol-como__title">{{ textos.comoFunciona.titulo }}</h2>
+    <p class="vol-como__subtitle">{{ textos.comoFunciona.subtitulo }}</p>
+
+    <div class="vol-como__steps">
+
+      <div class="vol-como__step">
+        <span class="vol-como__step-num">01</span>
+        <h3 class="vol-como__step-title">{{ textos.comoFunciona.paso1.titulo }}</h3>
+        <p class="vol-como__step-desc">{{ textos.comoFunciona.paso1.descripcion }}</p>
+      </div>
+
+      <div class="vol-como__step">
+        <span class="vol-como__step-num">02</span>
+        <h3 class="vol-como__step-title">{{ textos.comoFunciona.paso2.titulo }}</h3>
+        <p class="vol-como__step-desc">{{ textos.comoFunciona.paso2.descripcion }}</p>
+      </div>
+
+      <div class="vol-como__step">
+        <span class="vol-como__step-num">03</span>
+        <h3 class="vol-como__step-title">{{ textos.comoFunciona.paso3.titulo }}</h3>
+        <p class="vol-como__step-desc">{{ textos.comoFunciona.paso3.descripcion }}</p>
+      </div>
+
+    </div>
+
+  </section>
+  }
+
+</main>

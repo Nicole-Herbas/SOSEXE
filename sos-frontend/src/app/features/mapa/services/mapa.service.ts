@@ -25,4 +25,19 @@ export class MapaService {
 
   }
 
+  obtenerDetalle(
+    origen: PuntoMapa['origen'],
+    id: number
+  ): Observable<PuntoMapa> {
+
+    return this.http
+      .get<ApiResponse<PuntoMapa>>(
+        `${this.apiUrl}/puntos/${origen}/${id}`
+      )
+      .pipe(
+        map(respuesta => respuesta.data)
+      );
+
+  }
+
 }
