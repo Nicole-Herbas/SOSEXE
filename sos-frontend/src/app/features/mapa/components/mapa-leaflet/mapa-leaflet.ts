@@ -184,8 +184,11 @@ export class MapaLeaflet
       );
 
 
+      const nombreTooltip = document.createElement('span');
+      nombreTooltip.textContent = punto.nombre;
+
       marcador.bindTooltip(
-        punto.nombre,
+        nombreTooltip,
         {
           direction: 'top',
           offset: [0, -10]
