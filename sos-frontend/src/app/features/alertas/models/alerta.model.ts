@@ -12,6 +12,7 @@ export interface CrearAlerta {
 
 export interface Alerta extends CrearAlerta {
   id: number;
+  version: number;
   estado: string;
   creadoPorId: number;
   departamentoNombre: string;
