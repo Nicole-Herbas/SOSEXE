@@ -83,6 +83,12 @@ export const routes: Routes = [
     canActivate: [adminGuard]
   },
   {
+    path: 'admin/alertas',
+    loadComponent: () => import('./features/alertas/pages/revisar-alertas/revisar-alertas')
+      .then(m => m.RevisarAlertasComponent),
+    canActivate: [adminGuard]
+  },
+  {
     path: 'admin',
     loadComponent: () => import('./features/admin/pages/admin/admin').then(m => m.AdminComponent),
     canActivate: [adminGuard]

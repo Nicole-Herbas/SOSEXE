@@ -3,6 +3,7 @@ package bo.edu.sos.backend.exception;
 import bo.edu.sos.backend.dto.ApiResponse;
 
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.OptimisticLockingFailureException;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,6 +26,13 @@ import java.util.Map;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+        @ExceptionHandler({ConflictException.class, OptimisticLockingFailureException.class})
+        public ResponseEntity<ApiResponse<Void>> handleConflict(RuntimeException ex) {
+                String mensaje = ex instanceof ConflictException ? ex.getMessage()
+                        : "La alerta cambió durante la operación. Revisa la versión actual.";
+                return ResponseEntity.status(HttpStatus.CONFLICT).body(ApiResponse.error(mensaje));
+        }
 
 
         @ExceptionHandler(ResourceNotFoundException.class)

@@ -2,6 +2,12 @@ package bo.edu.sos.backend.service;
 
 import bo.edu.sos.backend.dto.AlertaDTO;
 import bo.edu.sos.backend.dto.CrearAlertaDTO;
+import bo.edu.sos.backend.dto.PublicarAlertaDTO;
+import bo.edu.sos.backend.entity.EventoPublicacionAlerta;
+import bo.edu.sos.backend.exception.BadRequestException;
+import bo.edu.sos.backend.exception.ConflictException;
+import bo.edu.sos.backend.repository.EventoPublicacionAlertaRepository;
+import jakarta.validation.Validator;
 import bo.edu.sos.backend.entity.Alerta;
 import bo.edu.sos.backend.entity.Departamento;
 import bo.edu.sos.backend.entity.Usuario;
@@ -15,6 +21,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.time.LocalDateTime;
+
+import static bo.edu.sos.backend.constants.AlertaConstants.*;
 
 
 @Service
@@ -23,16 +32,22 @@ public class AlertaService {
     private final AlertaRepository alertaRepository;
     private final DepartamentoRepository departamentoRepository;
     private final UsuarioRepository usuarioRepository;
+    private final EventoPublicacionAlertaRepository eventoRepository;
+    private final Validator validator;
 
 
     public AlertaService(
             AlertaRepository alertaRepository,
             DepartamentoRepository departamentoRepository,
-            UsuarioRepository usuarioRepository) {
+            UsuarioRepository usuarioRepository,
+            EventoPublicacionAlertaRepository eventoRepository,
+            Validator validator) {
 
         this.alertaRepository = alertaRepository;
         this.departamentoRepository = departamentoRepository;
         this.usuarioRepository = usuarioRepository;
+        this.eventoRepository = eventoRepository;
+        this.validator = validator;
     }
 
 
@@ -40,7 +55,7 @@ public class AlertaService {
     public List<AlertaDTO> listarTodas() {
 
         List<AlertaDTO> alertas = alertaRepository
-                .findAll()
+                .findByEstado(ACTIVA)
                 .stream()
                 .map(this::convertirADTO)
                 .toList();
@@ -69,6 +84,10 @@ public class AlertaService {
                         )
                 );
 
+        if (!ACTIVA.equals(alerta.getEstado())) {
+            throw new ResourceNotFoundException("Alerta", id);
+        }
+
 
         LogHelper.debug(
                 AlertaService.class,
@@ -80,13 +99,54 @@ public class AlertaService {
         return convertirADTO(alerta);
     }
 
+    @Transactional(readOnly = true)
+    public List<AlertaDTO> listarBorradores() {
+        return alertaRepository.findByEstado(BORRADOR).stream().map(this::convertirADTO).toList();
+    }
+
+    @Transactional(readOnly = true)
+    public AlertaDTO buscarParaRevision(Long id) {
+        return convertirADTO(alertaRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Alerta", id)));
+    }
+
+    @Transactional
+    public AlertaDTO publicar(Long id, PublicarAlertaDTO solicitud, String email) {
+        Alerta alerta = alertaRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Alerta", id));
+        if (!BORRADOR.equals(alerta.getEstado())) {
+            throw new ConflictException("La alerta ya no es un borrador. Vuelve a consultarla.");
+        }
+        if (!alerta.getVersion().equals(solicitud.getVersion())) {
+            throw new ConflictException("La alerta cambió después de la revisión. Revisa la versión actual.");
+        }
+        if (!validator.validate(convertirADTO(alerta)).isEmpty()) {
+            throw new BadRequestException("Completa los datos obligatorios y la vigencia antes de publicar.");
+        }
+        Usuario administrador = usuarioRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario autenticado no encontrado"));
+        alerta.setEstado(ACTIVA);
+        // El control optimista impide publicar dos veces o publicar una versión distinta.
+        alertaRepository.saveAndFlush(alerta);
+
+        EventoPublicacionAlerta evento = new EventoPublicacionAlerta();
+        evento.setAlerta(alerta);
+        evento.setAdministrador(administrador);
+        evento.setFecha(LocalDateTime.now());
+        evento.setEstadoAnterior(BORRADOR);
+        evento.setEstadoNuevo(ACTIVA);
+        // Misma transacción: si falla el evento, también se revierte la publicación.
+        eventoRepository.saveAndFlush(evento);
+        return convertirADTO(alerta);
+    }
+
 
     @Transactional(readOnly = true)
     public List<AlertaDTO> buscarPorDepartamento(
             Long departamentoId) {
 
         List<AlertaDTO> alertas = alertaRepository
-                .findByDepartamentoId(departamentoId)
+                .findByDepartamentoIdAndEstado(departamentoId, ACTIVA)
                 .stream()
                 .map(this::convertirADTO)
                 .toList();
@@ -122,7 +182,7 @@ public class AlertaService {
 
 
         alerta.setEstado(
-                "BORRADOR"
+                BORRADOR
         );
 
 
@@ -159,6 +219,18 @@ public class AlertaService {
                         )
                 );
 
+        if (!BORRADOR.equals(alerta.getEstado())) {
+            throw new BadRequestException("Una alerta publicada no puede editarse sin una nueva revisión.");
+        }
+        if (dto.getEstado() != null && !BORRADOR.equals(dto.getEstado())) {
+            throw new BadRequestException("Usa la confirmación de publicación para cambiar el estado.");
+        }
+        if (!alerta.getVersion().equals(dto.getVersion())) {
+            throw new ConflictException("La alerta cambió. Consulta la versión actual antes de editar.");
+        }
+        if (!alerta.getCreadoPor().getId().equals(dto.getCreadoPorId())) {
+            throw new BadRequestException("No se puede cambiar el creador de la alerta.");
+        }
 
         copiarDTOaEntidad(
                 dto,
@@ -166,7 +238,7 @@ public class AlertaService {
         );
 
 
-        Alerta actualizada = alertaRepository.save(
+        Alerta actualizada = alertaRepository.saveAndFlush(
                 alerta
         );
 
@@ -189,17 +261,15 @@ public class AlertaService {
     public void eliminar(
             Long id) {
 
-        if (!alertaRepository.existsById(id)) {
-
-            throw new ResourceNotFoundException(
-                    "Alerta",
-                    id
-            );
+        Alerta alerta = alertaRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Alerta", id));
+        if (!BORRADOR.equals(alerta.getEstado())) {
+            throw new BadRequestException("No se puede eliminar una alerta publicada ni su registro de publicación.");
         }
 
 
-        alertaRepository.deleteById(
-                id
+        alertaRepository.delete(
+                alerta
         );
 
 
@@ -216,15 +286,15 @@ public class AlertaService {
             Alerta alerta) {
 
         alerta.setTitulo(
-                dto.getTitulo()
+                dto.getTitulo().strip()
         );
 
         alerta.setMensaje(
-                dto.getMensaje()
+                dto.getMensaje().strip()
         );
 
         if (dto.getFuente() != null) {
-            alerta.setFuente(dto.getFuente());
+            alerta.setFuente(dto.getFuente().strip());
         }
 
         alerta.setSeveridad(
@@ -265,21 +335,6 @@ public class AlertaService {
         );
 
 
-        Usuario creador = usuarioRepository
-                .findById(
-                        dto.getCreadoPorId()
-                )
-                .orElseThrow(() ->
-                        new ResourceNotFoundException(
-                                "Usuario",
-                                dto.getCreadoPorId()
-                        )
-                );
-
-
-        alerta.setCreadoPor(
-                creador
-        );
     }
 
 
@@ -287,6 +342,8 @@ public class AlertaService {
             Alerta alerta) {
 
         AlertaDTO dto = new AlertaDTO();
+
+        dto.setVersion(alerta.getVersion());
 
 
         dto.setId(
