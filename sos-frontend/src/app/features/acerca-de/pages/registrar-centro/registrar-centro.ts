@@ -8,6 +8,15 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 
 import { ApiResponse } from '../../../../shared/models/api-response';
 import { APP_TEXTOS } from '../../../../shared/constants/app-textos.constants';
+import {
+  ArchivosBorrador,
+  BORRADOR_VIGENCIA_DIAS,
+  borradorVencido,
+  cargarArchivosBorrador,
+  claveBorrador,
+  eliminarBorradorDeUsuario,
+  guardarArchivosBorrador
+} from '../../utils/borrador-registro-centro';
 
 // Forma en que el backend devuelve cada departamento
 export interface Departamento {
@@ -37,21 +46,13 @@ export class RegistrarCentroComponent implements OnInit {
   private readonly API_SOLICITUDES = '/api/solicitudes-centro';
   private readonly API_DEPARTAMENTOS = '/api/departamentos';
 
-  // SOS-42: borrador guardado en el navegador
-  // Textos -> localStorage | Archivos -> IndexedDB (localStorage no guarda archivos)
-    private usuarioEmail = '';
+  // SOS-42: borrador guardado SOLO en este navegador, aislado por usuario.
+  // Textos -> localStorage | Archivos -> IndexedDB (ver utils/borrador-registro-centro.ts)
+  private usuarioEmail = '';
 
-    private readonly DB_NAME = 'SosExeDB';
-    private readonly DB_VERSION = 1;
-    private readonly STORE_ARCHIVOS = 'archivosBorrador';
-
-    private get BORRADOR_KEY(): string {
-      return `registroCentroBorrador_${this.usuarioEmail}`;
-    }
-
-    private archivoKey(tipo: string): string {
-      return `${this.usuarioEmail}_${tipo}`;
-    }
+  private get BORRADOR_KEY(): string {
+    return claveBorrador(this.usuarioEmail);
+  }
 
     async ngOnInit(): Promise<void> {
 
@@ -99,6 +100,10 @@ export class RegistrarCentroComponent implements OnInit {
   errorBorrador = false;
   mostrarModalBorrador = false;
   guardandoBorrador = false;
+
+  // SOS-42 (QA): el borrador vence y se informa al usuario
+  readonly diasVigenciaBorrador = BORRADOR_VIGENCIA_DIAS;
+  avisoBorradorVencido = false;
 
   // ==========================================
   // SESIÓN (el POST exige login; el token lo pone el authInterceptor)
@@ -733,6 +738,7 @@ readonly actividadesVoluntariado =
     const borrador = {
 
       guardadoEn: new Date().toISOString(),
+      propietario: this.usuarioEmail,
       currentStep: this.currentStep,
 
       // Paso 1
@@ -797,7 +803,10 @@ readonly actividadesVoluntariado =
       // 2. Guardar archivos en IndexedDB
       try {
 
-        await this.guardarArchivosBorrador();
+        await guardarArchivosBorrador(
+          this.usuarioEmail,
+          this.archivosActuales()
+        );
 
       } catch (errorIndexedDB) {
 
@@ -877,6 +886,22 @@ readonly actividadesVoluntariado =
   try {
 
     const b = JSON.parse(guardado);
+
+
+    // SOS-42 (QA): solo se recupera si es del usuario actual y no venció
+    const esDeOtroUsuario =
+      typeof b.propietario === 'string' &&
+      b.propietario !== this.usuarioEmail;
+
+    if (esDeOtroUsuario || borradorVencido(b.guardadoEn)) {
+
+      await this.eliminarBorrador();
+
+      this.avisoBorradorVencido = !esDeOtroUsuario;
+      this.cdr.detectChanges();
+
+      return;
+    }
 
 
     // currentStep válido solamente entre 1 y 5
@@ -979,7 +1004,18 @@ readonly actividadesVoluntariado =
     // PASO 3 - ARCHIVOS
     // ==========================================
 
-    await this.cargarArchivosBorrador();
+    const archivos =
+      await cargarArchivosBorrador(this.usuarioEmail);
+
+    this.personeriaArchivo = archivos.personeria;
+    this.nitArchivo = archivos.nit;
+    this.identidadArchivo = archivos.identidad;
+    this.domicilioArchivo = archivos.domicilio;
+
+    this.personeriaAdjunta = !!archivos.personeria;
+    this.nitAdjunto = !!archivos.nit;
+    this.identidadAdjunta = !!archivos.identidad;
+    this.domicilioAdjunto = !!archivos.domicilio;
 
 
     this.borradorRecuperado = true;
@@ -1024,327 +1060,35 @@ readonly actividadesVoluntariado =
     window.location.reload();
   }
 
+  // Borra texto + documentos SOLO del usuario actual.
+  // Si falla, lanza el error y el borrador se conserva para reintentar.
   async eliminarBorrador(): Promise<void> {
 
-  this.borradorRecuperado = false;
+    this.borradorRecuperado = false;
 
+    if (!this.usuarioEmail) {
+      return;
+    }
 
-  if (
-    typeof localStorage === 'undefined' ||
-    !this.usuarioEmail
-  ) {
-    return;
+    await eliminarBorradorDeUsuario(this.usuarioEmail);
   }
-
-
-  const db =
-    await this.abrirBaseDatos();
-
-
-  try {
-
-    await new Promise<void>(
-      (resolve, reject) => {
-
-        const tx =
-          db.transaction(
-            this.STORE_ARCHIVOS,
-            'readwrite'
-          );
-
-        const store =
-          tx.objectStore(
-            this.STORE_ARCHIVOS
-          );
-
-
-        const tipos = [
-          'personeria',
-          'nit',
-          'identidad',
-          'domicilio'
-        ];
-
-
-        tipos.forEach(tipo => {
-
-          store.delete(
-            this.archivoKey(tipo)
-          );
-
-        });
-
-
-        tx.oncomplete = () => {
-
-          resolve();
-
-        };
-
-
-        tx.onerror = () => {
-
-          reject(tx.error);
-
-        };
-
-
-        tx.onabort = () => {
-
-          reject(
-            tx.error ??
-            new Error(
-              'La eliminación del borrador fue abortada.'
-            )
-          );
-
-        };
-
-      }
-    );
-
-
-    // Solo eliminamos el texto después
-    // de eliminar correctamente los archivos.
-    localStorage.removeItem(
-      this.BORRADOR_KEY
-    );
-
-
-  } catch (error) {
-
-    console.error(
-      'Error al eliminar el borrador:',
-      error
-    );
-
-    throw error;
-
-  } finally {
-
-    db.close();
-
-  }
-}
 
   // ==========================================
-  // SOS-42: ARCHIVOS EN INDEXEDDB
+  // SOS-42: DOCUMENTOS DEL BORRADOR
   // ==========================================
 
-  private abrirBaseDatos(): Promise<IDBDatabase> {
-
-    return new Promise((resolve, reject) => {
-
-      const request = indexedDB.open(this.DB_NAME, this.DB_VERSION);
-
-      request.onupgradeneeded = () => {
-        const db = request.result;
-        if (!db.objectStoreNames.contains(this.STORE_ARCHIVOS)) {
-          db.createObjectStore(this.STORE_ARCHIVOS);
-        }
-      };
-
-      request.onsuccess = () => resolve(request.result);
-      request.onerror = () => reject(request.error);
-    });
+  private archivosActuales(): ArchivosBorrador {
+    return {
+      personeria: this.personeriaArchivo,
+      nit: this.nitArchivo,
+      identidad: this.identidadArchivo,
+      domicilio: this.domicilioArchivo
+    };
   }
-
-  private async guardarArchivosBorrador(): Promise<void> {
-
-  const db = await this.abrirBaseDatos();
-
-
-  return new Promise((resolve, reject) => {
-
-    const tx =
-      db.transaction(
-        this.STORE_ARCHIVOS,
-        'readwrite'
-      );
-
-    const store =
-      tx.objectStore(
-        this.STORE_ARCHIVOS
-      );
-
-
-    const tipos = [
-      'personeria',
-      'nit',
-      'identidad',
-      'domicilio'
-    ];
-
-
-    // Eliminar solamente los archivos
-    // del usuario actual.
-    tipos.forEach(tipo => {
-
-      store.delete(
-        this.archivoKey(tipo)
-      );
-
-    });
-
-
-    // Guardar nuevamente los archivos
-    // del usuario actual.
-
-    if (this.personeriaArchivo) {
-
-      store.put(
-        this.personeriaArchivo,
-        this.archivoKey('personeria')
-      );
-
-    }
-
-    if (this.nitArchivo) {
-
-      store.put(
-        this.nitArchivo,
-        this.archivoKey('nit')
-      );
-
-    }
-
-    if (this.identidadArchivo) {
-
-      store.put(
-        this.identidadArchivo,
-        this.archivoKey('identidad')
-      );
-
-    }
-
-    if (this.domicilioArchivo) {
-
-      store.put(
-        this.domicilioArchivo,
-        this.archivoKey('domicilio')
-      );
-
-    }
-
-
-    tx.oncomplete = () => {
-
-      db.close();
-      resolve();
-
-    };
-
-
-    tx.onerror = () => {
-
-      db.close();
-      reject(tx.error);
-
-    };
-
-
-    tx.onabort = () => {
-
-      db.close();
-
-      reject(
-        tx.error ??
-        new Error(
-          'La transacción de IndexedDB fue abortada.'
-        )
-      );
-
-    };
-
-  });
-}
-
-  private async cargarArchivosBorrador(): Promise<void> {
-
-  const db = await this.abrirBaseDatos();
-
-
-  const leer = (clave: string) =>
-    new Promise<File | null>((resolve, reject) => {
-
-      const tx =
-        db.transaction(
-          this.STORE_ARCHIVOS,
-          'readonly'
-        );
-
-      const request =
-        tx
-          .objectStore(this.STORE_ARCHIVOS)
-          .get(clave);
-
-
-      request.onsuccess = () => {
-
-        resolve(
-          request.result ?? null
-        );
-
-      };
-
-
-      request.onerror = () => {
-
-        reject(request.error);
-
-      };
-
-    });
-
-
-  try {
-
-    this.personeriaArchivo =
-      await leer(
-        this.archivoKey('personeria')
-      );
-
-    this.nitArchivo =
-      await leer(
-        this.archivoKey('nit')
-      );
-
-    this.identidadArchivo =
-      await leer(
-        this.archivoKey('identidad')
-      );
-
-    this.domicilioArchivo =
-      await leer(
-        this.archivoKey('domicilio')
-      );
-
-
-    this.personeriaAdjunta =
-      !!this.personeriaArchivo;
-
-    this.nitAdjunto =
-      !!this.nitArchivo;
-
-    this.identidadAdjunta =
-      !!this.identidadArchivo;
-
-    this.domicilioAdjunto =
-      !!this.domicilioArchivo;
-
-
-  } finally {
-
-    db.close();
-
-  }
-}
 
   // ==========================================
   // SOS-42: AYUDAS
   // ==========================================
-
-  // Muestra un aviso pequeño que desaparece solo después de 4 segundos
   // Botón "Seguir completando": cierra el modal y se queda en el mismo paso
   seguirCompletando(): void {
     this.mostrarModalBorrador = false;

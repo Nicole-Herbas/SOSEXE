@@ -106,7 +106,7 @@ export class AuthService {
         withCredentials: true
       }
     ).pipe(
-            tap(() => {
+        tap(() => {
 
         // SOS-42 (QA): al cerrar sesión se borra el borrador de registro
         // de centro de ESTE usuario (útil en computadoras compartidas).
