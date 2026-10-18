@@ -6,6 +6,7 @@ import { LoginRequest } from '../models/login-request';
 import { AuthResponse } from '../models/auth-response';
 import { AuthUser } from '../models/auth-user';
 import { RegistroRequest } from '../models/registro-request';
+import { eliminarBorradorDeUsuario } from '../../acerca-de/utils/borrador-registro-centro';
 
 @Injectable({
   providedIn: 'root'
@@ -105,7 +106,17 @@ export class AuthService {
         withCredentials: true
       }
     ).pipe(
-      tap(() => {
+            tap(() => {
+
+        // SOS-42 (QA): al cerrar sesión se borra el borrador de registro
+        // de centro de ESTE usuario (útil en computadoras compartidas).
+        const email = localStorage.getItem(this.STORAGE_EMAIL);
+
+        if (email) {
+          eliminarBorradorDeUsuario(email).catch(() => {
+            // Si falla, el borrador igual vence solo a los 7 días.
+          });
+        }
 
         localStorage.removeItem(this.STORAGE_TOKEN);
         localStorage.removeItem(this.STORAGE_NOMBRE);
