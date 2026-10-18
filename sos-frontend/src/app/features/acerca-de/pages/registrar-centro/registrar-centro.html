@@ -215,6 +215,20 @@
       <!-- =================================================
            PASO 1 - INFORMACIÓN DEL CENTRO
            ================================================= -->
+                 <!-- SOS-42: AVISO DE BORRADOR VENCIDO -->
+      @if (avisoBorradorVencido) {
+
+        <div class="draft-banner">
+          <div class="draft-banner-text">
+            <strong>Tu borrador anterior venció</strong>
+            <span>
+              Pasaron más de {{ diasVigenciaBorrador }} días desde que lo guardaste,
+              así que lo eliminamos para proteger tus datos.
+            </span>
+          </div>
+        </div>
+
+      }
 
       @if (currentStep === 1) {
 
@@ -2672,6 +2686,14 @@
             Puedes salir tranquilo. Cuando vuelvas a esta página,
             recuperaremos tu información y documentos, y continuarás
             en el paso {{ currentStep }}.
+          </p>
+          
+          <p class="success-description">
+            🔒 El borrador (incluidos los documentos) se guarda
+            <strong>solo en este navegador</strong> y se elimina
+            automáticamente a los {{ diasVigenciaBorrador }} días,
+            al enviar la solicitud o al cerrar sesión.
+            Si usas una computadora compartida, cierra sesión al terminar.
           </p>
 
         </div>
