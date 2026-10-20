@@ -2,14 +2,21 @@ package bo.edu.sos.backend.repository;
 
 import bo.edu.sos.backend.entity.Usuario;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository; // <-- Agrega esta importación
+import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
-@Repository 
+@Repository
 public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
-    
+
     Optional<Usuario> findByEmail(String email);
-    
+
     boolean existsByEmail(String email);
+
+    List<Usuario> findByRolId(Long rolId);
+
+    List<Usuario> findByActivo(Boolean activo);
+
+    long countByRolIdAndActivo(Long rolId, Boolean activo);
 }

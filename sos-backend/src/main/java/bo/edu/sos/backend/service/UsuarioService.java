@@ -9,7 +9,9 @@ import bo.edu.sos.backend.exception.ResourceNotFoundException;
 import bo.edu.sos.backend.helper.LogHelper;
 import bo.edu.sos.backend.repository.DepartamentoRepository;
 import bo.edu.sos.backend.repository.RolRepository;
-import bo.edu.sos.backend.repository.UsuarioRepository;
+import bo.edu.sos.backend.repository.UsuarioRepository;import bo.edu.sos.backend.constants.Roles;
+import bo.edu.sos.backend.exception.BadRequestException;
+import bo.edu.sos.backend.exception.ForbiddenException;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -243,6 +245,80 @@ public class UsuarioService {
         );
     }
 
+    @Transactional(readOnly = true)
+    public List<UsuarioDTO> listarPorRol(Long rolId) {
+
+        rolRepository.findById(rolId)
+                .orElseThrow(() -> new ResourceNotFoundException("Rol", rolId));
+
+        return usuarioRepository.findByRolId(rolId)
+                .stream()
+                .map(this::convertirADTO)
+                .toList();
+    }
+
+
+    @Transactional(readOnly = true)
+    public List<UsuarioDTO> listarActivos() {
+        return usuarioRepository.findByActivo(true)
+                .stream()
+                .map(this::convertirADTO)
+                .toList();
+    }
+
+
+    @Transactional(readOnly = true)
+    public List<UsuarioDTO> listarInactivos() {
+        return usuarioRepository.findByActivo(false)
+                .stream()
+                .map(this::convertirADTO)
+                .toList();
+    }
+
+
+    @Transactional
+    public UsuarioDTO cambiarEstado(
+            Long id,
+            Boolean activo) {
+
+        if (activo == null) {
+            throw new BadRequestException(
+                    "El campo 'activo' es obligatorio");
+        }
+
+        Usuario usuario = usuarioRepository
+                .findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Usuario", id));
+
+        // Regla: no se puede desactivar al último ADMIN activo.
+        boolean esAdmin = Roles.ADMIN.equals(
+                usuario.getRol() != null ? usuario.getRol().getNombre() : null);
+
+        if (esAdmin && !activo) {
+
+            long adminsActivos = usuarioRepository.countByRolIdAndActivo(
+                    usuario.getRol().getId(), true);
+
+            if (adminsActivos <= 1) {
+                throw new ForbiddenException(
+                        "No se puede desactivar al último administrador activo");
+            }
+        }
+
+        usuario.setActivo(activo);
+
+        Usuario actualizado = usuarioRepository.save(usuario);
+
+        LogHelper.info(
+                UsuarioService.class,
+                "Estado de usuario actualizado. id={}, activo={}",
+                id,
+                activo
+        );
+
+        return convertirADTO(actualizado);
+    }
 
     private void copiarDTOaEntidad(
             UsuarioDTO dto,
