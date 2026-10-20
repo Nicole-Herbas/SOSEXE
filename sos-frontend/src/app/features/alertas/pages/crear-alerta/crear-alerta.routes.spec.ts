@@ -8,16 +8,28 @@ import { of, throwError } from 'rxjs';
 import { routes } from '../../../../app.routes';
 import { AuthService } from '../../../auth/services/auth.service';
 import { CrearAlertaComponent } from './crear-alerta';
+import { RevisarAlertasComponent } from '../revisar-alertas/revisar-alertas';
 
 @Component({ template: '' })
 class DestinoComponent {}
 
-describe('Acceso a crear alertas', () => {
+describe.each([
+  {
+    path: 'admin/alertas/crear',
+    componenteEsperado: CrearAlertaComponent,
+    api: '/api/departamentos',
+  },
+  {
+    path: 'admin/alertas',
+    componenteEsperado: RevisarAlertasComponent,
+    api: '/api/alertas/borradores',
+  },
+])('Acceso administrativo a $path', ({ path, componenteEsperado, api }) => {
   afterEach(() => TestBed.inject(HttpTestingController).verify());
 
   it.each(['ADMIN', 'USER', 'sin sesión'])('protege la ruta para %s', async (rol) => {
-    const ruta = routes.find((route) => route.path === 'admin/alertas/crear');
-    if (!ruta) throw new Error('Falta la ruta de creación de alertas');
+    const ruta = routes.find((route) => route.path === path);
+    if (!ruta) throw new Error('Falta la ruta administrativa de alertas');
     await TestBed.configureTestingModule({
       providers: [
         provideRouter([
@@ -37,16 +49,17 @@ describe('Acceso a crear alertas', () => {
       ],
     }).compileComponents();
     const harness = await RouterTestingHarness.create();
-    const componente = await harness.navigateByUrl('/admin/alertas/crear');
+    const componente = await harness.navigateByUrl('/' + path);
     const http = TestBed.inject(HttpTestingController);
     if (rol === 'ADMIN') {
-      expect(componente).toBeInstanceOf(CrearAlertaComponent);
-      http
-        .expectOne('/api/departamentos')
-        .flush({ success: true, data: [{ id: 3, nombre: 'Cochabamba' }] });
+      expect(componente).toBeInstanceOf(componenteEsperado);
+      http.expectOne(api).flush({
+        success: true,
+        data: api === '/api/departamentos' ? [{ id: 3, nombre: 'Cochabamba' }] : [],
+      });
     } else {
       expect(TestBed.inject(Router).url).toBe(rol === 'USER' ? '/mapa' : '/login');
-      http.expectNone('/api/departamentos');
+      http.expectNone(api);
     }
   });
 });

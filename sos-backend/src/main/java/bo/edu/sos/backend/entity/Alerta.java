@@ -18,6 +18,10 @@ public class Alerta {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Version
+    @Column(nullable = false)
+    private Long version;
+
     @Column(nullable = false, length = 220)
     private String titulo;
 

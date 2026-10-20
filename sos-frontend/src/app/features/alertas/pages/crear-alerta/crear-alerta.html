@@ -13,6 +13,7 @@
   }
   @if (mensajeExito()) {
     <p class="exito" role="status">{{ mensajeExito() }}</p>
+    <a routerLink="/admin/alertas">{{ textos.revisarEncabezado }}</a>
   }
 
   <form [formGroup]="formulario" (ngSubmit)="guardar()" novalidate>
