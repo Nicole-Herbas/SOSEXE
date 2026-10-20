@@ -28,6 +28,12 @@ public class AlertaController {
                 ApiResponse.ok(alertaService.listarTodas()));
     }
 
+    @GetMapping("/activas")
+    public ResponseEntity<ApiResponse<List<AlertaDTO>>> listarActivas() {
+        return ResponseEntity.ok(
+                ApiResponse.ok(alertaService.listarActivas()));
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<AlertaDTO>> buscarPorId(
             @PathVariable Long id) {
@@ -54,6 +60,19 @@ public class AlertaController {
         return ResponseEntity
                 .created(URI.create("/api/alertas/" + creada.getId()))
                 .body(ApiResponse.created(creada));
+    }
+
+    @PatchMapping("/{id}/estado")
+    public ResponseEntity<ApiResponse<AlertaDTO>> cambiarEstado(
+            @PathVariable Long id,
+            @RequestParam String estado) {
+
+        return ResponseEntity.ok(
+                ApiResponse.ok(
+                        "Estado de alerta actualizado",
+                        alertaService.cambiarEstado(id, estado)
+                )
+        );
     }
 
     @PutMapping("/{id}")
