@@ -25,6 +25,15 @@ export class CentroService {
 
   }
 
+  // SOS-70: catálogo de centros disponibles para donaciones.
+  listarVerificados(): Observable<Centro[]> {
+    return this.http
+      .get<ApiResponse<Centro[]>>(`${this.apiUrl}/verificados`)
+      .pipe(
+        map(respuesta => respuesta.data)
+      );
+  }
+
 
   buscarPorId(id: number): Observable<Centro> {
 

@@ -18,4 +18,8 @@ export interface Centro {
 
   estadoVerificacion?: string;
   responsableId?: number;
+
+  departamentoNombre?: string;
+  necesidadIds?: number[];
+  necesidadNombres?: string[];
 }

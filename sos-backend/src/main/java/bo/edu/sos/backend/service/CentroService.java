@@ -58,6 +58,17 @@ public class CentroService {
         return centros;
     }
 
+    // SOS-70: Centros disponibles para el proceso de donación.
+    @Transactional(readOnly = true)
+    public List<CentroDTO> listarVerificados() {
+
+        return centroRepository
+                .findByEstadoVerificacion(EstadoVerificacion.VERIFICADO)
+                .stream()
+                .map(this::convertirADTO)
+                .toList();
+    }
+
 
     @Transactional(readOnly = true)
     public CentroDTO buscarPorId(
