@@ -62,6 +62,41 @@ public class UsuarioController {
                         usuarioService.actualizar(id, usuarioDTO)));
     }
 
+    @GetMapping("/rol/{rolId}")
+    public ResponseEntity<ApiResponse<List<UsuarioDTO>>> listarPorRol(
+            @PathVariable Long rolId) {
+
+        return ResponseEntity.ok(
+                ApiResponse.ok(usuarioService.listarPorRol(rolId)));
+    }
+
+    @GetMapping("/activos")
+    public ResponseEntity<ApiResponse<List<UsuarioDTO>>> listarActivos() {
+
+        return ResponseEntity.ok(
+                ApiResponse.ok(usuarioService.listarActivos()));
+    }
+
+    @GetMapping("/inactivos")
+    public ResponseEntity<ApiResponse<List<UsuarioDTO>>> listarInactivos() {
+
+        return ResponseEntity.ok(
+                ApiResponse.ok(usuarioService.listarInactivos()));
+    }
+
+    @PatchMapping("/{id}/estado")
+    public ResponseEntity<ApiResponse<UsuarioDTO>> cambiarEstado(
+            @PathVariable Long id,
+            @RequestParam Boolean activo) {
+
+        return ResponseEntity.ok(
+                ApiResponse.ok(
+                        "Estado de usuario actualizado",
+                        usuarioService.cambiarEstado(id, activo)
+                )
+        );
+    }
+    
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>> eliminar(
             @PathVariable Long id) {
