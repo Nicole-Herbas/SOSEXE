@@ -10,6 +10,7 @@ import { APP_TEXTOS } from '../../../../shared/constants/app-textos.constants';
     <section class="admin">
       <h1>{{ textos.admin }}</h1>
       <a routerLink="/admin/alertas/crear">{{ textos.encabezado }}</a>
+      <a routerLink="/admin/alertas">{{ textos.revisarEncabezado }}</a>
       <app-lista-centros />
     </section>
   `,

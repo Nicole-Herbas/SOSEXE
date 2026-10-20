@@ -117,6 +117,13 @@ public class SecurityConfig {
                                 ).authenticated()
 
 
+                        // Revisión administrativa antes de cualquier regla pública de alertas.
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                ApiRoutes.ALERTAS + "/borradores",
+                                ApiRoutes.ALERTAS + "/*/revision"
+                        ).hasAuthority(Roles.ADMIN)
+
                         // Datos públicos de lectura
                         .requestMatchers(
                                 HttpMethod.GET,
