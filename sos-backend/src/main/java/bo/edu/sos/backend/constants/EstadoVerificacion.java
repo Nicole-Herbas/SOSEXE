@@ -4,11 +4,6 @@ import java.util.List;
 
 /**
  * Estados de verificación usados en Centro y PuntoAyuda.
- * Reglas de publicación:
- *  - PENDIENTE: recién creado, aún no revisado.
- *  - EN_REVISION: un administrador lo tomó para revisión.
- *  - VERIFICADO: aprobado, se publica en el mapa.
- *  - RECHAZADO: no cumple, no se publica.
  */
 public final class EstadoVerificacion {
 
@@ -24,7 +19,6 @@ public final class EstadoVerificacion {
         return estado != null && VALORES.contains(estado);
     }
 
-    /** Regla de publicación: solo VERIFICADO se publica en el mapa. */
     public static boolean puedePublicarse(String estado) {
         return VERIFICADO.equals(estado);
     }
