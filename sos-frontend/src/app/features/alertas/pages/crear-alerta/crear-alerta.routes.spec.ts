@@ -51,6 +51,7 @@ describe.each([
     const harness = await RouterTestingHarness.create();
     const componente = await harness.navigateByUrl('/' + path);
     const http = TestBed.inject(HttpTestingController);
+    http.match(req => req.url.includes('/i18n/')).forEach(req => req.flush({}));
     if (rol === 'ADMIN') {
       expect(componente).toBeInstanceOf(componenteEsperado);
       http.expectOne(api).flush({
