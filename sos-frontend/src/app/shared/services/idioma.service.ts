@@ -29,7 +29,7 @@ export type Idioma = 'es' | 'en';
 export class IdiomaService {
 
   private readonly STORAGE_KEY = 'idioma_preferido';
-  private readonly http = inject(HttpClient);
+  private readonly http = inject(HttpClient, { optional: true });
 
   private readonly _idioma = signal<Idioma>(
     this.obtenerIdiomaGuardado()
@@ -74,6 +74,9 @@ export class IdiomaService {
   }
 
   private cargarTraducciones(idioma: Idioma): void {
+    if (!this.http) {
+      return;
+    }
     this.http
       .get<any>(`/i18n/${idioma}.json`)
       .subscribe({

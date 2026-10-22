@@ -12,11 +12,12 @@ import {
   filtrarNoticiasPorCategoria,
 } from '../../../noticias/utils/categoria-noticia';
 import { recortarResumen } from '../../../noticias/utils/resumen-noticia';
+import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
 
 const MAX_NOTICIAS_INICIO = 6;
 
 @Component({
-  imports: [RouterLink],
+  imports: [RouterLink, TranslatePipe],
   selector: 'app-inicio',
   styleUrl: './inicio.scss',
   templateUrl: './inicio.html',
