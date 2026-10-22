@@ -23,6 +23,8 @@ export const APP_TEXTOS = {
     iniciarSesion: 'Iniciar sesión',
     preferencias: 'Preferencias',
     quieroAyudar: '♥ Quiero ayudar',
+    salir: 'Salir',
+    cerrarSesion: 'Cerrar sesión',
   },
 
 
@@ -339,7 +341,13 @@ mapa: {
 
       confirmacion:
         'Gracias. Pasa a revisión del equipo.',
+
+      cerrar:
+        'Cerrar reporte',
     },
+
+    cerrarDetalle:
+      'Cerrar detalle',
   },
 
   filtrosTipo: {
@@ -463,6 +471,19 @@ noticias: {
     'Alertas',
     'Otras',
   ] as const,
+
+  // Etiquetas traducibles de las categorías (la lista de arriba se usa como
+  // valor de comparación; estas son las que se muestran al usuario).
+  categorias: {
+    todas: 'Todas',
+    incendios: 'Incendios',
+    inundaciones: 'Inundaciones',
+    deslizamientos: 'Deslizamientos',
+    sequias: 'Sequías',
+    comunidad: 'Comunidad',
+    alertas: 'Alertas',
+    otras: 'Otras',
+  },
 
   // ── Sección "Últimas actualizaciones" ────────────────────────────────────
   ultimasTitulo:
@@ -1077,6 +1098,94 @@ voluntariado: {
   acercaDe: {
     mensaje: 'acerca-de works!',
 
+    hero: {
+      eyebrow: 'Sobre SOS.exe',
+      titulo: 'Ayuda organizada,',
+      tituloDestacado: 'transparente y cercana.',
+      descripcion:
+        'SOS.exe conecta a personas, centros verificados y voluntarios para que la ayuda llegue a quienes más la necesitan durante desastres naturales en Bolivia.',
+      centros: 'Centros verificados',
+      informacion: 'Información clara',
+      comunidad: 'Comunidad solidaria',
+    },
+
+    mision: {
+      etiqueta: 'LO QUE BUSCAMOS',
+      titulo: 'Nuestra misión',
+      descripcion:
+        'Facilitar una respuesta solidaria y eficiente ante desastres naturales, garantizando que cada donación y esfuerzo voluntario llegue de forma segura, verificada y oportuna.',
+      conectarTitulo: 'Conectar',
+      conectarDescripcion:
+        'Unimos a personas donantes, centros de apoyo y voluntarios para multiplicar el impacto de cada ayuda.',
+      verificarTitulo: 'Verificar',
+      verificarDescripcion:
+        'Validamos centros y refugios mediante un proceso riguroso para asegurar confianza y transparencia.',
+      responderTitulo: 'Responder',
+      responderDescripcion:
+        'Facilitamos información actualizada para que la ayuda llegue rápido y donde realmente se necesita.',
+    },
+
+    verificacion: {
+      titulo: '¿Cómo verificamos los centros?',
+      insignia: '✓ Centros verificados',
+      paso1Titulo: 'Solicitud',
+      paso1Descripcion:
+        'El centro o refugio completa una solicitud con información básica y documentos.',
+      paso2Titulo: 'Revisión de documentos',
+      paso2Descripcion:
+        'Revisamos su documentación y verificamos que la información presentada sea válida.',
+      paso3Titulo: 'Validación del centro',
+      paso3Descripcion:
+        'Confirmamos la existencia, actividad, responsables y medios oficiales del centro.',
+      paso4Titulo: 'Seguimiento continuo',
+      paso4Descripcion:
+        'La información y las necesidades se revisan periódicamente para mantenerlas actualizadas.',
+    },
+
+    valores: {
+      titulo: 'Nuestros valores',
+      descripcion: 'Principios que orientan cada decisión de la plataforma.',
+      transparenciaTitulo: 'Transparencia',
+      transparenciaDescripcion:
+        'Mostramos información clara sobre centros, necesidades y destino de la ayuda.',
+      seguridadTitulo: 'Seguridad',
+      seguridadDescripcion:
+        'Priorizamos centros verificados y procesos confiables para proteger cada aporte.',
+      comunidadTitulo: 'Comunidad',
+      comunidadDescripcion:
+        'Creemos en la colaboración para responder juntos ante situaciones difíciles.',
+      informacionTitulo: 'Información actualizada',
+      informacionDescripcion:
+        'Mantenemos visibles las necesidades prioritarias, alertas y formas de colaborar.',
+    },
+
+    roles: {
+      titulo: 'Una plataforma para ayudar de distintas formas',
+      descripcion:
+        'Cada rol tiene herramientas y responsabilidades diferentes dentro de SOS.exe.',
+      donantesTitulo: 'Personas donantes',
+      donantesDescripcion:
+        'Encuentra centros verificados, conoce sus necesidades y elige dónde deseas ayudar.',
+      donantesBoton: 'Quiero donar →',
+      centrosTitulo: 'Centros y refugios',
+      centrosDescripcion:
+        'Solicita la verificación de tu centro, publica sus necesidades y crea oportunidades de voluntariado.',
+      centrosBoton: 'Registrar mi centro →',
+      voluntariosTitulo: 'Voluntarios',
+      voluntariosDescripcion:
+        'Participa según tu experiencia, disponibilidad y habilidades para apoyar a la comunidad.',
+      voluntariosBoton: 'Quiero ser voluntario →',
+    },
+
+    cta: {
+      etiqueta: 'PARTICIPA',
+      titulo: 'Cada ayuda cuenta cuando llega al lugar correcto.',
+      descripcion:
+        'Únete a una comunidad que responde con solidaridad y responsabilidad en toda Bolivia.',
+      quieroAyudar: '♥ Quiero ayudar',
+      explorarMapa: 'Explorar el mapa',
+    },
+
     registrarPunto: {
       titulo: 'Puntos de ayuda',
       descripcion:
@@ -1156,6 +1265,9 @@ registro: {
 
   errorGeneral:
     'Ocurrió un error al crear la cuenta. Intenta de nuevo.',
+
+  creandoCuenta:
+    'Creando cuenta...',
 },
   registrarCentro: {
 
@@ -1648,6 +1760,15 @@ registro: {
 
 preferencias: {
   titulo: 'Preferencias de cuenta',
+
+  // ── Idioma (SOS-114) ──────────────────────────────────────────────────
+  idiomaSeccion: 'Idioma de la aplicación',
+  idiomaDescripcion: 'Cambia el idioma de la interfaz de SOS.exe.',
+  idiomaEspanol: 'Español',
+  idiomaIngles: 'Inglés',
+  idiomaGuardado: '✓ Idioma actualizado correctamente.',
+
+  // ── SMS ───────────────────────────────────────────────────────────────
   seccionSms: 'Alertas SMS por región',
   descripcionSms:
     'Recibe notificaciones inmediatas por mensaje de texto ante emergencias y desastres naturales en tu región.',
@@ -1675,6 +1796,9 @@ preferencias: {
   modalCancelarBoton: 'Mantener suscripción',
   estadoActivo: 'Activa',
   estadoInactivo: 'Inactiva',
+  configuracion: 'Configuración',
+  cancelando: 'Cancelando...',
+  guardando: 'Guardando...',
 },
 
   alertas: {

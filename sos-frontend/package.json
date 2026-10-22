@@ -6,7 +6,9 @@
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "i18n:pull": "node scripts/pull-i18n.mjs",
+    "i18n:push": "node scripts/push-i18n.mjs"
   },
   "private": true,
   "packageManager": "npm@11.12.1",

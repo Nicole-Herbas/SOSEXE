@@ -1,14 +1,14 @@
 <main class="pagina-noticias">
 	<header class="noticias-encabezado">
 		<a class="noticias-volver" routerLink="/inicio">
-			{{ textos.volverInicio }}
+			{{ 'noticias.volverInicio' | translate }}
 		</a>
-		<h1>{{ textos.titulo }}</h1>
-		<p>{{ textos.subtitulo }}</p>
+		<h1>{{ 'noticias.titulo' | translate }}</h1>
+		<p>{{ 'noticias.subtitulo' | translate }}</p>
 	</header>
 
 	@if (featureToggles.noticias.mostrarFiltros) {
-		<div class="noticias-categorias" role="group" [attr.aria-label]="textos.categoriasEtiqueta">
+		<div class="noticias-categorias" role="group" [attr.aria-label]="'noticias.categoriasEtiqueta' | translate">
 			@for (categoria of categorias; track categoria) {
 				<button
 					type="button"
@@ -17,7 +17,7 @@
 					[attr.aria-pressed]="categoria === filtroActivo()"
 					(click)="seleccionarFiltro(categoria)"
 				>
-					{{ categoria }}
+					{{ claveCategoria(categoria) | translate }}
 				</button>
 			}
 		</div>
@@ -26,22 +26,22 @@
 	<section class="noticias-actualizaciones" aria-labelledby="noticias-actualizaciones-titulo">
 		<div class="noticias-seccion-encabezado">
 			<div>
-				<h2 id="noticias-actualizaciones-titulo">{{ textos.ultimasTitulo }}</h2>
-				<p>{{ textos.ultimasDesc }}</p>
+				<h2 id="noticias-actualizaciones-titulo">{{ 'noticias.ultimasTitulo' | translate }}</h2>
+				<p>{{ 'noticias.ultimasDesc' | translate }}</p>
 			</div>
 		</div>
 
 		@if (cargando()) {
-			<p class="noticias-estado" role="status">{{ textos.cargando }}</p>
+			<p class="noticias-estado" role="status">{{ 'noticias.cargando' | translate }}</p>
 		} @else if (error()) {
 			<div class="noticias-estado noticias-estado--error" role="alert">
-				<p>{{ textos.errorCarga }}</p>
+				<p>{{ 'noticias.errorCarga' | translate }}</p>
 				<button type="button" (click)="cargarNoticias()">
-					{{ textos.reintentar }}
+					{{ 'noticias.reintentar' | translate }}
 				</button>
 			</div>
 		} @else if (noticiasFiltradas().length === 0) {
-			<p class="noticias-estado">{{ textos.sinNoticias }}</p>
+			<p class="noticias-estado">{{ 'noticias.sinNoticias' | translate }}</p>
 		} @else {
 			<div class="noticias-destacadas">
 				@for (noticia of noticiasDestacadas(); track noticia.id; let principal = $first) {
@@ -59,10 +59,10 @@
 								/>
 							} @else {
 								<div class="noticia-tarjeta__imagen-fallback">
-									{{ textos.imagenNoDisponible }}
+									{{ 'noticias.imagenNoDisponible' | translate }}
 								</div>
 							}
-							<span class="noticia-tarjeta__categoria">{{ noticia.categoria || textos.categoriaGeneral }}</span>
+							<span class="noticia-tarjeta__categoria">{{ (noticia.categoria ? claveCategoria(noticia.categoria) : 'noticias.categoriaGeneral') | translate }}</span>
 							@if (noticia.fuente) {
 								<span class="noticia-tarjeta__fuente">{{ noticia.fuente }}</span>
 							}
@@ -70,7 +70,7 @@
 
 						<div class="noticia-tarjeta__contenido">
 							<div class="noticia-tarjeta__meta">
-								<span>{{ textos.ubicacionIcono }} {{ noticia.ubicacion || textos.ubicacion }}</span>
+								<span>{{ 'noticias.ubicacionIcono' | translate }} {{ noticia.ubicacion || ('noticias.ubicacion' | translate) }}</span>
 								@if (noticia.fechaPublicacion) {
 									<time [attr.datetime]="noticia.fechaPublicacion">
 										{{ formatearFecha(noticia.fechaPublicacion) }}
@@ -88,7 +88,7 @@
 									target="_blank"
 									rel="noopener noreferrer"
 								>
-									{{ textos.leerNoticia }}
+									{{ 'noticias.leerNoticia' | translate }}
 								</a>
 							}
 						</div>
@@ -110,10 +110,10 @@
 									/>
 								} @else {
 									<div class="noticia-tarjeta__imagen-fallback">
-										{{ textos.imagenNoDisponible }}
+										{{ 'noticias.imagenNoDisponible' | translate }}
 									</div>
 								}
-								<span class="noticia-tarjeta__categoria">{{ noticia.categoria || textos.categoriaGeneral }}</span>
+								<span class="noticia-tarjeta__categoria">{{ (noticia.categoria ? claveCategoria(noticia.categoria) : 'noticias.categoriaGeneral') | translate }}</span>
 								@if (noticia.fuente) {
 									<span class="noticia-tarjeta__fuente">{{ noticia.fuente }}</span>
 								}
@@ -121,7 +121,7 @@
 
 							<div class="noticia-tarjeta__contenido">
 								<div class="noticia-tarjeta__meta">
-									  <span>{{ textos.ubicacionIcono }} {{ noticia.ubicacion || textos.ubicacion }}</span>
+									<span>{{ 'noticias.ubicacionIcono' | translate }} {{ noticia.ubicacion || ('noticias.ubicacion' | translate) }}</span>
 									@if (noticia.fechaPublicacion) {
 										<time [attr.datetime]="noticia.fechaPublicacion">
 											{{ formatearFecha(noticia.fechaPublicacion) }}
@@ -139,7 +139,7 @@
 										target="_blank"
 										rel="noopener noreferrer"
 									>
-										{{ textos.leerNoticia }}
+										{{ 'noticias.leerNoticia' | translate }}
 									</a>
 								}
 							</div>
@@ -152,7 +152,7 @@
 		@if (apiNoDisponible() && !cargando()) {
 			<div class="noticias-aviso-api" role="status">
 				<span class="noticias-aviso-api__icono" aria-hidden="true">i</span>
-				{{ externasDesdeCache() ? textos.apiNoDisponibleCache : textos.apiNoDisponible }}
+				{{ (externasDesdeCache() ? 'noticias.apiNoDisponibleCache' : 'noticias.apiNoDisponible') | translate }}
 			</div>
 		}
 	</section>
@@ -160,25 +160,25 @@
 	@if (featureToggles.noticias.mostrarAlertas) {
 		<section class="noticias-alertas" aria-labelledby="noticias-alertas-titulo" data-alertas-referencia>
 			<div class="noticias-seccion-encabezado">
-				<h2 id="noticias-alertas-titulo">{{ textos.alertasTitulo }}</h2>
-				<p>{{ textos.alertasDesc }}</p>
+				<h2 id="noticias-alertas-titulo">{{ 'noticias.alertasTitulo' | translate }}</h2>
+				<p>{{ 'noticias.alertasDesc' | translate }}</p>
 			</div>
 
 			<article class="noticia-alerta">
 				<span class="noticia-alerta__icono" aria-hidden="true">!</span>
 				<div class="noticia-alerta__contenido">
 					<div class="noticia-alerta__meta">
-						<span class="noticia-alerta__badge">{{ textos.alertaActivaBadge }}</span>
-						<span>{{ textos.actualizado }} {{ textos.alertaActualizadoReferencia }}</span>
+						<span class="noticia-alerta__badge">{{ 'noticias.alertaActivaBadge' | translate }}</span>
+						<span>{{ 'noticias.actualizado' | translate }} {{ 'noticias.alertaActualizadoReferencia' | translate }}</span>
 					</div>
-					<h3>{{ textos.alertaTituloReferencia }}</h3>
-					<p>{{ textos.alertaMensajeReferencia }}</p>
+					<h3>{{ 'noticias.alertaTituloReferencia' | translate }}</h3>
+					<p>{{ 'noticias.alertaMensajeReferencia' | translate }}</p>
 					<span class="noticia-alerta__ubicacion">
-						{{ textos.ubicacionIcono }} {{ textos.alertaUbicacionReferencia }}
+						{{ 'noticias.ubicacionIcono' | translate }} {{ 'noticias.alertaUbicacionReferencia' | translate }}
 					</span>
 				</div>
 				<a class="noticia-alerta__mapa" routerLink="/mapa">
-					{{ textos.verEnMapa }}
+					{{ 'noticias.verEnMapa' | translate }}
 				</a>
 			</article>
 		</section>

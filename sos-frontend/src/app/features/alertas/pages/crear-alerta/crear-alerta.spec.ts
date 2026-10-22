@@ -25,6 +25,7 @@ describe('CrearAlertaComponent', () => {
     fixture = TestBed.createComponent(CrearAlertaComponent);
     component = fixture.componentInstance;
     http = TestBed.inject(HttpTestingController);
+    http.match(req => req.url.includes('/i18n/')).forEach(req => req.flush({}));
     fixture.detectChanges();
   });
   afterEach(() => http.verify());

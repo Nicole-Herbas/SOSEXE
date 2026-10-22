@@ -7,8 +7,10 @@ import {
 import { APP_TEXTOS } from '../../../../shared/constants/app-textos.constants';
 
 
+import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
+
 @Component({
-  imports: [RouterLink],
+  imports: [RouterLink, TranslatePipe],
   selector: 'app-acerca-de',
   styleUrl: './acerca-de.scss',
   templateUrl: './acerca-de.html',

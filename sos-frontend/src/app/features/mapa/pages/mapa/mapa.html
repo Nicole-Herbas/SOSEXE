@@ -1,9 +1,9 @@
 <section class="pagina-mapa">
   <div class="encabezado-mapa">
     <div>
-      <span class="subtitulo">{{ textos.subtitulo }}</span>
-      <h1>{{ textos.titulo }}</h1>
-      <p>{{ textos.descripcion }}</p>
+      <span class="subtitulo">{{ 'mapa.subtitulo' | translate }}</span>
+      <h1>{{ 'mapa.titulo' | translate }}</h1>
+      <p>{{ 'mapa.descripcion' | translate }}</p>
     </div>
 
     <div class="contador-verificados">
@@ -24,7 +24,7 @@
           @if (filtro.color) {
             <span class="punto {{ filtro.color }}"></span>
           }
-          {{ filtro.etiqueta }}
+          {{ filtro.clave | translate }}
         </button>
       }
     </div>
@@ -34,20 +34,20 @@
   @if (featureToggles.mapa.mostrarLista) {
     <aside class="columna-izquierda">
       <div class="bloque-busqueda">
-        <label for="mapa-busqueda">{{ textos.buscarEtiqueta }}</label>
+        <label for="mapa-busqueda">{{ 'mapa.buscarEtiqueta' | translate }}</label>
         <input
           id="mapa-busqueda"
           type="search"
           aria-controls="mapa-resultados"
           [value]="busqueda()"
-          [placeholder]="textos.buscarPlaceholder"
+          [placeholder]="'mapa.buscarPlaceholder' | translate"
           (input)="actualizarBusqueda($event)"
         />
       </div>
 
       @if (featureToggles.mapa.filtros) {
         <div class="bloque-filtros">
-          <label>{{ textos.necesidadesEtiqueta }}</label>
+          <label>{{ 'mapa.necesidadesEtiqueta' | translate }}</label>
 
           <div class="filtros-necesidades">
             @for (filtro of filtrosNecesidad; track filtro.id) {
@@ -62,7 +62,7 @@
               [attr.data-filtro-necesidad]="filtro.id"
               (click)="seleccionarFiltroNecesidad(filtro.id)"
             >
-              {{ filtro.etiqueta }}
+              {{ filtro.clave | translate }}
             </button>
             }
           </div>
@@ -72,17 +72,17 @@
       }
 
       <div class="resultados-header" role="status" aria-live="polite" aria-atomic="true" [attr.aria-busy]="cargando()">
-        <h3>{{ textos.resultadosTitulo }}</h3>
+        <h3>{{ 'mapa.resultadosTitulo' | translate }}</h3>
         <span class="cantidad-resultados">{{ puntosFiltrados().length }}</span>
       </div>
 
       <div id="mapa-resultados" class="lista-resultados">
         @if (cargando()) {
-          <p class="mensaje-estado">{{ textos.cargando }}</p>
+          <p class="mensaje-estado">{{ 'mapa.cargando' | translate }}</p>
         } @else if (error()) {
           <p class="mensaje-estado error">{{ error() }}</p>
         } @else if (puntosFiltrados().length === 0) {
-          <p class="mensaje-estado">{{ textos.sinResultados }}</p>
+          <p class="mensaje-estado">{{ 'mapa.sinResultados' | translate }}</p>
         } @else {
         @for (
         punto of puntosFiltrados();
@@ -96,7 +96,7 @@
               <div class="etiquetas-card">
                 <span class="tag {{ obtenerClaseTipo(punto.tipo) }}">{{ obtenerEtiquetaTipo(punto.tipo) }}</span>
                 @if (estaVerificado(punto)) {
-                  <span class="verificado">{{ textos.verificado }}</span>
+                  <span class="verificado">{{ 'mapa.verificado' | translate }}</span>
                 }
               </div>
 
@@ -126,7 +126,7 @@
       ></app-mapa-leaflet>
 
       <div class="mensaje-mapa">
-        {{ textos.mensajeMapa }}
+        {{ 'mapa.mensajeMapa' | translate }}
       </div>
 
     </main>
@@ -152,7 +152,7 @@
 
         @if (cargandoDetalle()) {
         <p class="mensaje-estado">
-          {{ detalleEtiquetas.cargando }}
+          {{ 'mapa.detalle.cargando' | translate }}
         </p>
         }
 
@@ -180,13 +180,13 @@
           @if (estaVerificado(puntoSeleccionado()!)) {
 
           <span class="tag-verificado">
-              {{ textos.verificado }}
+              {{ 'mapa.verificado' | translate }}
             </span>
 
           } @else {
 
           <span class="tag-verificado pendiente">
-              {{ textos.verificacionPendiente }}
+              {{ 'mapa.verificacionPendiente' | translate }}
             </span>
 
           }
@@ -214,7 +214,7 @@
 
 
         <div class="informacion-verificada">
-          {{ detalleEtiquetas.informacionVerificada }}
+          {{ 'mapa.detalle.informacionVerificada' | translate }}
         </div>
 
 
@@ -223,7 +223,7 @@
         <div class="detalle-dato">
 
             <span>
-              {{ detalleEtiquetas.direccionEtiqueta }}
+              {{ 'mapa.detalle.direccionEtiqueta' | translate }}
             </span>
 
           <p>
@@ -244,7 +244,7 @@
         <div class="detalle-dato">
 
             <span>
-              {{ detalleEtiquetas.contactoEtiqueta }}
+              {{ 'mapa.detalle.contactoEtiqueta' | translate }}
             </span>
 
 
@@ -275,7 +275,7 @@
         <div class="detalle-dato">
 
             <span>
-              {{ detalleEtiquetas.necesidadesEtiqueta }}
+              {{ 'mapa.detalle.necesidadesEtiqueta' | translate }}
             </span>
 
           <div class="mini-tags">
@@ -301,7 +301,7 @@
         <div class="detalle-dato">
 
             <span>
-              {{ detalleEtiquetas.actualizadoEtiqueta }}
+              {{ 'mapa.detalle.actualizadoEtiqueta' | translate }}
             </span>
 
           <p>
@@ -324,7 +324,7 @@
             class="boton-secundario"
             (click)="comoLlegar(puntoSeleccionado()!)"
           >
-            {{ detalleEtiquetas.comoLlegar }}
+            {{ 'mapa.detalle.comoLlegar' | translate }}
           </button>
 
 
@@ -333,7 +333,7 @@
             class="boton-principal"
             (click)="abrirModalDetalle()"
           >
-            {{ detalleEtiquetas.verCentro }}
+            {{ 'mapa.detalle.verCentro' | translate }}
           </button>
 
         </div>
@@ -344,7 +344,7 @@
           class="reportar"
           (click)="abrirReporte(false)"
         >
-          {{ detalleEtiquetas.reportar }}
+          {{ 'mapa.detalle.reportar' | translate }}
         </button>
 
       </div>
@@ -360,11 +360,11 @@
         </div>
 
         <h3>
-          {{ detalleEtiquetas.seleccionaPuntoTitulo }}
+          {{ 'mapa.detalle.seleccionaPuntoTitulo' | translate }}
         </h3>
 
         <p>
-          {{ detalleEtiquetas.seleccionaPuntoDescripcion }}
+          {{ 'mapa.detalle.seleccionaPuntoDescripcion' | translate }}
         </p>
 
       </div>
@@ -402,7 +402,7 @@ puntoSeleccionado()
       type="button"
       class="detalle-modal-cerrar"
       (click)="cerrarModalCompleto()"
-      aria-label="Cerrar detalle"
+      [attr.aria-label]="'mapa.cerrarDetalle' | translate"
     >
       ✕
     </button>
@@ -411,7 +411,7 @@ puntoSeleccionado()
     @if (cargandoDetalle()) {
 
     <p class="detalle-modal-estado">
-      {{ detalleEtiquetas.cargando }}
+      {{ 'mapa.detalle.cargando' | translate }}
     </p>
 
     }
@@ -450,13 +450,13 @@ puntoSeleccionado()
       ) {
 
       <span class="modal-verificado">
-            ✓ {{ textos.verificado }}
+            ✓ {{ 'mapa.verificado' | translate }}
           </span>
 
       } @else {
 
       <span class="modal-pendiente">
-            {{ textos.verificacionPendiente }}
+            {{ 'mapa.verificacionPendiente' | translate }}
           </span>
 
       }
@@ -494,7 +494,7 @@ puntoSeleccionado()
     <section class="modal-bloque">
 
           <span class="modal-label">
-            {{ detalleEtiquetas.direccionEtiqueta }}
+            {{ 'mapa.detalle.direccionEtiqueta' | translate }}
           </span>
 
       <p>
@@ -515,7 +515,7 @@ puntoSeleccionado()
     <section class="modal-bloque">
 
           <span class="modal-label">
-            {{ detalleEtiquetas.contactoEtiqueta }}
+            {{ 'mapa.detalle.contactoEtiqueta' | translate }}
           </span>
 
 
@@ -563,10 +563,7 @@ puntoSeleccionado()
     <section class="modal-bloque">
 
           <span class="modal-label">
-            {{
-              detalleEtiquetas
-                .necesidadesEtiqueta
-            }}
+            {{ 'mapa.detalle.necesidadesEtiqueta' | translate }}
           </span>
 
 
@@ -600,10 +597,7 @@ puntoSeleccionado()
     <section class="modal-actualizacion">
 
           <span>
-            {{
-              detalleEtiquetas
-                .actualizadoEtiqueta
-            }}
+            {{ 'mapa.detalle.actualizadoEtiqueta' | translate }}
           </span>
 
       <strong>
@@ -632,7 +626,7 @@ puntoSeleccionado()
           "
       >
         ⌖
-        {{ detalleEtiquetas.comoLlegar }}
+        {{ 'mapa.detalle.comoLlegar' | translate }}
       </button>
 
     </div>
@@ -644,7 +638,7 @@ puntoSeleccionado()
       (click)="abrirReporte(true)"
     >
       ⚠
-      {{ detalleEtiquetas.reportar }}
+      {{ 'mapa.detalle.reportar' | translate }}
     </button>
 
   </article>
@@ -679,7 +673,7 @@ puntoSeleccionado()
     <button
       type="button"
       class="reporte-cerrar"
-      aria-label="Cerrar reporte"
+      [attr.aria-label]="'mapa.detalle.reporte.cerrar' | translate"
       [disabled]="procesandoReporte()"
       (click)="cerrarReporte()"
     >
@@ -688,7 +682,7 @@ puntoSeleccionado()
 
 
     <h2>
-      {{ detalleEtiquetas.reporte.titulo }}
+      {{ 'mapa.detalle.reporte.titulo' | translate }}
     </h2>
 
 
@@ -713,11 +707,7 @@ puntoSeleccionado()
           )
         "
       >
-        {{
-        detalleEtiquetas
-        .reporte
-        .yaNoRecibe
-        }}
+        {{ 'mapa.detalle.reporte.yaNoRecibe' | translate }}
       </button>
 
 
@@ -735,11 +725,7 @@ puntoSeleccionado()
           )
         "
       >
-        {{
-        detalleEtiquetas
-        .reporte
-        .direccionIncorrecta
-        }}
+        {{ 'mapa.detalle.reporte.direccionIncorrecta' | translate }}
       </button>
 
 
@@ -757,11 +743,7 @@ puntoSeleccionado()
           )
         "
       >
-        {{
-        detalleEtiquetas
-        .reporte
-        .contactoNoResponde
-        }}
+        {{ 'mapa.detalle.reporte.contactoNoResponde' | translate }}
       </button>
 
 
@@ -779,18 +761,14 @@ puntoSeleccionado()
           )
         "
       >
-        {{
-        detalleEtiquetas
-        .reporte
-        .noEsReal
-        }}
+        {{ 'mapa.detalle.reporte.noEsReal' | translate }}
       </button>
 
     </div>
 
 
     <p class="reporte-aviso">
-      {{ detalleEtiquetas.reporte.aviso }}
+      {{ 'mapa.detalle.reporte.aviso' | translate }}
     </p>
 
   </section>
@@ -806,11 +784,7 @@ puntoSeleccionado()
   role="status"
   aria-live="polite"
 >
-  {{
-  detalleEtiquetas
-  .reporte
-  .confirmacion
-  }}
+  {{ 'mapa.detalle.reporte.confirmacion' | translate }}
 </div>
 
 }

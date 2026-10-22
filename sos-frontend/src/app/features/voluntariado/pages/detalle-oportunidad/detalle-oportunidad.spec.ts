@@ -219,6 +219,7 @@ describe('DetalleOportunidad (ruta pública)', () => {
 
   it('navega desde una tarjeta a su detalle real y vuelve al listado público', async () => {
     await harness.navigateByUrl('/voluntariado', Voluntariado);
+    httpTesting.match(req => req.url.includes('/i18n/')).forEach(req => req.flush({}));
     harness.detectChanges();
     httpTesting.expectOne('/api/voluntariados').flush(respuesta([OPORTUNIDAD]));
     harness.detectChanges();

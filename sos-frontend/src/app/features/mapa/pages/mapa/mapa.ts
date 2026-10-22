@@ -15,8 +15,10 @@ import {
   FILTROS_TIPO_MAPA,
   PUNTOS_MAPA_FALLBACK,
   TIPO_CLASE_MAPA,
+  TIPO_CLAVE_MAPA,
   TIPO_ETIQUETA_MAPA,
 } from '../../constants/mapa.constants';
+import { IdiomaService } from '../../../../shared/services/idioma.service';
 
 import {
   FEATURE_TOGGLES,
@@ -36,10 +38,13 @@ import {
 } from '../../models/punto-mapa.model';
 
 
+import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
+
 @Component({
   selector: 'app-mapa',
   imports: [
-    MapaLeaflet
+    MapaLeaflet,
+    TranslatePipe
   ],
   templateUrl: './mapa.html',
   styleUrl: './mapa.scss'
@@ -51,6 +56,9 @@ export class Mapa implements OnInit {
 
   private mapaService =
     inject(MapaService);
+
+  private idiomaService =
+    inject(IdiomaService);
 
 
   readonly textos =
@@ -664,7 +672,10 @@ export class Mapa implements OnInit {
   obtenerEtiquetaTipo(
     tipo: string
   ): string {
-
+    const clave = TIPO_CLAVE_MAPA[tipo];
+    if (clave) {
+      return this.idiomaService.t(clave);
+    }
     return (
       this.tipoEtiqueta[tipo]
       ??

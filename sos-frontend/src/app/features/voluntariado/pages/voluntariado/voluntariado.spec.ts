@@ -99,6 +99,7 @@ describe('Voluntariado', () => {
     httpTesting = TestBed.inject(HttpTestingController);
     fixture = TestBed.createComponent(Voluntariado);
     component = fixture.componentInstance;
+    httpTesting.match(req => req.url.includes('/i18n/')).forEach(req => req.flush({}));
   });
 
   afterEach(() => httpTesting.verify());
