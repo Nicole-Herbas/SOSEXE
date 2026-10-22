@@ -1,3 +1,146 @@
-<p>
-  {{ textos.mensaje }}
-</p>
+<main class="donar">
+  <header class="donar__intro">
+    <a routerLink="/inicio" class="donar__back">
+      {{ textos.volverInicio }}
+    </a>
+
+    <h1>{{ textos.titulo }}</h1>
+    <p>{{ textos.subtitulo }}</p>
+  </header>
+
+  <nav class="donar__steps" aria-label="Etapas de la donación">
+    @for (paso of textos.pasos; track $index) {
+    <div
+      class="donar__step"
+      [class.donar__step--active]="$index === 0"
+      [attr.aria-current]="$index === 0 ? 'step' : null"
+    >
+        <span class="donar__step-number">
+          {{ $index + 1 }}
+        </span>
+      <span>{{ paso }}</span>
+    </div>
+    }
+  </nav>
+
+  <div class="donar__layout">
+    <section class="donar__panel" aria-labelledby="donar-centros-titulo">
+      <span class="donar__eyebrow">{{ textos.etapa }}</span>
+
+      <div class="donar__panel-heading">
+        <h2 id="donar-centros-titulo">{{ textos.pregunta }}</h2>
+        <a routerLink="/mapa">{{ textos.verMapa }}</a>
+      </div>
+
+      @if (cargando()) {
+      <p class="donar__message" role="status">
+        {{ textos.cargando }}
+      </p>
+      } @else if (errorCarga()) {
+      <div class="donar__message donar__message--error" role="alert">
+        <p>{{ textos.errorCarga }}</p>
+        <button type="button" (click)="cargarCentros()">
+          {{ textos.reintentar }}
+        </button>
+      </div>
+      } @else if (centros().length === 0) {
+      <p class="donar__message" role="status">
+        {{ textos.sinCentros }}
+      </p>
+      } @else {
+      <div class="donar__centros">
+        @for (centro of centros(); track centro.id) {
+        <button
+          type="button"
+          class="donar__centro"
+          [class.donar__centro--selected]="centroSeleccionado()?.id === centro.id"
+          [attr.aria-pressed]="centroSeleccionado()?.id === centro.id"
+          (click)="seleccionarCentro(centro)"
+        >
+              <span class="donar__centro-top">
+                <span class="donar__verificado">
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <circle cx="12" cy="12" r="9"></circle>
+                    <path d="m8 12 3 3 5-6"></path>
+                  </svg>
+                  {{ textos.verificado }}
+                </span>
+                <span class="donar__selector" aria-hidden="true"></span>
+              </span>
+
+          <span class="donar__nombre">{{ centro.nombre }}</span>
+
+          <span class="donar__ubicacion">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z"></path>
+                  <circle cx="12" cy="10" r="2.5"></circle>
+                </svg>
+                {{ ubicacion(centro) }}
+              </span>
+
+          @if (centro.descripcion) {
+          <span class="donar__descripcion">
+                  {{ centro.descripcion }}
+                </span>
+          }
+
+          <span class="donar__necesidades-titulo">
+                {{ textos.necesidades }}
+              </span>
+
+          <span class="donar__necesidades">
+                @for (necesidad of centro.necesidadNombres ?? []; track $index) {
+                  <span class="donar__necesidad">{{ necesidad }}</span>
+                } @empty {
+                  <span class="donar__sin-necesidades">
+                    {{ textos.sinNecesidades }}
+                  </span>
+                }
+              </span>
+        </button>
+        }
+      </div>
+
+      <div class="donar__acciones">
+        <button
+          type="button"
+          class="donar__confirmar"
+          [disabled]="!centroSeleccionado()"
+          (click)="confirmarSeleccion()"
+        >
+          {{ textos.confirmarCentro }}
+          <span aria-hidden="true">→</span>
+        </button>
+      </div>
+
+      @if (seleccionConfirmada()) {
+      <p class="donar__confirmacion" role="status">
+        {{ textos.confirmacion }}
+      </p>
+      }
+      }
+    </section>
+
+    <aside class="donar__resumen" aria-labelledby="donar-resumen-titulo">
+      <h2 id="donar-resumen-titulo">{{ textos.resumen }}</h2>
+
+      @if (centroSeleccionado(); as centro) {
+      <div class="donar__resumen-centro">
+          <span class="donar__resumen-verificado">
+            {{ textos.verificado }}
+          </span>
+        <strong>{{ centro.nombre }}</strong>
+        <span>{{ ubicacion(centro) }}</span>
+      </div>
+      } @else {
+      <div class="donar__resumen-vacio">
+        {{ textos.sinSeleccion }}
+      </div>
+      }
+
+      <div class="donar__resumen-nota">
+        {{ textos.siguientePaso }}
+      </div>
+    </aside>
+  </div>
+</main>
