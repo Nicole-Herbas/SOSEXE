@@ -5,11 +5,9 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { APP_TEXTOS } from '../../../../shared/constants/app-textos.constants';
 import { Centro } from '../../../centros/models/centro';
 import { CentroService } from '../../../centros/services/centro';
-import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
-
 @Component({
   selector: 'app-donar',
-  imports: [RouterLink, TranslatePipe],
+  imports: [RouterLink],
   templateUrl: './donar.html',
   styleUrl: './donar.scss',
 })
