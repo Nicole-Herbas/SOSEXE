@@ -1,14 +1,10 @@
 import { Component } from '@angular/core';
-import { APP_TEXTOS } from '../../../../shared/constants/app-textos.constants';
+import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
 
 @Component({
-  imports: [],
+  imports: [TranslatePipe],
   selector: 'app-donar',
   styleUrl: './donar.scss',
   templateUrl: './donar.html',
 })
-export class Donar {
-
-  readonly textos =
-    APP_TEXTOS.donar;
-}
+export class Donar {}
