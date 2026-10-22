@@ -17,7 +17,7 @@
 					[attr.aria-pressed]="categoria === filtroActivo()"
 					(click)="seleccionarFiltro(categoria)"
 				>
-					{{ categoria }}
+					{{ claveCategoria(categoria) | translate }}
 				</button>
 			}
 		</div>
@@ -62,7 +62,7 @@
 									{{ 'noticias.imagenNoDisponible' | translate }}
 								</div>
 							}
-							<span class="noticia-tarjeta__categoria">{{ noticia.categoria || ('noticias.categoriaGeneral' | translate) }}</span>
+							<span class="noticia-tarjeta__categoria">{{ (noticia.categoria ? claveCategoria(noticia.categoria) : 'noticias.categoriaGeneral') | translate }}</span>
 							@if (noticia.fuente) {
 								<span class="noticia-tarjeta__fuente">{{ noticia.fuente }}</span>
 							}
@@ -113,7 +113,7 @@
 										{{ 'noticias.imagenNoDisponible' | translate }}
 									</div>
 								}
-								<span class="noticia-tarjeta__categoria">{{ noticia.categoria || ('noticias.categoriaGeneral' | translate) }}</span>
+								<span class="noticia-tarjeta__categoria">{{ (noticia.categoria ? claveCategoria(noticia.categoria) : 'noticias.categoriaGeneral') | translate }}</span>
 								@if (noticia.fuente) {
 									<span class="noticia-tarjeta__fuente">{{ noticia.fuente }}</span>
 								}

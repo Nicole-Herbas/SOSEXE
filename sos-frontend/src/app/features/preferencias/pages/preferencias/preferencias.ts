@@ -19,10 +19,12 @@ interface Departamento {
   nombre: string;
 }
 
+import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
+
 @Component({
   selector: 'app-preferencias',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, TranslatePipe],
   templateUrl: './preferencias.html',
   styleUrl: './preferencias.scss'
 })

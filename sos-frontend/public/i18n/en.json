@@ -1,8 +1,77 @@
 {
   "acercaDe": {
-    "mision": "Our mission",
+    "mision": {
+      "etiqueta": "OUR PURPOSE",
+      "titulo": "Our mission",
+      "descripcion": "Facilitate a solidarity-driven and efficient response to natural disasters, ensuring every donation and volunteer effort arrives safely, verified, and timely.",
+      "conectarTitulo": "Connect",
+      "conectarDescripcion": "We unite donors, support centers, and volunteers to multiply the impact of every helping hand.",
+      "verificarTitulo": "Verify",
+      "verificarDescripcion": "We validate centers and shelters through a rigorous process to ensure trust and transparency.",
+      "responderTitulo": "Respond",
+      "responderDescripcion": "We provide up-to-date information so help arrives quickly and where it is truly needed."
+    },
     "registrarCentro": "Register a center",
-    "titulo": "About SOS.exe"
+    "titulo": "About SOS.exe",
+    "mensaje": "acerca-de works!",
+    "hero": {
+      "eyebrow": "About SOS.exe",
+      "titulo": "Organized help,",
+      "tituloDestacado": "transparent and close.",
+      "descripcion": "SOS.exe connects people, verified centers, and volunteers so help reaches those who need it most during natural disasters in Bolivia.",
+      "centros": "Verified centers",
+      "informacion": "Clear information",
+      "comunidad": "Caring community"
+    },
+    "verificacion": {
+      "titulo": "How do we verify centers?",
+      "insignia": "✓ Verified centers",
+      "paso1Titulo": "Application",
+      "paso1Descripcion": "The center or shelter fills out an application with basic information and documents.",
+      "paso2Titulo": "Document review",
+      "paso2Descripcion": "We review documentation and verify that submitted information is valid.",
+      "paso3Titulo": "Center validation",
+      "paso3Descripcion": "We confirm existence, activity, personnel in charge, and official channels of the center.",
+      "paso4Titulo": "Ongoing monitoring",
+      "paso4Descripcion": "Information and needs are periodically reviewed to keep them up to date."
+    },
+    "valores": {
+      "titulo": "Our values",
+      "descripcion": "Principles guiding every platform decision.",
+      "transparenciaTitulo": "Transparency",
+      "transparenciaDescripcion": "We show clear information about centers, needs, and where aid goes.",
+      "seguridadTitulo": "Safety",
+      "seguridadDescripcion": "We prioritize verified centers and trusted processes to protect every contribution.",
+      "comunidadTitulo": "Community",
+      "comunidadDescripcion": "We believe in collaboration to respond together to difficult situations.",
+      "informacionTitulo": "Up-to-date information",
+      "informacionDescripcion": "We keep priority needs, alerts, and ways to collaborate visible."
+    },
+    "roles": {
+      "titulo": "One platform to help in different ways",
+      "descripcion": "Each role has distinct tools and responsibilities within SOS.exe.",
+      "donantesTitulo": "Donors",
+      "donantesDescripcion": "Find verified centers, learn about their needs, and choose where to help.",
+      "donantesBoton": "I want to donate →",
+      "centrosTitulo": "Centers & shelters",
+      "centrosDescripcion": "Request verification for your center, publish needs, and create volunteer opportunities.",
+      "centrosBoton": "Register my center →",
+      "voluntariosTitulo": "Volunteers",
+      "voluntariosDescripcion": "Participate according to your experience, availability, and skills to support the community.",
+      "voluntariosBoton": "I want to be a volunteer →"
+    },
+    "cta": {
+      "etiqueta": "PARTICIPATE",
+      "titulo": "Every bit of help counts when it reaches the right place.",
+      "descripcion": "Join a community responding with solidarity and responsibility across Bolivia.",
+      "quieroAyudar": "♥ I want to help",
+      "explorarMapa": "Explore the map"
+    },
+    "registrarPunto": {
+      "titulo": "Aid points",
+      "descripcion": "Register a location where donations can be received or aid provided to the community.",
+      "boton": "Register aid point →"
+    }
   },
   "alertas": {
     "admin": "Administration",
@@ -44,7 +113,10 @@
     "titulo": "Title",
     "vistaPrevia": "Alert preview",
     "volver": "Back to administration",
-    "volverBorradores": "Back to drafts"
+    "volverBorradores": "Back to drafts",
+    "fuentePendiente": "Source pending completion",
+    "errorCambio": "The alert changed or has already been published. Reload preview to review.",
+    "yaNoEsBorrador": "This alert is no longer a draft and cannot be published from this view."
   },
   "centros": {
     "cargando": "Loading centers...",
@@ -89,7 +161,43 @@
       "fuenteVerificada": "✓ Verified source",
       "sinNoticias": "No news available for this category.",
       "titulo": "Recent news and alerts",
-      "verTodas": "View all news →"
+      "verTodas": "View all news →",
+      "imagenReferencial": "Reference image",
+      "ubicacionIcono": "⌖"
+    },
+    "acciones": {
+      "donar": {
+        "icono": "♥",
+        "titulo": "Donate",
+        "descripcion": "Support affected communities",
+        "flecha": "→"
+      },
+      "centros": {
+        "icono": "⌂",
+        "titulo": "Centers & shelters",
+        "descripcion": "Find safe and verified locations",
+        "flecha": "→"
+      },
+      "voluntariado": {
+        "icono": "●",
+        "titulo": "Volunteering",
+        "descripcion": "Offer your time and skills to help",
+        "flecha": "→"
+      },
+      "emergencias": {
+        "icono": "!",
+        "titulo": "Emergencies",
+        "descripcion": "Check active alerts and notices",
+        "flecha": "→"
+      }
+    },
+    "imagenes": {
+      "referencial": "Reference image",
+      "incendioAlt": "Firefighters working during a forest fire",
+      "donacionesAlt": "Volunteers organizing donations",
+      "refugioAlt": "Volunteer helping at a shelter",
+      "inundacionAlt": "Community response to a flood",
+      "cajasAyudaAlt": "People preparing aid boxes"
     }
   },
   "login": {
@@ -124,7 +232,62 @@
     "subtitulo": "Help near you",
     "titulo": "Help and Emergency Map",
     "verificacionPendiente": "Pending verification",
-    "verificado": "✓ Verified"
+    "verificado": "✓ Verified",
+    "mensajeMapa": "Interactive map · Powered by Leaflet",
+    "cerrarDetalle": "Close details",
+    "filtrosTipo": {
+      "todos": "All",
+      "centroApoyo": "Support centers",
+      "refugio": "Shelters",
+      "puntoDonacion": "Donation points",
+      "emergencia": "Emergencies"
+    },
+    "filtrosNecesidad": {
+      "todas": "All",
+      "agua": "💧 Water",
+      "alimentos": "◉ Food",
+      "medicamentos": "✦ Medicines",
+      "ropa": "▭ Clothing",
+      "herramientas": "✚ Tools",
+      "voluntarios": "● Volunteers",
+      "higiene": "✦ Hygiene",
+      "primerosAuxilios": "✚ First aid",
+      "alojamiento": "⌂ Accommodation"
+    },
+    "tipos": {
+      "centroApoyo": "Support center",
+      "refugio": "Shelter",
+      "puntoDonacion": "Donation point",
+      "emergencia": "Emergency"
+    },
+    "detalle": {
+      "direccionEtiqueta": "ADDRESS",
+      "seleccionaPuntoTitulo": "Select a location",
+      "seleccionaPuntoDescripcion": "Choose a point on the map or list to view its information.",
+      "horarioEtiqueta": "HOURS OR STATUS",
+      "contactoEtiqueta": "CONTACT",
+      "necesidadesEtiqueta": "PRIORITY NEEDS",
+      "donacionesEtiqueta": "ACCEPTED DONATIONS",
+      "comoLlegar": "Directions",
+      "verCentro": "View center",
+      "reportar": "Report incorrect information",
+      "informacionVerificada": "Verified information pending review",
+      "emailEtiqueta": "EMAIL",
+      "actualizadoEtiqueta": "LAST UPDATE",
+      "cargando": "Loading details...",
+      "errorCarga": "Could not load full details.",
+      "cerrar": "Close details",
+      "reporte": {
+        "titulo": "What's wrong with this location?",
+        "yaNoRecibe": "No longer accepting donations",
+        "direccionIncorrecta": "The address or hours are incorrect",
+        "contactoNoResponde": "Contact is not responding",
+        "noEsReal": "I believe it is not real",
+        "aviso": "A location's status is not changed by reports alone. A moderator will review before applying changes.",
+        "confirmacion": "Thank you. Sent to team review.",
+        "cerrar": "Close report"
+      }
+    }
   },
   "navbar": {
     "cantidadNotificaciones": "1",
@@ -144,7 +307,9 @@
     "marca": "SOS.exe",
     "notificacionesAria": "Notifications",
     "preferencias": "Preferences",
-    "quieroAyudar": "♥ I want to help"
+    "quieroAyudar": "♥ I want to help",
+    "salir": "Log out",
+    "cerrarSesion": "Sign out"
   },
   "noticias": {
     "cargando": "Loading news...",
@@ -152,7 +317,42 @@
     "errorCarga": "Could not load news.",
     "reintentar": "Retry",
     "sinNoticias": "No news available.",
-    "titulo": "News"
+    "titulo": "News",
+    "volverInicio": "← Back to home",
+    "subtitulo": "Verified information on emergencies, disasters, and aid actions in Bolivia.",
+    "filtroTodas": "All",
+    "categoriasEtiqueta": "News categories",
+    "categorias": {
+      "todas": "All",
+      "incendios": "Wildfires",
+      "inundaciones": "Floods",
+      "deslizamientos": "Landslides",
+      "sequias": "Droughts",
+      "comunidad": "Community",
+      "alertas": "Alerts",
+      "otras": "Others"
+    },
+    "ultimasTitulo": "Latest updates",
+    "ultimasDesc": "The most recent news about the situation in Bolivia.",
+    "fuenteVerificada": "✓ Verified source",
+    "imagenReferencial": "Reference image",
+    "imagenNoDisponible": "Image not available",
+    "categoriaGeneral": "News",
+    "categoriaOtras": "Others",
+    "leerNoticia": "Read article →",
+    "ubicacionIcono": "⌖",
+    "ubicacion": "Bolivia",
+    "alertasTitulo": "Active alerts",
+    "alertasDesc": "Situations requiring immediate attention right now.",
+    "alertaActivaBadge": "Active alert",
+    "alertaTituloReferencia": "Floods in areas near the Piraí River",
+    "alertaMensajeReferencia": "Elevated levels of the Piraí River affect communities in Santa Cruz. Stay away from riverbanks and follow Civil Defense instructions.",
+    "alertaUbicacionReferencia": "Santa Cruz, Bolivia",
+    "alertaActualizadoReferencia": "today, 15:35",
+    "verEnMapa": "View on map →",
+    "actualizado": "Updated:",
+    "apiNoDisponible": "External news is currently unavailable.",
+    "apiNoDisponibleCache": "Could not refresh external news. Showing last available data."
   },
   "preferencias": {
     "advertenciaCancelacion": "By canceling, you will no longer receive emergency SMS alerts in your region.",
@@ -184,7 +384,10 @@
     "placeholderTelefono": "+591 XXXXXXXX",
     "seccionSms": "SMS alerts by region",
     "suscripcionActiva": "Your SMS subscription is active",
-    "titulo": "Account preferences"
+    "titulo": "Account preferences",
+    "configuracion": "Settings",
+    "cancelando": "Canceling...",
+    "guardando": "Saving..."
   },
   "registro": {
     "botonRegistrar": "Create account →",
@@ -207,13 +410,164 @@
     "telefonoPlaceholder": "71234567",
     "tituloFormulario": "Create an account",
     "tituloPrincipal": "Join and make a difference",
-    "yasTienesCuenta": "Already have an account? Log in"
+    "yasTienesCuenta": "Already have an account? Log in",
+    "registroExitoso": "Account created successfully! Redirecting to sign in...",
+    "correoExistente": "This email is already registered. Try another.",
+    "errorGeneral": "An error occurred while creating your account. Try again.",
+    "creandoCuenta": "Creating account..."
   },
   "voluntariado": {
     "cargando": "Loading opportunities...",
     "descripcion": "Offer your time and skills to help those who need it most.",
     "errorCarga": "Could not load opportunities.",
     "sinOportunidades": "No volunteer opportunities available.",
-    "titulo": "Volunteering"
+    "titulo": "Volunteering",
+    "hero": {
+      "badge": "Active volunteering in Bolivia",
+      "titulo": "Join as a volunteer",
+      "descripcion": "Communities affected by disasters need hands. Create your profile and find opportunities suited to your skills.",
+      "serVoluntario": "Become a volunteer",
+      "verMapa": "View map →",
+      "feat1": "✓ Verified centers",
+      "feat2": "✓ No prior experience required",
+      "feat3": "✓ Immediate impact"
+    },
+    "oportunidades": {
+      "titulo": "Available opportunities",
+      "subtitulo": "Create your profile to see personalized recommendations, or browse all opportunities directly.",
+      "cargando": "Loading volunteer opportunities...",
+      "errorCarga": "Could not load volunteer opportunities. Please try again later.",
+      "sinOportunidades": "There are no volunteer opportunities published at this time.",
+      "verDetalle": "View details",
+      "verDetalleEtiqueta": "View details of",
+      "centroLabel": "Responsible center",
+      "inicioLabel": "Start",
+      "finLabel": "End",
+      "centroNoDisponible": "Center not available",
+      "ubicacionNoDisponible": "Location not available",
+      "fechaNoDisponible": "Date not available",
+      "cuposLabel": "Available spots",
+      "participar": "Participate",
+      "filtros": {
+        "ciudadLabel": "City",
+        "todasCiudades": "All cities",
+        "tipoAyudaLabel": "Help type",
+        "todosTiposAyuda": "All help types",
+        "restablecer": "Reset filters",
+        "resultadosLabel": "Results found",
+        "sinResultados": "No opportunities match the selected filters."
+      },
+      "detalle": {
+        "titulo": "Opportunity details",
+        "descripcion": "Description",
+        "habilidades": "Required skills",
+        "inicio": "Start",
+        "fin": "End",
+        "centro": "Responsible center",
+        "ciudad": "City",
+        "departamento": "Department",
+        "noInformado": "Not specified",
+        "volver": "Back to opportunities",
+        "cargando": "Loading opportunity details...",
+        "noEncontrada": "Opportunity does not exist or is not published.",
+        "idInvalido": "Invalid opportunity identifier.",
+        "errorCarga": "Could not load opportunity. Check your connection and try again.",
+        "reintentar": "Retry"
+      },
+      "refugios": {
+        "titulo": "Shelters and hospices",
+        "ubicacion": "Cochabamba, Bolivia",
+        "descripcion": "Help manage temporary shelters: family registration, space allocation, and basic care for displaced people.",
+        "cupos": "12 spots"
+      },
+      "distribucion": {
+        "titulo": "Donation distribution",
+        "ubicacion": "La Paz, Bolivia",
+        "descripcion": "Participate in sorting, packing, and delivering donations to affected communities. Time availability and physical effort needed.",
+        "cupos": "8 spots"
+      },
+      "emergencias": {
+        "titulo": "Emergency support",
+        "ubicacion": "Santa Cruz, Bolivia",
+        "descripcion": "Provide direct assistance during active emergencies: communication, logistics, and coordination with local brigades and rescue teams.",
+        "cupos": "5 spots"
+      }
+    },
+    "comoFunciona": {
+      "titulo": "How does it work?",
+      "subtitulo": "Three steps to start helping.",
+      "paso1": {
+        "titulo": "Create your profile",
+        "descripcion": "State your skills and availability to receive personalized recommendations."
+      },
+      "paso2": {
+        "titulo": "Choose an opportunity",
+        "descripcion": "Select the activity that best suits your time and location."
+      },
+      "paso3": {
+        "titulo": "Start helping",
+        "descripcion": "You will receive confirmation and instructions to report to the coordination center."
+      }
+    },
+    "perfilVoluntario": {
+      "pasos": {
+        "datosPersonales": "Personal details",
+        "habilidades": "Skills",
+        "disponibilidad": "Availability"
+      },
+      "paso1": {
+        "titulo": "Create your volunteer profile",
+        "subtitulo": "Tell us who you are so we can connect you with the right opportunities.",
+        "nombreLabel": "FULL NAME",
+        "nombrePlaceholder": "E.g. María González Quispe",
+        "telefonoLabel": "PHONE / CELL",
+        "telefonoPlaceholder": "+591 7XX XXX XXX",
+        "telefonoError": "Phone number is required.",
+        "correoLabel": "EMAIL ADDRESS",
+        "correoPlaceholder": "your@email.com",
+        "departamentoLabel": "DEPARTMENT",
+        "departamentoPlaceholder": "Select a department",
+        "departamentoError": "Select a department.",
+        "ciudadLabel": "CITY / MUNICIPALITY",
+        "ciudadPlaceholder": "E.g. Cochabamba",
+        "ciudadError": "City is required.",
+        "continuar": "Continue →"
+      },
+      "paso2": {
+        "titulo": "Create your volunteer profile",
+        "subtitulo": "Select the skills you can contribute. Choose all that apply.",
+        "ningunaSeleccionada": "No skills selected yet.",
+        "seleccionadas": "skills selected.",
+        "habilidadError": "Select at least one skill.",
+        "notaExperiencia": "Don't worry if you have no prior experience — most opportunities do not require it.",
+        "anterior": "← Previous",
+        "continuar": "Continue →"
+      },
+      "paso3": {
+        "titulo": "Create your volunteer profile",
+        "subtitulo": "Indicate when you can participate to see compatible opportunities.",
+        "ningunaSeleccionada": "No option selected yet.",
+        "seleccionadas": "options selected.",
+        "disponibilidadError": "Select at least one availability option.",
+        "notaActualizar": "You can update your availability at any time from your profile.",
+        "anterior": "← Previous",
+        "crearPerfil": "Create volunteer profile",
+        "actualizarPerfil": "Save changes"
+      },
+      "exitoTitulo": "Profile created successfully, ",
+      "exitoMensaje": "We found opportunities for you based on your profile and availability.",
+      "editarPerfil": "Edit profile",
+      "tarjetaTitulo": "Your volunteer profile",
+      "tarjetaTelefono": "Phone",
+      "tarjetaCorreo": "Email",
+      "tarjetaDepartamento": "Department",
+      "tarjetaCiudad": "City",
+      "tarjetaHabilidades": "Skills",
+      "tarjetaDisponibilidad": "Availability",
+      "errorCrear": "Could not create profile. Try again.",
+      "errorCargar": "Could not load your profile.",
+      "errorActualizar": "Could not update profile.",
+      "perfilActualizado": "Profile updated successfully!"
+    }
   }
 }

@@ -116,7 +116,7 @@
         class="navbar-preferencias"
         routerLink="/preferencias"
         routerLinkActive="active"
-        title="Preferencias"
+        [title]="t()('navbar.preferencias')"
       >
         ⚙ {{ t()('navbar.preferencias') }}
       </a>
@@ -124,9 +124,9 @@
       <button
         class="navbar-logout"
         (click)="cerrarSesion()"
-        title="Cerrar sesión"
+        [title]="t()('navbar.cerrarSesion')"
       >
-        Salir
+        {{ t()('navbar.salir') }}
       </button>
 
     </div>

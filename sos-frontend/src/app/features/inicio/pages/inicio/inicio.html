@@ -296,7 +296,7 @@
           [attr.aria-pressed]="activeFilter() === filter"
           (click)="setFilter(filter)"
         >
-          {{ filter }}
+          {{ claveCategoria(filter) | translate }}
         </button>
 
       }
@@ -335,7 +335,7 @@
                 [class.news-card__category-badge--red]="news.categoria === 'Incendios'"
                 [class.news-card__category-badge--teal]="news.categoria !== 'Incendios'"
               >
-                {{ news.categoria }}
+                {{ claveCategoria(news.categoria) | translate }}
               </span>
               <span class="news-card__ref-badge">
                 {{ 'inicio.noticias.imagenReferencial' | translate }}
