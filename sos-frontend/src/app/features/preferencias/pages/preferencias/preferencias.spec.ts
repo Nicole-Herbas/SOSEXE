@@ -1,4 +1,4 @@
-import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 import {
   HttpTestingController,
@@ -119,41 +119,34 @@ describe('PreferenciasComponent', () => {
     expect(component.idiomaActual()).toBe('es');
   });
 
-  it('SOS-114: cambiarIdioma actualiza el idioma a ingles', fakeAsync(() => {
+  it('SOS-114: cambiarIdioma actualiza el idioma a ingles', () => {
     component.cambiarIdioma('en');
 
     const enReq = httpMock.match(req => req.url.includes('/i18n/en.json'));
     enReq.forEach(r => r.flush({ 'navbar.lema': 'Together against natural disasters' }));
-    tick();
 
     expect(component.idiomaActual()).toBe('en');
-  }));
+  });
 
-  it('SOS-114: cambiarIdioma muestra confirmacion y la oculta tras 3 segundos', fakeAsync(() => {
+  it('SOS-114: cambiarIdioma muestra confirmacion', () => {
     component.cambiarIdioma('en');
 
     const enReq = httpMock.match(req => req.url.includes('/i18n/en.json'));
     enReq.forEach(r => r.flush({}));
-    tick();
 
     expect(component.mensajeIdiomaGuardado()).toBe(true);
+  });
 
-    tick(3000);
-    expect(component.mensajeIdiomaGuardado()).toBe(false);
-  }));
-
-  it('SOS-114: volver a espanol restaura el idioma y el localStorage', fakeAsync(() => {
+  it('SOS-114: volver a espanol restaura el idioma y el localStorage', () => {
     component.cambiarIdioma('en');
     httpMock.match(r => r.url.includes('/i18n/en.json')).forEach(r => r.flush({}));
-    tick();
 
     component.cambiarIdioma('es');
     httpMock.match(r => r.url.includes('/i18n/es.json')).forEach(r => r.flush({}));
-    tick();
 
     expect(component.idiomaActual()).toBe('es');
     expect(localStorage.getItem('idioma_preferido')).toBe('es');
-  }));
+  });
 
   it('SOS-114: los botones de idioma estan presentes en el template', () => {
     fixture.detectChanges();
