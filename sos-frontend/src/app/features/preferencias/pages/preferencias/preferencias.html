@@ -14,6 +14,53 @@
         <p>{{ textos.cargandoEstado }}</p>
       </div>
     } @else {
+
+      <!-- SOS-114: Sección de selección de idioma -->
+      <section class="idioma-section">
+        <div class="idioma-header">
+          <div class="idioma-icon-wrapper">
+            <span class="idioma-icon">🌐</span>
+          </div>
+          <div>
+            <h2 class="idioma-title">{{ textos.idiomaSeccion }}</h2>
+            <p class="idioma-description">{{ textos.idiomaDescripcion }}</p>
+          </div>
+        </div>
+
+        <div class="idioma-opciones">
+          <button
+            id="btn-idioma-es"
+            type="button"
+            class="btn-idioma"
+            [class.activo]="idiomaActual() === 'es'"
+            (click)="cambiarIdioma('es')"
+            [attr.aria-pressed]="idiomaActual() === 'es'"
+          >
+            🇧🇴 {{ textos.idiomaEspanol }}
+          </button>
+
+          <button
+            id="btn-idioma-en"
+            type="button"
+            class="btn-idioma"
+            [class.activo]="idiomaActual() === 'en'"
+            (click)="cambiarIdioma('en')"
+            [attr.aria-pressed]="idiomaActual() === 'en'"
+          >
+            🇺🇸 {{ textos.idiomaIngles }}
+          </button>
+        </div>
+
+        @if (mensajeIdiomaGuardado()) {
+          <div class="alert alert-success idioma-confirmacion" role="status">
+            <span class="alert-icon">✓</span>
+            <span>{{ textos.idiomaGuardado }}</span>
+          </div>
+        }
+      </section>
+
+      <hr class="seccion-divisor" />
+
       <section class="sms-section">
         <div class="sms-header">
           <div class="sms-icon-wrapper">

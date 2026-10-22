@@ -1621,6 +1621,15 @@ registro: {
 
 preferencias: {
   titulo: 'Preferencias de cuenta',
+
+  // ── Idioma (SOS-114) ──────────────────────────────────────────────────
+  idiomaSeccion: 'Idioma de la aplicación',
+  idiomaDescripcion: 'Cambia el idioma de la interfaz de SOS.exe.',
+  idiomaEspanol: 'Español',
+  idiomaIngles: 'Inglés',
+  idiomaGuardado: '✓ Idioma actualizado correctamente.',
+
+  // ── SMS ───────────────────────────────────────────────────────────────
   seccionSms: 'Alertas SMS por región',
   descripcionSms:
     'Recibe notificaciones inmediatas por mensaje de texto ante emergencias y desastres naturales en tu región.',
