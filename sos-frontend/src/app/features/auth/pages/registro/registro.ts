@@ -1,4 +1,4 @@
-﻿import { Component, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
@@ -10,10 +10,12 @@ interface Departamento {
   nombre: string;
 }
 
+import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
+
 @Component({
   selector: 'app-registro',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule, RouterLink],
+  imports: [ReactiveFormsModule, CommonModule, RouterLink, TranslatePipe],
   templateUrl: './registro.component.html',
   styleUrl: './registro.component.css'
 })

@@ -3,15 +3,15 @@
   <div class="info-panel">
 
     <div class="logo">
-      {{ textos.logo }}
+      {{ 'login.logo' | translate }}
     </div>
 
     <h1>
-      {{ textos.tituloPrincipal }}
+      {{ 'login.tituloPrincipal' | translate }}
     </h1>
 
     <p>
-      {{ textos.descripcionPrincipal }}
+      {{ 'login.descripcionPrincipal' | translate }}
     </p>
 
   </div>
@@ -20,11 +20,11 @@
   <div class="form-panel">
 
     <h2>
-      {{ textos.tituloFormulario }}
+      {{ 'login.tituloFormulario' | translate }}
     </h2>
 
     <p>
-      {{ textos.descripcionFormulario }}
+      {{ 'login.descripcionFormulario' | translate }}
     </p>
 
 
@@ -36,13 +36,13 @@
       <div class="form-group">
 
         <label>
-          {{ textos.correoLabel }}
+          {{ 'login.correoLabel' | translate }}
         </label>
 
         <input
           type="email"
           formControlName="email"
-          [placeholder]="textos.correoPlaceholder"
+          [placeholder]="'login.correoPlaceholder' | translate"
         >
 
         <small
@@ -52,7 +52,7 @@
             loginForm.get('email')?.touched
           "
         >
-          {{ textos.correoError }}
+          {{ 'login.correoError' | translate }}
         </small>
 
       </div>
@@ -61,13 +61,13 @@
       <div class="form-group">
 
         <label>
-          {{ textos.passwordLabel }}
+          {{ 'login.passwordLabel' | translate }}
         </label>
 
         <input
           type="password"
           formControlName="password"
-          [placeholder]="textos.passwordPlaceholder"
+          [placeholder]="'login.passwordPlaceholder' | translate"
         >
 
         <small
@@ -77,7 +77,7 @@
             loginForm.get('password')?.touched
           "
         >
-          {{ textos.passwordError }}
+          {{ 'login.passwordError' | translate }}
         </small>
 
       </div>
@@ -87,7 +87,7 @@
         type="submit"
         class="btn-primary"
       >
-        {{ textos.botonIngresar }}
+        {{ 'login.botonIngresar' | translate }}
       </button>
 
 
@@ -104,11 +104,11 @@
     <div class="links">
 
       <a routerLink="/registro">
-        {{ textos.crearCuenta }}
+        {{ 'login.crearCuenta' | translate }}
       </a>
 
       <a href="/">
-        {{ textos.cancelar }}
+        {{ 'login.cancelar' | translate }}
       </a>
 
     </div>

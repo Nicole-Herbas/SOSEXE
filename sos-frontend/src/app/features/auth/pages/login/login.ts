@@ -5,10 +5,12 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { APP_TEXTOS } from '../../../../shared/constants/app-textos.constants';
 
+import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
+
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule, RouterLink],
+  imports: [ReactiveFormsModule, CommonModule, RouterLink, TranslatePipe],
   templateUrl: './login.component.html',
   styleUrl: './login.component.css'
 })
