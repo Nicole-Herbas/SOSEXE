@@ -29,6 +29,7 @@ describe('Revisión de alertas antes de publicar', () => {
     }).compileComponents();
     fixture = TestBed.createComponent(RevisarAlertasComponent);
     http = TestBed.inject(HttpTestingController);
+    http.match(req => req.url.includes('/i18n/')).forEach(req => req.flush({}));
     fixture.detectChanges();
     http.expectOne('/api/alertas/borradores').flush({ success: true, data: [borrador] });
     fixture.detectChanges();

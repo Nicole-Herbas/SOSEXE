@@ -1,14 +1,14 @@
 <section class="revisar-alertas" aria-labelledby="revisar-alertas-titulo">
-  <a routerLink="/admin">{{ textos.volver }}</a>
-  <h1 id="revisar-alertas-titulo">{{ textos.revisarEncabezado }}</h1>
+  <a routerLink="/admin">{{ 'alertas.volver' | translate }}</a>
+  <h1 id="revisar-alertas-titulo">{{ 'alertas.revisarEncabezado' | translate }}</h1>
   @if (error()) {
     <p role="alert">{{ error() }}</p>
   }
   @if (exito()) {
-    <p class="exito" role="status">{{ textos.exitoPublicar }}</p>
+    <p class="exito" role="status">{{ 'alertas.exitoPublicar' | translate }}</p>
   }
   @if (cargandoRevision()) {
-    <p role="status">{{ textos.cargandoRevision }}</p>
+    <p role="status">{{ 'alertas.cargandoRevision' | translate }}</p>
   }
 
   @if (alerta(); as vista) {
@@ -16,26 +16,26 @@
       aria-labelledby="vista-previa-titulo"
       [attr.aria-busy]="publicando() || cargandoRevision()"
     >
-      <h2 id="vista-previa-titulo" #encabezado tabindex="-1">{{ textos.vistaPrevia }}</h2>
+      <h2 id="vista-previa-titulo" #encabezado tabindex="-1">{{ 'alertas.vistaPrevia' | translate }}</h2>
       <h3>{{ vista.titulo }}</h3>
       <dl>
-        <dt>{{ textos.region }}</dt>
+        <dt>{{ 'alertas.region' | translate }}</dt>
         <dd>{{ vista.departamentoNombre }}</dd>
-        <dt>{{ textos.severidad }}</dt>
+        <dt>{{ 'alertas.severidad' | translate }}</dt>
         <dd>{{ vista.severidad }}</dd>
-        <dt>{{ textos.mensaje }}</dt>
+        <dt>{{ 'alertas.mensaje' | translate }}</dt>
         <dd class="mensaje">{{ vista.mensaje }}</dd>
-        <dt>{{ textos.fuente }}</dt>
-        <dd>{{ vista.fuente || textos.fuentePendiente }}</dd>
-        <dt>{{ textos.inicio }}</dt>
+        <dt>{{ 'alertas.fuente' | translate }}</dt>
+        <dd>{{ vista.fuente || ('alertas.fuentePendiente' | translate) }}</dd>
+        <dt>{{ 'alertas.inicio' | translate }}</dt>
         <dd>{{ vista.fechaPublicacion | date: 'dd/MM/yyyy HH:mm' }}</dd>
-        <dt>{{ textos.fin }}</dt>
+        <dt>{{ 'alertas.fin' | translate }}</dt>
         <dd>{{ vista.fechaExpiracion | date: 'dd/MM/yyyy HH:mm' }}</dd>
-        <dt>{{ textos.estado }}</dt>
+        <dt>{{ 'alertas.estado' | translate }}</dt>
         <dd>{{ vista.estado }}</dd>
       </dl>
       @if (vista.estado === 'BORRADOR') {
-        <p>{{ textos.avisoRevision }}</p>
+        <p>{{ 'alertas.avisoRevision' | translate }}</p>
         <label class="confirmacion">
           <input
             #casilla
@@ -44,7 +44,7 @@
             (change)="confirmado.set(casilla.checked)"
             [disabled]="publicando() || cargandoRevision() || requiereRecarga()"
           />
-          {{ textos.confirmacionPublicar }}
+          {{ 'alertas.confirmacionPublicar' | translate }}
         </label>
         <button
           type="button"
@@ -52,10 +52,10 @@
           (click)="publicar()"
           [disabled]="!confirmado() || publicando() || cargandoRevision() || requiereRecarga()"
         >
-          {{ publicando() ? textos.publicando : textos.confirmarPublicacion }}
+          {{ (publicando() ? 'alertas.publicando' : 'alertas.confirmarPublicacion') | translate }}
         </button>
       } @else if (!exito()) {
-        <p role="status">{{ textos.yaNoEsBorrador }}</p>
+        <p role="status">{{ 'alertas.yaNoEsBorrador' | translate }}</p>
       }
       @if (requiereRecarga()) {
         <button
@@ -64,7 +64,7 @@
           (click)="revisar(vista.id)"
           [disabled]="cargandoRevision()"
         >
-          {{ textos.recargarRevision }}
+          {{ 'alertas.recargarRevision' | translate }}
         </button>
       }
       <button
@@ -73,18 +73,18 @@
         (click)="volver()"
         [disabled]="publicando() || cargandoRevision()"
       >
-        {{ textos.volverBorradores }}
+        {{ 'alertas.volverBorradores' | translate }}
       </button>
     </article>
   } @else {
-    <h2 #encabezado tabindex="-1">{{ textos.borradores }}</h2>
-    <a routerLink="/admin/alertas/crear">{{ textos.encabezado }}</a>
+    <h2 #encabezado tabindex="-1">{{ 'alertas.borradores' | translate }}</h2>
+    <a routerLink="/admin/alertas/crear">{{ 'alertas.encabezado' | translate }}</a>
     @if (cargando()) {
-      <p role="status">{{ textos.cargandoBorradores }}</p>
+      <p role="status">{{ 'alertas.cargandoBorradores' | translate }}</p>
     } @else if (error()) {
-      <button type="button" (click)="cargarBorradores()">{{ textos.reintentar }}</button>
+      <button type="button" (click)="cargarBorradores()">{{ 'alertas.reintentar' | translate }}</button>
     } @else if (borradores().length === 0) {
-      <p role="status">{{ textos.sinBorradores }}</p>
+      <p role="status">{{ 'alertas.sinBorradores' | translate }}</p>
     } @else {
       <ul>
         @for (borrador of borradores(); track borrador.id) {
@@ -96,9 +96,9 @@
               [attr.data-testid]="'revisar-' + borrador.id"
               (click)="revisar(borrador.id)"
               [disabled]="cargandoRevision()"
-              [attr.aria-label]="textos.revisar + ': ' + borrador.titulo"
+              [attr.aria-label]="('alertas.revisar' | translate) + ': ' + borrador.titulo"
             >
-              {{ textos.revisar }}
+              {{ 'alertas.revisar' | translate }}
             </button>
           </li>
         }

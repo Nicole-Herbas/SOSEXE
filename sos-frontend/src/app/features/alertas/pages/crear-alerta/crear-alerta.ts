@@ -24,9 +24,11 @@ const vigenciaValida: ValidatorFn = (control: AbstractControl) => {
   return Date.parse(fin) > Date.parse(inicio) ? null : { vigencia: true };
 };
 
+import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
+
 @Component({
   selector: 'app-crear-alerta',
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [ReactiveFormsModule, RouterLink, TranslatePipe],
   templateUrl: './crear-alerta.html',
   styleUrl: './crear-alerta.scss',
 })

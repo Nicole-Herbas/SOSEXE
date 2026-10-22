@@ -17,9 +17,11 @@ import { APP_TEXTOS } from '../../../../shared/constants/app-textos.constants';
 import { Alerta } from '../../models/alerta.model';
 import { AlertaService } from '../../services/alerta.service';
 
+import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
+
 @Component({
   selector: 'app-revisar-alertas',
-  imports: [DatePipe, RouterLink],
+  imports: [DatePipe, RouterLink, TranslatePipe],
   templateUrl: './revisar-alertas.html',
   styleUrl: './revisar-alertas.scss',
 })
