@@ -9,9 +9,10 @@ import { Noticia } from '../../models/noticia.model';
 import { NoticiaService } from '../../services/noticia.service';
 import { CATEGORIAS_NOTICIAS, filtrarNoticiasPorCategoria } from '../../utils/categoria-noticia';
 import { recortarResumen } from '../../utils/resumen-noticia';
+import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
 
 @Component({
-  imports: [RouterLink],
+  imports: [RouterLink, TranslatePipe],
   selector: 'app-noticias',
   styleUrl: './noticias.scss',
   templateUrl: './noticias.html',
