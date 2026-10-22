@@ -12,6 +12,7 @@ import { RegistroComponent } from './features/auth/pages/registro/registro';
 import { PreferenciasComponent } from './features/preferencias/pages/preferencias/preferencias';
 import { adminGuard } from './admin-guard';
 import { authGuard } from './auth-guard';
+import { donarAuthGuard } from './features/donar/guards/donar-auth.guard';
 import { RegistrarPuntoComponent } from './features/puntos-ayuda/pages/registrar-punto/registrar-punto';
 import { registroPuntoGuard } from './features/auth/guards/registro-punto.guard';
 
@@ -31,7 +32,8 @@ export const routes: Routes = [
   },
   {
     path: 'donar',
-    component: Donar
+    component: Donar,
+    canActivate: [donarAuthGuard]
   },
   {
     path: 'voluntariado',

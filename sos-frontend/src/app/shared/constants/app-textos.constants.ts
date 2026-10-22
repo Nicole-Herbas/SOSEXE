@@ -414,10 +414,37 @@ mapa: {
   },
 },
 
-donar: {
-  mensaje:
-    'donar works!',
-},
+  donar: {
+    volverInicio: '← Volver al inicio',
+    titulo: 'Haz que tu ayuda llegue',
+    subtitulo:
+      'Elige un centro verificado y define cuánto deseas aportar. Podrás revisar todo antes de realizar el pago.',
+
+    pasos: ['Centro', 'Monto', 'Pago', 'Confirmación'],
+
+    etapa: 'Paso 1 de 4',
+    pregunta: '¿A qué centro deseas ayudar?',
+    verMapa: 'Explorar en el mapa →',
+
+    verificado: 'Centro verificado',
+    necesidades: 'Necesidades del centro',
+    sinNecesidades: 'Sin necesidades registradas',
+    ubicacionNoDisponible: 'Ubicación no disponible',
+
+    cargando: 'Cargando centros verificados...',
+    sinCentros: 'No hay centros verificados disponibles por el momento.',
+    errorCarga: 'No se pudieron cargar los centros.',
+    reintentar: 'Reintentar',
+
+    confirmarCentro: 'Confirmar selección',
+    confirmacion:
+      'Centro seleccionado correctamente. El siguiente paso será elegir el monto.',
+
+    resumen: 'Resumen de tu ayuda',
+    sinSeleccion: 'Selecciona un centro para comenzar.',
+    siguientePaso:
+      'La selección del monto se habilitará en el siguiente paso del desarrollo.',
+  },
 
 noticias: {
   // ── Encabezado de la página ──────────────────────────────────────────────

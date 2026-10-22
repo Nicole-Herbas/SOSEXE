@@ -26,6 +26,15 @@ public class CentroController {
                 ApiResponse.ok(centroService.listarTodos()));
     }
 
+    // SOS-70: Solo centros verificados para donaciones.
+    @GetMapping("/verificados")
+    public ResponseEntity<ApiResponse<List<CentroDTO>>> listarVerificados() {
+
+        return ResponseEntity.ok(
+                ApiResponse.ok(centroService.listarVerificados())
+        );
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<CentroDTO>> buscarPorId(
             @PathVariable Long id) {
