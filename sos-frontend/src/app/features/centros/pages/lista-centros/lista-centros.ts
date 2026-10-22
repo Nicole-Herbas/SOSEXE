@@ -4,9 +4,11 @@ import { CentroService } from '../../services/centro';
 import { Centro } from '../../models/centro';
 import { APP_TEXTOS } from '../../../../shared/constants/app-textos.constants';
 
+import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
+
 @Component({
   selector: 'app-lista-centros',
-  imports: [],
+  imports: [TranslatePipe],
   templateUrl: './lista-centros.html',
   styleUrl: './lista-centros.scss'
 })
