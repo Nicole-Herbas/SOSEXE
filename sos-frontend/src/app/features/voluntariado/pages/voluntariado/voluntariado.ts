@@ -28,6 +28,8 @@ export type EstadoPagina =
   | 'CON_PERFIL';
 
 
+import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
+
 @Component({
   imports: [
     CommonModule,
@@ -35,6 +37,7 @@ export type EstadoPagina =
     RouterLink,
     CrearPerfilComponent,
     TarjetaPerfilComponent,
+    TranslatePipe,
   ],
   selector: 'app-voluntariado',
   styleUrl: './voluntariado.scss',
