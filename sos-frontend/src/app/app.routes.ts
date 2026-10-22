@@ -52,7 +52,8 @@ export const routes: Routes = [
   },
   {
     path: 'acerca-de/registrar-centro',
-    component: RegistrarCentroComponent
+    component: RegistrarCentroComponent,
+    canActivate: [authGuard]
   },
   {
     path: 'registrar-punto',

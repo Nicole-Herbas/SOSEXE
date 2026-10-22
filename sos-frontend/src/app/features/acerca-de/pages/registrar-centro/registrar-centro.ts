@@ -1,10 +1,22 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { Router } from '@angular/router';
+import { Router} from '@angular/router';
+import { AuthService } from '../../../auth/services/auth.service';
+import { firstValueFrom } from 'rxjs';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 
 import { ApiResponse } from '../../../../shared/models/api-response';
+import { APP_TEXTOS } from '../../../../shared/constants/app-textos.constants';
+import {
+  ArchivosBorrador,
+  BORRADOR_VIGENCIA_DIAS,
+  borradorVencido,
+  cargarArchivosBorrador,
+  claveBorrador,
+  eliminarBorradorDeUsuario,
+  guardarArchivosBorrador
+} from '../../utils/borrador-registro-centro';
 
 // Forma en que el backend devuelve cada departamento
 export interface Departamento {
@@ -15,32 +27,83 @@ export interface Departamento {
 @Component({
   selector: 'app-registrar-centro',
   standalone: true,
-  imports: [FormsModule],
+ imports: [FormsModule],
   templateUrl: './registrar-centro.html',
   styleUrl: './registrar-centro.scss'
 })
 export class RegistrarCentroComponent implements OnInit {
+  readonly textos = APP_TEXTOS.registrarCentro;
 
   constructor(
     private http: HttpClient,
     private router: Router,
     private cdr: ChangeDetectorRef,
-    private sanitizer: DomSanitizer
+    private sanitizer: DomSanitizer,
+    private authService: AuthService
   ) {}
 
   // Rutas relativas: proxy.conf.json las envía al backend
   private readonly API_SOLICITUDES = '/api/solicitudes-centro';
   private readonly API_DEPARTAMENTOS = '/api/departamentos';
 
-  ngOnInit(): void {
-    this.cargarDepartamentos();
+  // SOS-42: borrador guardado SOLO en este navegador, aislado por usuario.
+  // Textos -> localStorage | Archivos -> IndexedDB (ver utils/borrador-registro-centro.ts)
+  private usuarioEmail = '';
+
+  private get BORRADOR_KEY(): string {
+    return claveBorrador(this.usuarioEmail);
   }
+
+    async ngOnInit(): Promise<void> {
+
+    this.cargarDepartamentos();
+
+    if (!this.haySesion) {
+      return;
+    }
+
+    try {
+
+      const usuario = await firstValueFrom(
+        this.authService.usuarioActual()
+      );
+
+      if (!usuario?.email) {
+        return;
+      }
+
+      this.usuarioEmail =
+        usuario.email.trim().toLowerCase();
+
+      await this.cargarBorrador();
+
+    } catch (error) {
+
+      console.error(
+        'No se pudo obtener el usuario autenticado:',
+        error
+      );
+
+    }
+}
 
   currentStep = 1;
   mostrarModalEnvio = false;
   mostrarModalError = false;
   enviando = false;
   errorEnvio = '';
+
+  // SOS-42: estado del borrador (para los avisos en pantalla)
+  borradorRecuperado = false;
+  fechaBorrador = '';
+  mensajeBorrador = '';
+  errorBorrador = false;
+  mostrarModalBorrador = false;
+  guardandoBorrador = false;
+
+  // SOS-42 (QA): el borrador vence y se informa al usuario
+  readonly diasVigenciaBorrador = BORRADOR_VIGENCIA_DIAS;
+  avisoBorradorVencido = false;
 
   // ==========================================
   // SESIÓN (el POST exige login; el token lo pone el authInterceptor)
@@ -68,13 +131,14 @@ export class RegistrarCentroComponent implements OnInit {
       .subscribe({
         next: (respuesta) => {
           this.departamentos = respuesta.data ?? [];
-          this.cdr.markForCheck();
+          this.cdr.detectChanges();
         },
         error: (error) => {
           console.error('Error al cargar departamentos:', error);
           this.errorDepartamentos =
-            'No se pudieron cargar los departamentos. Recarga la página.';
+            this.textos.errores.departamentos;
           this.cdr.markForCheck();
+
         }
       });
   }
@@ -165,44 +229,6 @@ export class RegistrarCentroComponent implements OnInit {
   get paso3Valido(): boolean {
     return this.documentosAdjuntos === 4;
   }
-
-  // ==========================================
-  // NECESIDADES Y VOLUNTARIADO - PASO 4
-  // ==========================================
-
-  necesidadesDisponibles = [
-    'Alimentos',
-    'Medicamentos',
-    'Ropa',
-    'Útiles escolares',
-    'Productos de higiene',
-    'Artículos para animales',
-    'Apoyo económico',
-    'Otro'
-  ];
-
-  donacionesDisponibles = [
-    'Alimentos',
-    'Ropa',
-    'Medicamentos',
-    'Útiles escolares',
-    'Productos de higiene',
-    'Dinero',
-    'Artículos para animales',
-    'Otro'
-  ];
-
-  actividadesVoluntariado = [
-    'Atención y acompañamiento',
-    'Apoyo educativo',
-    'Salud',
-    'Logística',
-    'Cocina',
-    'Limpieza',
-    'Cuidado de animales',
-    'Comunicación',
-    'Otro'
-  ];
 
   necesidadesSeleccionadas: string[] = [];
 
@@ -375,64 +401,90 @@ export class RegistrarCentroComponent implements OnInit {
   }
 
   enviarSolicitud(): void {
+  if (
+    this.enviando ||
+    !this.formularioCompleto ||
+    !this.haySesion
+  ) {
+    return;
+  }
 
-    if (this.enviando || !this.formularioCompleto || !this.haySesion) {
-      return;
-    }
+  this.enviando = true;
+  this.errorEnvio = '';
+  this.mostrarModalError = false;
 
-    this.enviando = true;
-    this.errorEnvio = '';
+  this.http
+    .post<ApiResponse<unknown>>(
+      this.API_SOLICITUDES,
+      this.construirFormData()
+    )
+    .subscribe({
+      next: async () => {
+        try {
+          await this.eliminarBorrador();
 
-    this.http
-      .post<ApiResponse<unknown>>(this.API_SOLICITUDES, this.construirFormData())
-            .subscribe({
-        next: () => {
-          console.log('✅ Solicitud guardada, mostrando modal');
           this.enviando = false;
           this.mostrarModalEnvio = true;
-          this.cdr.detectChanges();
-        },
-        error: (error: HttpErrorResponse) => {
-          console.error('Error al guardar la solicitud:', error);
+
+        } catch (error) {
+          console.error(
+            'La solicitud fue enviada, pero no se pudo eliminar el borrador:',
+            error
+          );
+
           this.enviando = false;
-          this.errorEnvio = this.mensajeDeError(error);
+
+          this.errorEnvio =
+            'La solicitud fue enviada correctamente, pero no se pudo eliminar el borrador local.';
+
           this.mostrarModalError = true;
-          this.cdr.detectChanges();
         }
-      });
-  }
+
+        this.cdr.detectChanges();
+      },
+
+      error: (error: HttpErrorResponse) => {
+        this.enviando = false;
+
+        this.errorEnvio =
+          this.mensajeDeError(error);
+
+        this.mostrarModalError = true;
+
+        this.cdr.detectChanges();
+      }
+    });
+}
 
   private mensajeDeError(error: HttpErrorResponse): string {
 
-    if (error.status === 401) {
-      return 'Tu sesión expiró. Inicia sesión nuevamente para enviar la solicitud.';
-    }
-
-    if (error.status === 413) {
-      return 'Los archivos superan el tamaño máximo permitido (10 MB por archivo).';
-    }
-
-    if (error.status === 422) {
-      return 'Algunos datos no son válidos. Revisa la información y completa lo que falta.';
-    }
-
-    return error.error?.message
-      ?? 'No se pudo registrar la solicitud. Revisa los datos e intenta nuevamente.';
+  if (error.status === 401) {
+    return this.textos.errores.sesionExpirada;
   }
 
-  // ==========================================
-  // TIPOS DE ORGANIZACIÓN
-  // ==========================================
+  if (error.status === 413) {
+    return this.textos.errores.archivosGrandes;
+  }
 
-  tiposOrganizacion = [
-    'Centro de apoyo',
-    'Refugio',
-    'Organización no gubernamental',
-    'Fundación',
-    'Institución pública',
-    'Organización comunitaria',
-    'Otro'
-  ];
+  if (error.status === 422) {
+    return this.textos.errores.datosInvalidos;
+  }
+
+  return error.error?.message
+    ?? this.textos.errores.errorEnvio;
+}
+
+ readonly tiposOrganizacion =
+  this.textos.opciones.tiposOrganizacion;
+
+readonly necesidadesDisponibles =
+  this.textos.opciones.necesidades;
+
+readonly donacionesDisponibles =
+  this.textos.opciones.donaciones;
+
+readonly actividadesVoluntariado =
+  this.textos.opciones.actividadesVoluntariado;
 
   // ==========================================
   // VALIDACIÓN DEL PASO 1
@@ -542,8 +594,8 @@ export class RegistrarCentroComponent implements OnInit {
 
     if (!tiposPermitidos.includes(archivo.type)) {
 
-      this.errorArchivo =
-        'Formato no válido. Solo se permiten archivos PDF, JPG, PNG o WEBP.';
+     this.errorArchivo =
+       this.textos.archivos.formatoInvalido;
 
       input.value = '';
 
@@ -554,7 +606,7 @@ export class RegistrarCentroComponent implements OnInit {
     if (archivo.size > this.MAX_FILE_SIZE) {
 
       this.errorArchivo =
-        'El archivo es demasiado grande. El tamaño máximo permitido es de 10 MB.';
+        this.textos.archivos.archivoGrande;
 
       input.value = '';
 
@@ -657,13 +709,39 @@ export class RegistrarCentroComponent implements OnInit {
   }
 
   // ==========================================
-  // GUARDAR BORRADOR (se completa en SOS-42)
+  // SOS-42: GUARDAR BORRADOR
   // ==========================================
 
-  guardarBorrador(): void {
+  async guardarBorrador(): Promise<void> {
 
-    console.log('Borrador guardado:', {
+    if (!this.haySesion || !this.usuarioEmail) {
 
+      this.mostrarModalBorrador = true;
+      this.guardandoBorrador = false;
+      this.errorBorrador = true;
+
+      this.mensajeBorrador =
+        'Debes iniciar sesión para guardar el borrador.';
+
+      this.cdr.detectChanges();
+
+      return;
+    }
+
+    // Abre el modal en modo "Guardando..."
+    this.mostrarModalBorrador = true;
+    this.guardandoBorrador = true;
+    this.errorBorrador = false;
+    this.cdr.detectChanges();
+
+
+    const borrador = {
+
+      guardadoEn: new Date().toISOString(),
+      propietario: this.usuarioEmail,
+      currentStep: this.currentStep,
+
+      // Paso 1
       nombreCentro: this.nombreCentro,
       tipoOrganizacion: this.tipoOrganizacion,
       departamentoId: this.departamentoId,
@@ -674,21 +752,365 @@ export class RegistrarCentroComponent implements OnInit {
       descripcion: this.descripcion,
       poblacionAtendida: this.poblacionAtendida,
 
+      // Paso 2
       nombreResponsable: this.nombreResponsable,
       cargoResponsable: this.cargoResponsable,
       documentoResponsable: this.documentoResponsable,
       correoResponsable: this.correoResponsable,
       telefonoResponsable: this.telefonoResponsable,
-
       ciudad: this.ciudad,
       departamentoUbicacion: this.departamentoUbicacion,
       direccionExacta: this.direccionExacta,
       referencia: this.referencia,
 
-      personeriaArchivo: this.personeriaArchivo?.name,
-      nitArchivo: this.nitArchivo?.name,
-      identidadArchivo: this.identidadArchivo?.name,
-      domicilioArchivo: this.domicilioArchivo?.name
+      // Paso 4
+      necesidadesSeleccionadas: [
+        ...this.necesidadesSeleccionadas
+      ],
+
+      donacionesSeleccionadas: [
+        ...this.donacionesSeleccionadas
+      ],
+
+      solicitaVoluntarios:
+        this.solicitaVoluntarios,
+
+      actividadesSeleccionadas: [
+        ...this.actividadesSeleccionadas
+      ],
+
+      descripcionVoluntariado:
+        this.descripcionVoluntariado
+    };
+
+
+    const clave = this.BORRADOR_KEY;
+
+    // Guardamos el estado anterior por si IndexedDB falla.
+    const borradorAnterior =
+      localStorage.getItem(clave);
+
+
+    try {
+
+      // 1. Guardar textos en localStorage
+      localStorage.setItem(
+        clave,
+        JSON.stringify(borrador)
+      );
+
+
+      // 2. Guardar archivos en IndexedDB
+      try {
+
+        await guardarArchivosBorrador(
+          this.usuarioEmail,
+          this.archivosActuales()
+        );
+
+      } catch (errorIndexedDB) {
+
+        // Restaurar el borrador anterior
+        // para no dejar un guardado incompleto.
+
+        if (borradorAnterior === null) {
+
+          localStorage.removeItem(clave);
+
+        } else {
+
+          localStorage.setItem(
+            clave,
+            borradorAnterior
+          );
+
+        }
+
+        throw errorIndexedDB;
+      }
+
+
+      // Pequeña pausa para mostrar "Guardando..."
+      await this.esperar(700);
+
+
+      this.fechaBorrador =
+        this.formatearFecha(
+          borrador.guardadoEn
+        );
+
+      this.mensajeBorrador =
+        `Borrador guardado · ${this.fechaBorrador}`;
+
+    } catch (error) {
+
+      console.error(
+        'Error al guardar el borrador:',
+        error
+      );
+
+      this.errorBorrador = true;
+
+      this.mensajeBorrador =
+        'No se pudo guardar el borrador. Inténtalo de nuevo.';
+    }
+
+
+    this.guardandoBorrador = false;
+    this.cdr.detectChanges();
+  }
+
+  // ==========================================
+  // SOS-42: RECUPERAR BORRADOR
+  // ==========================================
+
+  async cargarBorrador(): Promise<void> {
+
+  if (
+    typeof localStorage === 'undefined' ||
+    !this.usuarioEmail
+  ) {
+    return;
+  }
+
+
+  const guardado =
+    localStorage.getItem(this.BORRADOR_KEY);
+
+
+  if (!guardado) {
+    return;
+  }
+
+
+  try {
+
+    const b = JSON.parse(guardado);
+
+
+    // SOS-42 (QA): solo se recupera si es del usuario actual y no venció
+    const esDeOtroUsuario =
+      typeof b.propietario === 'string' &&
+      b.propietario !== this.usuarioEmail;
+
+    if (esDeOtroUsuario || borradorVencido(b.guardadoEn)) {
+
+      await this.eliminarBorrador();
+
+      this.avisoBorradorVencido = !esDeOtroUsuario;
+      this.cdr.detectChanges();
+
+      return;
+    }
+
+
+    // currentStep válido solamente entre 1 y 5
+    const paso =
+      Number(b.currentStep);
+
+    this.currentStep =
+      Number.isInteger(paso) &&
+      paso >= 1 &&
+      paso <= 5
+        ? paso
+        : 1;
+
+
+    // ==========================================
+    // PASO 1
+    // ==========================================
+
+    this.nombreCentro =
+      b.nombreCentro ?? '';
+
+    this.tipoOrganizacion =
+      b.tipoOrganizacion ?? '';
+
+    this.departamentoId =
+      b.departamentoId ?? null;
+
+    this.nit =
+      b.nit ?? '';
+
+    this.personeriaJuridica =
+      b.personeriaJuridica ?? '';
+
+    this.fechaFundacion =
+      b.fechaFundacion ?? '';
+
+    this.paginaWeb =
+      b.paginaWeb ?? '';
+
+    this.descripcion =
+      b.descripcion ?? '';
+
+    this.poblacionAtendida =
+      b.poblacionAtendida ?? '';
+
+
+    // ==========================================
+    // PASO 2
+    // ==========================================
+
+    this.nombreResponsable =
+      b.nombreResponsable ?? '';
+
+    this.cargoResponsable =
+      b.cargoResponsable ?? '';
+
+    this.documentoResponsable =
+      b.documentoResponsable ?? '';
+
+    this.correoResponsable =
+      b.correoResponsable ?? '';
+
+    this.telefonoResponsable =
+      b.telefonoResponsable ?? '';
+
+    this.ciudad =
+      b.ciudad ?? '';
+
+    this.departamentoUbicacion =
+      b.departamentoUbicacion ?? '';
+
+    this.direccionExacta =
+      b.direccionExacta ?? '';
+
+    this.referencia =
+      b.referencia ?? '';
+
+
+    // ==========================================
+    // PASO 4
+    // ==========================================
+
+    this.necesidadesSeleccionadas =
+      b.necesidadesSeleccionadas ?? [];
+
+    this.donacionesSeleccionadas =
+      b.donacionesSeleccionadas ?? [];
+
+    this.solicitaVoluntarios =
+      b.solicitaVoluntarios ?? null;
+
+    this.actividadesSeleccionadas =
+      b.actividadesSeleccionadas ?? [];
+
+    this.descripcionVoluntariado =
+      b.descripcionVoluntariado ?? '';
+
+
+    // ==========================================
+    // PASO 3 - ARCHIVOS
+    // ==========================================
+
+    const archivos =
+      await cargarArchivosBorrador(this.usuarioEmail);
+
+    this.personeriaArchivo = archivos.personeria;
+    this.nitArchivo = archivos.nit;
+    this.identidadArchivo = archivos.identidad;
+    this.domicilioArchivo = archivos.domicilio;
+
+    this.personeriaAdjunta = !!archivos.personeria;
+    this.nitAdjunto = !!archivos.nit;
+    this.identidadAdjunta = !!archivos.identidad;
+    this.domicilioAdjunto = !!archivos.domicilio;
+
+
+    this.borradorRecuperado = true;
+
+    this.fechaBorrador =
+      b.guardadoEn
+        ? this.formatearFecha(b.guardadoEn)
+        : '';
+
+  } catch (error) {
+
+    console.error(
+      'Error al recuperar el borrador:',
+      error
+    );
+
+    try {
+
+      await this.eliminarBorrador();
+
+    } catch (errorEliminacion) {
+
+      console.error(
+        'No se pudo eliminar el borrador dañado:',
+        errorEliminacion
+      );
+
+    }
+  }
+
+
+  this.cdr.detectChanges();
+}
+
+  // ==========================================
+  // SOS-42: DESCARTAR / ELIMINAR BORRADOR
+  // ==========================================
+
+  // Botón "Empezar de cero": borra el borrador y limpia el formulario
+  async descartarBorrador(): Promise<void> {
+    await this.eliminarBorrador();
+    window.location.reload();
+  }
+
+  // Borra texto + documentos SOLO del usuario actual.
+  // Si falla, lanza el error y el borrador se conserva para reintentar.
+  async eliminarBorrador(): Promise<void> {
+
+    this.borradorRecuperado = false;
+
+    if (!this.usuarioEmail) {
+      return;
+    }
+
+    await eliminarBorradorDeUsuario(this.usuarioEmail);
+  }
+
+  // ==========================================
+  // SOS-42: DOCUMENTOS DEL BORRADOR
+  // ==========================================
+
+  private archivosActuales(): ArchivosBorrador {
+    return {
+      personeria: this.personeriaArchivo,
+      nit: this.nitArchivo,
+      identidad: this.identidadArchivo,
+      domicilio: this.domicilioArchivo
+    };
+  }
+
+  // ==========================================
+  // SOS-42: AYUDAS
+  // ==========================================
+  // Botón "Seguir completando": cierra el modal y se queda en el mismo paso
+  seguirCompletando(): void {
+    this.mostrarModalBorrador = false;
+  }
+
+  // Botón "Salir y continuar después": el borrador ya está guardado
+  salirYContinuarDespues(): void {
+    this.mostrarModalBorrador = false;
+    this.router.navigate(['/acerca-de']);
+  }
+
+  private esperar(ms: number): Promise<void> {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  private formatearFecha(iso: string): string {
+    return new Date(iso).toLocaleString('es-BO', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
     });
   }
 
