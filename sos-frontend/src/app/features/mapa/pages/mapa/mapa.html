@@ -1,9 +1,9 @@
 <section class="pagina-mapa">
   <div class="encabezado-mapa">
     <div>
-      <span class="subtitulo">{{ textos.subtitulo }}</span>
-      <h1>{{ textos.titulo }}</h1>
-      <p>{{ textos.descripcion }}</p>
+      <span class="subtitulo">{{ 'mapa.subtitulo' | translate }}</span>
+      <h1>{{ 'mapa.titulo' | translate }}</h1>
+      <p>{{ 'mapa.descripcion' | translate }}</p>
     </div>
 
     <div class="contador-verificados">
@@ -34,20 +34,20 @@
   @if (featureToggles.mapa.mostrarLista) {
     <aside class="columna-izquierda">
       <div class="bloque-busqueda">
-        <label for="mapa-busqueda">{{ textos.buscarEtiqueta }}</label>
+        <label for="mapa-busqueda">{{ 'mapa.buscarEtiqueta' | translate }}</label>
         <input
           id="mapa-busqueda"
           type="search"
           aria-controls="mapa-resultados"
           [value]="busqueda()"
-          [placeholder]="textos.buscarPlaceholder"
+          [placeholder]="'mapa.buscarPlaceholder' | translate"
           (input)="actualizarBusqueda($event)"
         />
       </div>
 
       @if (featureToggles.mapa.filtros) {
         <div class="bloque-filtros">
-          <label>{{ textos.necesidadesEtiqueta }}</label>
+          <label>{{ 'mapa.necesidadesEtiqueta' | translate }}</label>
 
           <div class="filtros-necesidades">
             @for (filtro of filtrosNecesidad; track filtro.id) {

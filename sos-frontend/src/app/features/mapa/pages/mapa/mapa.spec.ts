@@ -157,6 +157,8 @@ describe('Mapa', () => {
 
     component =
       fixture.componentInstance;
+
+    httpTesting.match(req => req.url.includes('/i18n/')).forEach(req => req.flush({}));
   });
 
   it(

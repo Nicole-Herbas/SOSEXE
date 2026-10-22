@@ -36,10 +36,13 @@ import {
 } from '../../models/punto-mapa.model';
 
 
+import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
+
 @Component({
   selector: 'app-mapa',
   imports: [
-    MapaLeaflet
+    MapaLeaflet,
+    TranslatePipe
   ],
   templateUrl: './mapa.html',
   styleUrl: './mapa.scss'
