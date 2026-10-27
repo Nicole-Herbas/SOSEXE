@@ -12,16 +12,19 @@ import { SuscripcionSmsService } from '../../services/suscripcion-sms.service';
 import { SuscripcionSms } from '../../models/suscripcion-sms.model';
 import { APP_TEXTOS } from '../../../../shared/constants/app-textos.constants';
 import { ApiResponse } from '../../../../shared/models/api-response';
+import { IdiomaService, Idioma } from '../../../../shared/services/idioma.service';
 
 interface Departamento {
   id: number;
   nombre: string;
 }
 
+import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
+
 @Component({
   selector: 'app-preferencias',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, TranslatePipe],
   templateUrl: './preferencias.html',
   styleUrl: './preferencias.scss'
 })
@@ -30,10 +33,14 @@ export class PreferenciasComponent implements OnInit {
   private readonly fb = inject(FormBuilder);
   private readonly http = inject(HttpClient);
   private readonly suscripcionService = inject(SuscripcionSmsService);
+  private readonly idiomaService = inject(IdiomaService);
 
   readonly textos = APP_TEXTOS.preferencias;
   departamentos: Departamento[] = [];
   formulario!: FormGroup;
+
+  /** Señal con el idioma activo ('es' | 'en'). */
+  readonly idiomaActual = this.idiomaService.idioma$;
 
   cargando = signal<boolean>(true);
   cargandoDepartamentos = signal<boolean>(true);
@@ -42,6 +49,7 @@ export class PreferenciasComponent implements OnInit {
   cancelando = signal<boolean>(false);
   confirmandoCancelacion = signal<boolean>(false);
 
+  mensajeIdiomaGuardado = signal<boolean>(false);
   mensajeExito = signal<string | null>(null);
   mensajeError = signal<string | null>(null);
   suscripcionActual = signal<SuscripcionSms | null>(null);
@@ -50,6 +58,15 @@ export class PreferenciasComponent implements OnInit {
     this.inicializarFormulario();
     this.cargarDepartamentos();
     this.cargarSuscripcion();
+  }
+
+  /**
+   * SOS-114 — Cambia el idioma de la aplicación y muestra confirmación.
+   */
+  cambiarIdioma(idioma: Idioma): void {
+    this.idiomaService.setIdioma(idioma);
+    this.mensajeIdiomaGuardado.set(true);
+    setTimeout(() => this.mensajeIdiomaGuardado.set(false), 3000);
   }
 
   private inicializarFormulario(): void {

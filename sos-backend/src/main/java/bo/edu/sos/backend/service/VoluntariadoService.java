@@ -2,8 +2,10 @@ package bo.edu.sos.backend.service;
 
 import bo.edu.sos.backend.constants.EstadoVoluntariado;
 import bo.edu.sos.backend.constants.Roles;
+import bo.edu.sos.backend.dto.NecesidadDTO;
 import bo.edu.sos.backend.dto.VoluntariadoDTO;
 import bo.edu.sos.backend.entity.Centro;
+import bo.edu.sos.backend.entity.Necesidad;
 import bo.edu.sos.backend.entity.Usuario;
 import bo.edu.sos.backend.entity.Voluntariado;
 import bo.edu.sos.backend.exception.BadRequestException;
@@ -17,6 +19,7 @@ import bo.edu.sos.backend.repository.VoluntariadoRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Comparator;
 import java.util.List;
 
 
@@ -58,6 +61,26 @@ public class VoluntariadoService {
 
 
         return voluntariados;
+    }
+
+
+    @Transactional(readOnly = true)
+    public VoluntariadoDTO buscarPublicadaPorId(Long id) {
+        Voluntariado voluntariado = voluntariadoRepository.findById(id)
+                .filter(oportunidad -> "PUBLICADO".equals(oportunidad.getEstado()))
+                .orElseThrow(() -> new ResourceNotFoundException("Voluntariado", id));
+
+        VoluntariadoDTO dto = convertirADTO(voluntariado);
+        // El detalle ciudadano no necesita identificar al usuario que creó la oportunidad.
+        dto.setCreadoPorId(null);
+
+        LogHelper.debug(
+                VoluntariadoService.class,
+                "Detalle público de voluntariado consultado. id={}",
+                id
+        );
+
+        return dto;
     }
 
 
@@ -504,6 +527,13 @@ public class VoluntariadoService {
                     voluntariado
                             .getCentro()
                             .getCiudad()
+            );
+
+            dto.setCentroNecesidades(
+                    voluntariado.getCentro().getNecesidades().stream()
+                            .sorted(Comparator.comparing(Necesidad::getId))
+                            .map(necesidad -> new NecesidadDTO(necesidad.getId(), necesidad.getNombre()))
+                            .toList()
             );
 
             if (voluntariado.getCentro().getDepartamento() != null) {

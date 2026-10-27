@@ -12,6 +12,7 @@ import { RegistroComponent } from './features/auth/pages/registro/registro';
 import { PreferenciasComponent } from './features/preferencias/pages/preferencias/preferencias';
 import { adminGuard } from './admin-guard';
 import { authGuard } from './auth-guard';
+import { donarAuthGuard } from './features/donar/guards/donar-auth.guard';
 import { RegistrarPuntoComponent } from './features/puntos-ayuda/pages/registrar-punto/registrar-punto';
 import { registroPuntoGuard } from './features/auth/guards/registro-punto.guard';
 
@@ -31,11 +32,17 @@ export const routes: Routes = [
   },
   {
     path: 'donar',
-    component: Donar
+    component: Donar,
+    canActivate: [donarAuthGuard]
   },
   {
     path: 'voluntariado',
     component: Voluntariado
+  },
+  {
+    path: 'voluntariado/:id',
+    loadComponent: () => import('./features/voluntariado/pages/detalle-oportunidad/detalle-oportunidad')
+      .then(m => m.DetalleOportunidad)
   },
   {
     path: 'noticias',
@@ -47,7 +54,8 @@ export const routes: Routes = [
   },
   {
     path: 'acerca-de/registrar-centro',
-    component: RegistrarCentroComponent
+    component: RegistrarCentroComponent,
+    canActivate: [authGuard]
   },
   {
     path: 'registrar-punto',
@@ -72,8 +80,20 @@ export const routes: Routes = [
     canActivate: [authGuard]
   },
   {
+    path: 'admin/alertas/crear',
+    loadComponent: () => import('./features/alertas/pages/crear-alerta/crear-alerta')
+      .then(m => m.CrearAlertaComponent),
+    canActivate: [adminGuard]
+  },
+  {
+    path: 'admin/alertas',
+    loadComponent: () => import('./features/alertas/pages/revisar-alertas/revisar-alertas')
+      .then(m => m.RevisarAlertasComponent),
+    canActivate: [adminGuard]
+  },
+  {
     path: 'admin',
-    component: ListaCentros,
+    loadComponent: () => import('./features/admin/pages/admin/admin').then(m => m.AdminComponent),
     canActivate: [adminGuard]
   }
 ];

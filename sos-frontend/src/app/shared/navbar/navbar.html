@@ -3,17 +3,17 @@
   <div class="navbar-brand">
 
     <div class="navbar-icon">
-      {{ textos.iconoMarca }}
+      {{ t()('navbar.iconoMarca') }}
     </div>
 
     <div class="navbar-titles">
 
       <span class="navbar-logo">
-        {{ textos.marca }}
+        {{ t()('navbar.marca') }}
       </span>
 
       <span class="navbar-tagline">
-        {{ textos.lema }}
+        {{ t()('navbar.lema') }}
       </span>
 
     </div>
@@ -25,7 +25,7 @@
     class="navbar-toggle"
     (click)="menuAbierto = !menuAbierto"
   >
-    {{ textos.iconoMenu }}
+    {{ t()('navbar.iconoMenu') }}
   </button>
 
 
@@ -36,37 +36,37 @@
 
     <li>
       <a routerLink="/inicio" routerLinkActive="active">
-        {{ textos.enlaces.inicio }}
+        {{ t()('navbar.enlaces.inicio') }}
       </a>
     </li>
 
     <li>
       <a routerLink="/mapa" routerLinkActive="active">
-        {{ textos.enlaces.mapa }}
+        {{ t()('navbar.enlaces.mapa') }}
       </a>
     </li>
 
     <li>
       <a routerLink="/donar" routerLinkActive="active">
-        {{ textos.enlaces.donar }}
+        {{ t()('navbar.enlaces.donar') }}
       </a>
     </li>
 
     <li>
       <a routerLink="/voluntariado" routerLinkActive="active">
-        {{ textos.enlaces.voluntariados }}
+        {{ t()('navbar.enlaces.voluntariados') }}
       </a>
     </li>
 
     <li>
       <a routerLink="/noticias" routerLinkActive="active">
-        {{ textos.enlaces.noticias }}
+        {{ t()('navbar.enlaces.noticias') }}
       </a>
     </li>
 
     <li>
       <a routerLink="/acerca-de" routerLinkActive="active">
-        {{ textos.enlaces.acercaDe }}
+        {{ t()('navbar.enlaces.acercaDe') }}
       </a>
     </li>
 
@@ -77,12 +77,12 @@
 
     <button
       class="navbar-bell"
-      [attr.aria-label]="textos.notificacionesAria"
+      [attr.aria-label]="t()('navbar.notificacionesAria')"
     >
-      {{ textos.iconoNotificacion }}
+      {{ t()('navbar.iconoNotificacion') }}
 
       <span class="navbar-badge">
-        {{ textos.cantidadNotificaciones }}
+        {{ t()('navbar.cantidadNotificaciones') }}
       </span>
     </button>
 
@@ -94,7 +94,7 @@
       routerLink="/login"
       routerLinkActive="active"
     >
-      {{ textos.iniciarSesion }}
+      {{ t()('navbar.iniciarSesion') }}
     </a>
 
 
@@ -116,24 +116,24 @@
         class="navbar-preferencias"
         routerLink="/preferencias"
         routerLinkActive="active"
-        title="Preferencias"
+        [title]="t()('navbar.preferencias')"
       >
-        ⚙ {{ textos.preferencias }}
+        ⚙ {{ t()('navbar.preferencias') }}
       </a>
 
       <button
         class="navbar-logout"
         (click)="cerrarSesion()"
-        title="Cerrar sesión"
+        [title]="t()('navbar.cerrarSesion')"
       >
-        Salir
+        {{ t()('navbar.salir') }}
       </button>
 
     </div>
 
 
     <button class="navbar-cta">
-      {{ textos.quieroAyudar }}
+      {{ t()('navbar.quieroAyudar') }}
     </button>
 
   </div>

@@ -10,4 +10,6 @@ public interface AlertaRepository extends JpaRepository<Alerta, Long> {
     List<Alerta> findByDepartamentoId(Long departamentoId);
 
     List<Alerta> findByEstado(String estado);
+
+    List<Alerta> findByDepartamentoIdAndEstado(Long departamentoId, String estado);
 }

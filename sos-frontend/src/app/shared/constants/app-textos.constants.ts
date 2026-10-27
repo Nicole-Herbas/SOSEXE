@@ -23,6 +23,8 @@ export const APP_TEXTOS = {
     iniciarSesion: 'Iniciar sesión',
     preferencias: 'Preferencias',
     quieroAyudar: '♥ Quiero ayudar',
+    salir: 'Salir',
+    cerrarSesion: 'Cerrar sesión',
   },
 
 
@@ -339,7 +341,13 @@ mapa: {
 
       confirmacion:
         'Gracias. Pasa a revisión del equipo.',
+
+      cerrar:
+        'Cerrar reporte',
     },
+
+    cerrarDetalle:
+      'Cerrar detalle',
   },
 
   filtrosTipo: {
@@ -406,10 +414,37 @@ mapa: {
   },
 },
 
-donar: {
-  mensaje:
-    'donar works!',
-},
+  donar: {
+    volverInicio: '← Volver al inicio',
+    titulo: 'Haz que tu ayuda llegue',
+    subtitulo:
+      'Elige un centro verificado y define cuánto deseas aportar. Podrás revisar todo antes de realizar el pago.',
+
+    pasos: ['Centro', 'Monto', 'Pago', 'Confirmación'],
+
+    etapa: 'Paso 1 de 4',
+    pregunta: '¿A qué centro deseas ayudar?',
+    verMapa: 'Explorar en el mapa →',
+
+    verificado: 'Centro verificado',
+    necesidades: 'Necesidades del centro',
+    sinNecesidades: 'Sin necesidades registradas',
+    ubicacionNoDisponible: 'Ubicación no disponible',
+
+    cargando: 'Cargando centros verificados...',
+    sinCentros: 'No hay centros verificados disponibles por el momento.',
+    errorCarga: 'No se pudieron cargar los centros.',
+    reintentar: 'Reintentar',
+
+    confirmarCentro: 'Confirmar selección',
+    confirmacion:
+      'Centro seleccionado correctamente. El siguiente paso será elegir el monto.',
+
+    resumen: 'Resumen de tu ayuda',
+    sinSeleccion: 'Selecciona un centro para comenzar.',
+    siguientePaso:
+      'La selección del monto se habilitará en el siguiente paso del desarrollo.',
+  },
 
 noticias: {
   // ── Encabezado de la página ──────────────────────────────────────────────
@@ -436,6 +471,19 @@ noticias: {
     'Alertas',
     'Otras',
   ] as const,
+
+  // Etiquetas traducibles de las categorías (la lista de arriba se usa como
+  // valor de comparación; estas son las que se muestran al usuario).
+  categorias: {
+    todas: 'Todas',
+    incendios: 'Incendios',
+    inundaciones: 'Inundaciones',
+    deslizamientos: 'Deslizamientos',
+    sequias: 'Sequías',
+    comunidad: 'Comunidad',
+    alertas: 'Alertas',
+    otras: 'Otras',
+  },
 
   // ── Sección "Últimas actualizaciones" ────────────────────────────────────
   ultimasTitulo:
@@ -550,6 +598,27 @@ voluntariado: {
 
 
   oportunidades: {
+    verDetalle: 'Ver detalle',
+    verDetalleEtiqueta: 'Ver detalle de',
+
+    detalle: {
+      titulo: 'Detalle de oportunidad',
+      descripcion: 'Descripción',
+      habilidades: 'Habilidades requeridas',
+      inicio: 'Inicio',
+      fin: 'Finalización',
+      centro: 'Centro responsable',
+      ciudad: 'Ciudad',
+      departamento: 'Departamento',
+      noInformado: 'No informado',
+      volver: 'Volver a oportunidades',
+      cargando: 'Cargando detalle de la oportunidad...',
+      noEncontrada: 'La oportunidad no existe o no está publicada.',
+      idInvalido: 'El identificador de la oportunidad no es válido.',
+      errorCarga: 'No se pudo cargar la oportunidad. Comprueba tu conexión e intenta de nuevo.',
+      reintentar: 'Reintentar',
+    },
+
     titulo:
       'Oportunidades disponibles',
 
@@ -564,6 +633,16 @@ voluntariado: {
 
     sinOportunidades:
       'No hay oportunidades de voluntariado publicadas por el momento.',
+
+    filtros: {
+      ciudadLabel: 'Ciudad',
+      todasCiudades: 'Todas las ciudades',
+      tipoAyudaLabel: 'Tipo de ayuda',
+      todosTiposAyuda: 'Todos los tipos de ayuda',
+      restablecer: 'Restablecer filtros',
+      resultadosLabel: 'Resultados encontrados',
+      sinResultados: 'No hay oportunidades que coincidan con los filtros seleccionados.',
+    },
 
     centroLabel:
       'Centro responsable',
@@ -1019,6 +1098,94 @@ voluntariado: {
   acercaDe: {
     mensaje: 'acerca-de works!',
 
+    hero: {
+      eyebrow: 'Sobre SOS.exe',
+      titulo: 'Ayuda organizada,',
+      tituloDestacado: 'transparente y cercana.',
+      descripcion:
+        'SOS.exe conecta a personas, centros verificados y voluntarios para que la ayuda llegue a quienes más la necesitan durante desastres naturales en Bolivia.',
+      centros: 'Centros verificados',
+      informacion: 'Información clara',
+      comunidad: 'Comunidad solidaria',
+    },
+
+    mision: {
+      etiqueta: 'LO QUE BUSCAMOS',
+      titulo: 'Nuestra misión',
+      descripcion:
+        'Facilitar una respuesta solidaria y eficiente ante desastres naturales, garantizando que cada donación y esfuerzo voluntario llegue de forma segura, verificada y oportuna.',
+      conectarTitulo: 'Conectar',
+      conectarDescripcion:
+        'Unimos a personas donantes, centros de apoyo y voluntarios para multiplicar el impacto de cada ayuda.',
+      verificarTitulo: 'Verificar',
+      verificarDescripcion:
+        'Validamos centros y refugios mediante un proceso riguroso para asegurar confianza y transparencia.',
+      responderTitulo: 'Responder',
+      responderDescripcion:
+        'Facilitamos información actualizada para que la ayuda llegue rápido y donde realmente se necesita.',
+    },
+
+    verificacion: {
+      titulo: '¿Cómo verificamos los centros?',
+      insignia: '✓ Centros verificados',
+      paso1Titulo: 'Solicitud',
+      paso1Descripcion:
+        'El centro o refugio completa una solicitud con información básica y documentos.',
+      paso2Titulo: 'Revisión de documentos',
+      paso2Descripcion:
+        'Revisamos su documentación y verificamos que la información presentada sea válida.',
+      paso3Titulo: 'Validación del centro',
+      paso3Descripcion:
+        'Confirmamos la existencia, actividad, responsables y medios oficiales del centro.',
+      paso4Titulo: 'Seguimiento continuo',
+      paso4Descripcion:
+        'La información y las necesidades se revisan periódicamente para mantenerlas actualizadas.',
+    },
+
+    valores: {
+      titulo: 'Nuestros valores',
+      descripcion: 'Principios que orientan cada decisión de la plataforma.',
+      transparenciaTitulo: 'Transparencia',
+      transparenciaDescripcion:
+        'Mostramos información clara sobre centros, necesidades y destino de la ayuda.',
+      seguridadTitulo: 'Seguridad',
+      seguridadDescripcion:
+        'Priorizamos centros verificados y procesos confiables para proteger cada aporte.',
+      comunidadTitulo: 'Comunidad',
+      comunidadDescripcion:
+        'Creemos en la colaboración para responder juntos ante situaciones difíciles.',
+      informacionTitulo: 'Información actualizada',
+      informacionDescripcion:
+        'Mantenemos visibles las necesidades prioritarias, alertas y formas de colaborar.',
+    },
+
+    roles: {
+      titulo: 'Una plataforma para ayudar de distintas formas',
+      descripcion:
+        'Cada rol tiene herramientas y responsabilidades diferentes dentro de SOS.exe.',
+      donantesTitulo: 'Personas donantes',
+      donantesDescripcion:
+        'Encuentra centros verificados, conoce sus necesidades y elige dónde deseas ayudar.',
+      donantesBoton: 'Quiero donar →',
+      centrosTitulo: 'Centros y refugios',
+      centrosDescripcion:
+        'Solicita la verificación de tu centro, publica sus necesidades y crea oportunidades de voluntariado.',
+      centrosBoton: 'Registrar mi centro →',
+      voluntariosTitulo: 'Voluntarios',
+      voluntariosDescripcion:
+        'Participa según tu experiencia, disponibilidad y habilidades para apoyar a la comunidad.',
+      voluntariosBoton: 'Quiero ser voluntario →',
+    },
+
+    cta: {
+      etiqueta: 'PARTICIPA',
+      titulo: 'Cada ayuda cuenta cuando llega al lugar correcto.',
+      descripcion:
+        'Únete a una comunidad que responde con solidaridad y responsabilidad en toda Bolivia.',
+      quieroAyudar: '♥ Quiero ayudar',
+      explorarMapa: 'Explorar el mapa',
+    },
+
     registrarPunto: {
       titulo: 'Puntos de ayuda',
       descripcion:
@@ -1098,10 +1265,510 @@ registro: {
 
   errorGeneral:
     'Ocurrió un error al crear la cuenta. Intenta de nuevo.',
+
+  creandoCuenta:
+    'Creando cuenta...',
 },
+  registrarCentro: {
+
+    header: {
+      volverAcerca: '← Volver a Acerca de',
+      badge: 'Solicitud de verificación',
+
+      titulo:
+        'Registra tu centro o refugio',
+
+      descripcion:
+        'Completa la información para que el equipo administrador pueda comprobar la organización antes de publicarla.',
+
+      solicitudPrivada:
+        '🔒 Solicitud privada',
+
+      noPublicacionAutomatica:
+        'Nada se publica automáticamente.',
+    },
+
+
+    pasos: {
+      centro: 'Centro',
+      responsableUbicacion: 'Responsable y ubicación',
+      documentos: 'Documentos',
+      necesidadesVoluntariado:
+        'Necesidades y voluntariado',
+      revisionEnvio:
+        'Revisión y envío',
+
+      paso: 'Paso',
+      de: 'de',
+    },
+
+
+    paso1: {
+
+      titulo:
+        'Información del centro',
+
+      descripcion:
+        'Cuéntanos qué organización solicita ser verificada.',
+
+      nombreLabel:
+        'Nombre oficial del centro o refugio',
+
+      nombrePlaceholder:
+        'Ej.: Centro de Apoyo San José',
+
+      tipoLabel:
+        'Tipo de organización',
+
+      tipoPlaceholder:
+        'Selecciona una opción',
+
+      departamentoLabel:
+        'Departamento',
+
+      departamentoPlaceholder:
+        'Selecciona un departamento',
+
+      nitLabel:
+        'NIT',
+
+      nitPlaceholder:
+        'Número de Identificación Tributaria',
+
+      personeriaLabel:
+        'Personería jurídica',
+
+      personeriaPlaceholder:
+        'Número o resolución',
+
+      fechaFundacionLabel:
+        'Fecha de fundación',
+
+      paginaWebLabel:
+        'Página web o red social oficial',
+
+      paginaWebPlaceholder:
+        'https://...',
+
+      descripcionLabel:
+        'Descripción del centro',
+
+      descripcionPlaceholder:
+        'Explica qué hace el centro, a quién ayuda y desde cuándo trabaja.',
+
+      poblacionLabel:
+        'Población atendida',
+
+      poblacionPlaceholder:
+        'Ej.: familias afectadas, niños, adultos mayores o animales',
+    },
+
+
+    paso2: {
+
+      titulo:
+        'Responsable y ubicación',
+
+      descripcion:
+        'Indica quién representa al centro y dónde se encuentra.',
+
+      responsableTitulo:
+        'Persona responsable',
+
+      responsableDescripcion:
+        'Datos de la persona que podrá responder durante la verificación.',
+
+      nombreLabel:
+        'Nombre completo',
+
+      nombrePlaceholder:
+        'Nombre y apellidos',
+
+      cargoLabel:
+        'Cargo o relación con el centro',
+
+      cargoPlaceholder:
+        'Ej.: Representante legal',
+
+      documentoLabel:
+        'Documento de identidad',
+
+      documentoPlaceholder:
+        'Cédula de identidad',
+
+      correoLabel:
+        'Correo electrónico',
+
+      correoPlaceholder:
+        'correo@centro.org',
+
+      telefonoLabel:
+        'Teléfono o WhatsApp',
+
+      telefonoPlaceholder:
+        '+591 ...',
+
+      ubicacionTitulo:
+        'Ubicación del centro',
+
+      ubicacionDescripcion:
+        'Esta información permitirá ubicar el centro en el mapa.',
+
+      ciudadLabel:
+        'Ciudad o municipio',
+
+      ciudadPlaceholder:
+        'Ej.: Cochabamba',
+
+      departamentoLabel:
+        'Departamento',
+
+      departamentoPlaceholder:
+        'Selecciona un departamento',
+
+      direccionLabel:
+        'Dirección exacta',
+
+      direccionPlaceholder:
+        'Zona, avenida, calle y número',
+
+      referenciaLabel:
+        'Referencia para llegar',
+
+      referenciaPlaceholder:
+        'Ej.: a media cuadra de la plaza principal',
+    },
+
+
+    paso3: {
+
+      titulo:
+        'Documentos de respaldo',
+
+      descripcion:
+        'Adjunta los documentos que permitan verificar la existencia y representación del centro.',
+
+      personeriaTitulo:
+        'Personería jurídica o documento de constitución',
+
+      personeriaDescripcion:
+        'Documento que demuestra la existencia legal de la organización.',
+
+      nitTitulo:
+        'Documento del NIT',
+
+      nitDescripcion:
+        'Constancia vigente del Número de Identificación Tributaria.',
+
+      identidadTitulo:
+        'Identidad y poder del representante legal',
+
+      identidadDescripcion:
+        'Cédula de identidad y documento que respalda su representación.',
+
+      domicilioTitulo:
+        'Respaldo del domicilio del centro',
+
+      domicilioDescripcion:
+        'Factura de servicio, contrato o documento con la dirección declarada.',
+
+      adjuntarArchivo:
+        'Adjuntar archivo',
+
+      quitarArchivo:
+        'Quitar archivo',
+
+      informacionImportante:
+        'Información importante:',
+
+      documentosPrivados:
+        'Los documentos solo serán visibles para el equipo encargado de revisar la solicitud.',
+    },
+
+
+    paso4: {
+
+      titulo:
+        'Necesidades y voluntariado',
+
+      descripcion:
+        'Indica qué necesita actualmente el centro y si requiere apoyo de voluntarios.',
+
+      necesidadesTitulo:
+        'Necesidades prioritarias',
+
+      necesidadesDescripcion:
+        'Selecciona los recursos que el centro necesita actualmente.',
+
+      donacionesTitulo:
+        'Donaciones que acepta',
+
+      donacionesDescripcion:
+        'Selecciona los tipos de donaciones que el centro puede recibir.',
+
+      voluntariadoTitulo:
+        'Voluntariado',
+
+      voluntariadoDescripcion:
+        'Indica si el centro necesita personas voluntarias.',
+
+      necesitaVoluntarios:
+        'Sí, necesitamos voluntarios',
+
+      necesitaVoluntariosDescripcion:
+        'El centro desea recibir apoyo de personas voluntarias.',
+
+      noNecesitaVoluntarios:
+        'No necesitamos voluntarios',
+
+      noNecesitaVoluntariosDescripcion:
+        'Actualmente el centro no requiere voluntariado.',
+
+      actividadesLabel:
+        '¿En qué actividades necesitas voluntarios?',
+
+      descripcionApoyoLabel:
+        'Describe qué tipo de apoyo necesitas',
+
+      descripcionApoyoPlaceholder:
+        'Ej.: Necesitamos personas para apoyar en actividades educativas durante las tardes.',
+    },
+
+
+    paso5: {
+
+      titulo:
+        'Revisión y envío',
+
+      antesDeEnviar:
+        '🔒 Antes de enviar',
+
+      avisoEnvio:
+        'La solicitud será enviada al equipo administrador para su revisión. El centro no será publicado automáticamente.',
+
+      iniciarSesion:
+        'Inicia sesión para enviar',
+
+      necesitaCuenta:
+        'Necesitas una cuenta para enviar la solicitud.',
+
+      irIniciarSesion:
+        'Ir a iniciar sesión',
+
+      enviar:
+        'Enviar solicitud →',
+
+      enviando:
+        'Enviando...',
+    },
+
+
+    opciones: {
+
+      tiposOrganizacion: [
+        'Centro de apoyo',
+        'Refugio',
+        'Organización no gubernamental',
+        'Fundación',
+        'Institución pública',
+        'Organización comunitaria',
+        'Otro',
+      ],
+
+      necesidades: [
+        'Alimentos',
+        'Medicamentos',
+        'Ropa',
+        'Útiles escolares',
+        'Productos de higiene',
+        'Artículos para animales',
+        'Apoyo económico',
+        'Otro',
+      ],
+
+      donaciones: [
+        'Alimentos',
+        'Ropa',
+        'Medicamentos',
+        'Útiles escolares',
+        'Productos de higiene',
+        'Dinero',
+        'Artículos para animales',
+        'Otro',
+      ],
+
+      actividadesVoluntariado: [
+        'Atención y acompañamiento',
+        'Apoyo educativo',
+        'Salud',
+        'Logística',
+        'Cocina',
+        'Limpieza',
+        'Cuidado de animales',
+        'Comunicación',
+        'Otro',
+      ],
+    },
+
+
+    resumen: {
+
+      titulo:
+        'RESUMEN DE LA SOLICITUD',
+
+      centroPlaceholder:
+        'Tu centro o refugio',
+
+      ubicacionPendiente:
+        'Ubicación pendiente',
+
+      paso:
+        'Paso',
+
+      verificacionTitulo:
+        '✓ Se mostrará tras la verificación',
+
+      verificacionDescripcion:
+        'La información no será pública hasta que un administrador revise y apruebe la solicitud.',
+
+      necesidadesTitulo:
+        'NECESIDADES PRIORITARIAS',
+
+      donacionesTitulo:
+        'DONACIONES QUE ACEPTA',
+
+      voluntariadoTitulo:
+        'VOLUNTARIADO',
+
+      sinSeleccionar:
+        'Aún no seleccionadas',
+
+      noSolicitaVoluntarios:
+        'No solicita voluntarios',
+
+      documentosAnadidos:
+        'Documentos añadidos',
+
+      resumenFooter:
+        'Podrás actualizar necesidades, horarios y vacantes cuando cambie la situación del centro.',
+    },
+
+
+    acciones: {
+
+      cancelar:
+        '← Cancelar',
+
+      atras:
+        '← Atrás',
+
+      guardarBorrador:
+        'Guardar borrador',
+
+      continuar:
+        'Continuar →',
+
+      entendido:
+        'Entendido',
+
+      revisarCompletar:
+        'Revisar y completar',
+
+      cerrar:
+        'Cerrar',
+
+      iniciarSesion:
+        'Iniciar sesión',
+    },
+
+
+    archivos: {
+
+      formatoInvalido:
+        'Formato no válido. Solo se permiten archivos PDF, JPG, PNG o WEBP.',
+
+      archivoGrande:
+        'El archivo es demasiado grande. El tamaño máximo permitido es de 10 MB.',
+
+      vistaPrevia:
+        'Vista previa',
+
+      documento:
+        'Documento',
+
+      cerrarVistaPrevia:
+        'Cerrar vista previa',
+    },
+
+
+    errores: {
+
+      departamentos:
+        'No se pudieron cargar los departamentos. Recarga la página.',
+
+      sesionExpirada:
+        'Tu sesión expiró. Inicia sesión nuevamente para enviar la solicitud.',
+
+      archivosGrandes:
+        'Los archivos superan el tamaño máximo permitido (10 MB por archivo).',
+
+      datosInvalidos:
+        'Algunos datos no son válidos. Revisa la información y completa lo que falta.',
+
+      errorEnvio:
+        'No se pudo registrar la solicitud. Revisa los datos e intenta nuevamente.',
+
+      tituloEnvio:
+        'No se pudo enviar la solicitud',
+
+      informacionConservada:
+        'Tu información sigue aquí; no se perdió nada.',
+
+      errorBorrador:
+        'No se pudo guardar el borrador.',
+    },
+
+
+    modalExito: {
+
+      badge:
+        'Estado: Pendiente de revisión',
+
+      titulo:
+        '¡Registro recibido!',
+
+      descripcion:
+        'La solicitud de',
+
+      descripcionFinal:
+        'fue enviada correctamente.',
+
+      queSigue:
+        '¿Qué sigue?',
+
+      paso1:
+        'El equipo administrador revisará los datos y documentos.',
+
+      paso2:
+        'Podrá contactarte al correo o teléfono del responsable.',
+
+      paso3:
+        'Si todo está en orden, el centro se publicará en la plataforma.',
+    },
+
+  },
 
 preferencias: {
   titulo: 'Preferencias de cuenta',
+
+  // ── Idioma (SOS-114) ──────────────────────────────────────────────────
+  idiomaSeccion: 'Idioma de la aplicación',
+  idiomaDescripcion: 'Cambia el idioma de la interfaz de SOS.exe.',
+  idiomaEspanol: 'Español',
+  idiomaIngles: 'Inglés',
+  idiomaGuardado: '✓ Idioma actualizado correctamente.',
+
+  // ── SMS ───────────────────────────────────────────────────────────────
   seccionSms: 'Alertas SMS por región',
   descripcionSms:
     'Recibe notificaciones inmediatas por mensaje de texto ante emergencias y desastres naturales en tu región.',
@@ -1129,6 +1796,54 @@ preferencias: {
   modalCancelarBoton: 'Mantener suscripción',
   estadoActivo: 'Activa',
   estadoInactivo: 'Inactiva',
+  configuracion: 'Configuración',
+  cancelando: 'Cancelando...',
+  guardando: 'Guardando...',
 },
 
+  alertas: {
+    admin: 'Administración',
+    encabezado: 'Crear alerta de emergencia',
+    descripcion: 'Completa los datos de la alerta. Se guardará como borrador.',
+    volver: 'Volver a administración',
+    titulo: 'Título',
+    region: 'Departamento / Región',
+    severidad: 'Severidad',
+    mensaje: 'Mensaje',
+    fuente: 'Fuente',
+    inicio: 'Inicio de vigencia',
+    fin: 'Fin de vigencia',
+    seleccionar: 'Selecciona una opción',
+    cargando: 'Cargando departamentos...',
+    guardar: 'Crear alerta',
+    guardando: 'Guardando...',
+    exito: 'Alerta creada correctamente como borrador.',
+    errorDepartamentos: 'No se pudieron cargar los departamentos. Recarga la página para intentar de nuevo.',
+    errorGuardar: 'No se pudo guardar la alerta. Intenta de nuevo.',
+    errorObligatorio: 'Completa este campo con un valor válido.',
+    errorLongitud: 'El texto supera la longitud permitida.',
+    errorVigencia: 'El fin de vigencia debe ser posterior al inicio.',
+    revisarEncabezado: 'Revisar alertas antes de publicar',
+    borradores: 'Alertas en borrador',
+    cargandoBorradores: 'Cargando borradores...',
+    sinBorradores: 'No hay alertas pendientes de publicación.',
+    errorBorradores: 'No se pudieron cargar los borradores.',
+    reintentar: 'Reintentar',
+    revisar: 'Revisar alerta',
+    cargandoRevision: 'Cargando vista previa...',
+    vistaPrevia: 'Vista previa de la alerta',
+    errorRevision: 'No se pudo cargar la vista previa. Intenta de nuevo.',
+    estado: 'Estado',
+    fuentePendiente: 'Fuente pendiente de completar',
+    avisoRevision: 'Revisa todos los datos antes de publicar. La publicación quedará registrada.',
+    confirmacionPublicar: 'He revisado la alerta y confirmo su publicación.',
+    confirmarPublicacion: 'Confirmar y publicar',
+    publicando: 'Publicando...',
+    exitoPublicar: 'Alerta publicada correctamente.',
+    errorPublicar: 'No se pudo confirmar la publicación. Vuelve a cargar la vista previa.',
+    errorCambio: 'La alerta cambió o ya fue publicada. Vuelve a cargar la vista previa para revisarla.',
+    recargarRevision: 'Volver a cargar vista previa',
+    volverBorradores: 'Volver a borradores',
+    yaNoEsBorrador: 'Esta alerta ya no es un borrador y no puede publicarse desde esta vista.',
+  },
 } as const;

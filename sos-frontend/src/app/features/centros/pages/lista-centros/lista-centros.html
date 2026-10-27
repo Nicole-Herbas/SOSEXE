@@ -1,7 +1,7 @@
 @if (cargando()) {
 
   <p>
-    {{ textos.cargando }}
+    {{ 'centros.cargando' | translate }}
   </p>
 
 } @else if (error()) {
@@ -13,7 +13,7 @@
 } @else if (centros().length === 0) {
 
   <p>
-    {{ textos.vacio }}
+    {{ 'centros.vacio' | translate }}
   </p>
 
 } @else {
@@ -28,7 +28,7 @@
 
       <p>
         <strong>
-          {{ textos.tipo }}
+          {{ 'centros.tipo' | translate }}
         </strong>
 
         {{ centro.tipo }}
@@ -36,7 +36,7 @@
 
       <p>
         <strong>
-          {{ textos.ciudad }}
+          {{ 'centros.ciudad' | translate }}
         </strong>
 
         {{ centro.ciudad }}
@@ -44,7 +44,7 @@
 
       <p>
         <strong>
-          {{ textos.direccion }}
+          {{ 'centros.direccion' | translate }}
         </strong>
 
         {{ centro.direccion }}

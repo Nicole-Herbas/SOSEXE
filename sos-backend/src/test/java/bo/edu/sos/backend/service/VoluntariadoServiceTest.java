@@ -4,9 +4,11 @@ import bo.edu.sos.backend.constants.EstadoVoluntariado;
 import bo.edu.sos.backend.dto.VoluntariadoDTO;
 import bo.edu.sos.backend.entity.Centro;
 import bo.edu.sos.backend.entity.Departamento;
+import bo.edu.sos.backend.entity.Necesidad;
 import bo.edu.sos.backend.entity.Usuario;
 import bo.edu.sos.backend.entity.Voluntariado;
 import bo.edu.sos.backend.exception.BadRequestException;
+import bo.edu.sos.backend.exception.ResourceNotFoundException;
 import bo.edu.sos.backend.repository.CentroRepository;
 import bo.edu.sos.backend.repository.UsuarioRepository;
 import bo.edu.sos.backend.repository.VoluntariadoRepository;
@@ -15,9 +17,13 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -99,6 +105,55 @@ class VoluntariadoServiceTest {
         verifyNoMoreInteractions(voluntariadoRepository);
     }
 
+    @ParameterizedTest
+    @ValueSource(ints = {1, 3})
+    void listarTodosIncluyeIdYNombreDeCadaNecesidadDelCentro(int cantidad) {
+        Voluntariado publicado = crearPublicado();
+        for (long id = cantidad; id >= 1; id--) {
+            Necesidad necesidad = new Necesidad();
+            necesidad.setId(id);
+            necesidad.setNombre("Necesidad " + id);
+            publicado.getCentro().getNecesidades().add(necesidad);
+        }
+        when(voluntariadoRepository.findByEstado("PUBLICADO"))
+                .thenReturn(List.of(publicado));
+
+        var necesidades = voluntariadoService.listarTodos().get(0).getCentroNecesidades();
+
+        assertEquals(cantidad, necesidades.size());
+        for (int indice = 0; indice < cantidad; indice++) {
+            assertEquals(indice + 1L, necesidades.get(indice).getId());
+            assertEquals("Necesidad " + (indice + 1), necesidades.get(indice).getNombre());
+        }
+    }
+
+    @Test
+    void listarTodosDevuelveColeccionVaciaParaCentroSinNecesidades() {
+        when(voluntariadoRepository.findByEstado("PUBLICADO"))
+                .thenReturn(List.of(crearPublicado()));
+
+        assertEquals(List.of(), voluntariadoService.listarTodos().get(0).getCentroNecesidades());
+    }
+
+    @Test
+    void listarTodosMantieneLasNecesidadesAsociadasACadaCentro() {
+        Voluntariado primero = crearPublicado();
+        Necesidad necesidad = new Necesidad();
+        necesidad.setId(7L);
+        necesidad.setNombre("Apoyo educativo");
+        primero.getCentro().getNecesidades().add(necesidad);
+        Voluntariado segundo = crearPublicado();
+        segundo.setId(5L);
+        segundo.getCentro().setId(6L);
+        when(voluntariadoRepository.findByEstado("PUBLICADO"))
+                .thenReturn(List.of(primero, segundo));
+
+        var resultado = voluntariadoService.listarTodos();
+
+        assertEquals(7L, resultado.get(0).getCentroNecesidades().get(0).getId());
+        assertTrue(resultado.get(1).getCentroNecesidades().isEmpty());
+    }
+
     @Test
     void listarTodosToleraCentroNulo() {
         Voluntariado publicado = crearPublicado();
@@ -113,6 +168,7 @@ class VoluntariadoServiceTest {
                 () -> assertNull(dto.getCentroNombre()),
                 () -> assertNull(dto.getCentroCiudad()),
                 () -> assertNull(dto.getCentroDepartamento()),
+                () -> assertEquals(List.of(), dto.getCentroNecesidades()),
                 () -> assertEquals(publicado.getTitulo(), dto.getTitulo())
         );
     }
@@ -209,7 +265,92 @@ class VoluntariadoServiceTest {
         assertFalse(EstadoVoluntariado.puedePublicarse(EstadoVoluntariado.CERRADO));
     }
 
+    // ── Tests de buscarPublicadaPorId (de main) ───────────────────
+
+    @Test
+    void buscarPublicadaPorIdConservaDescripcionHabilidadesHorarioYCentroSinIdentificarCreador() {
+        Voluntariado publicada = crearPublicado();
+        String descripcion = "Descripción completa.\n\n" + "Detalle de la actividad. ".repeat(30);
+        publicada.setDescripcion(descripcion);
+        publicada.setFechaInicio(LocalDateTime.of(2026, 10, 15, 9, 0));
+        publicada.setFechaFin(LocalDateTime.of(2026, 10, 15, 16, 0));
+        Necesidad necesidad = new Necesidad();
+        necesidad.setId(7L);
+        necesidad.setNombre("Apoyo educativo");
+        publicada.getCentro().getNecesidades().add(necesidad);
+        when(voluntariadoRepository.findById(1L)).thenReturn(Optional.of(publicada));
+
+        VoluntariadoDTO dto = voluntariadoService.buscarPublicadaPorId(1L);
+
+        assertAll(
+                () -> assertEquals(publicada.getId(), dto.getId()),
+                () -> assertEquals(publicada.getTitulo(), dto.getTitulo()),
+                () -> assertEquals(descripcion, dto.getDescripcion()),
+                () -> assertEquals(publicada.getHabilidadesRequeridas(), dto.getHabilidadesRequeridas()),
+                () -> assertEquals(publicada.getFechaInicio(), dto.getFechaInicio()),
+                () -> assertEquals(publicada.getFechaFin(), dto.getFechaFin()),
+                () -> assertEquals(2L, dto.getCentroId()),
+                () -> assertEquals("Centro de apoyo", dto.getCentroNombre()),
+                () -> assertEquals("El Alto", dto.getCentroCiudad()),
+                () -> assertEquals("La Paz", dto.getCentroDepartamento()),
+                () -> assertEquals(7L, dto.getCentroNecesidades().get(0).getId()),
+                () -> assertEquals("PUBLICADO", dto.getEstado()),
+                () -> assertNull(dto.getCreadoPorId()),
+                () -> assertEquals(4L, publicada.getCreadoPor().getId())
+        );
+        verify(voluntariadoRepository).findById(1L);
+        verifyNoMoreInteractions(voluntariadoRepository);
+        verifyNoInteractions(centroRepository, usuarioRepository);
+    }
+
+    @Test
+    void buscarPublicadaPorIdMantieneHabilidadesNulas() {
+        Voluntariado publicada = crearPublicado();
+        publicada.setHabilidadesRequeridas(null);
+        when(voluntariadoRepository.findById(1L)).thenReturn(Optional.of(publicada));
+
+        assertNull(voluntariadoService.buscarPublicadaPorId(1L).getHabilidadesRequeridas());
+        verifyNoInteractions(usuarioRepository);
+    }
+
+    @Test
+    void buscarPublicadaPorIdInexistenteLanzaRecursoNoEncontrado() {
+        when(voluntariadoRepository.findById(99L)).thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class,
+                () -> voluntariadoService.buscarPublicadaPorId(99L));
+    }
+
+    @ParameterizedTest
+    @NullSource
+    @ValueSource(strings = {"BORRADOR", "CERRADO", "FINALIZADO", "CANCELADO", "RECHAZADO", "publicado", "PUBLICADO "})
+    void buscarPublicadaPorIdRechazaCualquierEstadoDistintoDePublicado(String estado) {
+        Voluntariado oportunidad = crearPublicado();
+        oportunidad.setEstado(estado);
+        when(voluntariadoRepository.findById(1L)).thenReturn(Optional.of(oportunidad));
+
+        assertThrows(ResourceNotFoundException.class,
+                () -> voluntariadoService.buscarPublicadaPorId(1L));
+    }
+
+    @Test
+    void consultasAntiguasMantienenEstadoEIdentificadorDelCreador() {
+        Voluntariado borrador = crearPublicado();
+        borrador.setEstado("BORRADOR");
+        when(voluntariadoRepository.findById(1L)).thenReturn(Optional.of(borrador));
+        when(voluntariadoRepository.findByCentroId(2L)).thenReturn(List.of(borrador));
+
+        VoluntariadoDTO porId = voluntariadoService.buscarPorId(1L);
+        VoluntariadoDTO porCentro = voluntariadoService.buscarPorCentro(2L).get(0);
+
+        assertEquals("BORRADOR", porId.getEstado());
+        assertEquals(4L, porId.getCreadoPorId());
+        assertEquals("BORRADOR", porCentro.getEstado());
+        assertEquals(4L, porCentro.getCreadoPorId());
+    }
+
     // ── Helper ────────────────────────────────────────────────────
+
 
     private Voluntariado crearPublicado() {
         Departamento departamento = new Departamento();

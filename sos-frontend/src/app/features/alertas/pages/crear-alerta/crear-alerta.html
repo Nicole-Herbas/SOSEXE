@@ -1,0 +1,109 @@
+<section class="crear-alerta" aria-labelledby="crear-alerta-titulo">
+  <a routerLink="/admin">{{ 'alertas.volver' | translate }}</a>
+  <h1 id="crear-alerta-titulo">{{ 'alertas.encabezado' | translate }}</h1>
+  <p>{{ 'alertas.descripcion' | translate }}</p>
+  @if (cargando()) {
+    <p role="status">{{ 'alertas.cargando' | translate }}</p>
+  }
+  @if (errorDepartamentos()) {
+    <p role="alert">{{ errorDepartamentos() }}</p>
+  }
+  @if (mensajeError()) {
+    <p role="alert">{{ mensajeError() }}</p>
+  }
+  @if (mensajeExito()) {
+    <p class="exito" role="status">{{ mensajeExito() }}</p>
+    <a routerLink="/admin/alertas">{{ 'alertas.revisarEncabezado' | translate }}</a>
+  }
+
+  <form [formGroup]="formulario" (ngSubmit)="guardar()" novalidate>
+    <fieldset [disabled]="guardando() || cargando() || departamentos().length === 0">
+      @for (campo of camposTexto; track campo.nombre) {
+        <div class="campo">
+          <label [for]="campo.nombre">{{ campo.label }}</label>
+          @if (campo.nombre === 'mensaje') {
+            <textarea
+              [id]="campo.nombre"
+              [formControlName]="campo.nombre"
+              rows="5"
+              required
+              [maxlength]="campo.max"
+              [attr.aria-invalid]="!!errorCampo(campo.nombre)"
+              [attr.aria-describedby]="campo.nombre + '-error'"
+            ></textarea>
+          } @else {
+            <input
+              [id]="campo.nombre"
+              [formControlName]="campo.nombre"
+              type="text"
+              required
+              [maxlength]="campo.max"
+              [attr.aria-invalid]="!!errorCampo(campo.nombre)"
+              [attr.aria-describedby]="campo.nombre + '-error'"
+            />
+          }
+          <small [id]="campo.nombre + '-error'">{{ errorCampo(campo.nombre) }}</small>
+        </div>
+      }
+      <div class="campo">
+        <label for="departamentoId">{{ 'alertas.region' | translate }}</label>
+        <select
+          id="departamentoId"
+          formControlName="departamentoId"
+          required
+          [attr.aria-invalid]="!!errorCampo('departamentoId')"
+          aria-describedby="departamento-error"
+        >
+          <option [ngValue]="null">{{ 'alertas.seleccionar' | translate }}</option>
+          @for (departamento of departamentos(); track departamento.id) {
+            <option [ngValue]="departamento.id">{{ departamento.nombre }}</option>
+          }
+        </select>
+        <small id="departamento-error">{{ errorCampo('departamentoId') }}</small>
+      </div>
+      <div class="campo">
+        <label for="severidad">{{ 'alertas.severidad' | translate }}</label>
+        <select
+          id="severidad"
+          formControlName="severidad"
+          required
+          [attr.aria-invalid]="!!errorCampo('severidad')"
+          aria-describedby="severidad-error"
+        >
+          <option [ngValue]="null">{{ 'alertas.seleccionar' | translate }}</option>
+          @for (severidad of severidades; track severidad) {
+            <option [value]="severidad">{{ severidad }}</option>
+          }
+        </select>
+        <small id="severidad-error">{{ errorCampo('severidad') }}</small>
+      </div>
+      <div class="campo">
+        <label for="fechaPublicacion">{{ 'alertas.inicio' | translate }}</label>
+        <input
+          id="fechaPublicacion"
+          formControlName="fechaPublicacion"
+          type="datetime-local"
+          required
+          [attr.aria-invalid]="!!errorCampo('fechaPublicacion')"
+          aria-describedby="fechaPublicacion-error"
+        />
+        <small id="fechaPublicacion-error">{{ errorCampo('fechaPublicacion') }}</small>
+      </div>
+      <div class="campo">
+        <label for="fechaExpiracion">{{ 'alertas.fin' | translate }}</label>
+        <input
+          id="fechaExpiracion"
+          formControlName="fechaExpiracion"
+          type="datetime-local"
+          required
+          [attr.aria-invalid]="!!errorCampo('fechaExpiracion')"
+          aria-describedby="fechaExpiracion-error"
+        />
+        <small id="fechaExpiracion-error">{{ errorCampo('fechaExpiracion') }}</small>
+      </div>
+      <button type="submit" [disabled]="guardando()">
+        {{ (guardando() ? 'alertas.guardando' : 'alertas.guardar') | translate }}
+      </button>
+    </fieldset>
+  </form>
+</section>

@@ -1,17 +1,35 @@
-import { CanActivateFn, Router } from '@angular/router';
+
 import { inject } from '@angular/core';
+import { CanActivateFn, Router } from '@angular/router';
+
+import { catchError, map, of } from 'rxjs';
+
 import { AuthService } from './features/auth/services/auth.service';
 
-/**
- * Guard de autenticación para proteger rutas que requieren inicio de sesión (SOS-63).
- */
 export const authGuard: CanActivateFn = () => {
-  const router = inject(Router);
+
   const authService = inject(AuthService);
+  const router = inject(Router);
 
-  if (authService.estaAutenticado()) {
-    return true;
-  }
+  return authService.usuarioActual().pipe(
 
-  return router.createUrlTree(['/login']);
+    map(usuario => {
+
+      if (usuario?.email) {
+        return true;
+      }
+
+      return router.createUrlTree(['/login']);
+
+    }),
+
+    catchError(() => {
+
+      return of(
+        router.createUrlTree(['/login'])
+      );
+
+    })
+
+  );
 };

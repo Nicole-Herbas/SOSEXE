@@ -19,7 +19,8 @@ package bo.edu.sos.backend.constants;
  * ├── EstadoEnvioSms.java     ← estados de envío SMS (EnvioSms)
  * ├── MapaConstants.java      ← constantes del módulo Mapa (origen de puntos)
  * ├── DonacionConstants.java  ← constantes del módulo Donación (prefijo código)
- * └── NoticiaConstants.java   ← estados, categorías y URL de API externa de noticias
+ * ├── NoticiaConstants.java   ← estados, categorías y URL de API externa de noticias
+ * └── AppConstants.java       ← idiomas soportados (SOS-114)
  * </pre>
  *
  * <h2>Cómo agregar nuevas constantes</h2>
@@ -40,6 +41,16 @@ package bo.edu.sos.backend.constants;
  * }</pre>
  */
 public final class AppConstants {
+
+    // ── Idiomas soportados (SOS-114) ──────────────────────────────────────
+    /** Código ISO 639-1 para español (Bolivia). */
+    public static final String IDIOMA_ES      = "es";
+
+    /** Código ISO 639-1 para inglés (USA). */
+    public static final String IDIOMA_EN      = "en";
+
+    /** Idioma por defecto de la aplicación. */
+    public static final String IDIOMA_DEFAULT = IDIOMA_ES;
 
     private AppConstants() {}
 }

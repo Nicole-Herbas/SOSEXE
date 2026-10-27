@@ -3,25 +3,72 @@
     <header class="preferencias-header">
       <div class="preferencias-badge">
         <span class="badge-icon">⚙</span>
-        <span>Configuración</span>
+        <span>{{ 'preferencias.configuracion' | translate }}</span>
       </div>
-      <h1 class="preferencias-title">{{ textos.titulo }}</h1>
+      <h1 class="preferencias-title">{{ 'preferencias.titulo' | translate }}</h1>
     </header>
 
     @if (cargando()) {
       <div class="preferencias-loading">
         <div class="spinner"></div>
-        <p>{{ textos.cargandoEstado }}</p>
+        <p>{{ 'preferencias.cargandoEstado' | translate }}</p>
       </div>
     } @else {
+
+      <!-- SOS-114: Sección de selección de idioma -->
+      <section class="idioma-section">
+        <div class="idioma-header">
+          <div class="idioma-icon-wrapper">
+            <span class="idioma-icon">🌐</span>
+          </div>
+          <div>
+            <h2 class="idioma-title">{{ 'preferencias.idiomaSeccion' | translate }}</h2>
+            <p class="idioma-description">{{ 'preferencias.idiomaDescripcion' | translate }}</p>
+          </div>
+        </div>
+
+        <div class="idioma-opciones">
+          <button
+            id="btn-idioma-es"
+            type="button"
+            class="btn-idioma"
+            [class.activo]="idiomaActual() === 'es'"
+            (click)="cambiarIdioma('es')"
+            [attr.aria-pressed]="idiomaActual() === 'es'"
+          >
+            🇧🇴 {{ 'preferencias.idiomaEspanol' | translate }}
+          </button>
+
+          <button
+            id="btn-idioma-en"
+            type="button"
+            class="btn-idioma"
+            [class.activo]="idiomaActual() === 'en'"
+            (click)="cambiarIdioma('en')"
+            [attr.aria-pressed]="idiomaActual() === 'en'"
+          >
+            🇺🇸 {{ 'preferencias.idiomaIngles' | translate }}
+          </button>
+        </div>
+
+        @if (mensajeIdiomaGuardado()) {
+          <div class="alert alert-success idioma-confirmacion" role="status">
+            <span class="alert-icon">✓</span>
+            <span>{{ 'preferencias.idiomaGuardado' | translate }}</span>
+          </div>
+        }
+      </section>
+
+      <hr class="seccion-divisor" />
+
       <section class="sms-section">
         <div class="sms-header">
           <div class="sms-icon-wrapper">
             <span class="sms-icon">📱</span>
           </div>
           <div>
-            <h2 class="sms-title">{{ textos.seccionSms }}</h2>
-            <p class="sms-description">{{ textos.descripcionSms }}</p>
+            <h2 class="sms-title">{{ 'preferencias.seccionSms' | translate }}</h2>
+            <p class="sms-description">{{ 'preferencias.descripcionSms' | translate }}</p>
           </div>
         </div>
 
@@ -51,26 +98,26 @@
             <div class="activa-card-top">
               <div class="activa-badge">
                 <span class="dot-indicator"></span>
-                <span>{{ textos.suscripcionActiva }}</span>
+                <span>{{ 'preferencias.suscripcionActiva' | translate }}</span>
               </div>
-              <span class="estado-tag">{{ textos.estadoActivo }}</span>
+              <span class="estado-tag">{{ 'preferencias.estadoActivo' | translate }}</span>
             </div>
 
             <div class="activa-datos">
               <div class="dato-item">
-                <span class="dato-label">{{ textos.labelTelefono }}</span>
+                <span class="dato-label">{{ 'preferencias.labelTelefono' | translate }}</span>
                 <span class="dato-valor">📞 {{ suscripcionActual()?.telefono }}</span>
               </div>
               <div class="dato-item">
-                <span class="dato-label">{{ textos.labelRegion }}</span>
+                <span class="dato-label">{{ 'preferencias.labelRegion' | translate }}</span>
                 <span class="dato-valor">📍 {{ suscripcionActual()?.departamentoNombre }}</span>
               </div>
             </div>
 
             @if (confirmandoCancelacion()) {
               <div class="confirmacion-box">
-                <h3 class="confirmacion-titulo">{{ textos.modalConfirmarTitulo }}</h3>
-                <p class="confirmacion-advertencia">{{ textos.advertenciaCancelacion }}</p>
+                <h3 class="confirmacion-titulo">{{ 'preferencias.modalConfirmarTitulo' | translate }}</h3>
+                <p class="confirmacion-advertencia">{{ 'preferencias.advertenciaCancelacion' | translate }}</p>
 
                 <div class="confirmacion-actions">
                   <button
@@ -81,9 +128,9 @@
                   >
                     @if (cancelando()) {
                       <span class="btn-spinner"></span>
-                      <span>Cancelando...</span>
+                      <span>{{ 'preferencias.cancelando' | translate }}</span>
                     } @else {
-                      <span>{{ textos.modalConfirmarBoton }}</span>
+                      <span>{{ 'preferencias.modalConfirmarBoton' | translate }}</span>
                     }
                   </button>
                   <button
@@ -92,7 +139,7 @@
                     (click)="descartarCancelacion()"
                     [disabled]="cancelando()"
                   >
-                    {{ textos.modalCancelarBoton }}
+                    {{ 'preferencias.modalCancelarBoton' | translate }}
                   </button>
                 </div>
               </div>
@@ -103,7 +150,7 @@
                   class="btn-cancelar-suscripcion"
                   (click)="solicitarCancelacion()"
                 >
-                  {{ textos.botonCancelar }}
+                  {{ 'preferencias.botonCancelar' | translate }}
                 </button>
               </div>
             }
@@ -112,7 +159,7 @@
           <form [formGroup]="formulario" (ngSubmit)="guardar()" class="sms-form">
             <div class="form-group" [class.has-error]="telefonoInvalido">
               <label for="telefono-sms" class="form-label">
-                {{ textos.labelTelefono }} <span class="required">*</span>
+                {{ 'preferencias.labelTelefono' | translate }} <span class="required">*</span>
               </label>
               <div class="input-wrapper">
                 <span class="input-prefix">📞</span>
@@ -121,18 +168,18 @@
                   type="tel"
                   formControlName="telefono"
                   class="form-control"
-                  [placeholder]="textos.placeholderTelefono"
+                  [placeholder]="'preferencias.placeholderTelefono' | translate"
                   autocomplete="tel"
                 />
               </div>
               @if (telefonoInvalido) {
-                <small class="error-text">{{ textos.errorTelefono }}</small>
+                <small class="error-text">{{ 'preferencias.errorTelefono' | translate }}</small>
               }
             </div>
 
             <div class="form-group" [class.has-error]="departamentoInvalido">
               <label for="departamento-sms" class="form-label">
-                {{ textos.labelRegion }} <span class="required">*</span>
+                {{ 'preferencias.labelRegion' | translate }} <span class="required">*</span>
               </label>
               <div class="input-wrapper">
                 <span class="input-prefix">📍</span>
@@ -143,9 +190,9 @@
                 >
                   <option [ngValue]="null" disabled>
                     @if (cargandoDepartamentos()) {
-                      {{ textos.cargandoDepartamentos }}
+                      {{ 'preferencias.cargandoDepartamentos' | translate }}
                     } @else {
-                      {{ textos.placeholderRegion }}
+                      {{ 'preferencias.placeholderRegion' | translate }}
                     }
                   </option>
                   @for (dpto of departamentos; track dpto.id) {
@@ -154,7 +201,7 @@
                 </select>
               </div>
               @if (departamentoInvalido) {
-                <small class="error-text">{{ textos.errorRegion }}</small>
+                <small class="error-text">{{ 'preferencias.errorRegion' | translate }}</small>
               }
             </div>
 
@@ -166,7 +213,7 @@
                   id="consentimiento-sms"
                 />
                 <span class="checkbox-checkmark"></span>
-                <span class="checkbox-label">{{ textos.labelConsentimiento }}</span>
+                <span class="checkbox-label">{{ 'preferencias.labelConsentimiento' | translate }}</span>
               </label>
             </div>
 
@@ -178,9 +225,9 @@
               >
                 @if (guardando()) {
                   <span class="btn-spinner"></span>
-                  <span>Guardando...</span>
+                  <span>{{ 'preferencias.guardando' | translate }}</span>
                 } @else {
-                  <span>{{ textos.botonSuscribir }}</span>
+                  <span>{{ 'preferencias.botonSuscribir' | translate }}</span>
                 }
               </button>
             </div>
