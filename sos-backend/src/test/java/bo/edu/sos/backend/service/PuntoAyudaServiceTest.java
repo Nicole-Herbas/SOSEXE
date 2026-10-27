@@ -1,4 +1,3 @@
-
 package bo.edu.sos.backend.service;
 
 import bo.edu.sos.backend.constants.EstadoVerificacion;
@@ -8,6 +7,7 @@ import bo.edu.sos.backend.entity.Departamento;
 import bo.edu.sos.backend.entity.Necesidad;
 import bo.edu.sos.backend.entity.PuntoAyuda;
 import bo.edu.sos.backend.entity.Usuario;
+import bo.edu.sos.backend.exception.BadRequestException;
 import bo.edu.sos.backend.repository.DepartamentoRepository;
 import bo.edu.sos.backend.repository.NecesidadRepository;
 import bo.edu.sos.backend.repository.PuntoAyudaRepository;
@@ -45,7 +45,6 @@ class PuntoAyudaServiceTest {
     @Mock
     private NecesidadRepository necesidadRepository;
 
-
     private PuntoAyudaService puntoAyudaService;
 
 
@@ -59,6 +58,46 @@ class PuntoAyudaServiceTest {
                         usuarioRepository,
                         necesidadRepository
                 );
+    }
+
+
+    // ==========================================
+    // MÁQUINA DE ESTADOS (SOS-65)
+    // ==========================================
+
+    @Test
+    void cambiarEstado_rechazaEstadoInvalido_sinTocarLaBaseDeDatos() {
+
+        assertThrows(BadRequestException.class,
+                () -> puntoAyudaService.cambiarEstado(1L, "INVENTADO"));
+
+        verifyNoInteractions(puntoAyudaRepository);
+    }
+
+    @Test
+    void esValido_aceptaLosCuatroEstadosDefinidos() {
+
+        assertTrue(EstadoVerificacion.esValido(EstadoVerificacion.PENDIENTE));
+        assertTrue(EstadoVerificacion.esValido(EstadoVerificacion.EN_REVISION));
+        assertTrue(EstadoVerificacion.esValido(EstadoVerificacion.VERIFICADO));
+        assertTrue(EstadoVerificacion.esValido(EstadoVerificacion.RECHAZADO));
+    }
+
+    @Test
+    void esValido_rechazaValoresFueraDeLaLista() {
+
+        assertFalse(EstadoVerificacion.esValido("APROBADO"));
+        assertFalse(EstadoVerificacion.esValido(""));
+        assertFalse(EstadoVerificacion.esValido(null));
+    }
+
+    @Test
+    void puedePublicarse_soloVerdaderoParaVerificado() {
+
+        assertTrue(EstadoVerificacion.puedePublicarse(EstadoVerificacion.VERIFICADO));
+        assertFalse(EstadoVerificacion.puedePublicarse(EstadoVerificacion.PENDIENTE));
+        assertFalse(EstadoVerificacion.puedePublicarse(EstadoVerificacion.EN_REVISION));
+        assertFalse(EstadoVerificacion.puedePublicarse(EstadoVerificacion.RECHAZADO));
     }
 
 
@@ -203,7 +242,7 @@ class PuntoAyudaServiceTest {
 
 
         List<PuntoAyudaDTO> resultado =
-                puntoAyudaService.listarTodos();
+                puntoAyudaService.listarTodosAdmin();
 
 
         assertEquals(1, resultado.size());

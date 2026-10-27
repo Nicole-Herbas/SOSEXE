@@ -11,5 +11,7 @@ public interface PuntoAyudaRepository extends JpaRepository<PuntoAyuda, Long> {
 
     List<PuntoAyuda> findByEstadoVerificacion(String estadoVerificacion);
 
+    long countByEstadoVerificacion(String estadoVerificacion);
+
     List<PuntoAyuda> findByCreadorIdOrderByFechaCreacionDesc(Long creadorId);
 }

@@ -93,7 +93,7 @@ class MapaServiceTest {
 
         when(centroRepository.findAll())
                 .thenReturn(List.of(centro));
-        when(puntoAyudaRepository.findAll())
+        when(puntoAyudaRepository.findByEstadoVerificacion("VERIFICADO"))
                 .thenReturn(List.of(punto));
 
 
@@ -151,7 +151,7 @@ class MapaServiceTest {
         when(centroRepository.findAll())
                 .thenReturn(List.of());
 
-        when(puntoAyudaRepository.findAll())
+        when(puntoAyudaRepository.findByEstadoVerificacion("VERIFICADO"))
                 .thenReturn(List.of(refugio));
 
         List<PuntoMapaDTO> resultado =
@@ -167,6 +167,7 @@ class MapaServiceTest {
         assertEquals("REFUGIO", resultado.get(0).getTipo());
         assertTrue(resultado.get(0).getNecesidades().contains("Agua"));
     }
+
     @Test
     void listarPuntosMapaDebeBuscarIgnorandoTildesYMayusculas() {
 
@@ -188,9 +189,6 @@ class MapaServiceTest {
         when(centroRepository.findAll())
                 .thenReturn(List.of(centro));
 
-        when(puntoAyudaRepository.findAll())
-                .thenReturn(List.of());
-
         List<PuntoMapaDTO> resultado =
                 mapaService.listarPuntosMapa(
                         null,
@@ -202,6 +200,7 @@ class MapaServiceTest {
         assertEquals(1, resultado.size());
         assertEquals("Centro San José", resultado.get(0).getNombre());
     }
+
     @Test
     void buscarDetalleDebeRetornarCentroOPuntoSegunOrigen() {
 
@@ -266,8 +265,8 @@ class MapaServiceTest {
         when(centroRepository.findAll())
                 .thenReturn(List.of());
 
-        when(puntoAyudaRepository.findAll())
-                .thenReturn(List.of(punto));
+        when(puntoAyudaRepository.findByEstadoVerificacion("VERIFICADO"))
+                .thenReturn(List.of());
 
 
         List<PuntoMapaDTO> resultado =

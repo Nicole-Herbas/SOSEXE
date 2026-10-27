@@ -43,11 +43,15 @@ public class PuntoAyudaController {
 
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<PuntoAyudaDTO>>> listarTodos() {
-
+    public ResponseEntity<ApiResponse<List<PuntoAyudaDTO>>> listarPublicos() {
         return ResponseEntity.ok(
-                ApiResponse.ok(puntoAyudaService.listarTodos())
-        );
+                ApiResponse.ok(puntoAyudaService.listarPublicos()));
+    }
+
+    @GetMapping("/admin")
+    public ResponseEntity<ApiResponse<List<PuntoAyudaDTO>>> listarTodosAdmin() {
+        return ResponseEntity.ok(
+                ApiResponse.ok(puntoAyudaService.listarTodosAdmin()));
     }
 
 
@@ -98,6 +102,19 @@ public class PuntoAyudaController {
                 ApiResponse.ok(
                         "Punto de ayuda actualizado",
                         puntoAyudaService.actualizar(id, puntoAyudaDTO)
+                )
+        );
+    }
+
+    @PatchMapping("/{id}/estado")
+    public ResponseEntity<ApiResponse<PuntoAyudaDTO>> cambiarEstado(
+            @PathVariable Long id,
+            @RequestParam String estado) {
+
+        return ResponseEntity.ok(
+                ApiResponse.ok(
+                        "Estado de punto de ayuda actualizado",
+                        puntoAyudaService.cambiarEstado(id, estado)
                 )
         );
     }

@@ -1,6 +1,7 @@
 package bo.edu.sos.backend.service;
 
 import bo.edu.sos.backend.constants.MapaConstants;
+import bo.edu.sos.backend.constants.EstadoVerificacion;
 import bo.edu.sos.backend.dto.PuntoMapaDTO;
 import bo.edu.sos.backend.entity.Centro;
 import bo.edu.sos.backend.entity.Necesidad;
@@ -11,6 +12,7 @@ import bo.edu.sos.backend.helper.LogHelper;
 import bo.edu.sos.backend.repository.CentroRepository;
 import bo.edu.sos.backend.repository.PuntoAyudaRepository;
 
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,7 +20,6 @@ import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import bo.edu.sos.backend.constants.EstadoVerificacion;
 
 
 @Service
@@ -72,12 +73,8 @@ public class MapaService {
 
 
         puntoAyudaRepository
-                .findAll()
-                .stream()
-                .filter(punto ->
-                        EstadoVerificacion.VERIFICADO.equals(
-                                punto.getEstadoVerificacion()
-                        )
+                .findByEstadoVerificacion(
+                        EstadoVerificacion.VERIFICADO
                 )
                 .forEach(punto ->
                         puntos.add(
@@ -86,6 +83,7 @@ public class MapaService {
                                 )
                         )
                 );
+
 
 
         List<PuntoMapaDTO> resultado =

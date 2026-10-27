@@ -6,6 +6,7 @@ import bo.edu.sos.backend.entity.Departamento;
 import bo.edu.sos.backend.entity.Necesidad;
 import bo.edu.sos.backend.entity.PuntoAyuda;
 import bo.edu.sos.backend.entity.Usuario;
+import bo.edu.sos.backend.exception.BadRequestException;
 import bo.edu.sos.backend.exception.ResourceNotFoundException;
 import bo.edu.sos.backend.helper.LogHelper;
 import bo.edu.sos.backend.repository.DepartamentoRepository;
@@ -48,7 +49,31 @@ public class PuntoAyudaService {
 
 
     @Transactional(readOnly = true)
-    public List<PuntoAyudaDTO> listarTodos() {
+    public List<PuntoAyudaDTO> listarPublicos() {
+
+        List<PuntoAyudaDTO> puntos =
+                puntoAyudaRepository
+                        .findByEstadoVerificacion(
+                                EstadoVerificacion.VERIFICADO
+                        )
+                        .stream()
+                        .map(this::convertirADTO)
+                        .toList();
+
+
+        LogHelper.debug(
+                PuntoAyudaService.class,
+                "Listado público de puntos de ayuda obtenido. cantidad={}",
+                puntos.size()
+        );
+
+
+        return puntos;
+    }
+
+
+    @Transactional(readOnly = true)
+    public List<PuntoAyudaDTO> listarTodosAdmin() {
 
         List<PuntoAyudaDTO> puntos =
                 puntoAyudaRepository
@@ -65,7 +90,7 @@ public class PuntoAyudaService {
 
         LogHelper.debug(
                 PuntoAyudaService.class,
-                "Listado de puntos de ayuda obtenido. cantidad={}",
+                "Listado administrativo de puntos de ayuda obtenido. cantidad={}",
                 puntos.size()
         );
 
@@ -311,6 +336,38 @@ public class PuntoAyudaService {
         return convertirADTO(
                 actualizado
         );
+    }
+
+
+    @Transactional
+    public PuntoAyudaDTO cambiarEstado(
+            Long id,
+            String nuevoEstado) {
+
+        if (!EstadoVerificacion.esValido(nuevoEstado)) {
+            throw new BadRequestException(
+                    "Estado de verificación inválido: " + nuevoEstado
+                            + ". Valores permitidos: "
+                            + EstadoVerificacion.VALORES);
+        }
+
+        PuntoAyuda punto = puntoAyudaRepository
+                .findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Punto de ayuda", id));
+
+        punto.setEstadoVerificacion(nuevoEstado);
+
+        PuntoAyuda actualizado = puntoAyudaRepository.save(punto);
+
+        LogHelper.info(
+                PuntoAyudaService.class,
+                "Estado de punto de ayuda actualizado. id={}, estado={}",
+                id,
+                nuevoEstado
+        );
+
+        return convertirADTO(actualizado);
     }
 
 
