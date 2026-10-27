@@ -83,6 +83,24 @@ public class VoluntariadoController {
         );
     }
 
+    @PatchMapping("/{id}/estado")
+    public ResponseEntity<ApiResponse<VoluntariadoDTO>> cambiarEstado(
+            @PathVariable Long id,
+            @RequestParam String estado,
+            Authentication authentication) {
+
+        return ResponseEntity.ok(
+                ApiResponse.ok(
+                        "Estado de voluntariado actualizado",
+                        voluntariadoService.cambiarEstado(
+                                id,
+                                estado,
+                                authentication.getName()
+                        )
+                )
+        );
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>> eliminar(
             @PathVariable Long id,

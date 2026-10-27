@@ -1,5 +1,7 @@
 package bo.edu.sos.backend.service;
 
+import bo.edu.sos.backend.constants.EstadoVoluntariado;
+import bo.edu.sos.backend.constants.Roles;
 import bo.edu.sos.backend.dto.NecesidadDTO;
 import bo.edu.sos.backend.dto.VoluntariadoDTO;
 import bo.edu.sos.backend.entity.Centro;
@@ -208,7 +210,7 @@ public class VoluntariadoService {
 
 
         voluntariado.setEstado(
-                "BORRADOR"
+                EstadoVoluntariado.BORRADOR
         );
 
 
@@ -368,6 +370,56 @@ public class VoluntariadoService {
         );
     }
 
+    @Transactional
+    public VoluntariadoDTO cambiarEstado(
+            Long id,
+            String nuevoEstado,
+            String emailAutenticado) {
+
+        if (!EstadoVoluntariado.esValido(nuevoEstado)) {
+            throw new BadRequestException(
+                    "Estado de voluntariado inválido: " + nuevoEstado
+                            + ". Valores permitidos: "
+                            + EstadoVoluntariado.VALORES);
+        }
+
+        Voluntariado voluntariado = voluntariadoRepository
+                .findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Voluntariado", id));
+
+        Usuario usuario = usuarioRepository
+                .findByEmail(emailAutenticado)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "No existe un usuario con email: " + emailAutenticado));
+
+        if (!puedeAdministrarCentro(usuario, voluntariado.getCentro())) {
+            throw new ForbiddenException(
+                    "No tienes permiso para cambiar el estado de este voluntariado");
+        }
+
+        String estadoActual = voluntariado.getEstado();
+
+        if (!EstadoVoluntariado.transicionPermitida(estadoActual, nuevoEstado)) {
+            throw new BadRequestException(
+                    "Transición de estado no permitida: "
+                            + estadoActual + " → " + nuevoEstado);
+        }
+
+        voluntariado.setEstado(nuevoEstado);
+
+        Voluntariado actualizado = voluntariadoRepository.save(voluntariado);
+
+        LogHelper.info(
+                VoluntariadoService.class,
+                "Estado de voluntariado actualizado. id={}, {} → {}",
+                id,
+                estadoActual,
+                nuevoEstado
+        );
+
+        return convertirADTO(actualizado);
+    }
 
     private void copiarDTOaEntidad(
             VoluntariadoDTO dto,
@@ -515,7 +567,7 @@ public class VoluntariadoService {
             Centro centro) {
 
         boolean esAdmin =
-                "ADMIN".equals(
+                Roles.ADMIN.equals(
                         usuario
                                 .getRol()
                                 .getNombre()

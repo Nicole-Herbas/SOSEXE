@@ -1,11 +1,13 @@
 package bo.edu.sos.backend.service;
 
+import bo.edu.sos.backend.constants.EstadoVoluntariado;
 import bo.edu.sos.backend.dto.VoluntariadoDTO;
 import bo.edu.sos.backend.entity.Centro;
 import bo.edu.sos.backend.entity.Departamento;
 import bo.edu.sos.backend.entity.Necesidad;
 import bo.edu.sos.backend.entity.Usuario;
 import bo.edu.sos.backend.entity.Voluntariado;
+import bo.edu.sos.backend.exception.BadRequestException;
 import bo.edu.sos.backend.exception.ResourceNotFoundException;
 import bo.edu.sos.backend.repository.CentroRepository;
 import bo.edu.sos.backend.repository.UsuarioRepository;
@@ -48,6 +50,8 @@ class VoluntariadoServiceTest {
                 usuarioRepository
         );
     }
+
+    // ── Tests originales de listarTodos ───────────────────────────
 
     @Test
     void listarTodosConsultaUnicamentePublicados() {
@@ -185,6 +189,84 @@ class VoluntariadoServiceTest {
         );
     }
 
+    // ── Tests nuevos: validación de estados ───────────────────────
+
+    @Test
+    void cambiarEstado_rechazaEstadoInvalido_sinTocarLaBaseDeDatos() {
+        assertThrows(BadRequestException.class,
+                () -> voluntariadoService.cambiarEstado(
+                        1L, "INVENTADO", "admin@sos.org"));
+
+        verifyNoInteractions(voluntariadoRepository);
+    }
+
+    @Test
+    void esValido_aceptaLosCincoEstadosDefinidos() {
+        assertTrue(EstadoVoluntariado.esValido(EstadoVoluntariado.BORRADOR));
+        assertTrue(EstadoVoluntariado.esValido(EstadoVoluntariado.PUBLICADO));
+        assertTrue(EstadoVoluntariado.esValido(EstadoVoluntariado.CERRADO));
+        assertTrue(EstadoVoluntariado.esValido(EstadoVoluntariado.CANCELADO));
+        assertTrue(EstadoVoluntariado.esValido(EstadoVoluntariado.ARCHIVADO));
+    }
+
+    @Test
+    void esValido_rechazaValoresFueraDeLaLista() {
+        assertFalse(EstadoVoluntariado.esValido("ABIERTO"));
+        assertFalse(EstadoVoluntariado.esValido(""));
+        assertFalse(EstadoVoluntariado.esValido(null));
+    }
+
+    // ── Tests nuevos: transiciones permitidas ─────────────────────
+
+    @Test
+    void transicionPermitida_borradorAPublicado() {
+        assertTrue(EstadoVoluntariado.transicionPermitida(
+                EstadoVoluntariado.BORRADOR, EstadoVoluntariado.PUBLICADO));
+    }
+
+    @Test
+    void transicionPermitida_publicadoACerrado() {
+        assertTrue(EstadoVoluntariado.transicionPermitida(
+                EstadoVoluntariado.PUBLICADO, EstadoVoluntariado.CERRADO));
+    }
+
+    @Test
+    void transicionPermitida_cerradoAArchivado() {
+        assertTrue(EstadoVoluntariado.transicionPermitida(
+                EstadoVoluntariado.CERRADO, EstadoVoluntariado.ARCHIVADO));
+    }
+
+    // ── Tests nuevos: transiciones prohibidas ─────────────────────
+
+    @Test
+    void transicionNoPermitida_borradorAArchivadoDirecto() {
+        assertFalse(EstadoVoluntariado.transicionPermitida(
+                EstadoVoluntariado.BORRADOR, EstadoVoluntariado.ARCHIVADO));
+    }
+
+    @Test
+    void transicionNoPermitida_desdeArchivado() {
+        assertFalse(EstadoVoluntariado.transicionPermitida(
+                EstadoVoluntariado.ARCHIVADO, EstadoVoluntariado.PUBLICADO));
+    }
+
+    @Test
+    void transicionNoPermitida_mismoEstado() {
+        assertFalse(EstadoVoluntariado.transicionPermitida(
+                EstadoVoluntariado.BORRADOR, EstadoVoluntariado.BORRADOR));
+    }
+
+    // ── Tests nuevos: reglas de publicación ───────────────────────
+
+    @Test
+    void puedePublicarse_soloVerdaderoParaPublicado() {
+        assertTrue(EstadoVoluntariado.puedePublicarse(EstadoVoluntariado.PUBLICADO));
+        assertFalse(EstadoVoluntariado.puedePublicarse(EstadoVoluntariado.BORRADOR));
+        assertFalse(EstadoVoluntariado.puedePublicarse(EstadoVoluntariado.CERRADO));
+    }
+
+    // ── Tests de buscarPublicadaPorId (de main) ───────────────────
+
     @Test
     void buscarPublicadaPorIdConservaDescripcionHabilidadesHorarioYCentroSinIdentificarCreador() {
         Voluntariado publicada = crearPublicado();
@@ -266,6 +348,9 @@ class VoluntariadoServiceTest {
         assertEquals("BORRADOR", porCentro.getEstado());
         assertEquals(4L, porCentro.getCreadoPorId());
     }
+
+    // ── Helper ────────────────────────────────────────────────────
+
 
     private Voluntariado crearPublicado() {
         Departamento departamento = new Departamento();
