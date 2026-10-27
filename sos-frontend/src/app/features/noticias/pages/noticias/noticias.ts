@@ -7,11 +7,16 @@ import {
 import { APP_TEXTOS } from '../../../../shared/constants/app-textos.constants';
 import { Noticia } from '../../models/noticia.model';
 import { NoticiaService } from '../../services/noticia.service';
-import { CATEGORIAS_NOTICIAS, filtrarNoticiasPorCategoria } from '../../utils/categoria-noticia';
+import {
+  CATEGORIAS_NOTICIAS,
+  claveTraduccionCategoria,
+  filtrarNoticiasPorCategoria,
+} from '../../utils/categoria-noticia';
 import { recortarResumen } from '../../utils/resumen-noticia';
+import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
 
 @Component({
-  imports: [RouterLink],
+  imports: [RouterLink, TranslatePipe],
   selector: 'app-noticias',
   styleUrl: './noticias.scss',
   templateUrl: './noticias.html',
@@ -21,6 +26,7 @@ export class Noticias implements OnInit {
 
   readonly textos = APP_TEXTOS.noticias;
   readonly resumenVistaPrevia = recortarResumen;
+  readonly claveCategoria = claveTraduccionCategoria;
   readonly featureToggles: Pick<FeatureToggles, 'noticias'> = {
     noticias: { ...FEATURE_TOGGLES.noticias },
   };

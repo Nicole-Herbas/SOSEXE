@@ -54,6 +54,7 @@ describe('Noticias', () => {
     httpTesting = TestBed.inject(HttpTestingController);
     fixture = TestBed.createComponent(Noticias);
     component = fixture.componentInstance;
+    httpTesting.match(req => req.url.includes('/i18n/')).forEach(req => req.flush({}));
   });
 
   afterEach(() => httpTesting.verify());

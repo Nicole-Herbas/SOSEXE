@@ -23,7 +23,7 @@ public final class ApiRoutes {
 
     // ── Departamentos (catálogo) ─────────────────────────────────────────────
     public static final String DEPARTAMENTOS  = "/api/departamentos";
-
+    public static final String NECESIDADES    = "/api/necesidades";
     // ── Noticias ─────────────────────────────────────────────────────────────
     public static final String NOTICIAS           = "/api/noticias";
     public static final String NOTICIAS_PUBLICAS  = NOTICIAS + "/publicas";
@@ -53,11 +53,17 @@ public final class ApiRoutes {
 
     // ── Perfil de voluntario (SOS-40) ─────────────────────────────────────────
     public static final String PERFIL_VOLUNTARIO = "/api/perfil-voluntario";
+    // ── Suscripciones SMS (SOS-63, SOS-69) ───────────────────────────────────
+    public static final String SUSCRIPCION_SMS   = "/api/suscripcion-sms";
+    public static final String SUSCRIPCIONES_SMS = "/api/suscripciones-sms";
 
     // ── Swagger / OpenAPI ─────────────────────────────────────────────────────
     public static final String SWAGGER_UI     = "/swagger-ui/**";
     public static final String SWAGGER_HTML   = "/swagger-ui.html";
     public static final String OPENAPI_DOCS   = "/v3/api-docs/**";
+
+    // ── Administración ───────────────────────────────────────────────────────
+    public static final String ADMIN_DASHBOARD = "/api/admin/dashboard";
 
     private ApiRoutes() {}
 }

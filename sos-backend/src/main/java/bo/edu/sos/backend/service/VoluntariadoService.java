@@ -1,7 +1,11 @@
 package bo.edu.sos.backend.service;
 
+import bo.edu.sos.backend.constants.EstadoVoluntariado;
+import bo.edu.sos.backend.constants.Roles;
+import bo.edu.sos.backend.dto.NecesidadDTO;
 import bo.edu.sos.backend.dto.VoluntariadoDTO;
 import bo.edu.sos.backend.entity.Centro;
+import bo.edu.sos.backend.entity.Necesidad;
 import bo.edu.sos.backend.entity.Usuario;
 import bo.edu.sos.backend.entity.Voluntariado;
 import bo.edu.sos.backend.exception.BadRequestException;
@@ -15,6 +19,7 @@ import bo.edu.sos.backend.repository.VoluntariadoRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Comparator;
 import java.util.List;
 
 
@@ -42,7 +47,7 @@ public class VoluntariadoService {
 
         List<VoluntariadoDTO> voluntariados =
                 voluntariadoRepository
-                        .findAll()
+                        .findByEstado("PUBLICADO")
                         .stream()
                         .map(this::convertirADTO)
                         .toList();
@@ -56,6 +61,26 @@ public class VoluntariadoService {
 
 
         return voluntariados;
+    }
+
+
+    @Transactional(readOnly = true)
+    public VoluntariadoDTO buscarPublicadaPorId(Long id) {
+        Voluntariado voluntariado = voluntariadoRepository.findById(id)
+                .filter(oportunidad -> "PUBLICADO".equals(oportunidad.getEstado()))
+                .orElseThrow(() -> new ResourceNotFoundException("Voluntariado", id));
+
+        VoluntariadoDTO dto = convertirADTO(voluntariado);
+        // El detalle ciudadano no necesita identificar al usuario que creó la oportunidad.
+        dto.setCreadoPorId(null);
+
+        LogHelper.debug(
+                VoluntariadoService.class,
+                "Detalle público de voluntariado consultado. id={}",
+                id
+        );
+
+        return dto;
     }
 
 
@@ -185,7 +210,7 @@ public class VoluntariadoService {
 
 
         voluntariado.setEstado(
-                "BORRADOR"
+                EstadoVoluntariado.BORRADOR
         );
 
 
@@ -345,6 +370,56 @@ public class VoluntariadoService {
         );
     }
 
+    @Transactional
+    public VoluntariadoDTO cambiarEstado(
+            Long id,
+            String nuevoEstado,
+            String emailAutenticado) {
+
+        if (!EstadoVoluntariado.esValido(nuevoEstado)) {
+            throw new BadRequestException(
+                    "Estado de voluntariado inválido: " + nuevoEstado
+                            + ". Valores permitidos: "
+                            + EstadoVoluntariado.VALORES);
+        }
+
+        Voluntariado voluntariado = voluntariadoRepository
+                .findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Voluntariado", id));
+
+        Usuario usuario = usuarioRepository
+                .findByEmail(emailAutenticado)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "No existe un usuario con email: " + emailAutenticado));
+
+        if (!puedeAdministrarCentro(usuario, voluntariado.getCentro())) {
+            throw new ForbiddenException(
+                    "No tienes permiso para cambiar el estado de este voluntariado");
+        }
+
+        String estadoActual = voluntariado.getEstado();
+
+        if (!EstadoVoluntariado.transicionPermitida(estadoActual, nuevoEstado)) {
+            throw new BadRequestException(
+                    "Transición de estado no permitida: "
+                            + estadoActual + " → " + nuevoEstado);
+        }
+
+        voluntariado.setEstado(nuevoEstado);
+
+        Voluntariado actualizado = voluntariadoRepository.save(voluntariado);
+
+        LogHelper.info(
+                VoluntariadoService.class,
+                "Estado de voluntariado actualizado. id={}, {} → {}",
+                id,
+                estadoActual,
+                nuevoEstado
+        );
+
+        return convertirADTO(actualizado);
+    }
 
     private void copiarDTOaEntidad(
             VoluntariadoDTO dto,
@@ -447,6 +522,29 @@ public class VoluntariadoService {
                             .getCentro()
                             .getNombre()
             );
+
+            dto.setCentroCiudad(
+                    voluntariado
+                            .getCentro()
+                            .getCiudad()
+            );
+
+            dto.setCentroNecesidades(
+                    voluntariado.getCentro().getNecesidades().stream()
+                            .sorted(Comparator.comparing(Necesidad::getId))
+                            .map(necesidad -> new NecesidadDTO(necesidad.getId(), necesidad.getNombre()))
+                            .toList()
+            );
+
+            if (voluntariado.getCentro().getDepartamento() != null) {
+
+                dto.setCentroDepartamento(
+                        voluntariado
+                                .getCentro()
+                                .getDepartamento()
+                                .getNombre()
+                );
+            }
         }
 
 
@@ -469,7 +567,7 @@ public class VoluntariadoService {
             Centro centro) {
 
         boolean esAdmin =
-                "ADMIN".equals(
+                Roles.ADMIN.equals(
                         usuario
                                 .getRol()
                                 .getNombre()

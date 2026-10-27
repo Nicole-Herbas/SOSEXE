@@ -9,14 +9,16 @@ import { Noticia } from '../../../noticias/models/noticia.model';
 import { NoticiaService } from '../../../noticias/services/noticia.service';
 import {
   CATEGORIAS_NOTICIAS,
+  claveTraduccionCategoria,
   filtrarNoticiasPorCategoria,
 } from '../../../noticias/utils/categoria-noticia';
 import { recortarResumen } from '../../../noticias/utils/resumen-noticia';
+import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
 
 const MAX_NOTICIAS_INICIO = 6;
 
 @Component({
-  imports: [RouterLink],
+  imports: [RouterLink, TranslatePipe],
   selector: 'app-inicio',
   styleUrl: './inicio.scss',
   templateUrl: './inicio.html',
@@ -27,6 +29,7 @@ export class Inicio implements OnInit {
   readonly textos = APP_TEXTOS.inicio;
   readonly textosNoticias = APP_TEXTOS.noticias;
   readonly resumenVistaPrevia = recortarResumen;
+  readonly claveCategoria = claveTraduccionCategoria;
   readonly featureToggles: Pick<FeatureToggles, 'inicio'> = {
     inicio: { ...FEATURE_TOGGLES.inicio },
   };

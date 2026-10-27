@@ -72,7 +72,7 @@ public class MapaService {
                 );
 
 
-                puntoAyudaRepository
+        puntoAyudaRepository
                 .findByEstadoVerificacion(
                         EstadoVerificacion.VERIFICADO
                 )
@@ -83,6 +83,7 @@ public class MapaService {
                                 )
                         )
                 );
+
 
 
         List<PuntoMapaDTO> resultado =
@@ -195,6 +196,19 @@ public class MapaService {
                                                         id
                                                 )
                                         );
+
+
+                        if (
+                                !EstadoVerificacion.VERIFICADO.equals(
+                                        punto.getEstadoVerificacion()
+                                )
+                        ) {
+
+                            throw new ResourceNotFoundException(
+                                    "Punto de ayuda",
+                                    id
+                            );
+                        }
 
 
                         yield convertirPuntoAyuda(

@@ -15,8 +15,10 @@ import {
   FILTROS_TIPO_MAPA,
   PUNTOS_MAPA_FALLBACK,
   TIPO_CLASE_MAPA,
+  TIPO_CLAVE_MAPA,
   TIPO_ETIQUETA_MAPA,
 } from '../../constants/mapa.constants';
+import { IdiomaService } from '../../../../shared/services/idioma.service';
 
 import {
   FEATURE_TOGGLES,
@@ -36,18 +38,27 @@ import {
 } from '../../models/punto-mapa.model';
 
 
+import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
+
 @Component({
   selector: 'app-mapa',
   imports: [
-    MapaLeaflet
+    MapaLeaflet,
+    TranslatePipe
   ],
   templateUrl: './mapa.html',
   styleUrl: './mapa.scss'
 })
+
+
+
 export class Mapa implements OnInit {
 
   private mapaService =
     inject(MapaService);
+
+  private idiomaService =
+    inject(IdiomaService);
 
 
   readonly textos =
@@ -194,9 +205,7 @@ export class Mapa implements OnInit {
 
 
     const busqueda =
-      this.busqueda()
-        .toLowerCase()
-        .trim();
+      this.normalizarTextoBusqueda(this.busqueda());
 
 
     if (busqueda) {
@@ -204,22 +213,9 @@ export class Mapa implements OnInit {
       resultado =
         resultado.filter(
           p =>
-
-            p.nombre
-              .toLowerCase()
-              .includes(busqueda)
-
-            ||
-
-            p.ciudad
-              ?.toLowerCase()
-              .includes(busqueda)
-
-            ||
-
-            p.departamentoNombre
-              ?.toLowerCase()
-              .includes(busqueda)
+            this.normalizarTextoBusqueda(p.nombre).includes(busqueda)
+            || this.normalizarTextoBusqueda(p.ciudad).includes(busqueda)
+            || this.normalizarTextoBusqueda(p.departamentoNombre).includes(busqueda)
         );
 
     }
@@ -635,6 +631,15 @@ export class Mapa implements OnInit {
   // BÚSQUEDA
   // ==========================================
 
+  private normalizarTextoBusqueda(texto: string | null | undefined): string {
+    return (texto ?? '')
+      .normalize('NFD')
+      .replace(/\p{M}/gu, '')
+      .replace(/\s+/g, ' ')
+      .trim()
+      .toLocaleLowerCase('es');
+  }
+
   actualizarBusqueda(
     evento: Event
   ): void {
@@ -667,7 +672,10 @@ export class Mapa implements OnInit {
   obtenerEtiquetaTipo(
     tipo: string
   ): string {
-
+    const clave = TIPO_CLAVE_MAPA[tipo];
+    if (clave) {
+      return this.idiomaService.t(clave);
+    }
     return (
       this.tipoEtiqueta[tipo]
       ??

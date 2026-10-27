@@ -46,6 +46,31 @@ export function normalizarTextoCategoria(categoria: string): string {
     .toLocaleLowerCase('es');
 }
 
+const CLAVES_CATEGORIA = [
+  'todas',
+  'incendios',
+  'inundaciones',
+  'deslizamientos',
+  'sequias',
+  'comunidad',
+  'alertas',
+  'otras',
+];
+
+/**
+ * Devuelve la clave i18n con la que se muestra una categoría. El valor de la
+ * categoría (en español) sigue siendo el que se usa para filtrar; esta clave
+ * solo sirve para traducir la etiqueta visible. Si la categoría no es una de
+ * las conocidas, se devuelve tal cual para mostrarla sin traducir.
+ */
+export function claveTraduccionCategoria(categoria: string | null | undefined): string {
+  const original = categoria ?? '';
+  const normalizada = normalizarTextoCategoria(original);
+  return CLAVES_CATEGORIA.includes(normalizada)
+    ? `noticias.categorias.${normalizada}`
+    : original;
+}
+
 export function normalizarCategoriaExterna(categoria: string | null): string {
   const normalizada = normalizarTextoCategoria(categoria ?? '');
   const categoriaConocida = CATEGORIAS_NOTICIAS.find(

@@ -1,0 +1,91 @@
+.revisar-alertas {
+  max-width: 760px;
+  margin: 32px auto;
+  padding: 24px;
+  border: 1px solid #d9e3e8;
+  border-radius: 12px;
+  overflow-wrap: anywhere;
+
+  h1,
+  h2,
+  h3 {
+    margin: 16px 0 8px;
+  }
+  p {
+    margin: 12px 0;
+  }
+  a {
+    color: #07847e;
+    text-decoration: underline;
+  }
+  ul {
+    padding: 0;
+    list-style: none;
+  }
+  li {
+    padding: 16px 0;
+    border-bottom: 1px solid #d9e3e8;
+  }
+  dl {
+    display: grid;
+    grid-template-columns: minmax(120px, 1fr) 3fr;
+    gap: 12px 16px;
+    margin: 24px 0;
+  }
+  dt {
+    font-weight: 600;
+  }
+  dd {
+    margin: 0;
+  }
+  .mensaje {
+    white-space: pre-wrap;
+  }
+  .confirmacion {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+  }
+  button {
+    display: block;
+    margin-top: 16px;
+    padding: 12px 24px;
+    border: 1px solid #07847e;
+    border-radius: 6px;
+    background: #07847e;
+    color: white;
+    font: inherit;
+    cursor: pointer;
+    &:disabled {
+      opacity: 0.6;
+      cursor: default;
+    }
+  }
+  .secundario {
+    color: #07847e;
+    background: white;
+  }
+  [role='alert'] {
+    color: #a52424;
+  }
+  .exito {
+    color: #06734b;
+  }
+  :focus-visible {
+    outline: 3px solid #07847e;
+    outline-offset: 3px;
+  }
+}
+@media (max-width: 600px) {
+  .revisar-alertas {
+    margin: 16px;
+    padding: 16px;
+    dl {
+      grid-template-columns: 1fr;
+      gap: 4px;
+    }
+    dd {
+      margin-bottom: 12px;
+    }
+  }
+}

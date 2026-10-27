@@ -1,4 +1,4 @@
-﻿import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   Router,
@@ -7,11 +7,8 @@ import {
 } from '@angular/router';
 import { Subscription } from 'rxjs';
 
-import {
-  APP_TEXTOS
-} from '../constants/app-textos.constants';
-
 import { AuthService } from '../../features/auth/services/auth.service';
+import { IdiomaService } from '../services/idioma.service';
 
 
 @Component({
@@ -26,18 +23,25 @@ import { AuthService } from '../../features/auth/services/auth.service';
 })
 export class Navbar implements OnInit, OnDestroy {
 
-  readonly textos = APP_TEXTOS.navbar;
+  private readonly authService = inject(AuthService);
+  private readonly router = inject(Router);
+  private readonly idiomaService = inject(IdiomaService);
+
+  /**
+   * SOS-114 — Función de traducción reactiva.
+   * La dependencia en `traducciones$` hace que el navbar se actualice
+   * automáticamente cuando el usuario cambia el idioma.
+   */
+  readonly t = computed(() => {
+    const _ = this.idiomaService.traducciones$();
+    return (clave: string) => this.idiomaService.t(clave);
+  });
 
   menuAbierto = false;
   sesionActiva = false;
   nombreUsuario = '';
 
   private sub!: Subscription;
-
-  constructor(
-    private authService: AuthService,
-    private router: Router
-  ) {}
 
   ngOnInit(): void {
 

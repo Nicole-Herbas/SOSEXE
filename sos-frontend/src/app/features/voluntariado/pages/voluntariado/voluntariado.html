@@ -5,21 +5,21 @@
 
     <div class="vol-hero__badge">
       <span class="vol-hero__badge-dot"></span>
-      {{ textos.hero.badge }}
+      {{ 'voluntariado.hero.badge' | translate }}
     </div>
 
-    <h1 class="vol-hero__title">{{ textos.hero.titulo }}</h1>
+    <h1 class="vol-hero__title">{{ 'voluntariado.hero.titulo' | translate }}</h1>
 
-    <p class="vol-hero__description">{{ textos.hero.descripcion }}</p>
+    <p class="vol-hero__description">{{ 'voluntariado.hero.descripcion' | translate }}</p>
 
     <!-- Hero actions: varían según estado -->
     @if (estado() === 'SIN_SESION') {
       <div class="vol-hero__actions">
         <a routerLink="/login" class="btn btn--primary">
-          {{ textos.hero.serVoluntario }}
+          {{ 'voluntariado.hero.serVoluntario' | translate }}
         </a>
         <a routerLink="/mapa" class="btn btn--outline">
-          {{ textos.hero.verMapa }}
+          {{ 'voluntariado.hero.verMapa' | translate }}
         </a>
       </div>
     }
@@ -27,18 +27,18 @@
     @if (estado() === 'SIN_PERFIL') {
       <div class="vol-hero__actions">
         <button class="btn btn--primary" (click)="iniciarCreacion()">
-          {{ textos.hero.serVoluntario }}
+          {{ 'voluntariado.hero.serVoluntario' | translate }}
         </button>
         <a routerLink="/mapa" class="btn btn--outline">
-          {{ textos.hero.verMapa }}
+          {{ 'voluntariado.hero.verMapa' | translate }}
         </a>
       </div>
     }
 
     <div class="vol-hero__features">
-      <span class="vol-hero__feature">{{ textos.hero.feat1 }}</span>
-      <span class="vol-hero__feature">{{ textos.hero.feat2 }}</span>
-      <span class="vol-hero__feature">{{ textos.hero.feat3 }}</span>
+      <span class="vol-hero__feature">{{ 'voluntariado.hero.feat1' | translate }}</span>
+      <span class="vol-hero__feature">{{ 'voluntariado.hero.feat2' | translate }}</span>
+      <span class="vol-hero__feature">{{ 'voluntariado.hero.feat3' | translate }}</span>
     </div>
 
   </section>
@@ -51,7 +51,7 @@
         <span class="vol-exito__icon">✓</span>
         <div class="vol-exito__content">
           <p class="vol-exito__titulo">{{ mensajeExito() }}</p>
-          <p class="vol-exito__mensaje">{{ textos.perfilVoluntario.exitoMensaje }}</p>
+          <p class="vol-exito__mensaje">{{ 'voluntariado.perfilVoluntario.exitoMensaje' | translate }}</p>
         </div>
       </div>
     </section>
@@ -99,95 +99,92 @@
   <!-- ===== CARGANDO ===== -->
   @if (estado() === 'CARGANDO') {
     <section class="vol-cargando">
-      <p>Cargando...</p>
+      <p>{{ 'voluntariado.cargando' | translate }}</p>
     </section>
   }
 
 
   <!-- ===== OPORTUNIDADES DISPONIBLES ===== -->
   @if (featureToggles.voluntariado.mostrarSeccionOportunidades) {
-  <section class="vol-oportunidades">
+  <section class="vol-oportunidades" [attr.aria-busy]="cargandoOportunidades()">
 
     <div class="vol-oportunidades__header">
-      <h2 class="vol-oportunidades__titulo">{{ textos.oportunidades.titulo }}</h2>
-      <p class="vol-oportunidades__subtitulo">{{ textos.oportunidades.subtitulo }}</p>
+      <h2 class="vol-oportunidades__titulo">{{ 'voluntariado.oportunidades.titulo' | translate }}</h2>
+      <p class="vol-oportunidades__subtitulo">{{ 'voluntariado.oportunidades.subtitulo' | translate }}</p>
     </div>
 
-    <div class="vol-cards">
-
-      <!-- Tarjeta 1: Refugios y albergues -->
-      <article class="vol-card">
-        <div class="vol-card__top-bar vol-card__top-bar--teal"></div>
-        <div class="vol-card__body">
-          <div class="vol-card__icon vol-card__icon--teal">🏠</div>
-          <h3 class="vol-card__title">{{ textos.oportunidades.refugios.titulo }}</h3>
-          <p class="vol-card__location">⌖ {{ textos.oportunidades.refugios.ubicacion }}</p>
-          <p class="vol-card__desc">{{ textos.oportunidades.refugios.descripcion }}</p>
-          <div class="vol-card__footer">
-            @if (featureToggles.voluntariado.mostrarCupos) {
-            <div class="vol-card__cupos">
-              <span class="vol-card__cupos-label">{{ textos.oportunidades.cuposLabel }}</span>
-              <span class="vol-card__cupos-badge vol-card__cupos-badge--teal">
-                {{ textos.oportunidades.refugios.cupos }}
-              </span>
-            </div>
+    @if (cargandoOportunidades()) {
+      <p class="vol-oportunidades__estado" role="status">
+        {{ 'voluntariado.oportunidades.cargando' | translate }}
+      </p>
+    } @else if (errorOportunidades()) {
+      <p class="vol-oportunidades__estado vol-oportunidades__estado--error" role="alert">
+        {{ 'voluntariado.oportunidades.errorCarga' | translate }}
+      </p>
+    } @else {
+      <div class="vol-filtros">
+        <div class="vol-filtros__campo">
+          <label for="vol-ciudad">{{ 'voluntariado.oportunidades.filtros.ciudadLabel' | translate }}</label>
+          <select id="vol-ciudad" [ngModel]="ciudadSeleccionada()" (ngModelChange)="ciudadSeleccionada.set($event)">
+            <option value="">{{ 'voluntariado.oportunidades.filtros.todasCiudades' | translate }}</option>
+            @for (ciudad of ciudadesDisponibles(); track ciudad.valor) {
+              <option [value]="ciudad.valor">{{ ciudad.nombre }}</option>
             }
-            <button class="vol-card__btn vol-card__btn--teal" type="button">
-              {{ textos.oportunidades.participar }}
-            </button>
-          </div>
+          </select>
         </div>
-      </article>
-
-      <!-- Tarjeta 2: Distribución de donaciones -->
-      <article class="vol-card">
-        <div class="vol-card__top-bar vol-card__top-bar--teal"></div>
-        <div class="vol-card__body">
-          <div class="vol-card__icon vol-card__icon--teal">🔒</div>
-          <h3 class="vol-card__title">{{ textos.oportunidades.distribucion.titulo }}</h3>
-          <p class="vol-card__location">⌖ {{ textos.oportunidades.distribucion.ubicacion }}</p>
-          <p class="vol-card__desc">{{ textos.oportunidades.distribucion.descripcion }}</p>
-          <div class="vol-card__footer">
-            @if (featureToggles.voluntariado.mostrarCupos) {
-            <div class="vol-card__cupos">
-              <span class="vol-card__cupos-label">{{ textos.oportunidades.cuposLabel }}</span>
-              <span class="vol-card__cupos-badge vol-card__cupos-badge--teal">
-                {{ textos.oportunidades.distribucion.cupos }}
-              </span>
-            </div>
+        <div class="vol-filtros__campo">
+          <label for="vol-tipo-ayuda">{{ 'voluntariado.oportunidades.filtros.tipoAyudaLabel' | translate }}</label>
+          <select id="vol-tipo-ayuda" [ngModel]="tipoAyudaSeleccionado()" (ngModelChange)="tipoAyudaSeleccionado.set($event)">
+            <option [ngValue]="null">{{ 'voluntariado.oportunidades.filtros.todosTiposAyuda' | translate }}</option>
+            @for (tipo of tiposAyudaDisponibles(); track tipo.id) {
+              <option [ngValue]="tipo.id">{{ tipo.nombre }}</option>
             }
-            <button class="vol-card__btn vol-card__btn--teal" type="button">
-              {{ textos.oportunidades.participar }}
-            </button>
-          </div>
+          </select>
         </div>
-      </article>
-
-      <!-- Tarjeta 3: Apoyo en emergencias -->
-      <article class="vol-card">
-        <div class="vol-card__top-bar vol-card__top-bar--red"></div>
-        <div class="vol-card__body">
-          <div class="vol-card__icon vol-card__icon--red">!</div>
-          <h3 class="vol-card__title">{{ textos.oportunidades.emergencias.titulo }}</h3>
-          <p class="vol-card__location">⌖ {{ textos.oportunidades.emergencias.ubicacion }}</p>
-          <p class="vol-card__desc">{{ textos.oportunidades.emergencias.descripcion }}</p>
-          <div class="vol-card__footer">
-            @if (featureToggles.voluntariado.mostrarCupos) {
-            <div class="vol-card__cupos">
-              <span class="vol-card__cupos-label">{{ textos.oportunidades.cuposLabel }}</span>
-              <span class="vol-card__cupos-badge vol-card__cupos-badge--red">
-                {{ textos.oportunidades.emergencias.cupos }}
-              </span>
+        <button type="button" class="btn btn--outline" (click)="restablecerFiltros()"
+          [disabled]="!ciudadSeleccionada() && tipoAyudaSeleccionado() === null">
+          {{ 'voluntariado.oportunidades.filtros.restablecer' | translate }}
+        </button>
+      </div>
+      <p class="vol-oportunidades__contador" role="status" aria-live="polite" aria-atomic="true">
+        {{ 'voluntariado.oportunidades.filtros.resultadosLabel' | translate }}: {{ oportunidadesFiltradas().length }}
+      </p>
+      <div class="vol-cards">
+        @for (oportunidad of oportunidadesFiltradas(); track oportunidad.id) {
+          <article class="vol-card">
+            <div class="vol-card__top-bar vol-card__top-bar--teal"></div>
+            <div class="vol-card__body">
+              <h3 class="vol-card__title">{{ oportunidad.titulo }}</h3>
+              <p class="vol-card__centro">
+                <strong>{{ 'voluntariado.oportunidades.centroLabel' | translate }}:</strong>
+                {{ oportunidad.centroNombre || ('voluntariado.oportunidades.centroNoDisponible' | translate) }}
+              </p>
+              <p class="vol-card__location">⌖ {{ formatearUbicacion(oportunidad) }}</p>
+              <p class="vol-card__desc">{{ oportunidad.descripcion }}</p>
+              <div class="vol-card__footer">
+                <p class="vol-card__fecha">
+                  <strong>{{ 'voluntariado.oportunidades.inicioLabel' | translate }}:</strong>
+                  <time [attr.datetime]="oportunidad.fechaInicio">{{ formatearFecha(oportunidad.fechaInicio) }}</time>
+                </p>
+                <p class="vol-card__fecha">
+                  <strong>{{ 'voluntariado.oportunidades.finLabel' | translate }}:</strong>
+                  <time [attr.datetime]="oportunidad.fechaFin">{{ formatearFecha(oportunidad.fechaFin) }}</time>
+                </p>
+                <a class="vol-card__btn vol-card__btn--teal vol-card__detalle"
+                  [routerLink]="['/voluntariado', oportunidad.id]"
+                  [attr.aria-label]="('voluntariado.oportunidades.verDetalleEtiqueta' | translate) + ' ' + oportunidad.titulo">
+                  {{ 'voluntariado.oportunidades.verDetalle' | translate }}
+                </a>
+              </div>
             </div>
-            }
-            <button class="vol-card__btn vol-card__btn--red" type="button">
-              {{ textos.oportunidades.participar }}
-            </button>
-          </div>
-        </div>
-      </article>
-
-    </div>
+          </article>
+        } @empty {
+          <p class="vol-oportunidades__estado" role="status">
+            {{ oportunidades().length === 0 ? ('voluntariado.oportunidades.sinOportunidades' | translate) : ('voluntariado.oportunidades.filtros.sinResultados' | translate) }}
+          </p>
+        }
+      </div>
+    }
 
   </section>
   }
@@ -197,27 +194,27 @@
   @if (featureToggles.voluntariado.mostrarSeccionComoFunciona) {
   <section class="vol-como">
 
-    <h2 class="vol-como__title">{{ textos.comoFunciona.titulo }}</h2>
-    <p class="vol-como__subtitle">{{ textos.comoFunciona.subtitulo }}</p>
+    <h2 class="vol-como__title">{{ 'voluntariado.comoFunciona.titulo' | translate }}</h2>
+    <p class="vol-como__subtitle">{{ 'voluntariado.comoFunciona.subtitulo' | translate }}</p>
 
     <div class="vol-como__steps">
 
       <div class="vol-como__step">
         <span class="vol-como__step-num">01</span>
-        <h3 class="vol-como__step-title">{{ textos.comoFunciona.paso1.titulo }}</h3>
-        <p class="vol-como__step-desc">{{ textos.comoFunciona.paso1.descripcion }}</p>
+        <h3 class="vol-como__step-title">{{ 'voluntariado.comoFunciona.paso1.titulo' | translate }}</h3>
+        <p class="vol-como__step-desc">{{ 'voluntariado.comoFunciona.paso1.descripcion' | translate }}</p>
       </div>
 
       <div class="vol-como__step">
         <span class="vol-como__step-num">02</span>
-        <h3 class="vol-como__step-title">{{ textos.comoFunciona.paso2.titulo }}</h3>
-        <p class="vol-como__step-desc">{{ textos.comoFunciona.paso2.descripcion }}</p>
+        <h3 class="vol-como__step-title">{{ 'voluntariado.comoFunciona.paso2.titulo' | translate }}</h3>
+        <p class="vol-como__step-desc">{{ 'voluntariado.comoFunciona.paso2.descripcion' | translate }}</p>
       </div>
 
       <div class="vol-como__step">
         <span class="vol-como__step-num">03</span>
-        <h3 class="vol-como__step-title">{{ textos.comoFunciona.paso3.titulo }}</h3>
-        <p class="vol-como__step-desc">{{ textos.comoFunciona.paso3.descripcion }}</p>
+        <h3 class="vol-como__step-title">{{ 'voluntariado.comoFunciona.paso3.titulo' | translate }}</h3>
+        <p class="vol-como__step-desc">{{ 'voluntariado.comoFunciona.paso3.descripcion' | translate }}</p>
       </div>
 
     </div>

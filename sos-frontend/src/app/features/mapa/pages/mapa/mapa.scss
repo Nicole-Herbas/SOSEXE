@@ -162,6 +162,11 @@
   outline: none;
 }
 
+.bloque-busqueda input:focus-visible {
+  outline: 3px solid #149b95;
+  outline-offset: 3px;
+}
+
 .filtros-necesidades {
   display: flex;
   flex-wrap: wrap;

@@ -1,0 +1,108 @@
+<section class="revisar-alertas" aria-labelledby="revisar-alertas-titulo">
+  <a routerLink="/admin">{{ 'alertas.volver' | translate }}</a>
+  <h1 id="revisar-alertas-titulo">{{ 'alertas.revisarEncabezado' | translate }}</h1>
+  @if (error()) {
+    <p role="alert">{{ error() }}</p>
+  }
+  @if (exito()) {
+    <p class="exito" role="status">{{ 'alertas.exitoPublicar' | translate }}</p>
+  }
+  @if (cargandoRevision()) {
+    <p role="status">{{ 'alertas.cargandoRevision' | translate }}</p>
+  }
+
+  @if (alerta(); as vista) {
+    <article
+      aria-labelledby="vista-previa-titulo"
+      [attr.aria-busy]="publicando() || cargandoRevision()"
+    >
+      <h2 id="vista-previa-titulo" #encabezado tabindex="-1">{{ 'alertas.vistaPrevia' | translate }}</h2>
+      <h3>{{ vista.titulo }}</h3>
+      <dl>
+        <dt>{{ 'alertas.region' | translate }}</dt>
+        <dd>{{ vista.departamentoNombre }}</dd>
+        <dt>{{ 'alertas.severidad' | translate }}</dt>
+        <dd>{{ vista.severidad }}</dd>
+        <dt>{{ 'alertas.mensaje' | translate }}</dt>
+        <dd class="mensaje">{{ vista.mensaje }}</dd>
+        <dt>{{ 'alertas.fuente' | translate }}</dt>
+        <dd>{{ vista.fuente || ('alertas.fuentePendiente' | translate) }}</dd>
+        <dt>{{ 'alertas.inicio' | translate }}</dt>
+        <dd>{{ vista.fechaPublicacion | date: 'dd/MM/yyyy HH:mm' }}</dd>
+        <dt>{{ 'alertas.fin' | translate }}</dt>
+        <dd>{{ vista.fechaExpiracion | date: 'dd/MM/yyyy HH:mm' }}</dd>
+        <dt>{{ 'alertas.estado' | translate }}</dt>
+        <dd>{{ vista.estado }}</dd>
+      </dl>
+      @if (vista.estado === 'BORRADOR') {
+        <p>{{ 'alertas.avisoRevision' | translate }}</p>
+        <label class="confirmacion">
+          <input
+            #casilla
+            type="checkbox"
+            [checked]="confirmado()"
+            (change)="confirmado.set(casilla.checked)"
+            [disabled]="publicando() || cargandoRevision() || requiereRecarga()"
+          />
+          {{ 'alertas.confirmacionPublicar' | translate }}
+        </label>
+        <button
+          type="button"
+          data-testid="publicar"
+          (click)="publicar()"
+          [disabled]="!confirmado() || publicando() || cargandoRevision() || requiereRecarga()"
+        >
+          {{ (publicando() ? 'alertas.publicando' : 'alertas.confirmarPublicacion') | translate }}
+        </button>
+      } @else if (!exito()) {
+        <p role="status">{{ 'alertas.yaNoEsBorrador' | translate }}</p>
+      }
+      @if (requiereRecarga()) {
+        <button
+          type="button"
+          data-testid="recargar-revision"
+          (click)="revisar(vista.id)"
+          [disabled]="cargandoRevision()"
+        >
+          {{ 'alertas.recargarRevision' | translate }}
+        </button>
+      }
+      <button
+        class="secundario"
+        type="button"
+        (click)="volver()"
+        [disabled]="publicando() || cargandoRevision()"
+      >
+        {{ 'alertas.volverBorradores' | translate }}
+      </button>
+    </article>
+  } @else {
+    <h2 #encabezado tabindex="-1">{{ 'alertas.borradores' | translate }}</h2>
+    <a routerLink="/admin/alertas/crear">{{ 'alertas.encabezado' | translate }}</a>
+    @if (cargando()) {
+      <p role="status">{{ 'alertas.cargandoBorradores' | translate }}</p>
+    } @else if (error()) {
+      <button type="button" (click)="cargarBorradores()">{{ 'alertas.reintentar' | translate }}</button>
+    } @else if (borradores().length === 0) {
+      <p role="status">{{ 'alertas.sinBorradores' | translate }}</p>
+    } @else {
+      <ul>
+        @for (borrador of borradores(); track borrador.id) {
+          <li>
+            <h3>{{ borrador.titulo }}</h3>
+            <p>{{ borrador.departamentoNombre }} · {{ borrador.severidad }}</p>
+            <button
+              type="button"
+              [attr.data-testid]="'revisar-' + borrador.id"
+              (click)="revisar(borrador.id)"
+              [disabled]="cargandoRevision()"
+              [attr.aria-label]="('alertas.revisar' | translate) + ': ' + borrador.titulo"
+            >
+              {{ 'alertas.revisar' | translate }}
+            </button>
+          </li>
+        }
+      </ul>
+    }
+  }
+</section>

@@ -37,6 +37,15 @@ public class PuntoAyuda {
     @Column(length = 100)
     private String ciudad;
 
+    @Column(name = "nombre_contacto", length = 150)
+    private String nombreContacto;
+
+    @Column(name = "telefono_contacto", length = 20)
+    private String telefonoContacto;
+
+    @Column(name = "correo_contacto", length = 150)
+    private String correoContacto;
+
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "departamento_id", nullable = false)
     private Departamento departamento;

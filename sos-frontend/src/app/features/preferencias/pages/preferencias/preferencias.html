@@ -1,0 +1,239 @@
+<div class="preferencias-container">
+  <div class="preferencias-card">
+    <header class="preferencias-header">
+      <div class="preferencias-badge">
+        <span class="badge-icon">⚙</span>
+        <span>{{ 'preferencias.configuracion' | translate }}</span>
+      </div>
+      <h1 class="preferencias-title">{{ 'preferencias.titulo' | translate }}</h1>
+    </header>
+
+    @if (cargando()) {
+      <div class="preferencias-loading">
+        <div class="spinner"></div>
+        <p>{{ 'preferencias.cargandoEstado' | translate }}</p>
+      </div>
+    } @else {
+
+      <!-- SOS-114: Sección de selección de idioma -->
+      <section class="idioma-section">
+        <div class="idioma-header">
+          <div class="idioma-icon-wrapper">
+            <span class="idioma-icon">🌐</span>
+          </div>
+          <div>
+            <h2 class="idioma-title">{{ 'preferencias.idiomaSeccion' | translate }}</h2>
+            <p class="idioma-description">{{ 'preferencias.idiomaDescripcion' | translate }}</p>
+          </div>
+        </div>
+
+        <div class="idioma-opciones">
+          <button
+            id="btn-idioma-es"
+            type="button"
+            class="btn-idioma"
+            [class.activo]="idiomaActual() === 'es'"
+            (click)="cambiarIdioma('es')"
+            [attr.aria-pressed]="idiomaActual() === 'es'"
+          >
+            🇧🇴 {{ 'preferencias.idiomaEspanol' | translate }}
+          </button>
+
+          <button
+            id="btn-idioma-en"
+            type="button"
+            class="btn-idioma"
+            [class.activo]="idiomaActual() === 'en'"
+            (click)="cambiarIdioma('en')"
+            [attr.aria-pressed]="idiomaActual() === 'en'"
+          >
+            🇺🇸 {{ 'preferencias.idiomaIngles' | translate }}
+          </button>
+        </div>
+
+        @if (mensajeIdiomaGuardado()) {
+          <div class="alert alert-success idioma-confirmacion" role="status">
+            <span class="alert-icon">✓</span>
+            <span>{{ 'preferencias.idiomaGuardado' | translate }}</span>
+          </div>
+        }
+      </section>
+
+      <hr class="seccion-divisor" />
+
+      <section class="sms-section">
+        <div class="sms-header">
+          <div class="sms-icon-wrapper">
+            <span class="sms-icon">📱</span>
+          </div>
+          <div>
+            <h2 class="sms-title">{{ 'preferencias.seccionSms' | translate }}</h2>
+            <p class="sms-description">{{ 'preferencias.descripcionSms' | translate }}</p>
+          </div>
+        </div>
+
+        @if (mensajeExito()) {
+          <div class="alert alert-success" role="alert">
+            <span class="alert-icon">✓</span>
+            <span>{{ mensajeExito() }}</span>
+          </div>
+        }
+
+        @if (mensajeError()) {
+          <div class="alert alert-error" role="alert">
+            <span class="alert-icon">⚠</span>
+            <span>{{ mensajeError() }}</span>
+          </div>
+        }
+
+        @if (errorDepartamentos()) {
+          <div class="alert alert-error" role="alert">
+            <span class="alert-icon">⚠</span>
+            <span>{{ errorDepartamentos() }}</span>
+          </div>
+        }
+
+        @if (tieneSuscripcionActiva) {
+          <div class="suscripcion-activa-card">
+            <div class="activa-card-top">
+              <div class="activa-badge">
+                <span class="dot-indicator"></span>
+                <span>{{ 'preferencias.suscripcionActiva' | translate }}</span>
+              </div>
+              <span class="estado-tag">{{ 'preferencias.estadoActivo' | translate }}</span>
+            </div>
+
+            <div class="activa-datos">
+              <div class="dato-item">
+                <span class="dato-label">{{ 'preferencias.labelTelefono' | translate }}</span>
+                <span class="dato-valor">📞 {{ suscripcionActual()?.telefono }}</span>
+              </div>
+              <div class="dato-item">
+                <span class="dato-label">{{ 'preferencias.labelRegion' | translate }}</span>
+                <span class="dato-valor">📍 {{ suscripcionActual()?.departamentoNombre }}</span>
+              </div>
+            </div>
+
+            @if (confirmandoCancelacion()) {
+              <div class="confirmacion-box">
+                <h3 class="confirmacion-titulo">{{ 'preferencias.modalConfirmarTitulo' | translate }}</h3>
+                <p class="confirmacion-advertencia">{{ 'preferencias.advertenciaCancelacion' | translate }}</p>
+
+                <div class="confirmacion-actions">
+                  <button
+                    type="button"
+                    class="btn-danger-confirm"
+                    (click)="confirmarCancelacion()"
+                    [disabled]="cancelando()"
+                  >
+                    @if (cancelando()) {
+                      <span class="btn-spinner"></span>
+                      <span>{{ 'preferencias.cancelando' | translate }}</span>
+                    } @else {
+                      <span>{{ 'preferencias.modalConfirmarBoton' | translate }}</span>
+                    }
+                  </button>
+                  <button
+                    type="button"
+                    class="btn-secondary"
+                    (click)="descartarCancelacion()"
+                    [disabled]="cancelando()"
+                  >
+                    {{ 'preferencias.modalCancelarBoton' | translate }}
+                  </button>
+                </div>
+              </div>
+            } @else {
+              <div class="activa-actions">
+                <button
+                  type="button"
+                  class="btn-cancelar-suscripcion"
+                  (click)="solicitarCancelacion()"
+                >
+                  {{ 'preferencias.botonCancelar' | translate }}
+                </button>
+              </div>
+            }
+          </div>
+        } @else {
+          <form [formGroup]="formulario" (ngSubmit)="guardar()" class="sms-form">
+            <div class="form-group" [class.has-error]="telefonoInvalido">
+              <label for="telefono-sms" class="form-label">
+                {{ 'preferencias.labelTelefono' | translate }} <span class="required">*</span>
+              </label>
+              <div class="input-wrapper">
+                <span class="input-prefix">📞</span>
+                <input
+                  id="telefono-sms"
+                  type="tel"
+                  formControlName="telefono"
+                  class="form-control"
+                  [placeholder]="'preferencias.placeholderTelefono' | translate"
+                  autocomplete="tel"
+                />
+              </div>
+              @if (telefonoInvalido) {
+                <small class="error-text">{{ 'preferencias.errorTelefono' | translate }}</small>
+              }
+            </div>
+
+            <div class="form-group" [class.has-error]="departamentoInvalido">
+              <label for="departamento-sms" class="form-label">
+                {{ 'preferencias.labelRegion' | translate }} <span class="required">*</span>
+              </label>
+              <div class="input-wrapper">
+                <span class="input-prefix">📍</span>
+                <select
+                  id="departamento-sms"
+                  formControlName="departamentoId"
+                  class="form-control select-control"
+                >
+                  <option [ngValue]="null" disabled>
+                    @if (cargandoDepartamentos()) {
+                      {{ 'preferencias.cargandoDepartamentos' | translate }}
+                    } @else {
+                      {{ 'preferencias.placeholderRegion' | translate }}
+                    }
+                  </option>
+                  @for (dpto of departamentos; track dpto.id) {
+                    <option [ngValue]="dpto.id">{{ dpto.nombre }}</option>
+                  }
+                </select>
+              </div>
+              @if (departamentoInvalido) {
+                <small class="error-text">{{ 'preferencias.errorRegion' | translate }}</small>
+              }
+            </div>
+
+            <div class="consentimiento-group" [class.has-error]="consentimientoInvalido">
+              <label class="checkbox-container">
+                <input
+                  type="checkbox"
+                  formControlName="consentimiento"
+                  id="consentimiento-sms"
+                />
+                <span class="checkbox-checkmark"></span>
+                <span class="checkbox-label">{{ 'preferencias.labelConsentimiento' | translate }}</span>
+              </label>
+            </div>
+
+            <div class="form-actions">
+              <button
+                type="submit"
+                class="btn-submit"
+                [disabled]="formulario.invalid || guardando() || cargandoDepartamentos() || !!errorDepartamentos()"
+              >
+                @if (guardando()) {
+                  <span class="btn-spinner"></span>
+                  <span>{{ 'preferencias.guardando' | translate }}</span>
+                } @else {
+                  <span>{{ 'preferencias.botonSuscribir' | translate }}</span>
+                }
+              </button>
+            </div>
+          </form>
+        }
+      </section>
+    }
+  </div>
+</div>

@@ -1,17 +1,17 @@
-﻿<div class="registro-container">
+<div class="registro-container">
 
   <div class="info-panel">
 
     <div class="logo">
-      {{ textos.logo }}
+      {{ 'registro.logo' | translate }}
     </div>
 
     <h1>
-      {{ textos.tituloPrincipal }}
+      {{ 'registro.tituloPrincipal' | translate }}
     </h1>
 
     <p>
-      {{ textos.descripcionPrincipal }}
+      {{ 'registro.descripcionPrincipal' | translate }}
     </p>
 
   </div>
@@ -20,11 +20,11 @@
   <div class="form-panel">
 
     <h2>
-      {{ textos.tituloFormulario }}
+      {{ 'registro.tituloFormulario' | translate }}
     </h2>
 
     <p>
-      {{ textos.descripcionFormulario }}
+      {{ 'registro.descripcionFormulario' | translate }}
     </p>
 
 
@@ -47,14 +47,14 @@
       <div class="form-group">
 
         <label for="reg-nombre">
-          {{ textos.nombreLabel }}
+          {{ 'registro.nombreLabel' | translate }}
         </label>
 
         <input
           id="reg-nombre"
           type="text"
           formControlName="nombre"
-          [placeholder]="textos.nombrePlaceholder"
+          [placeholder]="'registro.nombrePlaceholder' | translate"
         >
 
         <small
@@ -64,7 +64,7 @@
             registroForm.get('nombre')?.touched
           "
         >
-          {{ textos.nombreError }}
+          {{ 'registro.nombreError' | translate }}
         </small>
 
       </div>
@@ -74,14 +74,14 @@
       <div class="form-group">
 
         <label for="reg-email">
-          {{ textos.correoLabel }}
+          {{ 'registro.correoLabel' | translate }}
         </label>
 
         <input
           id="reg-email"
           type="email"
           formControlName="email"
-          [placeholder]="textos.correoPlaceholder"
+          [placeholder]="'registro.correoPlaceholder' | translate"
         >
 
         <small
@@ -91,7 +91,7 @@
             registroForm.get('email')?.touched
           "
         >
-          {{ textos.correoError }}
+          {{ 'registro.correoError' | translate }}
         </small>
 
       </div>
@@ -101,14 +101,14 @@
       <div class="form-group">
 
         <label for="reg-password">
-          {{ textos.passwordLabel }}
+          {{ 'registro.passwordLabel' | translate }}
         </label>
 
         <input
           id="reg-password"
           type="password"
           formControlName="password"
-          [placeholder]="textos.passwordPlaceholder"
+          [placeholder]="'registro.passwordPlaceholder' | translate"
         >
 
         <small
@@ -118,7 +118,7 @@
             registroForm.get('password')?.touched
           "
         >
-          {{ textos.passwordError }}
+          {{ 'registro.passwordError' | translate }}
         </small>
 
       </div>
@@ -128,14 +128,14 @@
       <div class="form-group">
 
         <label for="reg-telefono">
-          {{ textos.telefonoLabel }}
+          {{ 'registro.telefonoLabel' | translate }}
         </label>
 
         <input
           id="reg-telefono"
           type="tel"
           formControlName="telefono"
-          [placeholder]="textos.telefonoPlaceholder"
+          [placeholder]="'registro.telefonoPlaceholder' | translate"
         >
 
       </div>
@@ -145,7 +145,7 @@
       <div class="form-group">
 
         <label for="reg-departamento">
-          {{ textos.departamentoLabel }}
+          {{ 'registro.departamentoLabel' | translate }}
         </label>
 
         <select
@@ -154,7 +154,7 @@
         >
 
           <option [value]="null">
-            {{ textos.departamentoPlaceholder }}
+            {{ 'registro.departamentoPlaceholder' | translate }}
           </option>
 
           <option
@@ -175,8 +175,8 @@
         id="btn-crear-cuenta"
         [disabled]="cargando"
       >
-        <span *ngIf="!cargando">{{ textos.botonRegistrar }}</span>
-        <span *ngIf="cargando">Creando cuenta...</span>
+        <span *ngIf="!cargando">{{ 'registro.botonRegistrar' | translate }}</span>
+        <span *ngIf="cargando">{{ 'registro.creandoCuenta' | translate }}</span>
       </button>
 
 
@@ -194,11 +194,11 @@
     <div class="links">
 
       <a routerLink="/login">
-        {{ textos.yasTienesCuenta }}
+        {{ 'registro.yasTienesCuenta' | translate }}
       </a>
 
       <a routerLink="/">
-        {{ textos.cancelar }}
+        {{ 'registro.cancelar' | translate }}
       </a>
 
     </div>

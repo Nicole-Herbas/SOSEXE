@@ -1,14 +1,16 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { APP_TEXTOS } from '../../../../shared/constants/app-textos.constants';
+
+import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule, RouterLink],
+  imports: [ReactiveFormsModule, CommonModule, RouterLink, TranslatePipe],
   templateUrl: './login.component.html',
   styleUrl: './login.component.css'
 })
@@ -21,7 +23,8 @@ export class LoginComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private route: ActivatedRoute
   ) {}
 
   ngOnInit(): void {
@@ -44,20 +47,23 @@ export class LoginComponent implements OnInit {
 
         next: (respuesta) => {
 
-          if (respuesta.rol === 'ADMIN') {
+          const returnUrl =
+            this.route.snapshot.queryParamMap.get('returnUrl');
 
-            this.router.navigate([
-              '/admin'
-            ]);
-
-          } else {
-
-            this.router.navigate([
-              '/inicio'
-            ]);
-
+          // Solo admitimos rutas internas de la aplicación.
+          if (
+            returnUrl &&
+            returnUrl.startsWith('/') &&
+            !returnUrl.startsWith('//') &&
+            !returnUrl.includes('\\')
+          ) {
+            this.router.navigateByUrl(returnUrl);
+            return;
           }
 
+          this.router.navigate([
+            respuesta.rol === 'ADMIN' ? '/admin' : '/inicio'
+          ]);
         },
 
         error: (err) => {
@@ -68,7 +74,7 @@ export class LoginComponent implements OnInit {
           );
 
           this.mensajeError = this.textos.credencialesIncorrectas;
-            
+
 
         }
 

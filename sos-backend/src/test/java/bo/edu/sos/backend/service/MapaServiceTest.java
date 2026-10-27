@@ -254,6 +254,50 @@ class MapaServiceTest {
     }
 
     @Test
+    void listarPuntosMapaNoDebeMostrarPuntosPendientes() {
+
+        PuntoAyuda punto = new PuntoAyuda();
+
+        punto.setId(5L);
+        punto.setNombre("Punto pendiente");
+        punto.setEstadoVerificacion("PENDIENTE");
+
+        when(centroRepository.findAll())
+                .thenReturn(List.of());
+
+        when(puntoAyudaRepository.findByEstadoVerificacion("VERIFICADO"))
+                .thenReturn(List.of());
+
+
+        List<PuntoMapaDTO> resultado =
+                mapaService.listarPuntosMapa();
+
+
+        assertTrue(resultado.isEmpty());
+    }
+
+
+    @Test
+    void buscarDetalleNoDebeMostrarPuntoPendiente() {
+
+        PuntoAyuda punto = new PuntoAyuda();
+
+        punto.setId(5L);
+        punto.setEstadoVerificacion("PENDIENTE");
+
+        when(puntoAyudaRepository.findById(5L))
+                .thenReturn(java.util.Optional.of(punto));
+
+
+        assertThrows(
+                bo.edu.sos.backend.exception.ResourceNotFoundException.class,
+                () -> mapaService.buscarDetalle(
+                        "PUNTO_AYUDA",
+                        5L
+                )
+        );
+    }
+    @Test
     void buscarDetalleDebeRechazarOrigenInvalido() {
 
         assertThrows(

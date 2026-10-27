@@ -27,6 +27,14 @@ public class VoluntariadoController {
                 ApiResponse.ok(voluntariadoService.listarTodos()));
     }
 
+    /** Detalle público: las oportunidades no publicadas responden 404. */
+    @GetMapping("/publicos/{id}")
+    public ResponseEntity<ApiResponse<VoluntariadoDTO>> buscarPublicadaPorId(
+            @PathVariable Long id) {
+        return ResponseEntity.ok(
+                ApiResponse.ok(voluntariadoService.buscarPublicadaPorId(id)));
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<VoluntariadoDTO>> buscarPorId(
             @PathVariable Long id) {
@@ -69,6 +77,24 @@ public class VoluntariadoController {
                         voluntariadoService.actualizar(
                                 id,
                                 voluntariadoDTO,
+                                authentication.getName()
+                        )
+                )
+        );
+    }
+
+    @PatchMapping("/{id}/estado")
+    public ResponseEntity<ApiResponse<VoluntariadoDTO>> cambiarEstado(
+            @PathVariable Long id,
+            @RequestParam String estado,
+            Authentication authentication) {
+
+        return ResponseEntity.ok(
+                ApiResponse.ok(
+                        "Estado de voluntariado actualizado",
+                        voluntariadoService.cambiarEstado(
+                                id,
+                                estado,
                                 authentication.getName()
                         )
                 )
