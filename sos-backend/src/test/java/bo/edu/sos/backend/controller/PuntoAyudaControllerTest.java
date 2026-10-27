@@ -202,7 +202,7 @@ class PuntoAyudaControllerTest {
     // ==========================================
 
     @Test
-    void listarTodosDebeRetornarRespuestaCorrecta() {
+    void listarPublicosDebeRetornarRespuestaCorrecta() {
 
         PuntoAyudaDTO punto =
                 new PuntoAyudaDTO();
@@ -214,14 +214,14 @@ class PuntoAyudaControllerTest {
         );
 
 
-        when(puntoAyudaService.listarTodos())
+        when(puntoAyudaService.listarPublicos())
                 .thenReturn(
                         List.of(punto)
                 );
 
 
         ResponseEntity<ApiResponse<List<PuntoAyudaDTO>>> respuesta =
-                puntoAyudaController.listarTodos();
+                puntoAyudaController.listarPublicos();
 
 
         assertEquals(
@@ -243,6 +243,6 @@ class PuntoAyudaControllerTest {
         );
 
         verify(puntoAyudaService)
-                .listarTodos();
+                .listarPublicos();
     }
 }
