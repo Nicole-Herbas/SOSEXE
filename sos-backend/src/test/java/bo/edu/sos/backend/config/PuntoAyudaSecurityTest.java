@@ -63,7 +63,7 @@ class PuntoAyudaSecurityTest {
     @Test
     void listarTodosSinAutenticacionDebeRetornar200() throws Exception {
 
-        when(puntoAyudaService.listarTodos())
+        when(puntoAyudaService.listarPublicos())
                 .thenReturn(List.of());
 
         mockMvc.perform(
@@ -72,7 +72,7 @@ class PuntoAyudaSecurityTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true));
 
-        verify(puntoAyudaService).listarTodos();
+        verify(puntoAyudaService).listarPublicos();
     }
 
 
