@@ -27,6 +27,27 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class MapaServiceTest {
 
+    @Test
+    void puntosDelMapaPublicoNoIncluyenContactoPrivado() {
+        PuntoAyuda punto = new PuntoAyuda();
+        punto.setId(5L);
+        punto.setNombre("Punto público");
+        punto.setEstadoVerificacion("VERIFICADO");
+        punto.setNombreContacto("Contacto privado de prueba");
+        punto.setTelefonoContacto("70700001");
+        punto.setCorreoContacto("privado@example.com");
+        when(centroRepository.findAll()).thenReturn(List.of());
+        when(puntoAyudaRepository.findByEstadoVerificacion("VERIFICADO")).thenReturn(List.of(punto));
+        when(puntoAyudaRepository.findById(5L)).thenReturn(java.util.Optional.of(punto));
+
+        PuntoMapaDTO listado = mapaService.listarPuntosMapa().get(0);
+        PuntoMapaDTO detalle = mapaService.buscarDetalle("PUNTO_AYUDA", 5L);
+        assertNull(listado.getTelefono());
+        assertNull(listado.getEmail());
+        assertNull(detalle.getTelefono());
+        assertNull(detalle.getEmail());
+    }
+
     @Mock
     private CentroRepository centroRepository;
 

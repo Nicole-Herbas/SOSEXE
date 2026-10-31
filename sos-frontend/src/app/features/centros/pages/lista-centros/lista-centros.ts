@@ -1,8 +1,10 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, DestroyRef, inject, input, OnInit, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { CentroService } from '../../services/centro';
 import { Centro } from '../../models/centro';
-import { APP_TEXTOS } from '../../../../shared/constants/app-textos.constants';
+import { IdiomaService } from '../../../../shared/services/idioma.service';
+import { TIPO_CLAVE_MAPA } from '../../../mapa/constants/mapa.constants';
 
 import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
 
@@ -14,13 +16,15 @@ import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
 })
 export class ListaCentros implements OnInit {
 
-  readonly textos = APP_TEXTOS.centros;
+  readonly variante = input<'predeterminada' | 'admin'>('predeterminada');
+  private readonly idioma = inject(IdiomaService);
+  private readonly destroyRef = inject(DestroyRef);
 
-  private centroService = inject(CentroService);
+  private readonly centroService = inject(CentroService);
 
   centros = signal<Centro[]>([]);
   cargando = signal(true);
-  error = signal('');
+  error = signal(false);
 
   ngOnInit(): void {
     this.cargarCentros();
@@ -29,26 +33,25 @@ export class ListaCentros implements OnInit {
   cargarCentros(): void {
 
     this.cargando.set(true);
-    this.error.set('');
+    this.error.set(false);
 
-    this.centroService.listarTodos().subscribe({
+    this.centroService.listarTodos().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
 
       next: (centros) => {
-        console.log('Centros recibidos:', centros);
-
         this.centros.set(centros);
         this.cargando.set(false);
       },
 
-      error: (error) => {
-        console.error('Error cargando centros:', error);
-
-        this.error.set(
-  this.textos.errorCarga
-);
+      error: () => {
+        this.error.set(true);
         this.cargando.set(false);
       }
 
     });
+  }
+
+  etiquetaTipo(tipo: string): string {
+    const clave = TIPO_CLAVE_MAPA[tipo];
+    return clave ? this.idioma.t(clave) : tipo;
   }
 }
