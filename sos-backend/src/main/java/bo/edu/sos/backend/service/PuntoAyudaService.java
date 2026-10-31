@@ -59,7 +59,7 @@ public class PuntoAyudaService {
                                 EstadoVerificacion.VERIFICADO
                         )
                         .stream()
-                        .map(this::convertirADTO)
+                        .map(this::convertirADTOPublico)
                         .toList();
 
 
@@ -93,7 +93,7 @@ public class PuntoAyudaService {
         if (textoBusqueda.length() > 150) {
             throw new BadRequestException("La búsqueda no debe superar 150 caracteres");
         }
-        // LIKE interpreta comodines; la búsqueda ciudadana se trata como texto literal.
+        // LIKE interpreta comodines; la búsqueda se trata como texto literal.
         String patronBusqueda = textoBusqueda.isEmpty() ? null
                 : "%" + textoBusqueda.toLowerCase(Locale.ROOT)
                         .replace("!", "!!").replace("%", "!%").replace("_", "!_") + "%";

@@ -1,11 +1,19 @@
 {
+  "adminCentros": { "titulo": "Registered centers", "descripcion": "Centers available on the platform." },
   "adminPuntos": {
+    "cerrar": "Close",
+    "cerrarDetalle": "Close aid point details",
+    "resultados": "Aid points found",
     "volver": "Back to list",
     "cargandoDetalle": "Loading aid point details...",
     "errorDetalle": "Could not load aid point details. Please try again.",
     "puntoNoEncontrado": "This aid point is no longer available. Refresh the list.",
     "noInformado": "Not provided",
     "detalle": {
+      "general": "General information",
+      "latitud": "Latitude",
+      "longitud": "Longitude",
+      "nombreContacto": "Name",
       "titulo": "Registered aid point details",
       "descripcion": "Description",
       "ubicacion": "Location",

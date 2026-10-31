@@ -48,6 +48,13 @@ class PuntoAyudaRepositoryIntegrationTest {
     @Test
     void filtraPorEstadoTipoDepartamentoYBusquedaSinDuplicarResultados() {
         PuntoAyuda esperado = punto("Ayuda Norte", "Villa Norte", "PUNTO_DONACION", "PENDIENTE", departamento);
+        var agua = new bo.edu.sos.backend.entity.Necesidad();
+        agua.setNombre(prefijo + " Agua");
+        var alimentos = new bo.edu.sos.backend.entity.Necesidad();
+        alimentos.setNombre(prefijo + " Alimentos");
+        em.persist(agua);
+        em.persist(alimentos);
+        esperado.getNecesidades().addAll(java.util.Set.of(agua, alimentos));
         punto("Emergencia", "Villa Sur", "EMERGENCIA", "PENDIENTE", departamento);
         punto("Otro departamento", "Villa Norte", "PUNTO_DONACION", "PENDIENTE", otroDepartamento);
         punto("Verificado", "Villa Norte", "PUNTO_DONACION", "VERIFICADO", departamento);
@@ -58,6 +65,7 @@ class PuntoAyudaRepositoryIntegrationTest {
                 "PENDIENTE", "PUNTO_DONACION", departamento.getId(), "%villa norte%");
 
         assertEquals(List.of(esperado.getId()), resultado.stream().map(PuntoAyuda::getId).toList());
+        assertEquals(2, resultado.get(0).getNecesidades().size());
         var persistencia = em.getEntityManagerFactory().getPersistenceUnitUtil();
         assertTrue(persistencia.isLoaded(resultado.get(0), "departamento"));
         assertTrue(persistencia.isLoaded(resultado.get(0), "necesidades"));

@@ -1,11 +1,19 @@
 {
+  "adminCentros": { "titulo": "Centros registrados", "descripcion": "Centros disponibles en la plataforma." },
   "adminPuntos": {
+    "cerrar": "Cerrar",
+    "cerrarDetalle": "Cerrar detalle del punto",
+    "resultados": "Puntos encontrados",
     "volver": "Volver al listado",
     "cargandoDetalle": "Cargando detalle del punto...",
     "errorDetalle": "No se pudo cargar el detalle del punto. Intenta nuevamente.",
     "puntoNoEncontrado": "El punto ya no está disponible. Actualiza el listado.",
     "noInformado": "No informado",
     "detalle": {
+      "general": "Información general",
+      "latitud": "Latitud",
+      "longitud": "Longitud",
+      "nombreContacto": "Nombre",
       "titulo": "Detalle del punto registrado",
       "descripcion": "Descripción",
       "ubicacion": "Ubicación",

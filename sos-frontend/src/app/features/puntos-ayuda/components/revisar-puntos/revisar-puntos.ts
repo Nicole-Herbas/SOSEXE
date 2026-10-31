@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, ElementRef, OnInit, effect, inject, signal, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, computed, inject, signal } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
@@ -8,6 +8,7 @@ import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
 import { EstadoPunto, FiltrosRevisionPuntos, ItemCatalogo, PuntoAyuda, TipoPuntoCiudadano } from '../../models/registrar-punto.model';
 import { ESTADO_VERIFICACION_PUNTO } from '../../models/estado-punto.constants';
 import { RegistrarPuntoService } from '../../services/registrar-punto.service';
+import { DialogoComponent } from '../../../../shared/components/dialogo/dialogo';
 
 interface FormularioFiltrosRevision {
   estado: EstadoPunto;
@@ -18,7 +19,7 @@ interface FormularioFiltrosRevision {
 
 @Component({
   selector: 'app-revisar-puntos',
-  imports: [FormsModule, TranslatePipe],
+  imports: [FormsModule, TranslatePipe, DialogoComponent],
   templateUrl: './revisar-puntos.html',
   styleUrl: './revisar-puntos.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -28,9 +29,7 @@ export class RevisarPuntosComponent implements OnInit {
   private readonly destroyRef = inject(DestroyRef);
   private solicitudListado?: Subscription;
   private solicitudDetalle?: Subscription;
-  private readonly encabezadoDetalle = viewChild<ElementRef<HTMLElement>>('encabezadoDetalle');
-  private readonly encabezadoListado = viewChild<ElementRef<HTMLElement>>('encabezadoListado');
-  readonly estadosVerificacion = ESTADO_VERIFICACION_PUNTO;
+  protected botonOrigen: HTMLElement | null = null;
   readonly estados = Object.values(ESTADO_VERIFICACION_PUNTO);
   readonly tipos = APP_TEXTOS.registrarPunto.tipos.map(tipo => tipo.valor);
   readonly puntos = signal<PuntoAyuda[]>([]);
@@ -43,13 +42,9 @@ export class RevisarPuntosComponent implements OnInit {
   readonly detalle = signal<PuntoAyuda | null>(null);
   readonly cargandoDetalle = signal(false);
   readonly errorDetalle = signal<string | null>(null);
+  readonly puntoEnModal = computed(() => this.detalle() ??
+    this.puntos().find(punto => punto.id === this.seleccionadoId()));
   filtros = this.nuevosFiltros();
-
-  constructor() {
-    effect(() => {
-      if (this.detalle()) this.encabezadoDetalle()?.nativeElement.focus();
-    });
-  }
 
   ngOnInit(): void {
     this.cargarDepartamentos();
@@ -94,7 +89,8 @@ export class RevisarPuntosComponent implements OnInit {
     this.cargarListado();
   }
 
-  revisar(id: number): void {
+  revisar(id: number, evento?: Event): void {
+    if (evento?.currentTarget instanceof HTMLElement) this.botonOrigen = evento.currentTarget;
     this.solicitudDetalle?.unsubscribe();
     this.seleccionadoId.set(id);
     this.detalle.set(null);
@@ -114,7 +110,6 @@ export class RevisarPuntosComponent implements OnInit {
 
   volverAlListado(): void {
     this.cerrarDetalle();
-    this.encabezadoListado()?.nativeElement.focus();
   }
 
   claveTipo(tipo: string): string {

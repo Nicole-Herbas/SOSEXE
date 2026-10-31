@@ -29,6 +29,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
+import static org.hamcrest.Matchers.nullValue;
 
 /** API y seguridad reales, con la base de datos simulada. */
 @WebMvcTest(PuntoAyudaController.class)
@@ -116,7 +117,7 @@ class PuntoAyudaAdminWebMvcTest {
     }
 
     @ParameterizedTest
-    @CsvSource({"estado,INVENTADO", "tipo,INVENTADO", "departamentoId,0", "departamentoId,-1"})
+    @CsvSource({"estado,INVENTADO", "tipo,INVENTADO", "departamentoId,0", "departamentoId,-1", "departamentoId,texto"})
     @WithMockUser(authorities = Roles.ADMIN)
     void filtrosInvalidosDevuelven400(String parametro, String valor) throws Exception {
         mvc.perform(get("/api/puntos-ayuda/admin").param(parametro, valor))
@@ -156,6 +157,38 @@ class PuntoAyudaAdminWebMvcTest {
         mvc.perform(get("/api/puntos-ayuda/admin").param("buscar", "a".repeat(151)))
                 .andExpect(status().isBadRequest());
         verifyNoInteractions(puntoAyudaRepository);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"/api/puntos-ayuda", "/api/puntos-ayuda/5", "/api/puntos-ayuda/departamento/3"})
+    void consultasPublicasNoExponenContactoNiCreador(String ruta) throws Exception {
+        PuntoAyuda verificado = punto(5L, "Punto público", EstadoVerificacion.VERIFICADO);
+        verificado.setNombreContacto("Contacto privado de prueba");
+        verificado.setTelefonoContacto("70700001");
+        verificado.setCorreoContacto("privado@example.com");
+        var creador = new bo.edu.sos.backend.entity.Usuario();
+        creador.setId(10L);
+        verificado.setCreador(creador);
+        String datos;
+        if (ruta.endsWith("/5")) {
+            when(puntoAyudaRepository.findById(5L)).thenReturn(Optional.of(verificado));
+            datos = "$.data";
+        } else if (ruta.contains("/departamento/")) {
+            when(puntoAyudaRepository.findByDepartamentoId(3L)).thenReturn(List.of(
+                    verificado, punto(6L, "Pendiente privado", EstadoVerificacion.PENDIENTE)));
+            datos = "$.data[0]";
+        } else {
+            when(puntoAyudaRepository.findByEstadoVerificacion("VERIFICADO"))
+                    .thenReturn(List.of(verificado));
+            datos = "$.data[0]";
+        }
+        var respuesta = mvc.perform(get(ruta)).andExpect(status().isOk())
+                .andExpect(jsonPath(datos + ".id").value(5))
+                .andExpect(jsonPath(datos + ".nombreContacto").value(nullValue()))
+                .andExpect(jsonPath(datos + ".telefonoContacto").value(nullValue()))
+                .andExpect(jsonPath(datos + ".correoContacto").value(nullValue()))
+                .andExpect(jsonPath(datos + ".creadorId").value(nullValue()));
+        if (!ruta.endsWith("/5")) respuesta.andExpect(jsonPath("$.data.length()").value(1));
     }
 
     private PuntoAyuda punto(Long id, String nombre, String estado) {

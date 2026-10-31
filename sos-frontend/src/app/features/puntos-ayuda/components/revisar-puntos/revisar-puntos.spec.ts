@@ -6,6 +6,7 @@ import { PuntoAyuda } from '../../models/registrar-punto.model';
 import { IdiomaService } from '../../../../shared/services/idioma.service';
 import textosEs from '../../../../../../public/i18n/es.json';
 import textosEn from '../../../../../../public/i18n/en.json';
+import { APP_TEXTOS } from '../../../../shared/constants/app-textos.constants';
 
 const PUNTO_PENDIENTE: PuntoAyuda = {
   id: 5, nombre: 'Punto solidario', tipo: 'PUNTO_DONACION', estadoVerificacion: 'PENDIENTE',
@@ -101,6 +102,36 @@ describe('Revisión administrativa de puntos registrados', () => {
     http.expectNone(req => req.method !== 'GET');
   });
 
+  it('abre un diálogo accesible, contiene el foco, cierra con Escape y restaura foco y scroll', () => {
+    http.expectOne('/api/puntos-ayuda/admin?estado=PENDIENTE')
+      .flush({ success: true, data: [PUNTO_PENDIENTE] });
+    fixture.detectChanges();
+    const origen = elemento<HTMLButtonElement>('[data-testid="revisar-punto-5"]');
+    origen.focus();
+    const scrollAnterior = document.body.style.overflow;
+    origen.click();
+    const solicitud = http.expectOne('/api/puntos-ayuda/admin/5');
+    fixture.detectChanges();
+    const modal = elemento<HTMLElement>('[role="dialog"]');
+    expect(modal.getAttribute('aria-modal')).toBe('true');
+    expect(modal.getAttribute('aria-labelledby')).toBe('revision-detalle-titulo');
+    expect(modal.contains(document.activeElement)).toBe(true);
+    expect(document.body.style.overflow).toBe('hidden');
+    const botones = modal.querySelectorAll<HTMLButtonElement>('button');
+    botones[0].focus();
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Tab', shiftKey: true, bubbles: true, cancelable: true }));
+    expect(document.activeElement).toBe(botones[botones.length - 1]);
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Tab', bubbles: true, cancelable: true }));
+    expect(document.activeElement).toBe(botones[0]);
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true }));
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('[role="dialog"]')).toBeNull();
+    expect(document.activeElement).toBe(origen);
+    expect(document.body.style.overflow).toBe(scrollAnterior);
+    expect(solicitud.cancelled).toBe(true);
+    expect(fixture.nativeElement.textContent).toContain('Punto solidario');
+  });
+
   it('actualiza textos y estados al cambiar al inglés usando los catálogos reales', () => {
     http.expectOne('/api/puntos-ayuda/admin?estado=PENDIENTE')
       .flush({ success: true, data: [PUNTO_PENDIENTE] });
@@ -110,6 +141,58 @@ describe('Revisión administrativa de puntos registrados', () => {
     expect(fixture.nativeElement.textContent).toContain('Review registered aid points');
     expect(fixture.nativeElement.textContent).toContain('Pending verification');
     expect(fixture.nativeElement.textContent).toContain('Apply filters');
+  });
+
+  it('traduce el modal abierto, sus secciones y el cierre accesible sin recargar', () => {
+    http.expectOne('/api/puntos-ayuda/admin?estado=PENDIENTE')
+      .flush({ success: true, data: [PUNTO_PENDIENTE] });
+    fixture.detectChanges();
+    elemento<HTMLButtonElement>('[data-testid="revisar-punto-5"]').click();
+    http.expectOne('/api/puntos-ayuda/admin/5').flush({ success: true, data: PUNTO_PENDIENTE });
+    fixture.detectChanges();
+    TestBed.inject(IdiomaService).setIdioma('en');
+    http.expectOne('/i18n/en.json').flush(textosEn);
+    fixture.detectChanges();
+    const modal = elemento<HTMLElement>('[role="dialog"]');
+    for (const etiqueta of ['General information', 'Latitude', 'Longitude', 'Needs', 'Contact person', 'Close']) {
+      expect(modal.textContent).toContain(etiqueta);
+    }
+    expect(modal.querySelector('button')?.getAttribute('aria-label')).toBe('Close aid point details');
+    modal.querySelector<HTMLButtonElement>('button')!.click();
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('[role="dialog"]')).toBeNull();
+    expect(fixture.nativeElement.textContent).toContain('Punto solidario');
+  });
+
+  it('expresa datos ausentes sin inventarlos y conserva coordenadas iguales a cero', () => {
+    http.expectOne('/api/puntos-ayuda/admin?estado=PENDIENTE')
+      .flush({ success: true, data: [PUNTO_PENDIENTE] });
+    fixture.detectChanges();
+    elemento<HTMLButtonElement>('[data-testid="revisar-punto-5"]').click();
+    http.expectOne('/api/puntos-ayuda/admin/5').flush({ success: true, data: {
+      ...PUNTO_PENDIENTE, latitud: 0, longitud: 0, necesidadNombres: [], nombreContacto: null,
+    } });
+    fixture.detectChanges();
+    const modal = elemento<HTMLElement>('[role="dialog"]');
+    expect(modal.textContent).toContain('Sin necesidades registradas');
+    expect(modal.textContent).toContain('No informado');
+    expect(Array.from(modal.querySelectorAll('.coordenadas dd')).map(valor => valor.textContent?.trim()))
+      .toEqual(['0', '0']);
+  });
+
+  it('impide enfocar el fondo y libera el bloqueo de scroll al destruir la vista', () => {
+    http.expectOne('/api/puntos-ayuda/admin?estado=PENDIENTE')
+      .flush({ success: true, data: [PUNTO_PENDIENTE] });
+    fixture.detectChanges();
+    const overflowAnterior = document.body.style.overflow;
+    elemento<HTMLButtonElement>('[data-testid="revisar-punto-5"]').click();
+    const detalle = http.expectOne('/api/puntos-ayuda/admin/5');
+    fixture.detectChanges();
+    elemento<HTMLInputElement>('#revision-buscar').focus();
+    expect(elemento<HTMLElement>('[role="dialog"]').contains(document.activeElement)).toBe(true);
+    fixture.destroy();
+    expect(document.body.style.overflow).toBe(overflowAnterior);
+    expect(detalle.cancelled).toBe(true);
   });
 
   it('distingue un fallo del listado de una lista sin pendientes y permite reintentar', () => {
@@ -159,10 +242,14 @@ describe('Revisión administrativa de puntos registrados', () => {
     fixture.detectChanges();
     elemento<HTMLButtonElement>('[data-testid="revisar-punto-5"]').click();
     http.expectOne('/api/puntos-ayuda/admin/5')
-      .flush({ success: true, data: { ...PUNTO_PENDIENTE, descripcion: '<img src=x onerror=alert(1)>' } });
+      .flush({ success: true, data: { ...PUNTO_PENDIENTE, nombre: '<img src=x onerror=alert(1)>',
+        descripcion: '<img src=x onerror=alert(1)>', nombreContacto: '<script>alert(1)</script>',
+        correoContacto: '<img src=x onerror=alert(1)>',
+      } });
     fixture.detectChanges();
     const detalle = elemento<HTMLElement>('[data-testid="detalle-punto"]');
     expect(detalle.querySelector('img')).toBeNull();
+    expect(detalle.querySelector('script')).toBeNull();
     expect(detalle.textContent).toContain('<img src=x onerror=alert(1)>');
   });
 
@@ -176,6 +263,7 @@ describe('Revisión administrativa de puntos registrados', () => {
       }).sort();
     }
     expect(claves(textosEn.adminPuntos)).toEqual(claves(textosEs.adminPuntos));
+    expect(claves(textosEs.adminPuntos)).toEqual(claves(APP_TEXTOS.adminPuntos));
   });
 
   function elemento<T extends HTMLElement>(selector: string): T {
