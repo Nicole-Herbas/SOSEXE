@@ -1,4 +1,50 @@
 {
+  "adminPuntos": {
+    "volver": "Back to list",
+    "cargandoDetalle": "Loading aid point details...",
+    "errorDetalle": "Could not load aid point details. Please try again.",
+    "puntoNoEncontrado": "This aid point is no longer available. Refresh the list.",
+    "noInformado": "Not provided",
+    "detalle": {
+      "titulo": "Registered aid point details",
+      "descripcion": "Description",
+      "ubicacion": "Location",
+      "direccion": "Address",
+      "coordenadas": "Latitude and longitude",
+      "necesidades": "Needs",
+      "sinNecesidades": "No needs registered",
+      "contacto": "Contact person",
+      "telefono": "Phone number",
+      "correo": "Email address"
+    },
+    "sinPendientes": "There are no aid points pending verification.",
+    "errorDepartamentos": "Could not load departments. Please retry.",
+    "filtros": {
+      "estado": "Status",
+      "tipo": "Aid point type",
+      "departamento": "Department",
+      "buscar": "Search by name or city",
+      "placeholderBusqueda": "E.g.: Community aid point or Cochabamba",
+      "todosTipos": "All types",
+      "todosDepartamentos": "All departments",
+      "aplicar": "Apply filters",
+      "limpiar": "Reset filters"
+    },
+    "tipos": { "PUNTO_DONACION": "Donation point", "EMERGENCIA": "Emergency" },
+    "titulo": "Review registered aid points",
+    "descripcion": "View aid points registered by citizens and review their information.",
+    "cargando": "Loading registered aid points...",
+    "errorListado": "Could not load aid points. Please try again.",
+    "sinResultados": "No aid points match the selected filters.",
+    "reintentar": "Retry",
+    "verDetalle": "View details",
+    "estados": {
+      "PENDIENTE": "Pending verification",
+      "EN_REVISION": "Under review",
+      "VERIFICADO": "Verified",
+      "RECHAZADO": "Rejected"
+    }
+  },
   "acercaDe": {
     "mision": {
       "etiqueta": "OUR PURPOSE",

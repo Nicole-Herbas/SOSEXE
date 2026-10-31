@@ -1,6 +1,7 @@
 package bo.edu.sos.backend.service;
 
 import bo.edu.sos.backend.constants.EstadoVerificacion;
+import bo.edu.sos.backend.constants.TiposPuntoAyuda;
 import bo.edu.sos.backend.dto.PuntoAyudaDTO;
 import bo.edu.sos.backend.entity.Departamento;
 import bo.edu.sos.backend.entity.Necesidad;
@@ -19,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 
 import bo.edu.sos.backend.dto.RegistrarPuntoAyudaDTO;
@@ -73,31 +75,41 @@ public class PuntoAyudaService {
 
 
     @Transactional(readOnly = true)
-    public List<PuntoAyudaDTO> listarTodosAdmin() {
+    public List<PuntoAyudaDTO> listarTodosAdmin(
+            String estado, String tipo, Long departamentoId, String buscar) {
+        String estadoFiltro = estado == null || estado.isBlank()
+                ? EstadoVerificacion.PENDIENTE : estado.trim();
+        if (!EstadoVerificacion.esValido(estadoFiltro)) {
+            throw new BadRequestException("Estado de verificación inválido");
+        }
+        String tipoFiltro = tipo == null || tipo.isBlank() ? null : tipo.trim();
+        if (tipoFiltro != null && !tipoFiltro.matches(TiposPuntoAyuda.REGEX_CIUDADANO)) {
+            throw new BadRequestException("Tipo de punto inválido");
+        }
+        if (departamentoId != null && departamentoId <= 0) {
+            throw new BadRequestException("El identificador del departamento debe ser positivo");
+        }
+        String textoBusqueda = buscar == null ? "" : buscar.trim();
+        if (textoBusqueda.length() > 150) {
+            throw new BadRequestException("La búsqueda no debe superar 150 caracteres");
+        }
+        // LIKE interpreta comodines; la búsqueda ciudadana se trata como texto literal.
+        String patronBusqueda = textoBusqueda.isEmpty() ? null
+                : "%" + textoBusqueda.toLowerCase(Locale.ROOT)
+                        .replace("!", "!!").replace("%", "!%").replace("_", "!_") + "%";
 
-        List<PuntoAyudaDTO> puntos =
-                puntoAyudaRepository
-                        .findAll()
-                        .stream()
-                        .filter(punto ->
-                                EstadoVerificacion.VERIFICADO.equals(
-                                        punto.getEstadoVerificacion()
-                                )
-                        )
-                        .map(this::convertirADTOPublico)
-                        .toList();
-
-
-        LogHelper.debug(
-                PuntoAyudaService.class,
-                "Listado administrativo de puntos de ayuda obtenido. cantidad={}",
-                puntos.size()
-        );
-
-
-        return puntos;
+        return puntoAyudaRepository.buscarParaRevision(
+                        estadoFiltro, tipoFiltro, departamentoId, patronBusqueda)
+                .stream().map(this::convertirADTOPublico).toList();
     }
 
+
+    @Transactional(readOnly = true)
+    public PuntoAyudaDTO buscarDetalleAdmin(Long id) {
+        PuntoAyuda punto = puntoAyudaRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Punto de ayuda", id));
+        return convertirADTO(punto);
+    }
 
     @Transactional(readOnly = true)
     public PuntoAyudaDTO buscarPorId(

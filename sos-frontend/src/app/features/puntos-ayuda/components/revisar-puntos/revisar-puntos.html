@@ -1,0 +1,122 @@
+<section class="revisar-puntos" aria-labelledby="revision-puntos-titulo">
+  <h2 id="revision-puntos-titulo" #encabezadoListado tabindex="-1">{{ 'adminPuntos.titulo' | translate }}</h2>
+  <p>{{ 'adminPuntos.descripcion' | translate }}</p>
+
+  <form class="filtros" (ngSubmit)="cargarListado()">
+    <div>
+      <label for="revision-estado">{{ 'adminPuntos.filtros.estado' | translate }}</label>
+      <select id="revision-estado" name="estado" [(ngModel)]="filtros.estado">
+        @for (estado of estados; track estado) {
+          <option [value]="estado">{{ ('adminPuntos.estados.' + estado) | translate }}</option>
+        }
+      </select>
+    </div>
+    <div>
+      <label for="revision-tipo">{{ 'adminPuntos.filtros.tipo' | translate }}</label>
+      <select id="revision-tipo" name="tipo" [(ngModel)]="filtros.tipo">
+        <option value="">{{ 'adminPuntos.filtros.todosTipos' | translate }}</option>
+        @for (tipo of tipos; track tipo) {
+          <option [value]="tipo">{{ ('adminPuntos.tipos.' + tipo) | translate }}</option>
+        }
+      </select>
+    </div>
+    <div>
+      <label for="revision-departamento">{{ 'adminPuntos.filtros.departamento' | translate }}</label>
+      <select id="revision-departamento" name="departamento" [(ngModel)]="filtros.departamentoId">
+        <option [ngValue]="null">{{ 'adminPuntos.filtros.todosDepartamentos' | translate }}</option>
+        @for (departamento of departamentos(); track departamento.id) {
+          <option [ngValue]="departamento.id">{{ departamento.nombre }}</option>
+        }
+      </select>
+    </div>
+    <div>
+      <label for="revision-buscar">{{ 'adminPuntos.filtros.buscar' | translate }}</label>
+      <input id="revision-buscar" name="buscar" type="search" maxlength="150"
+        [(ngModel)]="filtros.buscar" [placeholder]="'adminPuntos.filtros.placeholderBusqueda' | translate">
+    </div>
+    <div class="acciones-filtros">
+      <button type="submit" [disabled]="cargando()">{{ 'adminPuntos.filtros.aplicar' | translate }}</button>
+      <button type="button" class="secundario" data-testid="limpiar-filtros" (click)="limpiarFiltros()">
+        {{ 'adminPuntos.filtros.limpiar' | translate }}
+      </button>
+    </div>
+  </form>
+
+  @if (errorDepartamentos()) {
+    <p role="alert">{{ 'adminPuntos.errorDepartamentos' | translate }}</p>
+    <button type="button" class="secundario" (click)="cargarDepartamentos()">
+      {{ 'adminPuntos.reintentar' | translate }}
+    </button>
+  }
+
+  @if (cargando()) {
+    <p role="status">{{ 'adminPuntos.cargando' | translate }}</p>
+  } @else if (errorListado()) {
+    <p role="alert">{{ 'adminPuntos.errorListado' | translate }}</p>
+    <button type="button" (click)="cargarListado()">{{ 'adminPuntos.reintentar' | translate }}</button>
+  } @else if (puntos().length === 0) {
+    <p role="status">{{ (consultaPendientesInicial() ? 'adminPuntos.sinPendientes' : 'adminPuntos.sinResultados') | translate }}</p>
+  } @else {
+    <ul class="lista-puntos">
+      @for (punto of puntos(); track punto.id) {
+        <li [class.seleccionado]="seleccionadoId() === punto.id">
+          <div class="punto-resumen">
+            <h3>{{ punto.nombre }}</h3>
+            <p>{{ claveTipo(punto.tipo) | translate }} · {{ punto.ciudad }} · {{ punto.departamentoNombre }}</p>
+          </div>
+          <span class="estado" [class.verificado]="punto.estadoVerificacion === estadosVerificacion.VERIFICADO">
+            {{ ('adminPuntos.estados.' + punto.estadoVerificacion) | translate }}
+          </span>
+          <button type="button" [attr.data-testid]="'revisar-punto-' + punto.id"
+            (click)="revisar(punto.id)" [attr.aria-expanded]="seleccionadoId() === punto.id"
+            aria-controls="revision-punto-detalle"
+            [attr.aria-label]="('adminPuntos.verDetalle' | translate) + ': ' + punto.nombre">
+            {{ 'adminPuntos.verDetalle' | translate }}
+          </button>
+        </li>
+      }
+    </ul>
+  }
+
+  @if (seleccionadoId() !== null) {
+    <section id="revision-punto-detalle" class="detalle-punto" data-testid="detalle-punto"
+      aria-labelledby="revision-detalle-titulo" [attr.aria-busy]="cargandoDetalle()">
+      <h3 id="revision-detalle-titulo" #encabezadoDetalle tabindex="-1">{{ 'adminPuntos.detalle.titulo' | translate }}</h3>
+      @if (cargandoDetalle()) {
+        <p role="status">{{ 'adminPuntos.cargandoDetalle' | translate }}</p>
+      } @else if (errorDetalle()) {
+        <p role="alert">{{ errorDetalle()! | translate }}</p>
+        <button type="button" class="secundario" (click)="revisar(seleccionadoId()!)">
+          {{ 'adminPuntos.reintentar' | translate }}
+        </button>
+      } @else if (detalle(); as punto) {
+        <h4>{{ punto.nombre }}</h4>
+        <dl>
+          <dt>{{ 'adminPuntos.filtros.estado' | translate }}</dt>
+          <dd>{{ ('adminPuntos.estados.' + punto.estadoVerificacion) | translate }}</dd>
+          <dt>{{ 'adminPuntos.filtros.tipo' | translate }}</dt>
+          <dd>{{ claveTipo(punto.tipo) | translate }}</dd>
+          <dt>{{ 'adminPuntos.detalle.descripcion' | translate }}</dt>
+          <dd class="descripcion">{{ punto.descripcion || ('adminPuntos.noInformado' | translate) }}</dd>
+          <dt>{{ 'adminPuntos.detalle.ubicacion' | translate }}</dt>
+          <dd>{{ punto.ciudad || ('adminPuntos.noInformado' | translate) }} · {{ punto.departamentoNombre }}</dd>
+          <dt>{{ 'adminPuntos.detalle.direccion' | translate }}</dt>
+          <dd>{{ punto.direccion || ('adminPuntos.noInformado' | translate) }}</dd>
+          <dt>{{ 'adminPuntos.detalle.coordenadas' | translate }}</dt>
+          <dd>{{ punto.latitud ?? ('adminPuntos.noInformado' | translate) }}, {{ punto.longitud ?? ('adminPuntos.noInformado' | translate) }}</dd>
+          <dt>{{ 'adminPuntos.detalle.necesidades' | translate }}</dt>
+          <dd>{{ punto.necesidadNombres?.join(', ') || ('adminPuntos.detalle.sinNecesidades' | translate) }}</dd>
+          <dt>{{ 'adminPuntos.detalle.contacto' | translate }}</dt>
+          <dd>{{ punto.nombreContacto || ('adminPuntos.noInformado' | translate) }}</dd>
+          <dt>{{ 'adminPuntos.detalle.telefono' | translate }}</dt>
+          <dd>{{ punto.telefonoContacto || ('adminPuntos.noInformado' | translate) }}</dd>
+          <dt>{{ 'adminPuntos.detalle.correo' | translate }}</dt>
+          <dd>{{ punto.correoContacto || ('adminPuntos.noInformado' | translate) }}</dd>
+        </dl>
+      }
+      <button type="button" class="secundario" data-testid="volver-listado" (click)="volverAlListado()">
+        {{ 'adminPuntos.volver' | translate }}
+      </button>
+    </section>
+  }
+</section>

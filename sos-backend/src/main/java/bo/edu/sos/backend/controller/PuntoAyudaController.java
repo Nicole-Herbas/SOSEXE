@@ -1,6 +1,7 @@
 package bo.edu.sos.backend.controller;
 
 import bo.edu.sos.backend.constants.ApiRoutes;
+import bo.edu.sos.backend.constants.EstadoVerificacion;
 import bo.edu.sos.backend.dto.ApiResponse;
 import bo.edu.sos.backend.dto.PuntoAyudaDTO;
 import bo.edu.sos.backend.dto.RegistrarPuntoAyudaDTO;
@@ -49,9 +50,20 @@ public class PuntoAyudaController {
     }
 
     @GetMapping("/admin")
-    public ResponseEntity<ApiResponse<List<PuntoAyudaDTO>>> listarTodosAdmin() {
+    public ResponseEntity<ApiResponse<List<PuntoAyudaDTO>>> listarTodosAdmin(
+            @RequestParam(defaultValue = EstadoVerificacion.PENDIENTE) String estado,
+            @RequestParam(required = false) String tipo,
+            @RequestParam(required = false) Long departamentoId,
+            @RequestParam(required = false) String buscar) {
         return ResponseEntity.ok(
-                ApiResponse.ok(puntoAyudaService.listarTodosAdmin()));
+                ApiResponse.ok(puntoAyudaService.listarTodosAdmin(estado, tipo, departamentoId, buscar)));
+    }
+
+    @GetMapping("/admin/{id}")
+    public ResponseEntity<ApiResponse<PuntoAyudaDTO>> buscarDetalleAdmin(
+            @PathVariable Long id) {
+        return ResponseEntity.ok(
+                ApiResponse.ok(puntoAyudaService.buscarDetalleAdmin(id)));
     }
 
 
