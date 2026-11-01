@@ -17,6 +17,10 @@ export class NoticiaService {
   private readonly http = inject(HttpClient);
   private readonly apiUrl = '/api/noticias';
 
+  obtenerPublicadaPorId(id: number): Observable<ApiResponse<NoticiaPublicada>> {
+    return this.http.get<ApiResponse<NoticiaPublicada>>(`${this.apiUrl}/publicas/${id}`);
+  }
+
   listarNoticias(
     fuentes: { propias?: boolean; externas?: boolean } = {},
   ): Observable<ResultadoNoticias> {

@@ -5,7 +5,7 @@ import {
   provideHttpClientTesting,
 } from '@angular/common/http/testing';
 
-import { ResultadoNoticias } from '../models/noticia.model';
+import { NoticiaPublicada, ResultadoNoticias } from '../models/noticia.model';
 import { NoticiaService } from './noticia.service';
 
 describe('NoticiaService', () => {
@@ -22,6 +22,30 @@ describe('NoticiaService', () => {
   });
 
   afterEach(() => httpTesting.verify());
+
+  it('consulta el detalle publicado y conserva el contrato ApiResponse sin truncar', () => {
+    const noticia: NoticiaPublicada = {
+      id: 7, titulo: 'Noticia completa', contenido: 'Contenido completo. '.repeat(40),
+      categoria: 'Comunidad', imagenUrl: null, fuente: 'Defensa Civil',
+      fechaPublicacion: '2026-10-12T09:30:00', estado: 'PUBLICADO', esExterna: false,
+    };
+    const respuesta = { success: true, message: 'OK', data: noticia, timestamp: '' };
+    let recibida;
+    service.obtenerPublicadaPorId(7).subscribe((valor) => (recibida = valor));
+    const peticion = httpTesting.expectOne('/api/noticias/publicas/7');
+    expect(peticion.request.method).toBe('GET');
+    peticion.flush(respuesta);
+    expect(recibida).toEqual(respuesta);
+  });
+
+  it('propaga el 404 del detalle para distinguirlo de errores de conexión', () => {
+    let estado;
+    service.obtenerPublicadaPorId(99).subscribe({ error: (error) => (estado = error.status) });
+    httpTesting.expectOne('/api/noticias/publicas/99').flush(
+      { success: false }, { status: 404, statusText: 'Not Found' },
+    );
+    expect(estado).toBe(404);
+  });
 
   it('combina noticias propias y externas en orden cronológico', () => {
     let resultado: ResultadoNoticias | undefined;

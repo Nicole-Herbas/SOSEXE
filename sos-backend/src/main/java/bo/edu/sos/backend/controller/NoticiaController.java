@@ -95,6 +95,14 @@ public class NoticiaController {
                 ApiResponse.ok(noticiaService.listarPublicadas()));
     }
 
+    /** Detalle público de una noticia propia; solo admite estado PUBLICADO. */
+    @GetMapping("/publicas/{id}")
+    public ResponseEntity<ApiResponse<NoticiaDTO>> buscarPublicadaPorId(
+            @PathVariable Long id) {
+        return ResponseEntity.ok(
+                ApiResponse.ok(noticiaService.buscarPublicadaPorId(id)));
+    }
+
     /**
      * Retorna noticias de Bolivia desde la API externa newsdata.io.
      * Los resultados se cachean 15 minutos en memoria.
