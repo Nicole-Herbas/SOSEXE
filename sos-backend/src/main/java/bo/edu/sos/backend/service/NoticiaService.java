@@ -4,16 +4,15 @@ import bo.edu.sos.backend.constants.NoticiaConstants;
 import bo.edu.sos.backend.dto.NoticiaDTO;
 import bo.edu.sos.backend.entity.Noticia;
 import bo.edu.sos.backend.entity.Usuario;
+import bo.edu.sos.backend.exception.BadRequestException;
 import bo.edu.sos.backend.exception.ResourceNotFoundException;
 import bo.edu.sos.backend.helper.LogHelper;
 import bo.edu.sos.backend.repository.NoticiaRepository;
 import bo.edu.sos.backend.repository.UsuarioRepository;
-
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-
 
 @Service
 public class NoticiaService {
@@ -21,363 +20,118 @@ public class NoticiaService {
     private final NoticiaRepository noticiaRepository;
     private final UsuarioRepository usuarioRepository;
 
-
-    public NoticiaService(
-            NoticiaRepository noticiaRepository,
-            UsuarioRepository usuarioRepository) {
-
+    public NoticiaService(NoticiaRepository noticiaRepository, UsuarioRepository usuarioRepository) {
         this.noticiaRepository = noticiaRepository;
         this.usuarioRepository = usuarioRepository;
     }
 
-
     @Transactional(readOnly = true)
     public List<NoticiaDTO> listarTodas() {
-
-        List<NoticiaDTO> noticias =
-                noticiaRepository
-                        .findAll()
-                        .stream()
-                        .map(this::convertirADTO)
-                        .toList();
-
-
-        LogHelper.debug(
-                NoticiaService.class,
-                "Listado de noticias obtenido. cantidad={}",
-                noticias.size()
-        );
-
-
-        return noticias;
+        return noticiaRepository.findAll().stream().map(this::convertirADTO).toList();
     }
-
 
     @Transactional(readOnly = true)
     public List<NoticiaDTO> listarPublicadas() {
-
-        List<NoticiaDTO> noticias =
-                noticiaRepository
-                        .findByEstadoOrderByFechaPublicacionDesc(
-                                NoticiaConstants.ESTADO_PUBLICADO
-                        )
-                        .stream()
-                        .map(this::convertirADTO)
-                        .toList();
-
-
-        LogHelper.debug(
-                NoticiaService.class,
-                "Listado de noticias publicadas obtenido. cantidad={}",
-                noticias.size()
-        );
-
-
-        return noticias;
+        return noticiaRepository
+                .findByEstadoOrderByFechaPublicacionDesc(NoticiaConstants.ESTADO_PUBLICADO)
+                .stream().map(this::convertirADTO).toList();
     }
-
 
     @Transactional(readOnly = true)
-    public List<NoticiaDTO> listarPublicadasPorCategoria(
-            String categoria) {
-
-        List<NoticiaDTO> noticias =
-                noticiaRepository
-                        .findByCategoriaAndEstadoOrderByFechaPublicacionDesc(
-                                categoria,
-                                NoticiaConstants.ESTADO_PUBLICADO
-                        )
-                        .stream()
-                        .map(this::convertirADTO)
-                        .toList();
-
-
-        LogHelper.debug(
-                NoticiaService.class,
-                "Noticias publicadas consultadas por categoría. cantidad={}",
-                noticias.size()
-        );
-
-
-        return noticias;
+    public NoticiaDTO buscarPorId(Long id) {
+        Noticia noticia = noticiaRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Noticia", id));
+        return convertirADTO(noticia);
     }
-
 
     @Transactional(readOnly = true)
-    public NoticiaDTO buscarPorId(
-            Long id) {
-
-        Noticia noticia =
-                noticiaRepository
-                        .findById(id)
-                        .orElseThrow(() ->
-                                new ResourceNotFoundException(
-                                        "Noticia",
-                                        id
-                                )
-                        );
-
-
-        LogHelper.debug(
-                NoticiaService.class,
-                "Noticia consultada correctamente. id={}",
-                id
-        );
-
-
-        return convertirADTO(
-                noticia
-        );
+    public List<NoticiaDTO> buscarPorCategoria(String categoria) {
+        return noticiaRepository.findByCategoria(categoria)
+                .stream().map(this::convertirADTO).toList();
     }
-
-
-    @Transactional(readOnly = true)
-    public List<NoticiaDTO> buscarPorCategoria(
-            String categoria) {
-
-        List<NoticiaDTO> noticias =
-                noticiaRepository
-                        .findByCategoria(
-                                categoria
-                        )
-                        .stream()
-                        .map(this::convertirADTO)
-                        .toList();
-
-
-        LogHelper.debug(
-                NoticiaService.class,
-                "Noticias consultadas por categoría. cantidad={}",
-                noticias.size()
-        );
-
-
-        return noticias;
-    }
-
 
     @Transactional
-    public NoticiaDTO guardar(
-            NoticiaDTO dto) {
+    public NoticiaDTO guardar(NoticiaDTO dto, String emailAutor) {
+        Usuario autor = usuarioRepository.findByEmail(emailAutor)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario autenticado no encontrado"));
 
-        Noticia noticia =
-                new Noticia();
+        Noticia noticia = new Noticia();
+        copiarDTOaEntidad(dto, noticia);
+        noticia.setAutor(autor);
+        noticia.setEstado(NoticiaConstants.ESTADO_BORRADOR);
 
-
-        copiarDTOaEntidad(
-                dto,
-                noticia
-        );
-
-
-        noticia.setEstado(
-                "BORRADOR"
-        );
-
-
-        Noticia guardada =
-                noticiaRepository.save(
-                        noticia
-                );
-
-
-        LogHelper.info(
-                NoticiaService.class,
-                "Noticia creada correctamente. id={}, estado={}",
-                guardada.getId(),
-                guardada.getEstado()
-        );
-
-
-        return convertirADTO(
-                guardada
-        );
+        Noticia guardada = noticiaRepository.save(noticia);
+        LogHelper.info(NoticiaService.class, "Noticia creada. id={}", guardada.getId());
+        return convertirADTO(guardada);
     }
 
-
     @Transactional
-    public NoticiaDTO actualizar(
-            Long id,
-            NoticiaDTO dto) {
+    public NoticiaDTO actualizar(Long id, NoticiaDTO dto) {
+        Noticia noticia = noticiaRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Noticia", id));
 
-        Noticia noticia =
-                noticiaRepository
-                        .findById(id)
-                        .orElseThrow(() ->
-                                new ResourceNotFoundException(
-                                        "Noticia",
-                                        id
-                                )
-                        );
+        if (!NoticiaConstants.ESTADO_BORRADOR.equals(noticia.getEstado())) {
+            throw new BadRequestException("Solo se pueden editar noticias en estado BORRADOR.");
+        }
 
-
-        copiarDTOaEntidad(
-                dto,
-                noticia
-        );
-
-
-        Noticia actualizada =
-                noticiaRepository.save(
-                        noticia
-                );
-
-
-        LogHelper.info(
-                NoticiaService.class,
-                "Noticia actualizada correctamente. id={}, estado={}",
-                id,
-                actualizada.getEstado()
-        );
-
-
-        return convertirADTO(
-                actualizada
-        );
+        copiarDTOaEntidad(dto, noticia);
+        Noticia actualizada = noticiaRepository.save(noticia);
+        LogHelper.info(NoticiaService.class, "Noticia actualizada. id={}", id);
+        return convertirADTO(actualizada);
     }
 
+    @Transactional
+    public NoticiaDTO cambiarEstado(Long id, String nuevoEstado) {
+        if (!NoticiaConstants.esValido(nuevoEstado)) {
+            throw new BadRequestException("Estado inválido: " + nuevoEstado);
+        }
+
+        Noticia noticia = noticiaRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Noticia", id));
+
+        if (!NoticiaConstants.transicionPermitida(noticia.getEstado(), nuevoEstado)) {
+            throw new BadRequestException(
+                    "Transición no permitida: " + noticia.getEstado() + " → " + nuevoEstado);
+        }
+
+        noticia.setEstado(nuevoEstado);
+        Noticia actualizada = noticiaRepository.save(noticia);
+        LogHelper.info(NoticiaService.class, "Estado de noticia actualizado. id={}, {} → {}", id, noticia.getEstado(), nuevoEstado);
+        return convertirADTO(actualizada);
+    }
 
     @Transactional
-    public void eliminar(
-            Long id) {
-
+    public void eliminar(Long id) {
         if (!noticiaRepository.existsById(id)) {
-
-            throw new ResourceNotFoundException(
-                    "Noticia",
-                    id
-            );
+            throw new ResourceNotFoundException("Noticia", id);
         }
-
-
-        noticiaRepository.deleteById(
-                id
-        );
-
-
-        LogHelper.info(
-                NoticiaService.class,
-                "Noticia eliminada correctamente. id={}",
-                id
-        );
+        noticiaRepository.deleteById(id);
     }
 
-
-    private void copiarDTOaEntidad(
-            NoticiaDTO dto,
-            Noticia noticia) {
-
-        noticia.setTitulo(
-                dto.getTitulo()
-        );
-
-        noticia.setContenido(
-                dto.getContenido()
-        );
-
-        noticia.setCategoria(
-                dto.getCategoria()
-        );
-
-        noticia.setImagenUrl(
-                dto.getImagenUrl()
-        );
-
-        noticia.setFuente(
-                dto.getFuente()
-        );
-
-        noticia.setFechaPublicacion(
-                dto.getFechaPublicacion()
-        );
-
-
-        if (dto.getEstado() != null) {
-
-            noticia.setEstado(
-                    dto.getEstado()
-            );
-        }
-
-
-        if (dto.getAutorId() != null) {
-
-            Usuario autor =
-                    usuarioRepository
-                            .findById(
-                                    dto.getAutorId()
-                            )
-                            .orElseThrow(() ->
-                                    new ResourceNotFoundException(
-                                            "Usuario",
-                                            dto.getAutorId()
-                                    )
-                            );
-
-
-            noticia.setAutor(
-                    autor
-            );
-        }
+    private void copiarDTOaEntidad(NoticiaDTO dto, Noticia noticia) {
+        noticia.setTitulo(dto.getTitulo());
+        noticia.setContenido(dto.getContenido());
+        noticia.setCategoria(dto.getCategoria());
+        noticia.setImagenUrl(dto.getImagenUrl());
+        noticia.setFuente(dto.getFuente());
+        noticia.setFechaPublicacion(dto.getFechaPublicacion());
     }
 
-
-    private NoticiaDTO convertirADTO(
-            Noticia noticia) {
-
-        NoticiaDTO dto =
-                new NoticiaDTO();
-
-
-        dto.setId(
-                noticia.getId()
-        );
-
-        dto.setTitulo(
-                noticia.getTitulo()
-        );
-
-        dto.setContenido(
-                noticia.getContenido()
-        );
-
-        dto.setCategoria(
-                noticia.getCategoria()
-        );
-
-        dto.setImagenUrl(
-                noticia.getImagenUrl()
-        );
-
-        dto.setFuente(
-                noticia.getFuente()
-        );
-
-        dto.setFechaPublicacion(
-                noticia.getFechaPublicacion()
-        );
-
-        dto.setEstado(
-                noticia.getEstado()
-        );
-
+    private NoticiaDTO convertirADTO(Noticia noticia) {
+        NoticiaDTO dto = new NoticiaDTO();
+        dto.setId(noticia.getId());
+        dto.setTitulo(noticia.getTitulo());
+        dto.setContenido(noticia.getContenido());
+        dto.setCategoria(noticia.getCategoria());
+        dto.setImagenUrl(noticia.getImagenUrl());
+        dto.setFuente(noticia.getFuente());
+        dto.setFechaPublicacion(noticia.getFechaPublicacion());
+        dto.setEstado(noticia.getEstado());
 
         if (noticia.getAutor() != null) {
-
-            dto.setAutorId(
-                    noticia
-                            .getAutor()
-                            .getId()
-            );
-
-            dto.setAutorNombre(
-                    noticia
-                            .getAutor()
-                            .getNombre()
-            );
+            dto.setAutorId(noticia.getAutor().getId());
+            dto.setAutorNombre(noticia.getAutor().getNombre());
         }
-
-
         return dto;
     }
 }
