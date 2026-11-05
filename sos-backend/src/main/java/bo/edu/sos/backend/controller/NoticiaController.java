@@ -56,6 +56,13 @@ public class NoticiaController {
         return ResponseEntity.ok(ApiResponse.ok("Noticia actualizada", noticiaService.actualizar(id, noticiaDTO)));
     }
 
+        @PatchMapping("/{id}/estado")
+    public ResponseEntity<ApiResponse<NoticiaDTO>> cambiarEstado(
+            @PathVariable Long id,
+            @RequestParam String estado) {
+        return ResponseEntity.ok(ApiResponse.ok("Estado actualizado", noticiaService.cambiarEstado(id, estado)));
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>> eliminar(@PathVariable Long id) {
         noticiaService.eliminar(id);
