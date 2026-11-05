@@ -9,6 +9,27 @@
     "errorDetalle": "Could not load aid point details. Please try again.",
     "puntoNoEncontrado": "This aid point is no longer available. Refresh the list.",
     "noInformado": "Not provided",
+    "revision": {
+      "titulo": "Aid point review",
+      "motivoOpcional": "Reason (optional)",
+      "placeholder": "Enter the reason for your decision...",
+      "avisoPublicacion": "Approved aid points can be published on the platform.",
+      "aprobar": "Approve", "rechazar": "Reject", "confirmar": "Confirm decision", "cancelar": "Cancel",
+      "guardando": "Saving decision...",
+      "confirmarAprobacion": "Confirm approval? This decision cannot be reversed.",
+      "confirmarRechazo": "Confirm rejection? This decision cannot be reversed.",
+      "aprobado": "Aid point approved.", "rechazado": "Aid point rejected.",
+      "motivoRechazo": "Reason for rejection",
+      "errorMotivo": "The reason cannot exceed 500 characters.",
+      "errorSesion": "Your session expired. Please sign in again.",
+      "errorPermiso": "You do not have permission to review this aid point.",
+      "errorNoEncontrado": "This aid point no longer exists. Refresh the list.",
+      "errorEstado": "The decision or reason is invalid.",
+      "errorConflicto": "This aid point has already been reviewed. Refresh the list.",
+      "errorConexion": "No connection. Your reason is saved so you can retry.",
+      "errorServidor": "Could not save the decision. Please try again.",
+      "errorRespuesta": "The server returned an unexpected response. Check the status before retrying."
+    },
     "detalle": {
       "general": "General information",
       "latitud": "Latitude",
@@ -53,6 +74,7 @@
       "RECHAZADO": "Rejected"
     }
   },
+  "registrarPunto": { "misPuntos": { "motivoRechazo": "Reason for rejection:", "sinMotivo": "No reason was provided." } },
   "acercaDe": {
     "mision": {
       "etiqueta": "OUR PURPOSE",

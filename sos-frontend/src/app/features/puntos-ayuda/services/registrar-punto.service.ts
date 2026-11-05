@@ -8,6 +8,7 @@ import {
   ItemCatalogo,
   FiltrosRevisionPuntos,
   PuntoAyuda,
+  DecisionRevisionPunto,
   PuntoAyudaPropio,
   RegistroPuntoSolicitud
 } from '../models/registrar-punto.model';
@@ -65,6 +66,17 @@ export class RegistrarPuntoService {
       .pipe(map(respuesta => {
         if (!respuesta.success || !respuesta.data || respuesta.data.id !== id) {
           throw new Error('Respuesta de detalle administrativo inválida');
+        }
+        return respuesta.data;
+      }));
+  }
+
+  decidirRevision(id: number, estado: DecisionRevisionPunto, motivo: string | null): Observable<PuntoAyuda> {
+    const params = new HttpParams().set('estado', estado);
+    return this.http.patch<ApiResponse<PuntoAyuda>>(`${this.API_PUNTOS}/${id}/estado`, { motivo }, { params })
+      .pipe(map(respuesta => {
+        if (!respuesta.success || respuesta.data?.id !== id || respuesta.data.estadoVerificacion !== estado) {
+          throw new Error('Respuesta de revisión inválida');
         }
         return respuesta.data;
       }));

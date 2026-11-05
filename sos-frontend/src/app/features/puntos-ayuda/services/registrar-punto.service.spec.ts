@@ -161,4 +161,23 @@ describe('RegistrarPuntoService', () => {
     httpTesting.expectOne('/api/puntos-ayuda/admin/5').flush({ success: true, data: { id: 6 } });
     expect(error).toHaveBeenCalledOnce();
   });
+
+  it.each(['VERIFICADO', 'RECHAZADO'] as const)('envía %s al PATCH existente con motivo opcional', estado => {
+    service.decidirRevision(5, estado, estado === 'VERIFICADO' ? 'Comprobado' : null)
+      .subscribe(punto => expect(punto.estadoVerificacion).toBe(estado));
+    const solicitud = httpTesting.expectOne(req => req.url === '/api/puntos-ayuda/5/estado');
+    expect(solicitud.request.method).toBe('PATCH');
+    expect(solicitud.request.body).toEqual({ motivo: estado === 'VERIFICADO' ? 'Comprobado' : null });
+    expect(solicitud.request.params.get('estado')).toBe(estado);
+    expect(solicitud.request.params.has('motivo')).toBe(false);
+    solicitud.flush({ success: true, data: { id: 5, estadoVerificacion: estado } });
+  });
+
+  it('rechaza respuestas de revisión inesperadas sin confirmar el cambio', () => {
+    const error = vi.fn();
+    service.decidirRevision(5, 'RECHAZADO', null).subscribe({ error });
+    httpTesting.expectOne(req => req.url === '/api/puntos-ayuda/5/estado')
+      .flush({ success: true, data: { id: 6, estadoVerificacion: 'VERIFICADO' } });
+    expect(error).toHaveBeenCalledOnce();
+  });
 });

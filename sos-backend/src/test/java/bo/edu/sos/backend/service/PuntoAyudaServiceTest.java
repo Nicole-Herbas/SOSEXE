@@ -8,6 +8,8 @@ import bo.edu.sos.backend.entity.Necesidad;
 import bo.edu.sos.backend.entity.PuntoAyuda;
 import bo.edu.sos.backend.entity.Usuario;
 import bo.edu.sos.backend.exception.BadRequestException;
+import bo.edu.sos.backend.exception.ConflictException;
+import bo.edu.sos.backend.exception.ResourceNotFoundException;
 import bo.edu.sos.backend.repository.DepartamentoRepository;
 import bo.edu.sos.backend.repository.NecesidadRepository;
 import bo.edu.sos.backend.repository.PuntoAyudaRepository;
@@ -25,6 +27,8 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.dao.CannotAcquireLockException;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -69,9 +73,123 @@ class PuntoAyudaServiceTest {
     void cambiarEstado_rechazaEstadoInvalido_sinTocarLaBaseDeDatos() {
 
         assertThrows(BadRequestException.class,
-                () -> puntoAyudaService.cambiarEstado(1L, "INVENTADO"));
+                () -> puntoAyudaService.cambiarEstado(1L, "INVENTADO", null, "admin@ejemplo.com"));
 
         verifyNoInteractions(puntoAyudaRepository);
+    }
+
+    @Test
+    void aprobarPendienteGuardaRevisorFechaYSoloDatosDeRevision() {
+        PuntoAyuda punto = puntoParaRevision(EstadoVerificacion.PENDIENTE);
+        Usuario creador = punto.getCreador();
+        Usuario revisor = new Usuario();
+        revisor.setId(99L);
+        when(puntoAyudaRepository.bloquearParaRevision(5L)).thenReturn(Optional.of(punto));
+        when(usuarioRepository.findByEmail("admin@ejemplo.com")).thenReturn(Optional.of(revisor));
+        when(puntoAyudaRepository.save(punto)).thenReturn(punto);
+
+        PuntoAyudaDTO resultado = puntoAyudaService.cambiarEstado(5L, EstadoVerificacion.VERIFICADO,
+                "  Información comprobada  ", "admin@ejemplo.com");
+
+        assertEquals(EstadoVerificacion.VERIFICADO, resultado.getEstadoVerificacion());
+        assertEquals("Información comprobada", resultado.getMotivoRevision());
+        assertEquals(99L, resultado.getRevisorId());
+        assertNotNull(resultado.getFechaRevision());
+        assertSame(creador, punto.getCreador());
+        assertEquals("Av. América", punto.getDireccion());
+        verify(puntoAyudaRepository).save(punto);
+    }
+
+    @Test
+    void rechazarEnRevisionAceptaAusenciaDeMotivo() {
+        PuntoAyuda punto = puntoParaRevision(EstadoVerificacion.EN_REVISION);
+        when(puntoAyudaRepository.bloquearParaRevision(5L)).thenReturn(Optional.of(punto));
+        when(usuarioRepository.findByEmail("admin@ejemplo.com")).thenReturn(Optional.of(new Usuario()));
+        when(puntoAyudaRepository.save(punto)).thenReturn(punto);
+
+        PuntoAyudaDTO resultado = puntoAyudaService.cambiarEstado(5L, EstadoVerificacion.RECHAZADO,
+                "   ", "admin@ejemplo.com");
+        assertEquals(EstadoVerificacion.RECHAZADO, resultado.getEstadoVerificacion());
+        assertNull(resultado.getMotivoRevision());
+        assertNull(punto.getMotivoRevision());
+    }
+
+    @Test
+    void rechazaEstadosDeEntradaYMotivosDemasiadoLargosAntesDeBloquear() {
+        for (String estado : List.of(EstadoVerificacion.PENDIENTE, EstadoVerificacion.EN_REVISION, "INVENTADO")) {
+            assertThrows(BadRequestException.class,
+                    () -> puntoAyudaService.cambiarEstado(5L, estado, null, "admin@ejemplo.com"));
+        }
+        assertThrows(BadRequestException.class, () -> puntoAyudaService.cambiarEstado(5L,
+                EstadoVerificacion.RECHAZADO, "x".repeat(501), "admin@ejemplo.com"));
+        verifyNoInteractions(puntoAyudaRepository);
+    }
+
+    @Test
+    void noSobrescribeDecisionesFinalizadasNiRegistrosInexistentes() {
+        for (String estado : List.of(EstadoVerificacion.VERIFICADO, EstadoVerificacion.RECHAZADO)) {
+            PuntoAyuda punto = puntoParaRevision(estado);
+            when(puntoAyudaRepository.bloquearParaRevision(5L)).thenReturn(Optional.of(punto));
+            assertThrows(ConflictException.class, () -> puntoAyudaService.cambiarEstado(5L,
+                    EstadoVerificacion.RECHAZADO, null, "admin@ejemplo.com"));
+        }
+        when(puntoAyudaRepository.bloquearParaRevision(5L)).thenReturn(Optional.empty());
+        assertThrows(ResourceNotFoundException.class, () -> puntoAyudaService.cambiarEstado(5L,
+                EstadoVerificacion.VERIFICADO, null, "admin@ejemplo.com"));
+        verify(puntoAyudaRepository, never()).save(any());
+    }
+
+    @Test
+    void sinRevisorAutenticadoNoGuardaDecision() {
+        PuntoAyuda punto = puntoParaRevision(EstadoVerificacion.PENDIENTE);
+        when(puntoAyudaRepository.bloquearParaRevision(5L)).thenReturn(Optional.of(punto));
+        assertThrows(ResponseStatusException.class, () -> puntoAyudaService.cambiarEstado(5L,
+                EstadoVerificacion.VERIFICADO, null, "desconocido@ejemplo.com"));
+        verify(puntoAyudaRepository, never()).save(any());
+    }
+
+    @Test
+    void propietarioVeSoloMotivoDeRechazoSinDatosInternosDelRevisor() {
+        Usuario creador = new Usuario();
+        creador.setId(10L);
+        Usuario revisor = new Usuario();
+        revisor.setId(99L);
+        PuntoAyuda aprobado = puntoParaRevision(EstadoVerificacion.VERIFICADO);
+        aprobado.setMotivoRevision("Comentario interno");
+        aprobado.setRevisor(revisor);
+        PuntoAyuda rechazado = puntoParaRevision(EstadoVerificacion.RECHAZADO);
+        rechazado.setMotivoRevision("Datos incorrectos");
+        rechazado.setRevisor(revisor);
+        when(usuarioRepository.findByEmail("ciudadano@ejemplo.com")).thenReturn(Optional.of(creador));
+        when(puntoAyudaRepository.findByCreadorIdOrderByFechaCreacionDesc(10L))
+                .thenReturn(List.of(aprobado, rechazado));
+
+        List<PuntoAyudaDTO> propios = puntoAyudaService.listarMisPuntos("ciudadano@ejemplo.com");
+        assertNull(propios.get(0).getMotivoRevision());
+        assertEquals("Datos incorrectos", propios.get(1).getMotivoRevision());
+        assertTrue(propios.stream().allMatch(p -> p.getRevisorId() == null && p.getFechaRevision() == null));
+    }
+
+    @Test
+    void conflictoDeBloqueoNoDejaCambiosParciales() {
+        when(puntoAyudaRepository.bloquearParaRevision(5L))
+                .thenThrow(new CannotAcquireLockException("Bloqueado"));
+        assertThrows(ConflictException.class, () -> puntoAyudaService.cambiarEstado(5L,
+                EstadoVerificacion.VERIFICADO, null, "admin@ejemplo.com"));
+        verify(puntoAyudaRepository, never()).save(any());
+        verifyNoInteractions(usuarioRepository);
+    }
+
+    private PuntoAyuda puntoParaRevision(String estado) {
+        PuntoAyuda punto = new PuntoAyuda();
+        punto.setId(5L);
+        punto.setNombre("Punto solidario");
+        punto.setDireccion("Av. América");
+        punto.setEstadoVerificacion(estado);
+        Usuario creador = new Usuario();
+        creador.setId(10L);
+        punto.setCreador(creador);
+        return punto;
     }
 
     @Test

@@ -1,6 +1,7 @@
 package bo.edu.sos.backend.service;
 
 import bo.edu.sos.backend.constants.EstadoVerificacion;
+import bo.edu.sos.backend.constants.RevisionPuntoConstants;
 import bo.edu.sos.backend.constants.TiposPuntoAyuda;
 import bo.edu.sos.backend.dto.PuntoAyudaDTO;
 import bo.edu.sos.backend.entity.Departamento;
@@ -8,6 +9,7 @@ import bo.edu.sos.backend.entity.Necesidad;
 import bo.edu.sos.backend.entity.PuntoAyuda;
 import bo.edu.sos.backend.entity.Usuario;
 import bo.edu.sos.backend.exception.BadRequestException;
+import bo.edu.sos.backend.exception.ConflictException;
 import bo.edu.sos.backend.exception.ResourceNotFoundException;
 import bo.edu.sos.backend.helper.LogHelper;
 import bo.edu.sos.backend.repository.DepartamentoRepository;
@@ -16,9 +18,11 @@ import bo.edu.sos.backend.repository.PuntoAyudaRepository;
 import bo.edu.sos.backend.repository.UsuarioRepository;
 
 import org.springframework.stereotype.Service;
+import org.springframework.dao.PessimisticLockingFailureException;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
@@ -194,7 +198,7 @@ public class PuntoAyudaService {
         return puntoAyudaRepository
                 .findByCreadorIdOrderByFechaCreacionDesc(usuario.getId())
                 .stream()
-                .map(this::convertirADTO)
+                .map(this::convertirADTOPropio)
                 .toList();
     }
 
@@ -354,21 +358,43 @@ public class PuntoAyudaService {
     @Transactional
     public PuntoAyudaDTO cambiarEstado(
             Long id,
-            String nuevoEstado) {
+            String nuevoEstado,
+            String motivo,
+            String emailRevisor) {
 
-        if (!EstadoVerificacion.esValido(nuevoEstado)) {
+        if (!EstadoVerificacion.VERIFICADO.equals(nuevoEstado)
+                && !EstadoVerificacion.RECHAZADO.equals(nuevoEstado)) {
             throw new BadRequestException(
-                    "Estado de verificación inválido: " + nuevoEstado
-                            + ". Valores permitidos: "
-                            + EstadoVerificacion.VALORES);
+                    "La decisión debe ser VERIFICADO o RECHAZADO");
         }
 
-        PuntoAyuda punto = puntoAyudaRepository
-                .findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "Punto de ayuda", id));
+        String motivoNormalizado = motivo == null || motivo.isBlank() ? null : motivo.trim();
+        if (motivoNormalizado != null && motivoNormalizado.length() > RevisionPuntoConstants.MOTIVO_MAX_CARACTERES) {
+            throw new BadRequestException("El motivo no puede superar "
+                    + RevisionPuntoConstants.MOTIVO_MAX_CARACTERES + " caracteres");
+        }
+
+        PuntoAyuda punto;
+        try {
+            punto = puntoAyudaRepository.bloquearParaRevision(id)
+                    .orElseThrow(() -> new ResourceNotFoundException("Punto de ayuda", id));
+        } catch (PessimisticLockingFailureException ex) {
+            throw new ConflictException("El punto está siendo revisado. Intenta nuevamente.");
+        }
+
+        if (!EstadoVerificacion.PENDIENTE.equals(punto.getEstadoVerificacion())
+                && !EstadoVerificacion.EN_REVISION.equals(punto.getEstadoVerificacion())) {
+            throw new ConflictException("Este punto ya fue revisado. Actualiza el listado.");
+        }
+
+        Usuario revisor = usuarioRepository.findByEmail(emailRevisor)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.UNAUTHORIZED, "Usuario autenticado no encontrado"));
 
         punto.setEstadoVerificacion(nuevoEstado);
+        punto.setMotivoRevision(motivoNormalizado);
+        punto.setRevisor(revisor);
+        punto.setFechaRevision(LocalDateTime.now());
 
         PuntoAyuda actualizado = puntoAyudaRepository.save(punto);
 
@@ -519,7 +545,20 @@ public class PuntoAyudaService {
         dto.setTelefonoContacto(null);
         dto.setCorreoContacto(null);
         dto.setCreadorId(null);
+        dto.setMotivoRevision(null);
+        dto.setRevisorId(null);
+        dto.setFechaRevision(null);
 
+        return dto;
+    }
+
+    private PuntoAyudaDTO convertirADTOPropio(PuntoAyuda punto) {
+        PuntoAyudaDTO dto = convertirADTO(punto);
+        dto.setRevisorId(null);
+        dto.setFechaRevision(null);
+        if (!EstadoVerificacion.RECHAZADO.equals(punto.getEstadoVerificacion())) {
+            dto.setMotivoRevision(null);
+        }
         return dto;
     }
 
@@ -570,6 +609,10 @@ public class PuntoAyudaService {
         dto.setEstadoVerificacion(
                 punto.getEstadoVerificacion()
         );
+
+        dto.setMotivoRevision(punto.getMotivoRevision());
+        dto.setFechaRevision(punto.getFechaRevision());
+        if (punto.getRevisor() != null) dto.setRevisorId(punto.getRevisor().getId());
 
 
         if (punto.getDepartamento() != null) {

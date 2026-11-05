@@ -44,6 +44,10 @@
     </div>
   </form>
 
+  @if (exitoDecision()) {
+    <p class="aviso-revision" role="status">{{ exitoDecision()! | translate }}</p>
+  }
+
   @if (errorDepartamentos()) {
     <p role="alert">{{ 'adminPuntos.errorDepartamentos' | translate }}</p>
     <button type="button" class="secundario" (click)="cargarDepartamentos()">
@@ -142,11 +146,46 @@
               <div class="dato-ancho"><dt>{{ 'adminPuntos.detalle.correo' | translate }}</dt><dd>{{ punto.correoContacto || ('adminPuntos.noInformado' | translate) }}</dd></div>
             </dl>
           </section>
+          @if (puedeDecidir()) {
+            <section class="modal-seccion revision-punto" aria-labelledby="revision-acciones-titulo">
+              <h3 id="revision-acciones-titulo">{{ 'adminPuntos.revision.titulo' | translate }}</h3>
+              <label for="revision-motivo">{{ 'adminPuntos.revision.motivoOpcional' | translate }}</label>
+              <textarea id="revision-motivo" rows="3" [maxLength]="maxMotivo"
+                [ngModel]="motivoRevision()" (ngModelChange)="motivoRevision.set($event)"
+                [disabled]="enviandoDecision()" [placeholder]="'adminPuntos.revision.placeholder' | translate"
+                aria-describedby="revision-contador"></textarea>
+              <small id="revision-contador" class="contador-motivo">{{ motivoRevision().length }} / {{ maxMotivo }}</small>
+              <p class="aviso-revision">{{ 'adminPuntos.revision.avisoPublicacion' | translate }}</p>
+              @if (decisionPendiente()) {
+                <p class="confirmacion-revision" role="status">{{ (decisionPendiente() === 'VERIFICADO'
+                  ? 'adminPuntos.revision.confirmarAprobacion' : 'adminPuntos.revision.confirmarRechazo') | translate }}</p>
+              }
+              @if (errorDecision()) { <p role="alert">{{ errorDecision()! | translate }}</p> }
+            </section>
+          } @else if (punto.estadoVerificacion === 'RECHAZADO' && punto.motivoRevision) {
+            <section class="modal-seccion"><h3>{{ 'adminPuntos.revision.motivoRechazo' | translate }}</h3><p>{{ punto.motivoRevision }}</p></section>
+          }
         }
         <footer class="modal-acciones">
-          <button type="button" class="secundario" data-testid="volver-listado" (click)="volverAlListado()">
+          <button type="button" class="secundario" data-testid="volver-listado" [disabled]="enviandoDecision()" (click)="volverAlListado()">
             {{ 'adminPuntos.cerrar' | translate }}
           </button>
+          @if (puedeDecidir()) {
+            @if (decisionPendiente()) {
+              <button type="button" class="secundario" (click)="decisionPendiente.set(null)" [disabled]="enviandoDecision()">
+                {{ 'adminPuntos.revision.cancelar' | translate }}
+              </button>
+              <button type="button" data-testid="confirmar-revision" [class.rechazar]="decisionPendiente() === 'RECHAZADO'"
+                [disabled]="enviandoDecision() || motivoRevision().trim().length > maxMotivo" (click)="confirmarDecision()">
+                {{ (enviandoDecision() ? 'adminPuntos.revision.guardando' : 'adminPuntos.revision.confirmar') | translate }}
+              </button>
+            } @else {
+              <button type="button" class="rechazar" data-testid="rechazar-punto" [disabled]="enviandoDecision()"
+                (click)="prepararDecision('RECHAZADO')">{{ 'adminPuntos.revision.rechazar' | translate }}</button>
+              <button type="button" data-testid="aprobar-punto" [disabled]="enviandoDecision()"
+                (click)="prepararDecision('VERIFICADO')">{{ 'adminPuntos.revision.aprobar' | translate }}</button>
+            }
+          }
         </footer>
       </article>
     </app-dialogo>
