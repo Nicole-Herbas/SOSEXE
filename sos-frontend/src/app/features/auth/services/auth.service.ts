@@ -1,6 +1,6 @@
 ﻿import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, Observable, tap } from 'rxjs';
+import { BehaviorSubject, finalize, Observable, tap } from 'rxjs';
 
 import { LoginRequest } from '../models/login-request';
 import { AuthResponse } from '../models/auth-response';
@@ -106,7 +106,7 @@ export class AuthService {
         withCredentials: true
       }
     ).pipe(
-        tap(() => {
+        finalize(() => {
 
         // SOS-42 (QA): al cerrar sesión se borra el borrador de registro
         // de centro de ESTE usuario (útil en computadoras compartidas).

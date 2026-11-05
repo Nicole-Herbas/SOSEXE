@@ -70,6 +70,14 @@
       </a>
     </li>
 
+    @if (esAdmin()) {
+    <li>
+      <a routerLink="/admin" routerLinkActive="active">
+        {{ t()('navbar.enlaces.administracion') }}
+      </a>
+    </li>
+    }
+
   </ul>
 
 
@@ -89,7 +97,7 @@
 
     <!-- Sin sesión: botón Iniciar sesión -->
     <a
-      *ngIf="!sesionActiva"
+      *ngIf="!sesionActiva()"
       class="navbar-login"
       routerLink="/login"
       routerLinkActive="active"
@@ -100,7 +108,7 @@
 
     <!-- Con sesión: avatar + nombre + cerrar sesión -->
     <div
-      *ngIf="sesionActiva"
+      *ngIf="sesionActiva()"
       class="navbar-user"
     >
 
@@ -109,7 +117,7 @@
       </div>
 
       <span class="navbar-username">
-        {{ nombreUsuario }}
+         {{ nombreUsuario() }}
       </span>
 
       <a

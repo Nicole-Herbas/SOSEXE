@@ -15,6 +15,7 @@ export const APP_TEXTOS = {
       voluntariados: 'Voluntariados',
       noticias: 'Noticias',
       acercaDe: 'Acerca de',
+      administracion: 'Administración',
     },
 
     notificacionesAria: 'Notificaciones',
@@ -420,7 +421,10 @@ mapa: {
     subtitulo:
       'Elige un centro verificado y define cuánto deseas aportar. Podrás revisar todo antes de realizar el pago.',
 
-    pasos: ['Centro', 'Monto', 'Pago', 'Confirmación'],
+    pasos: { centro: 'Centro', monto: 'Monto', pago: 'Pago', confirmacion: 'Confirmación' },
+
+    etapasAria: 'Etapas de la donación',
+    etapas: { '1': 'Paso 1 de 4', '2': 'Paso 2 de 4', '3': 'Paso 3 de 4' },
 
     etapa: 'Paso 1 de 4',
     pregunta: '¿A qué centro deseas ayudar?',
@@ -443,7 +447,22 @@ mapa: {
     resumen: 'Resumen de tu ayuda',
     sinSeleccion: 'Selecciona un centro para comenzar.',
     siguientePaso:
-      'La selección del monto se habilitará en el siguiente paso del desarrollo.',
+      'Este es un prototipo: no se procesan pagos ni se solicitan datos bancarios.',
+    preguntaMonto: '¿Cuánto deseas donar?',
+    minimoMonto: 'El monto mínimo para este prototipo es de Bs 5.',
+    montosAria: 'Montos predefinidos',
+    otroMonto: 'Otro monto',
+    montoPlaceholder: 'Escribe un monto',
+    errorFormatoMonto: 'Ingresa un monto numérico con máximo dos decimales.',
+    errorMontoVacio: 'Ingresa un monto para continuar.',
+    errorMinimoMonto: 'El monto mínimo es Bs 5.',
+    anonima: 'Deseo que mi nombre no se muestre públicamente.',
+    atras: '← Atrás',
+    continuarPago: 'Continuar al pago',
+    donacion: 'Donación',
+    total: 'Total',
+    pagoPrototipoTitulo: 'Pago no disponible en este prototipo',
+    pagoPrototipo: 'Tu centro y monto están seleccionados. Aún no se ha realizado ningún pago ni registrado una donación.',
   },
 
 noticias: {
