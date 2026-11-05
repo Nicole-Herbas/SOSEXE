@@ -1,11 +1,11 @@
-import { Component, OnInit, OnDestroy, computed, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   Router,
   RouterLink,
   RouterLinkActive
 } from '@angular/router';
-import { Subscription } from 'rxjs';
+import { catchError, map, of, Subscription, switchMap } from 'rxjs';
 
 import { AuthService } from '../../features/auth/services/auth.service';
 import { IdiomaService } from '../services/idioma.service';
@@ -38,23 +38,24 @@ export class Navbar implements OnInit, OnDestroy {
   });
 
   menuAbierto = false;
-  sesionActiva = false;
-  nombreUsuario = '';
+  readonly sesionActiva = signal(false);
+  readonly esAdmin = signal(false);
+  readonly nombreUsuario = signal('');
 
   private sub!: Subscription;
 
   ngOnInit(): void {
 
     this.sub = this.authService.sesion$
-      .subscribe(activa => {
-
-        this.sesionActiva = activa;
-        this.nombreUsuario =
-          activa
-            ? this.authService.obtenerNombreUsuario()
-            : '';
-
-      });
+      .pipe(switchMap(activa => {
+        this.sesionActiva.set(activa);
+        this.esAdmin.set(false);
+        this.nombreUsuario.set(activa ? this.authService.obtenerNombreUsuario() : '');
+        return activa
+          ? this.authService.usuarioActual().pipe(map(usuario => usuario.rol === 'ADMIN'), catchError(() => of(false)))
+          : of(false);
+      }))
+      .subscribe(esAdmin => this.esAdmin.set(esAdmin));
 
   }
 
@@ -65,7 +66,7 @@ export class Navbar implements OnInit, OnDestroy {
   }
 
   cerrarSesion(): void {
-
+    this.esAdmin.set(false);
     this.authService.logout().subscribe({
       next: () => this.router.navigate(['/inicio']),
       error: () => {

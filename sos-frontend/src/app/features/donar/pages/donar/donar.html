@@ -1,51 +1,53 @@
 <main class="donar">
   <header class="donar__intro">
     <a routerLink="/inicio" class="donar__back">
-      {{ textos.volverInicio }}
+      {{ t()('volverInicio') }}
     </a>
 
-    <h1>{{ textos.titulo }}</h1>
-    <p>{{ textos.subtitulo }}</p>
+    <h1>{{ t()('titulo') }}</h1>
+    <p>{{ t()('subtitulo') }}</p>
   </header>
 
-  <nav class="donar__steps" aria-label="Etapas de la donación">
-    @for (paso of textos.pasos; track $index) {
+  <nav class="donar__steps" [class.donar__steps--monto]="pasoActual() === 2" [class.donar__steps--pago]="pasoActual() === 3" [attr.aria-label]="t()('etapasAria')">
+    @for (paso of pasos; track paso) {
     <div
       class="donar__step"
-      [class.donar__step--active]="$index === 0"
-      [attr.aria-current]="$index === 0 ? 'step' : null"
+       [class.donar__step--active]="$index + 1 === pasoActual()"
+       [class.donar__step--completed]="$index + 1 < pasoActual()"
+       [attr.aria-current]="$index + 1 === pasoActual() ? 'step' : null"
     >
         <span class="donar__step-number">
           {{ $index + 1 }}
         </span>
-      <span>{{ paso }}</span>
+      <span>{{ t()('pasos.' + paso) }}</span>
     </div>
     }
   </nav>
 
   <div class="donar__layout">
-    <section class="donar__panel" aria-labelledby="donar-centros-titulo">
-      <span class="donar__eyebrow">{{ textos.etapa }}</span>
+    <section class="donar__panel" [attr.aria-labelledby]="pasoActual() === 1 ? 'donar-centros-titulo' : pasoActual() === 2 ? 'donar-monto-titulo' : 'donar-pago-titulo'">
+      <span class="donar__eyebrow">{{ t()('etapas.' + pasoActual()) }}</span>
 
+      @if (pasoActual() === 1) {
       <div class="donar__panel-heading">
-        <h2 id="donar-centros-titulo">{{ textos.pregunta }}</h2>
-        <a routerLink="/mapa">{{ textos.verMapa }}</a>
+        <h2 id="donar-centros-titulo">{{ t()('pregunta') }}</h2>
+        <a routerLink="/mapa">{{ t()('verMapa') }}</a>
       </div>
 
       @if (cargando()) {
       <p class="donar__message" role="status">
-        {{ textos.cargando }}
+         {{ t()('cargando') }}
       </p>
       } @else if (errorCarga()) {
       <div class="donar__message donar__message--error" role="alert">
-        <p>{{ textos.errorCarga }}</p>
+         <p>{{ t()('errorCarga') }}</p>
         <button type="button" (click)="cargarCentros()">
-          {{ textos.reintentar }}
+           {{ t()('reintentar') }}
         </button>
       </div>
       } @else if (centros().length === 0) {
       <p class="donar__message" role="status">
-        {{ textos.sinCentros }}
+         {{ t()('sinCentros') }}
       </p>
       } @else {
       <div class="donar__centros">
@@ -63,7 +65,7 @@
                     <circle cx="12" cy="12" r="9"></circle>
                     <path d="m8 12 3 3 5-6"></path>
                   </svg>
-                  {{ textos.verificado }}
+                   {{ t()('verificado') }}
                 </span>
                 <span class="donar__selector" aria-hidden="true"></span>
               </span>
@@ -85,7 +87,7 @@
           }
 
           <span class="donar__necesidades-titulo">
-                {{ textos.necesidades }}
+                 {{ t()('necesidades') }}
               </span>
 
           <span class="donar__necesidades">
@@ -93,7 +95,7 @@
                   <span class="donar__necesidad">{{ necesidad }}</span>
                 } @empty {
                   <span class="donar__sin-necesidades">
-                    {{ textos.sinNecesidades }}
+                     {{ t()('sinNecesidades') }}
                   </span>
                 }
               </span>
@@ -108,39 +110,78 @@
           [disabled]="!centroSeleccionado()"
           (click)="confirmarSeleccion()"
         >
-          {{ textos.confirmarCentro }}
+           {{ t()('confirmarCentro') }}
           <span aria-hidden="true">→</span>
         </button>
       </div>
 
-      @if (seleccionConfirmada()) {
-      <p class="donar__confirmacion" role="status">
-        {{ textos.confirmacion }}
-      </p>
+       }
+      } @else if (pasoActual() === 2) {
+      <div class="donar__panel-heading">
+        <h2 id="donar-monto-titulo">{{ t()('preguntaMonto') }}</h2>
+      </div>
+      <p class="donar__instruccion">{{ t()('minimoMonto') }}</p>
+      <div class="donar__montos" role="group" [attr.aria-label]="t()('montosAria')">
+        @for (monto of montos; track monto) {
+        <button type="button" class="donar__monto" [class.donar__monto--selected]="!usarMontoPersonalizado() && montoPredefinido() === monto"
+          [attr.aria-pressed]="!usarMontoPersonalizado() && montoPredefinido() === monto" (click)="seleccionarMonto(monto)">
+          {{ formatearMonto(monto) }}
+        </button>
+        }
+      </div>
+      <label class="donar__monto-label" for="donar-monto-personalizado">{{ t()('otroMonto') }}</label>
+      <div class="donar__monto-input" [class.donar__monto-input--selected]="usarMontoPersonalizado()">
+        <span aria-hidden="true">Bs</span>
+        <input id="donar-monto-personalizado" type="text" inputmode="decimal" autocomplete="off"
+          [placeholder]="t()('montoPlaceholder')" [attr.aria-describedby]="errorMonto() ? 'donar-error-monto' : 'donar-minimo-monto'"
+          [attr.aria-invalid]="!!errorMonto()" [value]="montoPersonalizado()"
+          (focus)="usarMontoPersonalizado.set(true)" (input)="actualizarMontoPersonalizado($any($event.target).value)" />
+      </div>
+      <p id="donar-minimo-monto" class="donar__sr-only">{{ t()('minimoMonto') }}</p>
+      @if (errorMonto(); as error) {
+        <p id="donar-error-monto" class="donar__error" role="alert">{{ t()(error) }}</p>
       }
+      <label class="donar__anonima">
+        <input type="checkbox" [checked]="anonima()" (change)="anonima.set($any($event.target).checked)" />
+        {{ t()('anonima') }}
+      </label>
+      <div class="donar__acciones donar__acciones--separadas">
+        <button type="button" class="donar__atras" (click)="atras()">{{ t()('atras') }}</button>
+        <button type="button" class="donar__confirmar" [disabled]="!centroSeleccionado() || !montoValido()" (click)="continuar()">
+          {{ t()('continuarPago') }} <span aria-hidden="true">→</span>
+        </button>
+      </div>
+      } @else {
+        <h2 id="donar-pago-titulo">{{ t()('pagoPrototipoTitulo') }}</h2>
+        <p class="donar__instruccion" role="status">{{ t()('pagoPrototipo') }}</p>
+        <button type="button" class="donar__atras" (click)="atras()">{{ t()('atras') }}</button>
       }
     </section>
 
     <aside class="donar__resumen" aria-labelledby="donar-resumen-titulo">
-      <h2 id="donar-resumen-titulo">{{ textos.resumen }}</h2>
+       <h2 id="donar-resumen-titulo">{{ t()('resumen') }}</h2>
 
       @if (centroSeleccionado(); as centro) {
       <div class="donar__resumen-centro">
           <span class="donar__resumen-verificado">
-            {{ textos.verificado }}
+             {{ t()('verificado') }}
           </span>
         <strong>{{ centro.nombre }}</strong>
         <span>{{ ubicacion(centro) }}</span>
       </div>
       } @else {
       <div class="donar__resumen-vacio">
-        {{ textos.sinSeleccion }}
+         {{ t()('sinSeleccion') }}
       </div>
       }
 
-      <div class="donar__resumen-nota">
-        {{ textos.siguientePaso }}
-      </div>
+       @if (pasoActual() > 1) {
+       <div class="donar__resumen-montos">
+         <div><span>{{ t()('donacion') }}</span><strong>{{ formatearMonto(montoValido() ? montoCentavos() : null) }}</strong></div>
+         <div class="donar__resumen-total"><span>{{ t()('total') }}</span><strong>{{ formatearMonto(montoValido() ? montoCentavos() : null) }}</strong></div>
+       </div>
+       }
+       <div class="donar__resumen-nota">{{ t()('siguientePaso') }}</div>
     </aside>
   </div>
 </main>
