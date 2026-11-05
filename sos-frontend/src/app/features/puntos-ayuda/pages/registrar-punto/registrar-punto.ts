@@ -11,6 +11,7 @@ import { Router, RouterLink } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { APP_TEXTOS } from '../../../../shared/constants/app-textos.constants';
+import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
 
 import {
   ItemCatalogo,
@@ -30,6 +31,7 @@ import { MapaRegistroComponent } from '../../components/mapa-registro/mapa-regis
   imports: [
     FormsModule,
     RouterLink,
+    TranslatePipe,
     MapaRegistroComponent
   ],
   templateUrl: './registrar-punto.html',

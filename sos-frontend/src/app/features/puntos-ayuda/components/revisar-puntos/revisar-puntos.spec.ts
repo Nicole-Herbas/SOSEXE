@@ -253,6 +253,132 @@ describe('Revisión administrativa de puntos registrados', () => {
     expect(detalle.textContent).toContain('<img src=x onerror=alert(1)>');
   });
 
+  it.each([
+    ['VERIFICADO', 'Punto aprobado correctamente.'],
+    ['RECHAZADO', 'Punto rechazado correctamente.'],
+  ] as const)('confirma %s, bloquea dobles clics y actualiza el listado con filtros', (estado, mensaje) => {
+    abrirPendiente();
+    const componente = fixture.componentInstance;
+    componente.filtros.buscar = 'Villa';
+    const motivo = elemento<HTMLTextAreaElement>('#revision-motivo');
+    motivo.value = '  Revisado por el equipo  ';
+    motivo.dispatchEvent(new Event('input'));
+    fixture.detectChanges();
+    elemento<HTMLButtonElement>(estado === 'VERIFICADO' ? '[data-testid="aprobar-punto"]' : '[data-testid="rechazar-punto"]').click();
+    fixture.detectChanges();
+    expect(elemento<HTMLElement>('.confirmacion-revision').textContent).toContain('no se puede revertir');
+    http.expectNone(req => req.method === 'PATCH');
+    elemento<HTMLButtonElement>('[data-testid="confirmar-revision"]').click();
+    componente.confirmarDecision();
+    const solicitud = http.expectOne(req => req.url === '/api/puntos-ayuda/5/estado');
+    expect(solicitud.request.params.get('estado')).toBe(estado);
+    expect(solicitud.request.body).toEqual({ motivo: 'Revisado por el equipo' });
+    fixture.detectChanges();
+    expect(elemento<HTMLButtonElement>('[data-testid="confirmar-revision"]').disabled).toBe(true);
+    solicitud.flush({ success: true, data: { ...PUNTO_PENDIENTE, estadoVerificacion: estado } });
+    const refresco = http.expectOne('/api/puntos-ayuda/admin?estado=PENDIENTE&buscar=Villa');
+    refresco.flush({ success: true, data: [] });
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('[role="dialog"]')).toBeNull();
+    expect(fixture.nativeElement.textContent).toContain(mensaje);
+    expect(componente.filtros.buscar).toBe('Villa');
+    expect(componente.puntos()).toEqual([]);
+  });
+
+  it('rechaza sin motivo y muestra el motivo solo en los detalles de un rechazado', () => {
+    abrirPendiente();
+    elemento<HTMLButtonElement>('[data-testid="rechazar-punto"]').click();
+    fixture.detectChanges();
+    elemento<HTMLButtonElement>('[data-testid="confirmar-revision"]').click();
+    const solicitud = http.expectOne(req => req.url === '/api/puntos-ayuda/5/estado');
+    expect(solicitud.request.body).toEqual({ motivo: null });
+    solicitud.flush({ success: true, data: { ...PUNTO_PENDIENTE, estadoVerificacion: 'RECHAZADO' } });
+    http.expectOne('/api/puntos-ayuda/admin?estado=PENDIENTE').flush({ success: true, data: [] });
+    fixture.detectChanges();
+    fixture.componentInstance.filtros.estado = 'RECHAZADO';
+    fixture.componentInstance.cargarListado();
+    http.expectOne('/api/puntos-ayuda/admin?estado=RECHAZADO').flush({ success: true, data: [{ ...PUNTO_PENDIENTE, estadoVerificacion: 'RECHAZADO' }] });
+    fixture.detectChanges();
+    elemento<HTMLButtonElement>('[data-testid="revisar-punto-5"]').click();
+    http.expectOne('/api/puntos-ayuda/admin/5').flush({ success: true, data: {
+      ...PUNTO_PENDIENTE, estadoVerificacion: 'RECHAZADO', motivoRevision: '<strong>Prueba</strong>'
+    } });
+    fixture.detectChanges();
+    const modal = elemento<HTMLElement>('[role="dialog"]');
+    expect(modal.textContent).toContain('<strong>Prueba</strong>');
+    expect(modal.querySelector('strong')?.textContent).not.toBe('Prueba');
+    expect(modal.querySelector('[data-testid="aprobar-punto"]')).toBeNull();
+  });
+
+  it.each([
+    [401, 'sesión'], [403, 'permisos'], [404, 'no existe'], [409, 'ya fue revisado'],
+    [422, '500 caracteres'],
+    [500, 'No se pudo guardar'], [0, 'No hay conexión'],
+  ] as const)('maneja el error %i sin perder motivo ni cerrar el modal', (estado, mensaje) => {
+    abrirPendiente();
+    const componente = fixture.componentInstance;
+    componente.motivoRevision.set('Motivo conservado');
+    componente.prepararDecision('RECHAZADO');
+    componente.confirmarDecision();
+    http.expectOne(req => req.method === 'PATCH').flush({}, { status: estado, statusText: 'Error' });
+    fixture.detectChanges();
+    expect(elemento<HTMLElement>('[role="alert"]').textContent).toContain(mensaje);
+    expect(componente.motivoRevision()).toBe('Motivo conservado');
+    expect(elemento<HTMLElement>('[role="dialog"]')).toBeTruthy();
+    expect(componente.puntos()[0].estadoVerificacion).toBe('PENDIENTE');
+  });
+
+  it('señala una respuesta inesperada y permite cancelar la confirmación sin enviar solicitudes', () => {
+    abrirPendiente();
+    const componente = fixture.componentInstance;
+    componente.prepararDecision('VERIFICADO');
+    fixture.detectChanges();
+    const cancelar = Array.from(elemento<HTMLElement>('.modal-acciones').querySelectorAll('button'))
+      .find(boton => boton.textContent?.includes('Cancelar'))!;
+    cancelar.click();
+    fixture.detectChanges();
+    expect(componente.decisionPendiente()).toBeNull();
+    http.expectNone(req => req.method === 'PATCH');
+    componente.prepararDecision('VERIFICADO');
+    componente.confirmarDecision();
+    http.expectOne(req => req.method === 'PATCH').flush({ success: true, data: { id: 5, estadoVerificacion: 'RECHAZADO' } });
+    fixture.detectChanges();
+    expect(elemento<HTMLElement>('[role="alert"]').textContent).toContain('respuesta inesperada');
+  });
+
+  it('impide enviar un motivo que exceda el límite y conserva el texto', () => {
+    abrirPendiente();
+    const componente = fixture.componentInstance;
+    componente.motivoRevision.set('x'.repeat(501));
+    componente.prepararDecision('RECHAZADO');
+    componente.confirmarDecision();
+    fixture.detectChanges();
+    expect(elemento<HTMLElement>('[role="alert"]').textContent).toContain('500 caracteres');
+    expect(componente.motivoRevision().length).toBe(501);
+    http.expectNone(req => req.method === 'PATCH');
+  });
+
+  it('traduce la revisión al inglés sin recargar el modal', () => {
+    abrirPendiente();
+    TestBed.inject(IdiomaService).setIdioma('en');
+    http.expectOne('/i18n/en.json').flush(textosEn);
+    fixture.detectChanges();
+    const modal = elemento<HTMLElement>('[role="dialog"]');
+    expect(modal.textContent).toContain('Reason (optional)');
+    expect(modal.textContent).toContain('Approve');
+    expect(modal.textContent).toContain('Reject');
+    expect(modal.textContent).toContain('Approved aid points can be published');
+  });
+
+  function abrirPendiente(): void {
+    http.expectOne('/api/puntos-ayuda/admin?estado=PENDIENTE')
+      .flush({ success: true, data: [PUNTO_PENDIENTE] });
+    fixture.detectChanges();
+    elemento<HTMLButtonElement>('[data-testid="revisar-punto-5"]').click();
+    http.expectOne('/api/puntos-ayuda/admin/5').flush({ success: true, data: PUNTO_PENDIENTE });
+    fixture.detectChanges();
+  }
+
   it('mantiene las mismas claves de revisión en español e inglés', () => {
     http.expectOne('/api/puntos-ayuda/admin?estado=PENDIENTE').flush({ success: true, data: [] });
     function claves(objeto: Record<string, unknown>, prefijo = ''): string[] {

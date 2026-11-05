@@ -138,7 +138,30 @@
 .descripcion { white-space: pre-wrap; }
 .necesidades { padding-left: 20px; li + li { margin-top: 6px; } }
 .mensaje { padding: 24px 0; p { margin-bottom: 12px; } }
-.modal-acciones { display: flex; justify-content: flex-end; padding-top: 20px; border-top: 1px solid #e5ecef; }
+.modal-acciones { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 10px; padding-top: 20px; border-top: 1px solid #e5ecef; }
+
+.revision-punto {
+  label { display: block; margin-bottom: 8px; font-weight: 600; color: #102a3a; }
+  textarea {
+    box-sizing: border-box;
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #c5d3db;
+    border-radius: 7px;
+    resize: vertical;
+    font: inherit;
+    color: #102a3a;
+  }
+  .contador-motivo { display: block; text-align: right; color: #526b7c; }
+  .confirmacion-revision { margin-top: 12px; font-weight: 600; }
+}
+.aviso-revision { padding: 12px; border-radius: 7px; background: #e6f4f1; color: #075b57; }
+.revisar-puntos button.rechazar {
+  border-color: #e05353;
+  background: #fff1f1;
+  color: #a52424;
+  &:hover:not(:disabled) { border-color: #a52424; background: #fee2e2; }
+}
 
 @media (max-width: 1100px) {
   .filtros { grid-template-columns: repeat(2, minmax(0, 1fr)); }

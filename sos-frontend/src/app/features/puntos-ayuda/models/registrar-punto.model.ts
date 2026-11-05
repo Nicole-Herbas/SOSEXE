@@ -12,6 +12,9 @@ export type TipoPuntoCiudadano =
 export type EstadoPunto =
   (typeof ESTADO_VERIFICACION_PUNTO)[keyof typeof ESTADO_VERIFICACION_PUNTO];
 
+export type DecisionRevisionPunto = typeof ESTADO_VERIFICACION_PUNTO.VERIFICADO |
+  typeof ESTADO_VERIFICACION_PUNTO.RECHAZADO;
+
 export interface RegistroPuntoSolicitud {
   nombre: string;
   tipo: TipoPuntoCiudadano;
@@ -45,6 +48,7 @@ export interface PuntoAyuda {
   latitud: number | null;
   longitud: number | null;
   estadoVerificacion: EstadoPunto;
+  motivoRevision?: string | null;
   necesidadNombres: string[] | null;
   nombreContacto: string | null;
   telefonoContacto: string | null;

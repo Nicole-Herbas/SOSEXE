@@ -393,7 +393,7 @@
                         [class.pendiente]="punto.estadoVerificacion === estados.PENDIENTE"
                         [class.verificado]="punto.estadoVerificacion === estados.VERIFICADO"
                         [class.rechazado]="punto.estadoVerificacion === estados.RECHAZADO">
-                    {{ etiquetaEstado(punto.estadoVerificacion) }}
+                     {{ ('adminPuntos.estados.' + punto.estadoVerificacion) | translate }}
                   </span>
                 </div>
 
@@ -416,7 +416,11 @@
                   <div class="detalle-punto">
                     <p><strong>{{ textos.misPuntos.direccion }}</strong> {{ punto.direccion }}</p>
                     <p><strong>{{ textos.misPuntos.descripcionEtiqueta }}</strong> {{ punto.descripcion }}</p>
-                    <p><strong>{{ textos.misPuntos.estado }}</strong> {{ etiquetaEstado(punto.estadoVerificacion) }}</p>
+                     <p><strong>{{ textos.misPuntos.estado }}</strong> {{ ('adminPuntos.estados.' + punto.estadoVerificacion) | translate }}</p>
+                     @if (punto.estadoVerificacion === estados.RECHAZADO) {
+                       <p><strong>{{ 'registrarPunto.misPuntos.motivoRechazo' | translate }}</strong>
+                         {{ punto.motivoRevision || ('registrarPunto.misPuntos.sinMotivo' | translate) }}</p>
+                     }
                     <p><strong>{{ textos.misPuntos.contacto }}</strong> {{ punto.nombreContacto }}</p>
                     <p><strong>{{ textos.misPuntos.telefono }}</strong> {{ punto.telefonoContacto }}</p>
                     @if (punto.correoContacto) {

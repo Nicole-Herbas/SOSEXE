@@ -1,10 +1,14 @@
 package bo.edu.sos.backend.repository;
 
 import bo.edu.sos.backend.constants.EstadoVerificacion;
+import bo.edu.sos.backend.constants.MapaConstants;
 import bo.edu.sos.backend.constants.Roles;
 import bo.edu.sos.backend.entity.Departamento;
 import bo.edu.sos.backend.entity.PuntoAyuda;
 import bo.edu.sos.backend.entity.Usuario;
+import bo.edu.sos.backend.service.MapaService;
+import bo.edu.sos.backend.service.PuntoAyudaService;
+import bo.edu.sos.backend.exception.ConflictException;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,6 +30,8 @@ class PuntoAyudaRepositoryIntegrationTest {
     @Autowired private PuntoAyudaRepository puntos;
     @Autowired private RolRepository roles;
     @Autowired private EntityManager em;
+    @Autowired private PuntoAyudaService revision;
+    @Autowired private MapaService mapa;
 
     private String prefijo;
     private Departamento departamento;
@@ -103,6 +109,67 @@ class PuntoAyudaRepositoryIntegrationTest {
         punto("Donaciones", "Villa", "PUNTO_DONACION", "PENDIENTE", departamento);
         em.flush();
         assertTrue(puntos.buscarParaRevision("PENDIENTE", "EMERGENCIA", departamento.getId(), null).isEmpty());
+    }
+
+    @Test
+    void aprobacionPersisteYPublicaEnMapaSinContactoNiMotivo() {
+        PuntoAyuda pendiente = punto("Para aprobar", "Villa", "PUNTO_DONACION", EstadoVerificacion.PENDIENTE, departamento);
+        pendiente.setTelefonoContacto("70700001");
+        pendiente.setNombreContacto("Contacto privado");
+        Usuario administrador = revisor();
+        em.flush();
+        em.clear();
+
+        revision.cambiarEstado(pendiente.getId(), EstadoVerificacion.VERIFICADO, "Comprobado", administrador.getEmail());
+        em.flush();
+        em.clear();
+
+        assertEquals(EstadoVerificacion.VERIFICADO, puntos.findById(pendiente.getId()).orElseThrow().getEstadoVerificacion());
+        assertEquals("Comprobado", puntos.findById(pendiente.getId()).orElseThrow().getMotivoRevision());
+        assertTrue(revision.listarTodosAdmin(EstadoVerificacion.PENDIENTE, null, null, null).stream()
+                .noneMatch(p -> p.getId().equals(pendiente.getId())));
+        var publico = revision.listarPublicos().stream()
+                .filter(p -> p.getId().equals(pendiente.getId())).findFirst().orElseThrow();
+        assertNull(publico.getTelefonoContacto());
+        assertNull(publico.getMotivoRevision());
+        assertNull(publico.getRevisorId());
+        assertTrue(mapa.listarPuntosMapa().stream().anyMatch(p -> p.getId().equals(pendiente.getId())
+                && MapaConstants.ORIGEN_PUNTO_AYUDA.equals(p.getOrigen())));
+        assertThrows(ConflictException.class, () -> revision.cambiarEstado(pendiente.getId(),
+                EstadoVerificacion.RECHAZADO, null, administrador.getEmail()));
+    }
+
+    @Test
+    void rechazoSinMotivoPersistePrivadoYNuncaApareceEnMapa() {
+        PuntoAyuda pendiente = punto("Para rechazar", "Villa", "EMERGENCIA", EstadoVerificacion.EN_REVISION, departamento);
+        Usuario administrador = revisor();
+        em.flush();
+        em.clear();
+
+        revision.cambiarEstado(pendiente.getId(), EstadoVerificacion.RECHAZADO, null, administrador.getEmail());
+        em.flush();
+        em.clear();
+
+        var persistido = puntos.findById(pendiente.getId()).orElseThrow();
+        assertNull(persistido.getMotivoRevision());
+        assertNotNull(persistido.getFechaRevision());
+        assertEquals(administrador.getId(), persistido.getRevisor().getId());
+        assertEquals(creador.getId(), persistido.getCreador().getId());
+        assertTrue(revision.listarMisPuntos(creador.getEmail()).stream().anyMatch(p ->
+                p.getId().equals(pendiente.getId()) && EstadoVerificacion.RECHAZADO.equals(p.getEstadoVerificacion())));
+        assertTrue(revision.listarPublicos().stream().noneMatch(p -> p.getId().equals(pendiente.getId())));
+        assertTrue(mapa.listarPuntosMapa().stream().noneMatch(p ->
+                p.getId().equals(pendiente.getId()) && MapaConstants.ORIGEN_PUNTO_AYUDA.equals(p.getOrigen())));
+    }
+
+    private Usuario revisor() {
+        Usuario administrador = new Usuario();
+        administrador.setNombre("Admin SOS53");
+        administrador.setEmail(prefijo + "-admin@example.com");
+        administrador.setPassword("valor-sintetico-no-utilizado-en-login");
+        administrador.setRol(roles.findByNombre(Roles.ADMIN).orElseThrow());
+        em.persist(administrador);
+        return administrador;
     }
 
     private Departamento departamento(String nombre) {

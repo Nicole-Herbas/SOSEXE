@@ -5,6 +5,7 @@ import bo.edu.sos.backend.constants.EstadoVerificacion;
 import bo.edu.sos.backend.dto.ApiResponse;
 import bo.edu.sos.backend.dto.PuntoAyudaDTO;
 import bo.edu.sos.backend.dto.RegistrarPuntoAyudaDTO;
+import bo.edu.sos.backend.dto.RevisionPuntoDTO;
 import bo.edu.sos.backend.service.PuntoAyudaService;
 
 import jakarta.validation.Valid;
@@ -121,12 +122,15 @@ public class PuntoAyudaController {
     @PatchMapping("/{id}/estado")
     public ResponseEntity<ApiResponse<PuntoAyudaDTO>> cambiarEstado(
             @PathVariable Long id,
-            @RequestParam String estado) {
+            @RequestParam String estado,
+            @Valid @RequestBody(required = false) RevisionPuntoDTO revision,
+            Authentication authentication) {
 
         return ResponseEntity.ok(
                 ApiResponse.ok(
                         "Estado de punto de ayuda actualizado",
-                        puntoAyudaService.cambiarEstado(id, estado)
+                        puntoAyudaService.cambiarEstado(id, estado,
+                                revision == null ? null : revision.motivo(), authentication.getName())
                 )
         );
     }

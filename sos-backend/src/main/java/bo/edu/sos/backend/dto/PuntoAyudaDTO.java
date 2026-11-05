@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
@@ -54,6 +55,12 @@ public class PuntoAyudaDTO {
     private BigDecimal longitud;
 
     private String estadoVerificacion;
+
+    private String motivoRevision;
+
+    private Long revisorId;
+
+    private LocalDateTime fechaRevision;
 
     @NotNull(message = "El creador es obligatorio")
     private Long creadorId;

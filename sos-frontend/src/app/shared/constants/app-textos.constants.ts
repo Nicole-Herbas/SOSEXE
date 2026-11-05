@@ -13,6 +13,27 @@ export const APP_TEXTOS = {
     errorDetalle: 'No se pudo cargar el detalle del punto. Intenta nuevamente.',
     puntoNoEncontrado: 'El punto ya no está disponible. Actualiza el listado.',
     noInformado: 'No informado',
+    revision: {
+      titulo: 'Revisión del punto',
+      motivoOpcional: 'Motivo (opcional)',
+      placeholder: 'Escribe el motivo de tu decisión...',
+      avisoPublicacion: 'Los puntos aprobados pueden publicarse en la plataforma.',
+      aprobar: 'Aprobar', rechazar: 'Rechazar', confirmar: 'Confirmar decisión', cancelar: 'Cancelar',
+      guardando: 'Guardando decisión...',
+      confirmarAprobacion: '¿Confirmas la aprobación? Esta decisión no se puede revertir.',
+      confirmarRechazo: '¿Confirmas el rechazo? Esta decisión no se puede revertir.',
+      aprobado: 'Punto aprobado correctamente.', rechazado: 'Punto rechazado correctamente.',
+      motivoRechazo: 'Motivo del rechazo',
+      errorMotivo: 'El motivo no puede superar 500 caracteres.',
+      errorSesion: 'Tu sesión expiró. Inicia sesión nuevamente.',
+      errorPermiso: 'No tienes permisos para revisar este punto.',
+      errorNoEncontrado: 'El punto ya no existe. Actualiza el listado.',
+      errorEstado: 'La decisión o el motivo no son válidos.',
+      errorConflicto: 'Este punto ya fue revisado. Actualiza el listado.',
+      errorConexion: 'No hay conexión. Conservamos tu motivo para reintentar.',
+      errorServidor: 'No se pudo guardar la decisión. Intenta nuevamente.',
+      errorRespuesta: 'El servidor devolvió una respuesta inesperada. Comprueba el estado antes de reintentar.',
+    },
     detalle: {
       general: 'Información general',
       latitud: 'Latitud',
@@ -1133,7 +1154,9 @@ voluntariado: {
       estado: 'Estado:',
       contacto: 'Contacto:',
       telefono: 'Teléfono:',
-      correo: 'Correo:'
+      correo: 'Correo:',
+      motivoRechazo: 'Motivo del rechazo:',
+      sinMotivo: 'No se proporcionó un motivo.'
     },
 
     etiquetas: {

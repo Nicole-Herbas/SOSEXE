@@ -59,6 +59,16 @@ public class PuntoAyuda {
     @Column(name = "estado_verificacion", nullable = false, length = 30)
     private String estadoVerificacion = EstadoVerificacion.PENDIENTE;
 
+    @Column(name = "motivo_revision", length = 500)
+    private String motivoRevision;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "revisor_id")
+    private Usuario revisor;
+
+    @Column(name = "fecha_revision")
+    private LocalDateTime fechaRevision;
+
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "creador_id", nullable = false)
     private Usuario creador;
