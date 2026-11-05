@@ -128,7 +128,8 @@ public class SecurityConfig {
                         // IMPORTANTE: va antes del GET público de puntos.
                         .requestMatchers(
                                 HttpMethod.GET,
-                                ApiRoutes.PUNTOS_AYUDA + "/admin"
+                                ApiRoutes.PUNTOS_AYUDA + "/admin",
+                                ApiRoutes.PUNTOS_AYUDA + "/admin/**"
                         ).hasAuthority(Roles.ADMIN)
 
                         // Datos públicos de lectura
