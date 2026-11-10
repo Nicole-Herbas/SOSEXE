@@ -1,3 +1,4 @@
+<div [class.centros-admin]="variante() === 'admin'">
 @if (cargando()) {
 
   <p>
@@ -7,7 +8,7 @@
 } @else if (error()) {
 
   <p>
-    {{ error() }}
+    {{ 'centros.errorCarga' | translate }}
   </p>
 
 } @else if (centros().length === 0) {
@@ -20,18 +21,22 @@
 
   @for (centro of centros(); track centro.id) {
 
-    <div>
+    <article [class.centro-tarjeta]="variante() === 'admin'">
 
+      @if (variante() === 'admin') {
+        <h3>{{ centro.nombre }}</h3>
+      } @else {
       <h2>
         {{ centro.nombre }}
       </h2>
+      }
 
       <p>
         <strong>
           {{ 'centros.tipo' | translate }}
         </strong>
 
-        {{ centro.tipo }}
+        {{ variante() === 'admin' ? etiquetaTipo(centro.tipo) : centro.tipo }}
       </p>
 
       <p>
@@ -50,8 +55,9 @@
         {{ centro.direccion }}
       </p>
 
-    </div>
+    </article>
 
   }
 
 }
+</div>

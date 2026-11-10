@@ -128,4 +128,37 @@ describe('RegistrarPuntoService', () => {
       timestamp: '2026-10-11T00:00:00'
     });
   });
+
+  it('consulta pendientes administrativos por defecto', () => {
+    service.listarParaRevision().subscribe(puntos => expect(puntos).toEqual([]));
+    const solicitud = httpTesting.expectOne('/api/puntos-ayuda/admin?estado=PENDIENTE');
+    expect(solicitud.request.method).toBe('GET');
+    solicitud.flush({ success: true, data: [] });
+  });
+
+  it('envía filtros administrativos tipados y la búsqueda sin espacios externos', () => {
+    service.listarParaRevision({ estado: 'EN_REVISION', tipo: 'EMERGENCIA', departamentoId: 3, buscar: '  Villa  ' })
+      .subscribe(puntos => expect(puntos).toEqual([]));
+    const solicitud = httpTesting.expectOne(req => req.url === '/api/puntos-ayuda/admin');
+    expect(solicitud.request.params.get('estado')).toBe('EN_REVISION');
+    expect(solicitud.request.params.get('tipo')).toBe('EMERGENCIA');
+    expect(solicitud.request.params.get('departamentoId')).toBe('3');
+    expect(solicitud.request.params.get('buscar')).toBe('Villa');
+    solicitud.flush({ success: true, data: [] });
+  });
+
+  it('trata una respuesta de listado fallida como error y no como lista vacía', () => {
+    const error = vi.fn();
+    service.listarParaRevision().subscribe({ error });
+    httpTesting.expectOne('/api/puntos-ayuda/admin?estado=PENDIENTE')
+      .flush({ success: false, data: [] });
+    expect(error).toHaveBeenCalledOnce();
+  });
+
+  it('rechaza un detalle que no corresponde al punto solicitado', () => {
+    const error = vi.fn();
+    service.obtenerDetalleAdmin(5).subscribe({ error });
+    httpTesting.expectOne('/api/puntos-ayuda/admin/5').flush({ success: true, data: { id: 6 } });
+    expect(error).toHaveBeenCalledOnce();
+  });
 });
