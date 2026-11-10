@@ -1,0 +1,28 @@
+:host {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgb(16 42 58 / 48%);
+}
+
+section {
+  width: 100%;
+  max-width: 720px;
+  max-height: calc(100dvh - 48px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 28px;
+  border: 1px solid #d9e3e8;
+  border-radius: 12px;
+  background: #fff;
+  color: #102a3a;
+  box-shadow: 0 16px 48px rgb(16 42 58 / 20%);
+}
+
+@media (max-width: 600px) {
+  :host { padding: 12px; }
+  section { max-height: calc(100dvh - 24px); padding: 20px; }
+}

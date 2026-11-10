@@ -1,0 +1,21 @@
+:host { display: block; }
+
+.centros-admin {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+  gap: 14px;
+  font-size: 13px;
+  color: #526b7c;
+
+  .centro-tarjeta {
+    min-width: 0;
+    padding: 16px;
+    border: 1px solid #d9e3e8;
+    border-radius: 10px;
+    background: #fff;
+    overflow-wrap: anywhere;
+  }
+  h3 { margin: 0 0 9px; font-size: 14px; line-height: 1.5; color: #102a3a; }
+  p + p { margin-top: 6px; }
+  strong { font-weight: 500; color: #526b7c; }
+}

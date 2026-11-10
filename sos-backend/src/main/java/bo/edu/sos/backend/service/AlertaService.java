@@ -34,6 +34,7 @@ public class AlertaService {
     private final UsuarioRepository usuarioRepository;
     private final EventoPublicacionAlertaRepository eventoRepository;
     private final Validator validator;
+    private final NotificacionService notificacionService;
 
 
     public AlertaService(
@@ -41,13 +42,15 @@ public class AlertaService {
             DepartamentoRepository departamentoRepository,
             UsuarioRepository usuarioRepository,
             EventoPublicacionAlertaRepository eventoRepository,
-            Validator validator) {
+            Validator validator,
+            NotificacionService notificacionService) {
 
         this.alertaRepository = alertaRepository;
         this.departamentoRepository = departamentoRepository;
         this.usuarioRepository = usuarioRepository;
         this.eventoRepository = eventoRepository;
         this.validator = validator;
+        this.notificacionService = notificacionService;
     }
 
 
@@ -137,6 +140,10 @@ public class AlertaService {
         evento.setEstadoNuevo(ACTIVA);
         // Misma transacción: si falla el evento, también se revierte la publicación.
         eventoRepository.saveAndFlush(evento);
+
+        // Disparar el proceso de notificación
+        notificacionService.enviarAlertaSms(alerta);
+
         return convertirADTO(alerta);
     }
 
@@ -333,7 +340,6 @@ public class AlertaService {
         alerta.setDepartamento(
                 departamento
         );
-
 
     }
 

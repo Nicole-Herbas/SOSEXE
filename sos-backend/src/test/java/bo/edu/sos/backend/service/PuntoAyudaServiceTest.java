@@ -210,7 +210,7 @@ class PuntoAyudaServiceTest {
     // ==========================================
 
     @Test
-    void listarTodosNoDebeMostrarPuntosPendientes() {
+    void listarTodosAdminDebeMostrarPendientesPorDefecto() {
 
         PuntoAyuda pendiente = new PuntoAyuda();
 
@@ -222,33 +222,24 @@ class PuntoAyudaServiceTest {
         );
 
 
-        PuntoAyuda verificado = new PuntoAyuda();
-
-        verificado.setId(2L);
-        verificado.setNombre("Punto verificado");
-
-        verificado.setEstadoVerificacion(
-                EstadoVerificacion.VERIFICADO
-        );
-
-        verificado.setTelefonoContacto("70700001");
-        verificado.setCorreoContacto("contacto@ejemplo.com");
+        pendiente.setTelefonoContacto("70700001");
+        pendiente.setCorreoContacto("contacto@ejemplo.com");
 
 
-        when(puntoAyudaRepository.findAll())
+        when(puntoAyudaRepository.buscarParaRevision("PENDIENTE", null, null, null))
                 .thenReturn(
-                        List.of(pendiente, verificado)
+                        List.of(pendiente)
                 );
 
 
         List<PuntoAyudaDTO> resultado =
-                puntoAyudaService.listarTodosAdmin();
+                puntoAyudaService.listarTodosAdmin(null, null, null, null);
 
 
         assertEquals(1, resultado.size());
 
         assertEquals(
-                "Punto verificado",
+                "Punto pendiente",
                 resultado.get(0).getNombre()
         );
 
