@@ -27,7 +27,14 @@ export interface RegistroPuntoSolicitud {
   correoContacto: string | null;
 }
 
-export interface PuntoAyudaPropio {
+export interface FiltrosRevisionPuntos {
+  estado: EstadoPunto;
+  tipo?: TipoPuntoCiudadano;
+  departamentoId?: number;
+  buscar?: string;
+}
+
+export interface PuntoAyuda {
   id: number;
   nombre: string;
   tipo: string;
@@ -43,6 +50,9 @@ export interface PuntoAyudaPropio {
   telefonoContacto: string | null;
   correoContacto: string | null;
 }
+
+/** Compatibilidad con la consulta de puntos del ciudadano. */
+export type PuntoAyudaPropio = PuntoAyuda;
 
 export interface UbicacionSeleccionada {
   latitud: number;
