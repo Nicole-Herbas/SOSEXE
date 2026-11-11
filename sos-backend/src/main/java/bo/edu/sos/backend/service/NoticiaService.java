@@ -9,12 +9,10 @@ import bo.edu.sos.backend.exception.ResourceNotFoundException;
 import bo.edu.sos.backend.helper.LogHelper;
 import bo.edu.sos.backend.repository.NoticiaRepository;
 import bo.edu.sos.backend.repository.UsuarioRepository;
-
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-
 
 @Service
 public class NoticiaService {
@@ -22,15 +20,10 @@ public class NoticiaService {
     private final NoticiaRepository noticiaRepository;
     private final UsuarioRepository usuarioRepository;
 
-
-    public NoticiaService(
-            NoticiaRepository noticiaRepository,
-            UsuarioRepository usuarioRepository) {
-
+    public NoticiaService(NoticiaRepository noticiaRepository, UsuarioRepository usuarioRepository) {
         this.noticiaRepository = noticiaRepository;
         this.usuarioRepository = usuarioRepository;
     }
-
 
     @Transactional(readOnly = true)
     public List<NoticiaDTO> listarTodas() {
@@ -41,13 +34,6 @@ public class NoticiaService {
     public List<NoticiaDTO> listarPublicadas() {
         return noticiaRepository
                 .findByEstadoOrderByFechaPublicacionDesc(NoticiaConstants.ESTADO_PUBLICADO)
-                .stream().map(this::convertirADTO).toList();
-    }
-
-    @Transactional(readOnly = true)
-    public List<NoticiaDTO> listarPublicadasPorCategoria(String categoria) {
-        return noticiaRepository
-                .findByCategoriaAndEstadoOrderByFechaPublicacionDesc(categoria, NoticiaConstants.ESTADO_PUBLICADO)
                 .stream().map(this::convertirADTO).toList();
     }
 
@@ -71,7 +57,7 @@ public class NoticiaService {
 
         Noticia noticia = new Noticia();
         copiarDTOaEntidad(dto, noticia);
-        noticia.setAutor(autor); // Asignación segura desde el token
+        noticia.setAutor(autor);
         noticia.setEstado(NoticiaConstants.ESTADO_BORRADOR);
 
         Noticia guardada = noticiaRepository.save(noticia);
@@ -84,7 +70,6 @@ public class NoticiaService {
         Noticia noticia = noticiaRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Noticia", id));
 
-        // Regla SOS-76: Solo se editan borradores
         if (!NoticiaConstants.ESTADO_BORRADOR.equals(noticia.getEstado())) {
             throw new BadRequestException("Solo se pueden editar noticias en estado BORRADOR.");
         }
@@ -92,6 +77,26 @@ public class NoticiaService {
         copiarDTOaEntidad(dto, noticia);
         Noticia actualizada = noticiaRepository.save(noticia);
         LogHelper.info(NoticiaService.class, "Noticia actualizada. id={}", id);
+        return convertirADTO(actualizada);
+    }
+
+    @Transactional
+    public NoticiaDTO cambiarEstado(Long id, String nuevoEstado) {
+        if (!NoticiaConstants.esValido(nuevoEstado)) {
+            throw new BadRequestException("Estado inválido: " + nuevoEstado);
+        }
+
+        Noticia noticia = noticiaRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Noticia", id));
+
+        if (!NoticiaConstants.transicionPermitida(noticia.getEstado(), nuevoEstado)) {
+            throw new BadRequestException(
+                    "Transición no permitida: " + noticia.getEstado() + " → " + nuevoEstado);
+        }
+
+        noticia.setEstado(nuevoEstado);
+        Noticia actualizada = noticiaRepository.save(noticia);
+        LogHelper.info(NoticiaService.class, "Estado de noticia actualizado. id={}, {} → {}", id, noticia.getEstado(), nuevoEstado);
         return convertirADTO(actualizada);
     }
 
